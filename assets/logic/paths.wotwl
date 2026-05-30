@@ -5142,11 +5142,11 @@ anchor GladesTown.InsideLupoHouse at -185, -4508:  # At the entrance of Lupo's h
     enter: free
 
   pickup GladesTown.LupoPotSL: free
-  pickup LupoShop.HFMapIcons:
+  pickup LupoShop.Slot1:
     moki: SpiritLight=1200
-  pickup LupoShop.EFMapIcons:
+  pickup LupoShop.Slot2:
     moki: SpiritLight=1200
-  pickup LupoShop.ShardMapIcons:
+  pickup LupoShop.Slot3:
     moki: SpiritLight=1200
 
 anchor GladesTown.BelowHoleHut at -214, -4111:  # The ledge below Hole Hut
@@ -17151,47 +17151,47 @@ anchor TwillenShop:
   quest GladesTown.TwillenGemQuest:
     moki: LowerWastes.EerieGemQI
 
-  pickup TwillenShop.Overcharge:
+  pickup TwillenShop.Slot1:
     moki: SpiritLight=1200
-  pickup TwillenShop.Wingclip:
+  pickup TwillenShop.Slot2:
     moki: SpiritLight=1200
-  pickup TwillenShop.Swap:
+  pickup TwillenShop.Slot3:
     moki: SpiritLight=1200
-  pickup TwillenShop.Vitality:
+  pickup TwillenShop.Slot4:
     moki: SpiritLight=1200
-  pickup TwillenShop.Energy:
+  pickup TwillenShop.Slot5:
     moki: SpiritLight=1200
-  pickup TwillenShop.Finesse:
+  pickup TwillenShop.Slot6:
     moki: SpiritLight=1200
-  pickup TwillenShop.TripleJump:
+  pickup TwillenShop.Slot7:
     moki: SpiritLight=1200
-  pickup TwillenShop.LightHarvest:
+  pickup TwillenShop.Slot8:
     moki: SpiritLight=1200
 
 anchor OpherShop:  # Opher's offers
-  pickup OpherShop.Spear:
+  pickup OpherShop.Slot1:
     moki: SpiritLight=1200
-  pickup OpherShop.Hammer:
+  pickup OpherShop.Slot2:
     moki: SpiritLight=1200
-  pickup OpherShop.Shuriken:
+  pickup OpherShop.Slot3:
     moki: SpiritLight=1200
-  pickup OpherShop.Blaze:
+  pickup OpherShop.Slot4:
     moki: SpiritLight=1200
-  pickup OpherShop.Sentry:  # used for keystones if necessary; filtered by gen
+  pickup OpherShop.Slot5:  # used for keystones if necessary; filtered by gen
     moki: SpiritLight=1200
-  pickup OpherShop.FastTravel:
+  pickup OpherShop.Slot6:
     moki: SpiritLight=1200
-  pickup OpherShop.HammerShockwave:
+  pickup OpherShop.Slot7:
     moki: SpiritLight=1200
-  pickup OpherShop.StaticShuriken:
+  pickup OpherShop.Slot8:
     moki: SpiritLight=1200
-  pickup OpherShop.ExplodingSpear:
+  pickup OpherShop.Slot9:
     moki: SpiritLight=1200
-  pickup OpherShop.RapidSentry:
+  pickup OpherShop.Slot10:
     moki: SpiritLight=1200
-  pickup OpherShop.ChargeBlaze:
+  pickup OpherShop.Slot11:
     moki: SpiritLight=1200
-  pickup OpherShop.WaterBreath:
+  pickup OpherShop.Slot12:
     # TODO this is snippet dependent though
     moki: InnerWellspring.WaterEscape, SpiritLight=1200
 

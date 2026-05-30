@@ -25,15 +25,15 @@ Twillen tells the zones holding Bow and Bash")
 !augment_fun(write_map_progress_message, write_hints())
 
 fun write_hints() {
-    if LupoShop.ShardMapIcons {
+    if LupoShop.Slot3 {
         write_lupo_hint()
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("lupo_hint"))
     }
-    if OpherShop.WaterBreath {
+    if OpherShop.Slot11 {
         write_opher_hint()
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("opher_hint"))
     }
-    if TwillenShop.TripleJump {
+    if TwillenShop.Slot8 {
         write_twillen_hint()
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("twillen_hint"))
     }
@@ -84,25 +84,25 @@ fun write_twillen_hint() {
 
 on spawn {
     set_shop_item_data(
-        LupoShop.ShardMapIcons,
+        LupoShop.Slot3,
         4000,
         "Burrow, Water Dash, Grenade, Flash hint",
         "Costs 500 less for every item you found already",
         ShardsMap,
     )
     set_shop_item_data(
-        OpherShop.WaterBreath,
+        OpherShop.Slot11,
         2500,
         "Clean Water, Flap, Glide hint",
         "Costs 500 less for every item you found already",
         ShardsMap,
     )
     if InnerWellspring.WaterEscape == false {
-        set_shop_item_description(OpherShop.WaterBreath, "Complete the Wellspring escape to unlock")
-        set_shop_item_hidden(OpherShop.WaterBreath, true)
+        set_shop_item_description(OpherShop.Slot11, "Complete the Wellspring escape to unlock")
+        set_shop_item_hidden(OpherShop.Slot11, true)
     }
     set_shop_item_data(
-        TwillenShop.TripleJump,
+        TwillenShop.Slot8,
         1500,
         "Bash, Bow hint",
         "Costs 500 less for every item you found already",
@@ -113,8 +113,8 @@ on spawn {
     updateTwillenHintPrice()
 }
 on InnerWellspring.WaterEscape {
-    set_shop_item_description(OpherShop.WaterBreath, "Costs 500 less for every item you found already")
-    set_shop_item_hidden(OpherShop.WaterBreath, false)
+    set_shop_item_description(OpherShop.Slot11, "Costs 500 less for every item you found already")
+    set_shop_item_hidden(OpherShop.Slot11, false)
 }
 
 fun updateLupoHintPrice() {
@@ -124,7 +124,7 @@ fun updateLupoHintPrice() {
     if skills.grenade set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
     if skills.flash set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
     if get_integer("lupo_hint_price") == 2000 set_integer("lupo_hint_price", 0)
-    set_shop_item_price(LupoShop.ShardMapIcons, get_integer("lupo_hint_price"))
+    set_shop_item_price(LupoShop.Slot3, get_integer("lupo_hint_price"))
 }
 fun updateOpherHintPrice() {
     set_integer("opher_hint_price", 2500)
@@ -132,14 +132,14 @@ fun updateOpherHintPrice() {
     if skills.flap set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
     if skills.glide set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
     if get_integer("opher_hint_price") == 1000 set_integer("opher_hint_price", 0)
-    set_shop_item_price(OpherShop.WaterBreath, get_integer("opher_hint_price"))
+    set_shop_item_price(OpherShop.Slot11, get_integer("opher_hint_price"))
 }
 fun updateTwillenHintPrice() {
     set_integer("twillen_hint_price", 1500)
     if skills.bash set_integer("twillen_hint_price", get_integer("twillen_hint_price") - 500)
     if skills.bow set_integer("twillen_hint_price", get_integer("twillen_hint_price") - 500)
     if get_integer("twillen_hint_price") == 500 set_integer("twillen_hint_price", 0)
-    set_shop_item_price(TwillenShop.TripleJump, get_integer("twillen_hint_price"))
+    set_shop_item_price(TwillenShop.Slot8, get_integer("twillen_hint_price"))
 }
 
 on skills.burrow updateLupoHintPrice()
@@ -152,18 +152,18 @@ on skills.glide updateOpherHintPrice()
 on skills.bash updateTwillenHintPrice()
 on skills.bow updateTwillenHintPrice()
 
-!remove_location(LupoShop.ShardMapIcons)
-on LupoShop.ShardMapIcons {
+!remove_location(LupoShop.Slot3)
+on LupoShop.Slot3 {
     write_lupo_hint()
     item_message(get_string("lupo_hint"))
 }
-!remove_location(OpherShop.WaterBreath)
-on OpherShop.WaterBreath {
+!remove_location(OpherShop.Slot11)
+on OpherShop.Slot11 {
     write_opher_hint()
     item_message(get_string("opher_hint"))
 }
-!remove_location(TwillenShop.TripleJump)
-on TwillenShop.TripleJump {
+!remove_location(TwillenShop.Slot8)
+on TwillenShop.Slot8 {
     write_twillen_hint()
     item_message(get_string("twillen_hint"))
 }

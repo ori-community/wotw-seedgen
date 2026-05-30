@@ -1562,95 +1562,95 @@ on WillowsEnd.UpperRightSL {
     store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.Overcharge {
+on TwillenShop.Slot1 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.TripleJump {
+on TwillenShop.Slot2 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.Wingclip {
+on TwillenShop.Slot3 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.Swap {
+on TwillenShop.Slot4 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.LightHarvest {
+on TwillenShop.Slot5 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.Vitality {
+on TwillenShop.Slot6 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.Energy {
+on TwillenShop.Slot7 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on TwillenShop.Finesse {
+on TwillenShop.Slot8 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.WaterBreath {
+on OpherShop.Slot1 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.Spear {
+on OpherShop.Slot2 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.Hammer {
+on OpherShop.Slot3 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.FastTravel {
+on OpherShop.Slot4 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.Shuriken {
+on OpherShop.Slot5 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.Blaze {
+on OpherShop.Slot6 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.Sentry {
+on OpherShop.Slot7 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.ExplodingSpear {
+on OpherShop.Slot8 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.HammerShockwave {
+on OpherShop.Slot9 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.StaticShuriken {
+on OpherShop.Slot10 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.ChargeBlaze {
+on OpherShop.Slot11 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on OpherShop.RapidSentry {
+on OpherShop.Slot12 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.HFMapIcons {
+on LupoShop.Slot1 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.EFMapIcons {
+on LupoShop.Slot2 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on LupoShop.ShardMapIcons {
+on LupoShop.Slot3 {
     store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
