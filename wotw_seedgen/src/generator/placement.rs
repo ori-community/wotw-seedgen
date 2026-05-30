@@ -521,7 +521,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         self.worlds[target_world_index].force_place_spirit_light(
             progression.spirit_light,
             &mut self.spoiler.groups[self.step - 1].placements,
-        )
+        );
     }
 
     fn force_place_command(
@@ -533,7 +533,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
         let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
         let origin_world = &mut self.worlds[origin_world_index];
 
-        match origin_world.choose_location::<false>() {
+        match origin_world.choose_non_spirit_light_location() {
             None => {
                 if origin_world.spawn_slots > 0 {
                     origin_world.spawn_slots -= 1;
@@ -1129,7 +1129,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             let batch = self.spirit_light_provider.take();
             amount = amount.saturating_sub(batch);
 
-            match self.choose_location::<true>() {
+            match self.choose_spirit_light_location() {
                 None => {
                     warn!("Not enough space to place spirit light, aborting progression");
                     break;
@@ -1139,31 +1139,36 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         }
     }
 
-    fn choose_location<const SPIRIT_LIGHT: bool>(&mut self) -> Option<&'graph LocDataEntry> {
-        if SPIRIT_LIGHT {
-            self.reached_needs_placement
-                .iter()
-                .enumerate()
-                .filter(|(_, pickup_index)| {
-                    !self.needs_placement[**pickup_index]
-                        .uber_identifier
-                        .is_shop()
-                })
-                .map(|(index, _)| index)
-                .choose(&mut self.rng) // TODO shuffle instead?
-        } else {
-            (!self.reached_needs_placement.is_empty()
-                && self.placements_remaining() > self.spirit_light_placements_remaining)
-                .then(|| self.rng.gen_range(0..self.reached_needs_placement.len()))
-        }
-        .map(|index| {
-            let pickup_index = self.reached_needs_placement.swap_remove(index);
-            self.received_placement.push(pickup_index);
+    fn choose_non_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
+        let any_remaining = self.placements_remaining() > self.spirit_light_placements_remaining;
 
-            self.needs_placement[pickup_index]
-        })
-        .or_else(|| {
-            if SPIRIT_LIGHT {
+        if any_remaining {
+            if !self.reached_needs_placement.is_empty() {
+                let index = self.rng.gen_range(0..self.reached_needs_placement.len());
+                Some(self.commit_chosen_location(index))
+            } else {
+                self.placeholders.pop()
+            }
+        } else {
+            None
+        }
+    }
+
+    fn choose_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
+        match self
+            .reached_needs_placement
+            .iter()
+            .enumerate()
+            .filter(|(_, pickup_index)| {
+                !self.needs_placement[**pickup_index]
+                    .uber_identifier
+                    .is_shop()
+            })
+            .map(|(index, _)| index)
+            // TODO shuffle instead?
+            .choose(&mut self.rng)
+        {
+            None => {
                 let (index, _) = self
                     .placeholders
                     .iter()
@@ -1171,10 +1176,16 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     .find(|(_, pickup)| !pickup.uber_identifier.is_shop())?;
 
                 Some(self.placeholders.swap_remove(index))
-            } else {
-                self.placeholders.pop()
             }
-        })
+            Some(index) => Some(self.commit_chosen_location(index)),
+        }
+    }
+
+    fn commit_chosen_location(&mut self, index: usize) -> &'graph LocDataEntry {
+        let pickup_index = self.reached_needs_placement.swap_remove(index);
+        self.received_placement.push(pickup_index);
+
+        self.needs_placement[pickup_index]
     }
 
     pub fn name(&self, command: &CommandVoid) -> CommandString {
