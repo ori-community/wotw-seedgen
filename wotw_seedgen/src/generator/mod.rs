@@ -4,27 +4,20 @@ pub mod spoiler;
 
 mod placement;
 mod solutions;
+mod spawn;
 mod spirit_light;
 
 use self::spoiler::SeedSpoiler;
-use crate::{
-    generator::placement::generate_placements, logical_difficulty::LogicalDifficulty, world::World,
-};
+use crate::{generator::placement::generate_placements, world::World};
 use log::{info, trace, warn};
-use rand::{seq::IteratorRandom, Rng};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::iter;
-use wotw_seedgen_data::seed_language::output::CommandVoid;
 use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
     logic_language::output::Graph,
-    seed_language::{
-        compile::{store_boolean, Compiler},
-        output::{ClientEvent, Event, IntermediateOutput, Trigger},
-        simulate::UberStates,
-    },
-    Spawn, UberIdentifier, UniverseSettings, WorldSettings,
+    seed_language::{compile::Compiler, output::IntermediateOutput, simulate::UberStates},
+    UniverseSettings,
 };
 use wotw_seedgen_seed::Seed;
 
@@ -79,63 +72,15 @@ pub fn generate_seed<F: SnippetAccess>(
         let worlds = snippet_outputs
             .iter()
             .map(|(world_settings, output)| {
-                let spawn = choose_spawn(graph, world_settings, &mut rng)?;
                 if output.spawn.is_some() {
                     warn!("A Snippet attempted to set spawn");
                 }
 
                 let mut output = output.clone();
-                let spawn_node = &graph.nodes[spawn];
-
-                // TODO something less specialized?
-                match spawn_node.identifier() {
-                    "EastPools.Teleporter" => {
-                        // Lower the water at the pools teleporter if we spawn there
-                        output.events.push(Event {
-                            trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                            command: store_boolean(UberIdentifier::new(5377, 63173), true),
-                        })
-                    }
-                    "MidnightBurrows.Teleporter"
-                    | "MarshSpawn.Main"
-                    | "HowlsDen.Teleporter"
-                    | "EastHollow.Teleporter"
-                    | "GladesTown.Teleporter"
-                    | "InnerWellspring.Teleporter"
-                    | "WoodsEntry.Teleporter"
-                    | "WoodsMain.Teleporter"
-                    | "LowerReach.Teleporter"
-                    | "UpperDepths.Teleporter"
-                    | "WestPools.Teleporter"
-                    | "LowerWastes.FeedingGroundsTP"
-                    | "LowerWastes.CentralTP"
-                    | "UpperWastes.OuterRuinsTP"
-                    | "WindtornRuins.RuinsTP"
-                    | "WillowsEnd.InnerTP"
-                    | "WillowsEnd.ShriekArena" => {}
-                    _ => {
-                        if let Some(spawn_position) = spawn_node.position() {
-                            output.events.push(Event {
-                                trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                                command: CommandVoid::CreateWarpIcon {
-                                    id: 0,
-                                    x: spawn_position.x.into(),
-                                    y: spawn_position.y.into(),
-                                },
-                            })
-                        }
-                    }
-                }
-
                 let uber_states = UberStates::new(uber_state_data, &output.events);
 
-                let world = World::new(
-                    graph,
-                    spawn,
-                    world_settings,
-                    uber_states,
-                    &mut output.events,
-                );
+                // TODO technically we shouldn't have to change our spawn choice between attempts anymore?
+                let world = World::new(graph, 0, world_settings, uber_states, &mut output.events);
 
                 Ok((world, output))
             })
@@ -181,50 +126,4 @@ fn parse_snippets(
         .finish()
         .eprint_errors()
         .ok_or_else(|| "failed to compile snippets".to_string())
-}
-
-fn choose_spawn(
-    graph: &Graph,
-    world_settings: &WorldSettings,
-    rng: &mut impl Rng,
-) -> Result<usize, String> {
-    let spawn = match &world_settings.spawn {
-        Spawn::Random => {
-            let spawns = world_settings.difficulty.spawn_locations();
-
-            graph
-                .nodes
-                .iter()
-                .enumerate()
-                .filter(|(_, node)| spawns.contains(&node.identifier()))
-                .choose(rng)
-                .ok_or_else(|| String::from("No valid spawn locations available"))?
-                .0
-        }
-        Spawn::FullyRandom => {
-            graph
-                .nodes
-                .iter()
-                .enumerate()
-                .filter(|(_, node)| node.can_spawn())
-                .choose(rng)
-                .ok_or_else(|| String::from("No valid spawn locations available"))?
-                .0
-        }
-        Spawn::Set(spawn_loc) => {
-            let (index, node) = graph
-                .nodes
-                .iter()
-                .enumerate()
-                .find(|(_, node)| node.identifier() == spawn_loc)
-                .ok_or_else(|| format!("Spawn {} not found", spawn_loc))?;
-
-            if !node.can_spawn() {
-                return Err(format!("{} is not a valid spawn", spawn_loc));
-            }
-
-            index
-        }
-    };
-    Ok(spawn)
 }

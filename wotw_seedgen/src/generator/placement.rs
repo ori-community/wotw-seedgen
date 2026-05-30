@@ -5,6 +5,7 @@ use crate::{
     generator::{
         entrances::generate_entrances,
         solutions::{solution_weights, Solution, SolutionLike, SOLUTION_MAX_ITEMS},
+        spawn,
     },
     item_pool::ItemPoolBuilder,
     logical_difficulty::LogicalDifficulty,
@@ -28,25 +29,19 @@ use wotw_seedgen_data::{
     seed_language::{
         compile,
         output::{
-            ClientEvent, CommandBoolean, CommandString, CommandVoid, Concatenator, ContainedWrites,
-            Event, IntermediateOutput, IntoConstant, Operation, Trigger,
+            postprocess, AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid,
+            Concatenator, ContainedWrites, Event, IntermediateOutput, IntoConstant, Operation,
+            Trigger,
         },
-        simulate::{Simulate, Simulation, Snapshot},
+        simulate::{Simulate, Simulation},
     },
     UberIdentifier, UniverseSettings,
-};
-use wotw_seedgen_data::{
-    seed_language::{
-        compile::store_boolean,
-        output::{postprocess, AsConstant},
-    },
-    DEFAULT_SPAWN,
 };
 use wotw_seedgen_seed::SeedgenInfo;
 
 pub(super) const SPAWN_SLOTS: usize = 7;
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
-const TOTAL_SPIRIT_LIGHT: i32 = 20000;
+pub const TOTAL_SPIRIT_LIGHT: i32 = 20000;
 
 const MIN_PLACEHOLDERS: usize = 3;
 static MAX_PLACEHOLDERS: LazyLock<usize> =
@@ -691,7 +686,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 message,
                 timeout: None,
             };
-            let store_command = store_boolean(uber_identifier, true);
+            let store_command = compile::store_boolean(uber_identifier, true);
 
             self.worlds[origin_world_index].push_command(
                 trigger,
@@ -818,11 +813,6 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
             String::new()
         };
 
-        trace!(
-            "{log_index}Spawning on {}",
-            world.graph.nodes[world.spawn].identifier()
-        );
-
         let mut item_pool = ItemPoolBuilder::new(&mut rng);
 
         for (command, amount) in mem::take(&mut output.item_pool_changes) {
@@ -845,7 +835,9 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         // between client and simulation?
         generate_entrances(&mut world, &mut output.events, &mut rng)?;
 
-        let needs_placement = total_reach_check(&mut world, &log_index, &output, &item_pool);
+        let mut needs_placement =
+            spawn::choose_spawn(&mut rng, &mut world, &log_index, &item_pool, &mut output)?;
+        filter_needs_placement(&world, &log_index, &mut needs_placement, &output);
         let total_pickups = needs_placement.len() as f32;
 
         world.traverse_spawn(&output.events);
@@ -1385,28 +1377,13 @@ impl OrderingDistribution {
     }
 }
 
-fn total_reach_check<'graph>(
-    world: &mut World<'graph, '_>,
+fn filter_needs_placement(
+    world: &World,
     log_index: &str,
+    needs_placement: &mut Vec<&LocDataEntry>,
     output: &IntermediateOutput,
-    item_pool: &ItemPool,
-) -> Vec<&'graph LocDataEntry> {
-    world.snapshot();
-
-    for command in &**item_pool {
-        command.simulate(world, &output.events);
-    }
-    world.add_spirit_light(TOTAL_SPIRIT_LIGHT, &output.events);
-
-    let spawn = world.spawn;
-    world.spawn = world.graph.find_node(DEFAULT_SPAWN).unwrap();
-    world.traverse_spawn(&output.events);
-
-    let mut needs_placement = world.reached_pickups().collect::<Vec<_>>();
+) {
     let mut extra_slots = vec![];
-
-    world.spawn = spawn;
-    world.restore_snapshot();
 
     needs_placement.retain(|pickup| {
         let condition = CommandBoolean::loc_data_condition(pickup.uber_identifier, pickup.value);
@@ -1459,8 +1436,6 @@ fn total_reach_check<'graph>(
         amount = needs_placement.len(),
         needs_placement = format_pickups(&needs_placement)
     );
-
-    needs_placement
 }
 
 fn format_pickups<'a, 'graph>(

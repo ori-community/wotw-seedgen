@@ -24,6 +24,7 @@ pub struct LogConfig {
     trace_is_met: LevelFilter,
     trace_solutions: LevelFilter,
     trace_weight: LevelFilter,
+    trace_spawn: LevelFilter,
     trace_entrances: LevelFilter,
     trace_optimize_graph: LevelFilter,
     trace_uber_states: Option<Vec<UberIdentifier>>,
@@ -35,6 +36,7 @@ const REACHED_MOD: &str = "wotw_seedgen::world::reached";
 const IS_MET_MOD: &str = "wotw_seedgen::world::is_met";
 const SOLUTIONS_MOD: &str = "wotw_seedgen::generator::solutions";
 const WEIGHT_MOD: &str = "wotw_seedgen::generator::solutions::weight";
+const SPAWN_MOD: &str = "wotw_seedgen::generator::spawn";
 const ENTRANCES_MOD: &str = "wotw_seedgen::generator::entrances";
 const OPTIMIZE_GRAPH_MOD: &str = "wotw_seedgen_data::logic_language::optimize";
 
@@ -47,6 +49,7 @@ impl Default for LogConfig {
             trace_is_met: LevelFilter::Info,
             trace_solutions: LevelFilter::Info,
             trace_weight: LevelFilter::Info,
+            trace_spawn: LevelFilter::Info,
             trace_entrances: LevelFilter::Info,
             trace_optimize_graph: LevelFilter::Info,
             trace_uber_states: None,
@@ -64,6 +67,7 @@ impl Index<VerboseTarget> for LogConfig {
             VerboseTarget::IsMet => &self.trace_is_met,
             VerboseTarget::Solutions => &self.trace_solutions,
             VerboseTarget::Weight => &self.trace_weight,
+            VerboseTarget::Spawn => &self.trace_spawn,
             VerboseTarget::Entrances => &self.trace_entrances,
             VerboseTarget::OptimizeGraph => &self.trace_optimize_graph,
         }
@@ -78,6 +82,7 @@ impl IndexMut<VerboseTarget> for LogConfig {
             VerboseTarget::IsMet => &mut self.trace_is_met,
             VerboseTarget::Solutions => &mut self.trace_solutions,
             VerboseTarget::Weight => &mut self.trace_weight,
+            VerboseTarget::Spawn => &mut self.trace_spawn,
             VerboseTarget::Entrances => &mut self.trace_entrances,
             VerboseTarget::OptimizeGraph => &mut self.trace_optimize_graph,
         }
@@ -129,6 +134,7 @@ impl LogConfig {
             trace_is_met,
             trace_solutions,
             trace_weight,
+            trace_spawn,
             trace_entrances,
             trace_optimize_graph,
             trace_uber_states,
@@ -147,6 +153,7 @@ impl LogConfig {
                 .level_for(IS_MET_MOD, trace_is_met)
                 .level_for(SOLUTIONS_MOD, trace_solutions)
                 .level_for(WEIGHT_MOD, trace_weight)
+                .level_for(SPAWN_MOD, trace_spawn)
                 .level_for(ENTRANCES_MOD, trace_entrances)
                 .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
                 .level_for("perf_counters", LevelFilter::Off)
