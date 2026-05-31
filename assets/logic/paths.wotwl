@@ -8154,14 +8154,26 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
     moki: Keystone=2, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: Keystone=2, Damage=10
 
-  pickup WoodsMain.LowerKS:
+  conn WoodsMain.InFrontLowerKS:  # make sure it's not redundant with going to WoodsMain.FourKeystoneRoom first
+    gorlek: Bash, Grenade=1, DoubleJump
     kii:
       Bash, DoubleJump, TripleJump OR Glide  # using Tentacle's projectiles (stalling with glide)
-      Launch
+      Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # bash tentacle's projectile to reach your grenade
+      # Glitched
+      # AerialHammerJump, Dash OR Glide OR Sword  # starts from the checkpoint
+      # AerialHammerJump, TripleJump OR Bash  # starts from the lower platform
+      # GlideJump, DoubleJump, TripleJump  # from the checkpoint, wjump on the wall before the floating platform
     unsafe:
+      Bash  # https://youtu.be/Mk8lSFa21IA
+      # DoubleJump, Bash  # Using the Skeeto from the left
       Sword, Deflector, DoubleJump, TripleJump OR Glide  # pogo/slash the projectiles
-      DoubleJump, Bash  # Using the Skeeto from the left
-
+      GlideJump, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # from the checkpoint, wjump on the wall before the floating platform
+      GlideJump, DoubleJump, Dash  #  glide jump -> dash into the ceiling -> djump -> dash
+      AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
+      BlazeSwap=2 OR SentrySwap=2:
+        DoubleJump OR Glide OR Sword OR Hammer OR Blaze=1 OR Sentry=1 
+      BlazeSwap=1 OR SentrySwap=1:
+        Dash OR GlideJump OR PauseFloat
   conn WoodsMain.BelowFourKeystoneRoom:
     moki:
       DoubleJump, Dash
@@ -8174,25 +8186,17 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
     kii:
       Dash  # coyote dash
       Sentry=3
-      Sword, Damage=10  # Sword hover->pogo->upslash. Damage can de avoided but you'll most likely get hit.
-      Combat=Tentacle, Sword
-      Combat=Tentacle, Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Combat=Tentacle, DoubleJump, Hammer
-      Combat=Tentacle, DoubleJump, Shuriken=1 OR Flash=1 OR Sentry=1
+      Sword  # Can pogo the tentacle or just hover above it after it shoot
+      DoubleJump, TripleJump OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # wait for the tentacle to shoot before jumping above it (getting a 3 shot pattern will most likely result in you getting hit)
+      Bow=4 OR Spear=2 OR Grenade=1:  # kill the tentacle. Can't use Combat requirement because it would solve with just Hammer
+        Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Sword  # Pogo the projectiles
-      Hammer, DoubleJump  # upslash to protect yourself from projectiles then double jump
-      Combat=Tentacle, DoubleJump, Spear=1 OR Blaze=1
+      Sword OR Hammer  # https://youtu.be/KcxcNoQocWw
+      DoubleJump, Spear=1 OR Blaze=1 OR Damage=10  # damage dboost on a projectile before using djump
+      PauseFloat OR AbilitySwap=1
   conn WoodsEntry.TwoKeystoneRoom:
     moki: WoodsEntry.KeystoneDoor, Combat=2xSkeeto+Tentacle OR Bash OR Launch
     gorlek: WoodsEntry.KeystoneDoor, Damage=10
-  conn WoodsMain.FourKeystoneRoom:
-    kii, WoodsMain.KSRoomYellowBarrierBroken:
-      Bash, Damage=15, DoubleJump, TripleJump OR Glide  # using Tentacle's projectiles (stalling with glide)
-      Launch, Damage=15 OR DoubleJump OR Bash OR Dash
-    unsafe, WoodsMain.KSRoomYellowBarrierBroken:
-      Sword, Deflector, DoubleJump, TripleJump OR Glide  # pogo/slash the projectiles
-      DoubleJump, Bash, Damage=15  # Using the Skeeto from the left
 
 anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile after meeting Ku
   pickup WoodsMain.LowerLeafPileSL:
@@ -8257,7 +8261,8 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
     unsafe:
       # BreakWall=20, Dash  # Breakwall so you have more space for a coyote dash. Reset dash on the left wall
       Dash  # Coyote dash. Reset dash on the left wall
-  pickup WoodsMain.LowerKS:  # All paths that aren't breaking the yellow wall
+  
+  conn WoodsMain.InFrontLowerKS:  # All paths that aren't breaking the yellow wall
     gorlek:
       Launch  # launch on the wall near WoodsMain.BelowKeystonesSL then launch again
       Glide, Bash  # glide above the tentacle and bash its projectiles to reach the floating platform
@@ -8266,7 +8271,6 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
     kii:
       Bash, DoubleJump, TripleJump
       Glide, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # glide under the pickup then djump-> upslash -> energy to get on the floasting platform (with sentry or flash you can get onto the ks platform instead)
-
   conn WoodsMain.BelowFourKeystoneRoom: free
   conn WoodsMain.FourKeystoneRoom:
     moki:
@@ -8340,7 +8344,20 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       Bash, Dash, Combat=Balloon  # bait the skeetos
     unsafe:
       DoubleJump, TripleJump  # tjump on the wall above
-  pickup WoodsMain.LowerKS:  # All path reaching that pickup without breaking the yellow wall are from WallOreLedge
+  pickup WoodsMain.BelowKeystonesSL:  # Make sure it's not redundant with WallOreLedge->BelowKeystonesSL
+    gorlek:
+      Launch
+      DoubleJump, TripleJump OR Dash
+    kii:
+      Bash
+      DoubleJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Sword, Damage=15  # Pogo the plant
+      Dash  # reset dash on the wall
+    unsafe:
+      DoubleJump  # get a wall jump after dropping down
+      AbilitySwap=1
+
+  conn WoodsMain.InFrontLowerKS:  # most paths reaching that anchor without breaking the yellow wall originate from WoodsMain.WallOreLedge
     moki, WoodsMain.KSRoomYellowBarrierBroken:
       Glide OR Launch
       DoubleJump, Dash
@@ -8353,24 +8370,14 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       Spear=3 OR Shuriken=3 OR Sentry=3 OR Blaze=4 OR Flash=3 OR Sentry=3
       Damage=15, Spear=2 OR Shuriken=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
       Damage=25, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe, WoodsMain.KSRoomYellowBarrierBroken:
-      # Bash, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15 # was in kii but only Bash is kii aswell
-      Spear=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
-      Damage=15, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      # fiendly spikes and slide from the ceiling to the platform
-      Shuriken=1 OR Damage=15
-  pickup WoodsMain.BelowKeystonesSL:  # Make sure it's not redundant with WallOreLedge->BelowKeystonesSL
-    gorlek:
-      Launch
-      DoubleJump, TripleJump OR Dash
-    kii:
-      Bash
-      DoubleJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump, Sword, Damage=15  # Pogo the plant
-      Dash  # reset dash on the wall
     unsafe:
-      DoubleJump  # get a wall jump after dropping down
-
+      WoodsMain.KSRoomYellowBarrierBroken:
+        # Bash, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15 # was in kii but only Bash is kii aswell
+        Spear=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Damage=15, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+        # fiendly spikes and slide from the ceiling to the platform
+        Shuriken=1 OR Damage=15
+      AbilitySwap=3
   conn WoodsMain.GiantSkull:
     moki: WoodsMain.KeystoneDoor
   conn WoodsMain.WallOreLedge:
@@ -8378,6 +8385,19 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
     gorlek: Sword OR Hammer
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: Bash OR Grenade=1 OR Bow=1
+  conn WoodsMain.BelowFourKeystoneRoom: free
+
+anchor WoodsMain.InFrontLowerKS at 927, -4186:  # Just in front of the KS you get by going through the yellow wall path
+  pickup WoodsMain.LowerKS: free
+  pickup WoodsMain.BelowKeystonesSL:
+    unsafe: AbilitySwap=2
+
+  conn WoodsMain.FourKeystoneRoom:  # make sure it's not redundant with WoodsMain.AfterKuMeet->WoodsMain.BelowFourKeystoneRoom->WoodsMain.WallOreLedge->WoodsMain.FourKeystoneRoom
+    kii, WoodsMain.KSRoomYellowBarrierBroken:
+      Bash, Damage=15, DoubleJump, TripleJump OR Glide  # using Tentacle's projectiles (stalling with glide)
+    unsafe, WoodsMain.KSRoomYellowBarrierBroken:
+      # Sword, Deflector, DoubleJump, TripleJump OR Glide  # pogo/slash the projectiles  # Djump+Sword makes it redundant in unsafe
+      DoubleJump, Bash, Damage=15  # Using the Skeeto from the left
   conn WoodsMain.BelowFourKeystoneRoom: free
 
 anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
