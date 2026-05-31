@@ -70,6 +70,8 @@ pub fn seed_world_settings(
     settings: &mut WorldPresetSettings,
     include_settings: &mut WorldSettings,
 ) -> Result<(), Error> {
+    select_random_settings(&prefix, settings)?;
+
     select_presets(
         &prefix,
         "world",
@@ -146,6 +148,22 @@ fn choose_world_count(world_settings: &mut Vec<WorldPresetSettings>) -> Result<(
             *world_settings = vec![world_settings[0].clone(); world_count];
         }
     }
+    Ok(())
+}
+
+fn select_random_settings(prefix: &str, settings: &mut WorldPresetSettings) -> Result<(), Error> {
+    if settings.random_settings.is_none() {
+        if let Some(true) = Confirm::new()
+            .with_prompt(format!(
+                "{prefix}Choose whether the settings should be randomized before applying further changes"
+            ))
+            .default(false)
+            .interact_opt()?
+        {
+            settings.random_settings = Some(true);
+        }
+    }
+
     Ok(())
 }
 

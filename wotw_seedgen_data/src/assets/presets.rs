@@ -1,4 +1,6 @@
-use crate::{Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings};
+use crate::{
+    assets::SnippetAccess, Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
+};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -51,7 +53,7 @@ impl PresetInfo {
 ///
 /// ```
 /// # use wotw_seedgen_data::assets::UniversePreset;
-/// use wotw_seedgen_data::{assets::{NoPresetAccess, UniversePresetSettings, WorldPresetSettings}, Spawn, UniverseSettings};
+/// use wotw_seedgen_data::{assets::{NoAccess, UniversePresetSettings, WorldPresetSettings}, Spawn, UniverseSettings};
 ///
 /// let mut universe_settings = UniverseSettings::new("seed".to_string());
 ///
@@ -69,7 +71,7 @@ impl PresetInfo {
 ///     }
 /// };
 ///
-/// preset.apply(&mut universe_settings, &NoPresetAccess);
+/// preset.apply(&mut universe_settings, &NoAccess);
 /// assert_eq!(universe_settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 ///
@@ -100,12 +102,12 @@ impl UniversePreset {
     /// - If multiple worlds are in the preset, but only one in the existing settings, the existing settings will be copied for all worlds, then the preset will be applied per index
     /// - If multiple worlds are in both and their number does not match, returns an error
     /// - Nested presets will be applied before the parent preset
-    pub fn apply<A: PresetAccess>(
+    pub fn apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut UniverseSettings,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], preset_access)
+        self._apply(settings, &mut vec![], file_access)
     }
 
     pub fn is_base_preset(&self) -> bool {
@@ -116,14 +118,14 @@ impl UniversePreset {
         self.settings.difficulty_cmp(&other.settings)
     }
 
-    fn _apply<A: PresetAccess>(
+    fn _apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut UniverseSettings,
         already_applied: &mut Vec<String>,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
         self.check_compability()?
-            ._apply(settings, already_applied, preset_access)
+            ._apply(settings, already_applied, file_access)
     }
 
     fn check_compability(mut self) -> Result<UniversePresetSettings, String> {
@@ -163,12 +165,12 @@ pub struct UniversePresetSettings {
 
 impl UniversePresetSettings {
     /// Apply these `UniversePresetSettings` to some [`UniverseSettings`]
-    pub fn apply<A: PresetAccess>(
+    pub fn apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut UniverseSettings,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], preset_access)
+        self._apply(settings, &mut vec![], file_access)
     }
 
     pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
@@ -188,11 +190,11 @@ impl UniversePresetSettings {
         }
     }
 
-    fn _apply<A: PresetAccess>(
+    fn _apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut UniverseSettings,
         already_applied: &mut Vec<String>,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
         let Self {
             includes,
@@ -201,7 +203,7 @@ impl UniversePresetSettings {
         } = self;
 
         for identifier in includes.into_iter().flatten() {
-            include_universe_preset(settings, identifier, already_applied, preset_access)?;
+            include_universe_preset(settings, identifier, already_applied, file_access)?;
         }
 
         if let Some(seed) = seed {
@@ -221,13 +223,13 @@ impl UniversePresetSettings {
                     .iter_mut()
                     .zip(preset_world_settings)
                 {
-                    preset_world_settings.apply(world_settings, preset_access)?;
+                    preset_world_settings.apply(world_settings, file_access)?;
                 }
             } else if preset_worlds == 1 {
                 for world_settings in &mut settings.world_settings {
                     preset_world_settings[0]
                         .clone()
-                        .apply(world_settings, preset_access)?;
+                        .apply(world_settings, file_access)?;
                 }
             } else if setting_worlds == 1 {
                 settings.world_settings.extend(iter::repeat_n(
@@ -240,7 +242,7 @@ impl UniversePresetSettings {
                     .iter_mut()
                     .zip(preset_world_settings)
                 {
-                    preset_world_settings.apply(world_settings, preset_access)?;
+                    preset_world_settings.apply(world_settings, file_access)?;
                 }
             } else {
                 return Err(format!("Cannot apply preset with {preset_worlds} worlds to settings with {setting_worlds} worlds"));
@@ -259,21 +261,21 @@ impl UniversePresetSettings {
     }
 }
 
-fn include_universe_preset<A: PresetAccess>(
+fn include_universe_preset<A: PresetAccess + SnippetAccess>(
     settings: &mut UniverseSettings,
     identifier: String,
     already_applied: &mut Vec<String>,
-    preset_access: &A,
+    file_access: &A,
 ) -> Result<(), String> {
     // Prevent cyclic patterns
     if already_applied.contains(&identifier) {
         return Ok(());
     }
 
-    let preset = preset_access.universe_preset(&identifier)?;
+    let preset = file_access.universe_preset(&identifier)?;
     already_applied.push(identifier);
 
-    preset._apply(settings, already_applied, preset_access)
+    preset._apply(settings, already_applied, file_access)
 }
 
 /// A collection of settings that can be applied to one world of existing settings
@@ -284,7 +286,7 @@ fn include_universe_preset<A: PresetAccess>(
 ///
 /// ```
 /// # use wotw_seedgen_data::assets::WorldPreset;
-/// use wotw_seedgen_data::{assets::{NoPresetAccess, WorldPresetSettings}, Spawn, WorldSettings};
+/// use wotw_seedgen_data::{assets::{NoAccess, WorldPresetSettings}, Spawn, WorldSettings};
 ///
 /// let mut world_settings = WorldSettings::default();
 ///
@@ -297,7 +299,7 @@ fn include_universe_preset<A: PresetAccess>(
 ///     }
 /// };
 ///
-/// world_preset.apply(&mut world_settings, &NoPresetAccess);
+/// world_preset.apply(&mut world_settings, &NoAccess);
 /// assert_eq!(world_settings.spawn, Spawn::Random);
 /// ```
 ///
@@ -318,12 +320,12 @@ pub struct WorldPreset {
 
 impl WorldPreset {
     /// Apply this `WorldPreset` to some [`WorldSettings`]
-    pub fn apply<A: PresetAccess>(
+    pub fn apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut WorldSettings,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], preset_access)
+        self._apply(settings, &mut vec![], file_access)
     }
 
     pub fn is_base_preset(&self) -> bool {
@@ -334,14 +336,14 @@ impl WorldPreset {
         self.settings.difficulty_cmp(&other.settings)
     }
 
-    fn _apply<A: PresetAccess>(
+    fn _apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut WorldSettings,
         already_applied: &mut Vec<String>,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
         self.check_compability()?
-            ._apply(settings, already_applied, preset_access)
+            ._apply(settings, already_applied, file_access)
     }
 
     fn check_compability(mut self) -> Result<WorldPresetSettings, String> {
@@ -368,6 +370,8 @@ impl WorldPreset {
 #[serde(rename_all = "camelCase")]
 // TODO replace hashsets with vecs?
 pub struct WorldPresetSettings {
+    /// Randomize settings before applying further changes
+    pub random_settings: Option<bool>,
     /// Names of further [`WorldPreset`]s to use
     ///
     /// A [`PresetAccess::world_preset`] implementation may be used to resolve the identifiers
@@ -390,12 +394,12 @@ pub struct WorldPresetSettings {
 
 impl WorldPresetSettings {
     /// Apply these `WorldPresetSettings` to some [`WorldSettings`]
-    pub fn apply<A: PresetAccess>(
+    pub fn apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut WorldSettings,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], preset_access)
+        self._apply(settings, &mut vec![], file_access)
     }
 
     pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
@@ -417,13 +421,14 @@ impl WorldPresetSettings {
             .then_with(|| self.hard.cmp(&other.hard))
     }
 
-    fn _apply<A: PresetAccess>(
+    fn _apply<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut WorldSettings,
         already_applied: &mut Vec<String>,
-        preset_access: &A,
+        file_access: &A,
     ) -> Result<(), String> {
         let Self {
+            random_settings,
             includes,
             difficulty,
             tricks,
@@ -434,8 +439,12 @@ impl WorldPresetSettings {
             snippet_config,
         } = self;
 
+        if let Some(true) = random_settings {
+            *settings = WorldSettings::random(&mut rand::thread_rng(), file_access);
+        }
+
         for identifier in includes.into_iter().flatten() {
-            include_world_preset(settings, identifier, already_applied, preset_access)?;
+            include_world_preset(settings, identifier, already_applied, file_access)?;
         }
 
         // TODO surely there's a handy command for this
@@ -504,21 +513,21 @@ impl WorldPresetSettings {
     }
 }
 
-fn include_world_preset<A: PresetAccess>(
+fn include_world_preset<A: PresetAccess + SnippetAccess>(
     settings: &mut WorldSettings,
     identifier: String,
     already_applied: &mut Vec<String>,
-    preset_access: &A,
+    file_access: &A,
 ) -> Result<(), String> {
     // Prevent cyclic patterns
     if already_applied.contains(&identifier) {
         return Ok(());
     }
 
-    let preset = preset_access.world_preset(&identifier)?;
+    let preset = file_access.world_preset(&identifier)?;
     already_applied.push(identifier);
 
-    preset._apply(settings, already_applied, preset_access)
+    preset._apply(settings, already_applied, file_access)
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
@@ -596,28 +605,6 @@ where
     universe_base_presets.sort_unstable_by(|(_, a), (_, b)| cmp(a, b));
 
     universe_base_presets
-}
-
-/// [`PresetAccess`] implementation that forbids accessing any presets
-///
-/// You may use this is you're using presets that don't include any other presets
-pub struct NoPresetAccess;
-impl PresetAccess for NoPresetAccess {
-    fn universe_preset(&self, identifier: &str) -> Result<UniversePreset, String> {
-        panic!("Attempted to read universe preset \"{identifier}\" while explicitely using NoPresetAccess");
-    }
-
-    fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
-        panic!("Attempted to read world preset \"{identifier}\" while explicitely using NoPresetAccess");
-    }
-
-    fn available_universe_presets(&self) -> Vec<String> {
-        vec![]
-    }
-
-    fn available_world_presets(&self) -> Vec<String> {
-        vec![]
-    }
 }
 
 #[cfg(test)]

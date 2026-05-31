@@ -10,12 +10,14 @@ pub use uber_state_data::{
     UberStateDumpMember, UberStateDumpValueType, UberStateValue,
 };
 mod snippet_access;
-pub use snippet_access::{ChainedSnippetAccess, InlineSnippets, NoSnippetAccess, SnippetAccess};
+pub use snippet_access::{ChainedSnippetAccess, InlineSnippets, SnippetAccess};
 mod presets;
 pub use presets::{
-    NoPresetAccess, PresetAccess, PresetGroup, PresetInfo, Tricks, UniversePreset,
-    UniversePresetSettings, WorldPreset, WorldPresetSettings, CURRENT_ASSETS_VERSION,
+    PresetAccess, PresetGroup, PresetInfo, Tricks, UniversePreset, UniversePresetSettings,
+    WorldPreset, WorldPresetSettings, CURRENT_ASSETS_VERSION,
 };
+mod no_access;
+pub use no_access::NoAccess;
 mod file_access;
 pub use file_access::{
     canonicalize, create_dir_all, file_create, file_err, file_open, metadata, read_to_string,

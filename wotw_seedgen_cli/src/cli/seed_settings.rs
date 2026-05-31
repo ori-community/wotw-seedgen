@@ -41,6 +41,7 @@ impl Args for SeedSettings {
             .arg(seed_arg())
             .arg(universe_presets_arg())
             .arg(worlds_arg())
+            .arg(random_settings_arg(true))
             .arg(world_presets_arg(true))
             .arg(spawn_arg(true))
             .arg(difficulty_arg(true))
@@ -68,6 +69,7 @@ impl Args for SeedWorldSettings {
     fn augment_args(cmd: clap::Command) -> clap::Command {
         cmd.group(ArgGroup::new("seed_settings").multiple(true))
             .arg(interactive_arg())
+            .arg(random_settings_arg(false))
             .arg(world_presets_arg(false))
             .arg(spawn_arg(false))
             .arg(difficulty_arg(false))
@@ -164,6 +166,16 @@ macro_rules! choose_strum_enum_parser {
             StrumEnumValueParser::<$ty>::new()
         )
     };
+}
+
+fn random_settings_arg(world_scoped: bool) -> Arg {
+    let arg = world_scoped_flag_arg("random_settings", world_scoped)
+        .short('R')
+        .long("random-settings")
+        .help("Randomize settings")
+        .long_help("Randomize all settings before applying further changes");
+
+    choose_parser!(arg, world_scoped, bool)
 }
 
 fn world_presets_arg(world_scoped: bool) -> Arg {
@@ -645,6 +657,13 @@ impl FromArgMatches for SeedSettings {
             Ok(())
         }
 
+        update_from_world_scoped_flag(
+            matches,
+            &mut world_settings,
+            "random_settings",
+            |world_preset, random_settings| world_preset.random_settings = Some(*random_settings),
+        )?;
+
         update_from_world_scoped_args(
             matches,
             &mut world_settings,
@@ -759,6 +778,7 @@ impl FromArgMatches for SeedWorldSettings {
 
     fn update_from_arg_matches(&mut self, matches: &ArgMatches) -> Result<(), clap::Error> {
         self.0 = WorldPresetSettings {
+            random_settings: matches.get_flag("random_settings").then_some(true),
             includes: matches
                 .get_many("world_presets")
                 .map(|world_presets| world_presets.cloned().collect()),

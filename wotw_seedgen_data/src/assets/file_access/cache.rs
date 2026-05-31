@@ -422,3 +422,23 @@ impl PresetAccess for DefaultAssetCacheValues {
         self.world_presets.keys().cloned().collect()
     }
 }
+
+impl SnippetAccess for DefaultAssetCacheValues {
+    fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
+        self.snippets
+            .get(identifier)
+            .cloned()
+            .ok_or_else(|| format!("unknown snippet \"{identifier}\""))
+    }
+
+    fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
+        Err(format!(
+            "tried to read non-default file \"{}\" directly from cache",
+            path.display()
+        ))
+    }
+
+    fn available_snippets(&self) -> Vec<String> {
+        self.snippets.keys().cloned().collect()
+    }
+}

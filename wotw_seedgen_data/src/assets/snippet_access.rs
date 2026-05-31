@@ -129,25 +129,3 @@ fn chained_err(a_err: String, b_err: String) -> String {
         _ => format!("{a_err} and {b_err}"),
     }
 }
-
-// TODO are NoAccess impls used anymore?
-/// [`SnippetAccess`] implementation that forbids accessing any snippets
-pub struct NoSnippetAccess;
-impl SnippetAccess for NoSnippetAccess {
-    fn read_snippet(&self, identifier: &str) -> Result<Source, String> {
-        panic!(
-            "Attempted to read snippet \"{identifier}\" while explicitely using NoSnippetAccess"
-        );
-    }
-
-    fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-        panic!(
-            "Attempted to read \"{}\" while explicitely using NoSnippetAccess",
-            path.display()
-        );
-    }
-
-    fn available_snippets(&self) -> Vec<String> {
-        vec![]
-    }
-}
