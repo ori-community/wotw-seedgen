@@ -9,7 +9,7 @@ use crate::{
 use clap::{
     builder::{styling::Reset, PossibleValue, StringValueParser, TypedValueParser},
     error::ErrorKind,
-    value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches,
+    value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches, Id,
 };
 use itertools::Itertools;
 use rustc_hash::FxHashSet;
@@ -253,37 +253,21 @@ fn tricks_arg(world_scoped: bool) -> Arg {
 }
 
 fn all_tricks_arg(world_scoped: bool) -> Arg {
-    let arg = Arg::new("all_tricks")
-        .group("seed_settings")
+    let arg = world_scoped_flag_arg("all_tricks", world_scoped)
         .long("all-tricks")
         .short('T')
-        .value_name("BOOLEAN")
         .help("Enable all tricks supported in the selected difficulty");
-
-    let arg = if world_scoped {
-        arg.num_args(0..)
-    } else {
-        arg.action(ArgAction::SetTrue)
-    };
 
     choose_parser!(arg, world_scoped, bool)
 }
 
 fn hard_arg(world_scoped: bool) -> Arg {
-    let arg = Arg::new("hard")
-        .group("seed_settings")
+    let arg = world_scoped_flag_arg("hard", world_scoped)
         .long("hard")
-        .value_name("BOOLEAN")
         .help("Logically assume hard in-game difficulty")
         .long_help(
             "Logic will account for the player using the hard in-game difficulty, for instance by scaling damage requirements"
         );
-
-    let arg = if world_scoped {
-        arg.num_args(0..)
-    } else {
-        arg.action(ArgAction::SetTrue)
-    };
 
     choose_parser!(arg, world_scoped, bool)
 }
@@ -331,6 +315,16 @@ fn snippet_config_arg(world_scoped: bool) -> Arg {
         .long_help(snippet_config_help(&AVAILABLE_SNIPPETS));
 
     choose_parser!(arg, world_scoped, SnippetConfigArg)
+}
+
+fn world_scoped_flag_arg(id: impl Into<Id>, world_scoped: bool) -> Arg {
+    let arg = Arg::new(id).group("seed_settings").value_name("BOOLEAN");
+
+    if world_scoped {
+        arg.num_args(0..)
+    } else {
+        arg.action(ArgAction::SetTrue)
+    }
 }
 
 fn preset_help(available_presets: &[AvailablePreset], kind: &str) -> String {
