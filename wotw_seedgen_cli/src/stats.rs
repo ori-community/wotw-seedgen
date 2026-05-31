@@ -22,12 +22,12 @@ use wotw_seedgen_stats::{
 
 pub fn stats(args: StatsArgs) -> Result<(), Error> {
     let StatsArgs {
-        settings,
+        settings_args,
         sample_size,
         analyzers,
     } = args;
 
-    let settings = settings.into_universe_settings()?;
+    let settings = settings_args.into_universe_settings()?;
 
     let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
 

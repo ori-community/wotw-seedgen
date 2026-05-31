@@ -6,11 +6,19 @@ use super::{SeedSettings, LITERAL};
 #[derive(Args, Debug, Default)]
 pub struct SeedArgs {
     #[command(flatten)]
-    pub settings: SeedSettings,
+    pub settings_args: SeedSettingsArgs,
     #[command(flatten)]
     pub generation_args: GenerationArgs,
     #[command(flatten)]
     pub verbose_args: VerboseArgs,
+}
+
+#[derive(Args, Debug, Default)]
+pub struct SeedSettingsArgs {
+    #[arg(long)]
+    pub stdin_settings: bool,
+    #[command(flatten)]
+    pub settings: SeedSettings,
 }
 
 #[derive(Args, Debug, Default)]

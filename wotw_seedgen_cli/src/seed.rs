@@ -6,7 +6,7 @@ use std::{
 };
 
 use crate::{
-    cli::{GenerationArgs, LaunchArgs, SeedArgs},
+    cli::{GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs},
     log_config::LogConfig,
     Error,
 };
@@ -26,7 +26,7 @@ use wotw_seedgen::{
 
 pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
-        settings,
+        settings_args,
         generation_args: GenerationArgs { debug, launch },
         verbose_args,
     } = args;
@@ -35,7 +35,8 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
 
     LogConfig::from_args(verbose_args).apply()?;
 
-    let mut settings = settings.into_universe_settings()?;
+    let mut settings = settings_args.into_universe_settings()?;
+
     let name = if settings.seed.is_empty() {
         let distribution = Uniform::from('0'..='9');
         settings.seed = distribution
@@ -58,6 +59,28 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
     );
 
     Ok(())
+}
+
+impl SeedSettingsArgs {
+    pub fn into_universe_settings(self) -> Result<UniverseSettings, Error> {
+        let Self {
+            stdin_settings,
+            settings,
+        } = self;
+
+        let mut universe_settings = if stdin_settings {
+            serde_json::from_reader(io::stdin().lock())
+                .map_err(|err| format!("failed to read settings from stdin: {err}"))?
+        } else {
+            UniverseSettings::new(String::new())
+        };
+
+        settings
+            .0
+            .apply(&mut universe_settings, &DefaultFileAccess)?;
+
+        Ok(universe_settings)
+    }
 }
 
 pub fn write_seed(

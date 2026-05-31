@@ -1,4 +1,4 @@
-use super::{SeedSettings, LITERAL};
+use super::{SeedSettingsArgs, LITERAL};
 use clap::{builder::styling::Reset, error::ErrorKind, Args, Parser};
 use std::{num::NonZeroUsize, str::FromStr};
 use wotw_seedgen::data::Zone;
@@ -6,7 +6,7 @@ use wotw_seedgen::data::Zone;
 #[derive(Args)]
 pub struct StatsArgs {
     #[command(flatten)]
-    pub settings: SeedSettings,
+    pub settings_args: SeedSettingsArgs,
     /// How many samples (seeds) to use
     #[arg(short = 'z', long, value_name = "NUMBER", default_value = "10000")]
     pub sample_size: usize,

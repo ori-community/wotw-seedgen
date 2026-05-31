@@ -16,7 +16,9 @@ pub use http_server_args::HttpServerArgs;
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
 pub use regenerate_args::RegenerateArgs;
-pub use seed_args::{GenerationArgs, LaunchArgs, SeedArgs, VerboseArgs, VerboseTarget};
+pub use seed_args::{
+    GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs, VerboseArgs, VerboseTarget,
+};
 pub use seed_settings::{SeedSettings, SeedWorldSettings};
 pub use stats_args::{Analyzer, ChainedAnalyzers, StatsArgs};
 

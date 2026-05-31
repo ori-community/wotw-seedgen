@@ -17,27 +17,18 @@ use std::{
     convert::Infallible,
     ffi::OsStr,
     fmt::{Debug, Display, Write},
-    io,
     marker::PhantomData,
     num::NonZeroUsize,
     str::FromStr,
 };
 use strum::VariantNames;
 use wotw_seedgen::data::{
-    assets::{DefaultFileAccess, Tricks, UniversePresetSettings, WorldPresetSettings},
-    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
+    assets::{Tricks, UniversePresetSettings, WorldPresetSettings},
+    Difficulty, GreaterOneU8, Spawn, Trick, WorldSettings,
 };
 
 #[derive(Debug, Default)]
 pub struct SeedSettings(pub UniversePresetSettings);
-
-impl SeedSettings {
-    pub fn into_universe_settings(self) -> Result<UniverseSettings, Error> {
-        let mut settings = stdin_settings().unwrap_or(UniverseSettings::new(String::new()));
-        self.0.apply(&mut settings, &DefaultFileAccess)?;
-        Ok(settings)
-    }
-}
 
 impl Args for SeedSettings {
     fn group_id() -> Option<clap::Id> {
@@ -809,8 +800,4 @@ impl From<Error> for clap::Error {
             format!("interactive session failed: {value:?}"),
         )
     }
-}
-
-fn stdin_settings() -> Option<UniverseSettings> {
-    serde_json::from_reader(io::stdin().lock()).ok()
 }
