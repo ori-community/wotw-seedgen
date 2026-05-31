@@ -11470,7 +11470,7 @@ anchor MoraSecondPhase at 690, -4386:
       Boss=165, Regenerate, Damage=60, DepthsLight, Bash, DoubleJump OR Dash
     unsafe: Boss=165
 
-anchor UpperDepths.LowerConnection at 423, -4475:  # The firefly egg to the left of the second keystone door
+anchor UpperDepths.LowerConnection at 423, -4474:  # The firefly egg to the left of the second keystone door
   refill Checkpoint
   # energy crystal on the way to the trial not considered
 
@@ -16194,7 +16194,7 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       # WillowsEnd.PortalShortcut, AerialHammerJump OR GrenadeJump=2
       # Bash, Grenade=1, GlideJump, WillowsEnd.PortalShortcut OR Grenade=1 OR Damage=80
       # Bash, Grenade=1, DoubleJump, GlideJump, Damage=40
-      # DoubleJump, GlideJump, Damage=40, Bash, Sword OR Hammer OR Spear=1  # Condition to enter the portal. Then dboost in spikes to reach the elemental 
+      # DoubleJump, GlideJump, Damage=40, Bash, Sword OR Hammer OR Spear=1  # Condition to enter the portal. Then dboost in spikes to reach the elemental
       # WillowsEnd.PortalShortcut, DoubleJump, GlideJump, Sword OR Hammer OR Spear=1  # Condition to enter the portal
       # WillowsEnd.PortalShortcut, GrenadeJump=1, Damage=80  # only need one dboost but the portal can be weird
       # WillowsEnd.PortalShortcut, GrenadeJump=1, DoubleJump, TripleJump OR Sword OR Hammer OR Flash=1 OR GlideJump OR Damage=40
@@ -17141,7 +17141,7 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
     moki: WillowsEnd.SpinPortalsHeart
     unsafe:  # Backward connections without solving the state have some weird spots
       Unpopular, Launch, Bash OR Glide  # I hate this path
-    
+
 
 anchor Tokk:  # Tokk's talks
   quest GladesTown.HandToHandPouch:
