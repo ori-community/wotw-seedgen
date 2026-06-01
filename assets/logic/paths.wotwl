@@ -8224,7 +8224,6 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
     gorlek:
       Combat=2xBalloon, DoubleJump, TripleJump, Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=15
       Combat=Balloon, SentryJump=1, DoubleJump, TripleJump
-      SwordSJump=1, DoubleJump, Bash  # bash the plant above and sword hover
       Damage=20, Bash, Grenade=2, DoubleJump OR Dash OR Glide
       Damage=20, Launch
     kii:
