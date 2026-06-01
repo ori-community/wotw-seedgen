@@ -8157,6 +8157,7 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
   conn WoodsMain.InFrontLowerKS:  # make sure it's not redundant with going to WoodsMain.FourKeystoneRoom first
     gorlek: Bash, Grenade=1, DoubleJump
     kii:
+      Launch
       Bash, DoubleJump, TripleJump OR Glide  # using Tentacle's projectiles (stalling with glide)
       Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # bash tentacle's projectile to reach your grenade
       # Glitched
@@ -8167,9 +8168,10 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
       Bash  # https://youtu.be/Mk8lSFa21IA
       # DoubleJump, Bash  # Using the Skeeto from the left
       Sword, Deflector, DoubleJump, TripleJump OR Glide  # pogo/slash the projectiles
-      GlideJump, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # from the checkpoint, wjump on the wall before the floating platform
+      GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # from the checkpoint, wjump on the wall before the floating platform
       GlideJump, DoubleJump, Dash  #  glide jump -> dash into the ceiling -> djump -> dash
       AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
+      GrenadeJump, DoubleJump
       BlazeSwap=2 OR SentrySwap=2:
         DoubleJump OR Glide OR Sword OR Hammer OR Blaze=1 OR Sentry=1 
       BlazeSwap=1 OR SentrySwap=1:
@@ -8204,6 +8206,13 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
   pickup WoodsMain.BreakableWallOre:
     kii: Flap, Glide  # Lure the balloon
 
+  conn WoodsMain.InFrontLowerKS:  # Most paths are gonna be redundant with going to either WoodsMain.AfterKuMeet or WoodsMain.FourKeystoneRoom
+    # kii:
+    #  SwordSJump=1
+    #  HammerSJump=1, DoubleJump
+    unsafe:
+      SentryJump=1  # https://youtu.be/VIFsMrBUwEk
+      AbilitySwap=3
   conn WoodsMain.FourKeystoneRoom:
     moki: Combat=2xBalloon, Flap, Glide
     gorlek: Flap, Glide  # Flap kills these
@@ -8222,12 +8231,23 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       DoubleJump, Sword, Combat=Balloon OR Damage=20  # Pogo the first balloon
       DoubleJump, Combat=2xBalloon, Damage=15, Glide OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Damage=20, Damage=35, TripleJump OR Glide OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost 1st balloon, dboost in spikes + energy weapon + dboost 2nd balloon
+      # Glitched
+      # LaunchSwap
+      # SentryJump=1, DoubleJump OR Dash
+      # SwordSJump=1, Bash  # bash the plant above and sword hover
+      # HammerSJump=1, Bash, Glide OR Sword  # same as above but glide instead
+      # Combat=2xBalloon, AerialHammerJump
+      # Combat=2xBalloon, DoubleJump, GrenadeJump=1 OR GlideJump
     unsafe:
       DoubleJump, Sword  # Pogo the first balloon, avoid the second one and kill it with a pogo
-      DoubleJump, HammerSJump=1  # DoubleJump + full sword combo + up slash from the breakable wall to reach the left platform
       DoubleJump, TripleJump OR Dash
       DoubleJump, Damage=15  # https://youtu.be/5OAN8TzrH4k
       Launch  # use launch invincibility to avoid dboost from balloons
+      SentryJump=1  # with sword: sjump-> upslash / with hammer https://youtu.be/R33cssSV7CY
+      GlideJump, Sword  # pogo the ballons to kill them, pogo the health plant to reach the spawn point of the 2nd balloon then precise walljump-> upslash
+      Combat=2xBalloon, GlideJump, DoubleJump OR Hammer
+      Combat=2xBalloon, AerialHammerJump
+      Combat=2xBalloon, DoubleJump, GrenadeJump
   conn WoodsMain.AfterKuMeet:
     moki:
       Bash, Grenade=2, Damage=10  # uses the enemy
@@ -8238,14 +8258,30 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       Bash, Grenade=1 OR SentryJump=1
       Launch, Sword OR Hammer
     kii:
+      Launch, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       DoubleJump, Bash
       DoubleJump, Sword  # Keep hitting the tentacle with sword to reset your double jump
-      Combat=Tentacle, DoubleJump, TripleJump, Dash OR Glide OR Hammer OR Sentry=2
-      Combat=Tentacle, DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Bow=4 OR Spear=2 OR Grenade=1:  # kill the tentacle by using a ranged weapon
+        DoubleJump, TripleJump, Dash OR Glide OR Hammer OR Sentry=2
+        DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # LaunchSwap
+      # Launch, GrenadeJump=1
+      # SentryJump=2
+      # HammerSJump=1, DoubleJump  # SwordSJump would be redundant with DoubleJump+Sword
+      # Bow=4 OR Spear=2 OR Grenade=1:  # kill the tentacle by using a ranged weapon
+      #   Glide, AerialHammerJump OR GrenadeJump=2
+      #   DoubleJump, Dash, AerialHammerJump OR GrenadeJump=1
+      #   GlideJump, DoubleJump OR HammerSJump=1  # use hammer to hover as well
+      #   GlideJump, SwordSJump=1, Dash OR Hammer OR Shuriken=1 OR Sentry=1  # hover with sword as well. sjump to climb the last wall
     unsafe:
-      Bash
-      Combat=Tentacle, DoubleJump, Dash, Spear=1
-      Combat=Tentacle, DoubleJump, TripleJump, Shuriken=2
+      Bash OR Launch OR AerialHammerJump OR GlideHammerJump
+      SentryJump=1  # sjump in front of the tentable then upslash to climb the wall. Extremely precise with sword.
+      GrenadeJump, DoubleJump OR Glide OR Sword
+      Bow=4 OR Spear=2 OR Grenade=1:  # kill the tentacle by using a ranged weapon
+        DoubleJump, Dash, Spear=1
+        DoubleJump, TripleJump, Shuriken=2
+        GlideJump, DoubleJump OR Sword OR Hammer
 
 anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the wall being broken - paths would be complicated otherwise
   pickup WoodsMain.BreakableWallOre:
