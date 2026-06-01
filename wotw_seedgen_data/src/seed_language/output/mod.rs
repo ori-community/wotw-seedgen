@@ -16,7 +16,7 @@ pub use contained_uber_identifiers::{
     UberStateWrite, UberStateWriteGeneric, UberStateWriteOwned, WriteCommand, WriteCommandOwned,
 };
 pub use event::{ClientEvent, Event, Trigger, TriggerCondition};
-pub use intermediate::{Constant, Literal};
+pub use intermediate::{Constant, Literal, Reference, VariableValue};
 pub(crate) use item_metadata::ItemMetadataEntry;
 pub use item_metadata::{ItemMetadata, ItemMetadataRef};
 pub use operation::{

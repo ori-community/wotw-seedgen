@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use super::{args::Args, Compile, CompileContext};
 use crate::assembly::{Command, Trigger};
+use crate::compile::function::FunctionCompiler;
 use indexmap::map::Entry;
 use log::trace;
 use wotw_seedgen_data::seed_language::output::{
@@ -84,6 +85,10 @@ impl Compile for input::CommandBoolean {
 
         match self {
             Self::Constant { value } => (vec![Command::SetBoolean(value)], MemoryUsed::ONE_BOOLEAN),
+            Self::FunctionArgument { index } => (
+                vec![Command::StackCopyBoolean(index)],
+                MemoryUsed::ONE_BOOLEAN,
+            ),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
             Self::CompareBoolean { operation } => Args::new(context)
                 .boolean(0, operation.left)
@@ -153,6 +158,10 @@ impl Compile for input::CommandInteger {
 
         match self {
             Self::Constant { value } => (vec![Command::SetInteger(value)], MemoryUsed::ONE_INTEGER),
+            Self::FunctionArgument { index } => (
+                vec![Command::StackCopyInteger(index)],
+                MemoryUsed::ONE_INTEGER,
+            ),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
             Self::Arithmetic { operation } => Args::new(context)
                 .integer(0, operation.left)
@@ -191,6 +200,9 @@ impl Compile for input::CommandFloat {
             Self::Constant { value } => {
                 (vec![Command::SetFloat(value.into())], MemoryUsed::ONE_FLOAT)
             }
+            Self::FunctionArgument { index } => {
+                (vec![Command::StackCopyFloat(index)], MemoryUsed::ONE_FLOAT)
+            }
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
             Self::Arithmetic { operation } => Args::new(context)
                 .float(0, operation.left)
@@ -219,6 +231,10 @@ impl Compile for input::CommandString {
 
         match self {
             Self::Constant { value } => value.compile(context),
+            Self::FunctionArgument { index } => (
+                vec![Command::StackCopyString(index)],
+                MemoryUsed::ONE_STRING,
+            ),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
             Self::Concatenate { operation } => Args::new(context)
                 .string(0, operation.left)
@@ -288,7 +304,45 @@ impl Compile for input::CommandVoid {
 
         match self {
             Self::Multi { commands } => multi(commands, context),
-            Self::Lookup { index } => (vec![Command::Execute(index)], MemoryUsed::ZERO),
+            Self::CallFunction {
+                booleans,
+                integers,
+                floats,
+                strings,
+                index,
+            } => {
+                let len = booleans.len() + integers.len() + floats.len() + strings.len();
+
+                if len == 0 {
+                    return (vec![Command::Execute(index)], MemoryUsed::ZERO);
+                }
+
+                let mut function = FunctionCompiler::new(context);
+
+                let mut arg_index = 0;
+
+                for boolean in booleans {
+                    function.boolean(arg_index, boolean);
+                    arg_index += 1;
+                }
+
+                for integer in integers {
+                    function.integer(arg_index, integer);
+                    arg_index += 1;
+                }
+
+                for float in floats {
+                    function.float(arg_index, float);
+                    arg_index += 1;
+                }
+
+                for string in strings {
+                    function.string(arg_index, string);
+                    arg_index += 1;
+                }
+
+                function.finish(index)
+            }
             Self::If { condition, command } => {
                 let index = context.compile_into_lookup(*command);
                 Args::new(context)

@@ -1,26 +1,48 @@
-use crate::seed_language::ast::{self, get_command_arg_ref, RecoverContent};
-use rustc_hash::FxHashSet;
-use wotw_seedgen_parse::{Error, Recoverable, Span, Spanned, SpannedOption};
+use std::{borrow::Cow, collections::hash_map::Entry, ops::RangeFrom};
+
+use crate::seed_language::{
+    ast::{self, get_command_arg_ref, Punctuated, RecoverContent},
+    compile::{FunctionArg, FunctionSignature},
+    output::IntermediateOutput,
+    types::Type,
+};
+use rustc_hash::FxHashMap;
+use wotw_seedgen_parse::{Error, Identifier, Recoverable, Span, Spanned, SpannedOption};
 
 // TODO our preprocessing is a bit weird. For instance if you want to use an event
 // from a parent file, it fails to resolve with an odd error message
 
-#[derive(Default)]
 pub(crate) struct Preprocessor {
     pub output: PreprocessorOutput,
     pub errors: Vec<Error>,
+    next_function_index: RangeFrom<usize>,
 }
 
+// TODO we could probably use a lot more references if the compile trait didn't take ownership of self
 #[derive(Default)]
 pub(crate) struct PreprocessorOutput {
-    pub config_sets: Vec<(String, String, String)>, // TODO can these be references?
-    pub includes: Vec<Spanned<String>>,             // TODO can these be references?
-    pub functions: FxHashSet<String>,               // TODO can these be references?
+    pub config_sets: Vec<(String, String, String)>,
+    pub includes: Vec<Spanned<String>>,
+    pub functions: FxHashMap<String, PreprocessedFunction>,
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct PreprocessedFunction {
+    pub index: usize,
+    pub signature: FunctionSignature,
 }
 
 impl Preprocessor {
-    pub(crate) fn preprocess(ast: &ast::Snippet) -> Self {
-        let mut preprocessor = Self::default();
+    fn new(output: &IntermediateOutput) -> Self {
+        Self {
+            output: PreprocessorOutput::default(),
+            errors: vec![],
+            next_function_index: output.command_lookup.len()..,
+        }
+    }
+
+    pub(crate) fn preprocess(ast: &ast::Snippet, output: &IntermediateOutput) -> Self {
+        let mut preprocessor = Self::new(output);
         preprocessor.preprocess_contents(&ast.contents);
         preprocessor
     }
@@ -88,12 +110,56 @@ impl Preprocessor {
                 }
                 ast::Content::Function(_, content) => {
                     if let SpannedOption::Some(function) = &content.value {
-                        self.output
-                            .functions
-                            .insert(function.identifier.data.0.to_string());
+                        if let Some(signature) = &function.signature.content {
+                            self.preprocess_function(&function.identifier, signature);
+                        }
                     }
                 }
                 _ => {}
+            }
+        }
+    }
+
+    fn preprocess_function(
+        &mut self,
+        identifier: &Spanned<Identifier>,
+        signature: &Punctuated<ast::FunctionArg, ','>,
+    ) {
+        match self.output.functions.entry(identifier.data.0.to_string()) {
+            Entry::Occupied(_) => self.errors.push(Error::error(
+                "already defined".to_string(),
+                identifier.span.clone(),
+            )),
+            Entry::Vacant(vacant) => {
+                let args = signature
+                    .iter()
+                    .map(|arg| {
+                        if !matches!(
+                            arg.ty.data,
+                            Type::Boolean | Type::Integer | Type::Float | Type::String
+                        ) {
+                            self.errors.push(Error::error(
+                                "unsupported type for function arguments".to_string(),
+                                arg.ty.span.clone(),
+                            ));
+                        }
+
+                        FunctionArg {
+                            identifier: Cow::Owned(arg.identifier.data.0.to_string()),
+                            ty: arg.ty.data,
+                        }
+                    })
+                    .collect();
+
+                let function = PreprocessedFunction {
+                    index: self.next_function_index.next().unwrap(),
+                    signature: FunctionSignature {
+                        args,
+                        return_ty: None,
+                    },
+                };
+
+                vacant.insert(function);
             }
         }
     }

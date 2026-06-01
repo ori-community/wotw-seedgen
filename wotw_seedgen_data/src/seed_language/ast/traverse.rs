@@ -472,7 +472,7 @@ impl<H: Handler> Traverse<H> for BuiltinIconArgs<'_> {
 
 impl<H: Handler> Traverse<H> for AugmentFunArgs<'_> {
     fn traverse(&self, handler: &mut H) {
-        handler.identifier_use(&self.identifier);
+        handler.function_use(&self.identifier);
         inspect_command_arg(&self.action, |action| action.traverse(handler));
     }
 }

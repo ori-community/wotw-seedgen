@@ -1,14 +1,16 @@
 use super::{Compile, SnippetCompiler};
 use crate::seed_language::{
     ast::{self, TriggerBinding},
-    output::{Command, CommandVoid, Event, Literal, Trigger, TriggerCondition},
+    compile::error::type_error,
+    output::{Command, CommandVoid, Event, Literal, Trigger, TriggerCondition, VariableValue},
+    types::Type,
 };
 use wotw_seedgen_parse::{Error, Span};
 
 impl<'source> Compile<'source> for ast::Content<'source> {
     type Output = ();
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Content::Event(_, event) => {
                 event.compile(compiler);
@@ -29,7 +31,7 @@ impl<'source> Compile<'source> for ast::Content<'source> {
 impl<'source> Compile<'source> for ast::Event<'source> {
     type Output = ();
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         let trigger = self.trigger.compile(compiler);
         let span = self.action.span();
         let command = self.action.compile(compiler);
@@ -50,7 +52,7 @@ impl<'source> Compile<'source> for ast::Event<'source> {
 impl<'source> Compile<'source> for ast::Trigger<'source> {
     type Output = Option<Trigger>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Trigger::ClientEvent(client) => Some(Trigger::ClientEvent(client.data)),
             ast::Trigger::Binding(_, binding) => {
@@ -63,14 +65,18 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                         uber_identifier.compile(compiler)?
                     }
                     TriggerBinding::Identifier(identifier) => {
-                        match compiler.resolve(&identifier)? {
-                            Literal::UberIdentifier(uber_state) => uber_state.clone(),
+                        match compiler.resolve_variable(&identifier)? {
+                            VariableValue::Literal(Literal::UberIdentifier(uber_state)) => {
+                                uber_state.clone()
+                            }
                             other => {
-                                let found = other.literal_type();
-                                compiler.errors.push(Error::error(
-                                    format!("Expected UberIdentifier, but found {found}"),
+                                let found = other.ty();
+                                compiler.errors.push(type_error(
+                                    found,
+                                    Type::UberIdentifier,
                                     identifier.span,
                                 ));
+
                                 return None;
                             }
                         }
@@ -115,7 +121,16 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
 impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
     type Output = ();
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+        let function = compiler
+            .preprocessed
+            .functions
+            .get(self.identifier.data.0)
+            .unwrap();
+
+        compiler.scopes.push_function(&function.signature);
+        let index = function.index;
+
         let commands = self
             .actions
             .content
@@ -127,19 +142,16 @@ impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
             })
             .collect();
 
-        let index = compiler
-            .function_indices
-            .get(self.identifier.data.0)
-            .unwrap();
+        compiler.scopes.pop();
 
-        compiler.global.output.command_lookup[*index] = CommandVoid::Multi { commands };
+        compiler.global.output.command_lookup[index] = CommandVoid::Multi { commands };
     }
 }
 
 impl<'source> Compile<'source> for ast::Action<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Action::Function(function_call) => function_call.compile(compiler),
             ast::Action::Condition(_, condition) => condition.compile(compiler),
@@ -163,7 +175,7 @@ impl<'source> Compile<'source> for ast::Action<'source> {
 impl<'source> Compile<'source> for ast::ActionCondition<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         let condition = self.condition.compile_into(compiler);
         let span = self.action.span();
         let command = self.action.compile(compiler);
@@ -178,5 +190,5 @@ impl<'source> Compile<'source> for ast::ActionCondition<'source> {
 impl<'source> Compile<'source> for ast::Annotation<'source> {
     type Output = ();
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {}
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {}
 }

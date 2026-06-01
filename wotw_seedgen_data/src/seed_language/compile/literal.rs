@@ -11,7 +11,7 @@ use wotw_seedgen_parse::{Error, Span};
 impl<'source> Compile<'source> for ast::Literal<'source> {
     type Output = Option<Literal>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Literal::UberIdentifier(uber_identifier) => uber_identifier
                 .compile(compiler)
@@ -28,7 +28,7 @@ impl<'source> Compile<'source> for ast::Literal<'source> {
 impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
     type Output = Option<UberStateAlias>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         let uber_state = self.resolve(compiler)?;
 
         if uber_state.uber_identifier.group == 9 {
@@ -60,14 +60,9 @@ impl ast::UberIdentifier<'_> {
     pub(crate) fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
         match self {
             ast::UberIdentifier::Numeric(numeric) => {
-                numeric
-                    .member
-                    .value
-                    .as_option()
-                    .map(|member| UberStateAlias {
-                        uber_identifier: UberIdentifier::new(numeric.group.data, member.data),
-                        value: None,
-                    })
+                numeric.member.value.as_option().map(|member| {
+                    UberStateAlias::regular(UberIdentifier::new(numeric.group.data, member.data))
+                })
             }
             ast::UberIdentifier::Name(name) => name.resolve(compiler),
         }

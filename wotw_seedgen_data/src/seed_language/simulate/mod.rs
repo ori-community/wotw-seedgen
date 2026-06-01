@@ -1,19 +1,21 @@
 mod cache;
 mod condition_values;
+mod heap;
 mod simulation;
 mod snapshot;
+mod stack;
 mod uber_states;
-mod variables;
 mod world_state;
 
 use std::mem;
 
 pub use cache::SimulationCache;
 pub use condition_values::ConditionValues;
+pub use heap::Heap;
 pub use simulation::Simulation;
 pub use snapshot::{CloneSnapshot, Snapshot};
+pub use stack::Stack;
 pub use uber_states::{UberStates, UBER_STATES_TARGET_PREFIX};
-pub use variables::Variables;
 pub use world_state::WorldState;
 
 use crate::{
@@ -118,6 +120,7 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
     fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
         match self {
             CommandBoolean::Constant { value } => *value,
+            CommandBoolean::FunctionArgument { index } => simulation.stack().get_boolean(*index),
             CommandBoolean::Multi { commands, last } => {
                 commands.simulate(simulation, events);
                 last.simulate(simulation, events)
@@ -131,7 +134,7 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
             CommandBoolean::FetchBoolean { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_boolean()
             }
-            CommandBoolean::GetBoolean { id } => simulation.variables().get_boolean(*id),
+            CommandBoolean::GetBoolean { id } => simulation.heap().get_boolean(*id),
             CommandBoolean::IsInBox { .. } => false,
         }
     }
@@ -143,6 +146,7 @@ impl<S: Simulation> Simulate<S> for CommandInteger {
     fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
         match self {
             CommandInteger::Constant { value } => *value,
+            CommandInteger::FunctionArgument { index } => simulation.stack().get_integer(*index),
             CommandInteger::Multi { commands, last } => {
                 commands.simulate(simulation, events);
                 last.simulate(simulation, events)
@@ -151,7 +155,7 @@ impl<S: Simulation> Simulate<S> for CommandInteger {
             CommandInteger::FetchInteger { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_integer()
             }
-            CommandInteger::GetInteger { id } => simulation.variables().get_integer(*id),
+            CommandInteger::GetInteger { id } => simulation.heap().get_integer(*id),
             CommandInteger::FromFloat { float } => {
                 float.simulate(simulation, events).round() as i32
             }
@@ -168,6 +172,7 @@ impl<S: Simulation> Simulate<S> for CommandFloat {
     fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
         match self {
             CommandFloat::Constant { value } => **value,
+            CommandFloat::FunctionArgument { index } => simulation.stack().get_float(*index),
             CommandFloat::Multi { commands, last } => {
                 commands.simulate(simulation, events);
                 last.simulate(simulation, events)
@@ -176,7 +181,7 @@ impl<S: Simulation> Simulate<S> for CommandFloat {
             CommandFloat::FetchFloat { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_float()
             }
-            CommandFloat::GetFloat { id } => simulation.variables().get_float(*id),
+            CommandFloat::GetFloat { id } => simulation.heap().get_float(*id),
             CommandFloat::FromInteger { integer } => integer.simulate(simulation, events) as f32,
         }
     }
@@ -191,12 +196,13 @@ impl<S: Simulation> Simulate<S> for CommandString {
                 StringOrPlaceholder::Value(value) => value.clone(),
                 other => other.to_string(),
             },
+            CommandString::FunctionArgument { index } => simulation.stack().get_string(*index),
             CommandString::Multi { commands, last } => {
                 commands.simulate(simulation, events);
                 last.simulate(simulation, events)
             }
             CommandString::Concatenate { operation } => operation.simulate(simulation, events),
-            CommandString::GetString { id } => simulation.variables().get_string(*id),
+            CommandString::GetString { id } => simulation.heap().get_string(*id),
             CommandString::WorldName { .. } => Default::default(),
             CommandString::FromBoolean { boolean } => {
                 boolean.simulate(simulation, events).to_string()
@@ -230,6 +236,32 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
     fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
         match self {
             CommandVoid::Multi { commands } => commands.simulate(simulation, events),
+            CommandVoid::CallFunction {
+                booleans,
+                integers,
+                floats,
+                strings,
+                index,
+            } => {
+                for boolean in booleans {
+                    let boolean = boolean.simulate(simulation, events);
+                    simulation.stack_mut().push_boolean(boolean);
+                }
+                for integer in integers {
+                    let integer = integer.simulate(simulation, events);
+                    simulation.stack_mut().push_integer(integer);
+                }
+                for float in floats {
+                    let float = float.simulate(simulation, events);
+                    simulation.stack_mut().push_float(float);
+                }
+                for string in strings {
+                    let string = string.simulate(simulation, events);
+                    simulation.stack_mut().push_string(string);
+                }
+
+                // TODO we definitely have to simulate the lookup?
+            }
             CommandVoid::If { condition, command } => {
                 if condition.simulate(simulation, events) {
                     command.simulate(simulation, events)
@@ -261,19 +293,19 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             }
             CommandVoid::SetBoolean { id, value } => {
                 let value = value.simulate(simulation, events);
-                simulation.variables_mut().set_boolean(*id, value);
+                simulation.heap_mut().set_boolean(*id, value);
             }
             CommandVoid::SetInteger { id, value } => {
                 let value = value.simulate(simulation, events);
-                simulation.variables_mut().set_integer(*id, value);
+                simulation.heap_mut().set_integer(*id, value);
             }
             CommandVoid::SetFloat { id, value } => {
                 let value = value.simulate(simulation, events);
-                simulation.variables_mut().set_float(*id, value);
+                simulation.heap_mut().set_float(*id, value);
             }
             CommandVoid::SetString { id, value } => {
                 let value = value.simulate(simulation, events);
-                simulation.variables_mut().set_string(*id, value);
+                simulation.heap_mut().set_string(*id, value);
             }
             CommandVoid::TriggerClientEvent { client_event } => {
                 client_event.simulate(simulation, events)
@@ -298,7 +330,6 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::FreeMessageHide { .. }
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }
-            | CommandVoid::Lookup { .. } // TODO we definitely have to simulate the lookup?
             | CommandVoid::BoxTrigger { .. }
             | CommandVoid::BoxTriggerDestroy { .. }
             | CommandVoid::BoxTriggerEnterCallback { .. }

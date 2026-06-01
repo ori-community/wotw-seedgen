@@ -4,30 +4,35 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         ast::{self, UberStateType},
-        compile::{add_float, add_integer, store_boolean, store_float, store_integer},
+        compile::{
+            add_float, add_integer, preprocess::PreprocessedFunction, store_boolean, store_float,
+            store_integer,
+        },
         output::{
             ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
             CommandString, CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator,
-            IntoConstant, Operation,
+            IntoConstant, Operation, StringOrPlaceholder,
         },
+        types::Type,
     },
     Alignment, Corner, HorizontalAnchor, Shard, ShopKind, Skill, Teleporter, UberIdentifier,
     VerticalAnchor, WeaponUpgrade, WheelBind,
 };
-use arrayvec::ArrayVec;
 use heck::ToTitleCase;
 use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
 use regex::Regex;
 use rustc_hash::FxHashMap;
+use smallvec::{smallvec, SmallVec};
 use std::{
+    borrow::Cow,
     cmp::Ordering,
     fmt::{self, Display},
     ops::Range,
 };
 use strum::{Display, EnumString, VariantArray};
-use wotw_seedgen_parse::{Error, Punctuated, Span, SpanEnd, SpanStart, Symbol};
+use wotw_seedgen_parse::{Error, Span, SpanEnd, SpanStart, Spanned, SpannedOption, Symbol};
 
 pub const fn empty() -> CommandVoid {
     CommandVoid::Multi { commands: vec![] }
@@ -133,9 +138,9 @@ pub fn weapon_upgrade(weapon_upgrade: WeaponUpgrade) -> CommandVoid {
     }
 }
 
-struct ArgContext<'a, 'compiler, 'source, 'snippets, 'uberstates> {
-    parameters: <Punctuated<ast::Expression<'source>, Symbol<','>> as IntoIterator>::IntoIter,
-    compiler: &'a mut SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates>,
+struct ArgContext<'a, 'source, 'compiler, 'snippets, 'uberstates> {
+    parameters: <ast::Punctuated<ast::Expression<'source>, ','> as IntoIterator>::IntoIter,
+    compiler: &'a mut SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates>,
 }
 
 fn arg<T: CompileInto>(context: &mut ArgContext) -> Option<T> {
@@ -340,40 +345,30 @@ pub enum FunctionIdentifier {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionSignature {
-    pub args: ArrayVec<FunctionArg, 6>,
-    pub return_ty: Option<&'static str>,
+    pub args: SmallVec<[FunctionArg; 6]>,
+    pub return_ty: Option<Type>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FunctionArg {
-    pub name: &'static str,
-    pub ty: &'static str,
+    pub identifier: Cow<'static, str>,
+    pub ty: Type,
 }
 
 macro_rules! function_signatures {
-    (@acc $self:ident [$identifier:ident($($name:ident: $ty:tt),*) -> $return_ty:tt, $($more:tt)*] -> [$($acc:tt)*]) => {
+    (@acc $self:ident [$identifier:ident($($arg_identifier:ident: $ty:tt),*) -> $return_ty:tt, $($more:tt)*] -> [$($acc:tt)*]) => {
         function_signatures!(@acc $self [$($more)*] -> [$($acc)*
             FunctionIdentifier::$identifier => FunctionSignature {
-                args: ArrayVec::from_iter([
-                    $(FunctionArg {
-                        name: stringify!($name),
-                        ty: stringify!($ty),
-                    }),*
-                ]),
-                return_ty: Some(stringify!($return_ty)),
+                args: function_signatures!(@args $($arg_identifier: $ty),*),
+                return_ty: Some($return_ty),
             },
         ])
     };
 
-    (@acc $self:ident [$identifier:ident($($name:ident: $ty:tt),*), $($more:tt)*] -> [$($acc:tt)*]) => {
+    (@acc $self:ident [$identifier:ident($($arg_identifier:ident: $ty:tt),*), $($more:tt)*] -> [$($acc:tt)*]) => {
         function_signatures!(@acc $self [$($more)*] -> [$($acc)*
             FunctionIdentifier::$identifier => FunctionSignature {
-                args: ArrayVec::from_iter([
-                    $(FunctionArg {
-                        name: stringify!($name),
-                        ty: stringify!($ty),
-                    }),*
-                ]),
+                args: function_signatures!(@args $($arg_identifier: $ty),*),
                 return_ty: None,
             },
         ])
@@ -381,10 +376,21 @@ macro_rules! function_signatures {
 
     (@acc $self:ident [] -> [$($acc:tt)*]) => {
         {
+            use Type::*;
+
             match $self {
                 $($acc)*
             }
         }
+    };
+
+    (@args $($arg_identifier:ident: $ty:tt),*) => {
+        smallvec![
+            $(FunctionArg {
+                identifier: Cow::Borrowed(stringify!($arg_identifier)),
+                ty: $ty,
+            }),*
+        ]
     };
 
     ($self:ident, $($items:tt)*) => {
@@ -396,7 +402,7 @@ impl FunctionIdentifier {
     pub fn signature(self) -> FunctionSignature {
         function_signatures! {
             self,
-            Fetch(uber_identifier: UberIdentifier) -> ?,
+            Fetch(uber_identifier: UberIdentifier) -> UberStateValue,
             GetBoolean(id: String) -> Boolean,
             IsInBox(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
             GetInteger(id: String) -> Integer,
@@ -405,7 +411,7 @@ impl FunctionIdentifier {
             GetFloat(id: String) -> Float,
             ToFloat(integer: Integer) -> Float,
             GetString(id: String) -> String,
-            ToString(value: ?) -> String,
+            ToString(value: Expression) -> String,
             SpiritLightString(amount: Integer) -> String,
             RemoveSpiritLightString(amount: Integer) -> String,
             GorlekOreString() -> String,
@@ -472,8 +478,8 @@ impl FunctionIdentifier {
             SetMessageCoordinateSystem(id: String, coordinate_system: CoordinateSystem),
             FreeMessageShow(id: String, fade: Boolean, sound: Boolean),
             FreeMessageHide(id: String, fade: Boolean),
-            Store(uber_identifier: UberIdentifier, value: ?),
-            StoreWithoutTriggers(uber_identifier: UberIdentifier, value: ?),
+            Store(uber_identifier: UberIdentifier, value: UberStateValue),
+            StoreWithoutTriggers(uber_identifier: UberIdentifier, value: UberStateValue),
             StoreDefaults(),
             StoreDefaultsExclude(regex: String),
             SetBoolean(id: String, value: Boolean),
@@ -545,34 +551,73 @@ impl Display for FunctionSignature {
 
 impl Display for FunctionArg {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}: {}", self.name, self.ty)
+        write!(f, "{}: {}", self.identifier, self.ty)
     }
 }
 
 impl<'source> ast::FunctionCall<'source> {
     fn compile_custom_function(
         self,
-        index: usize,
-        compiler: &mut SnippetCompiler,
+        function: PreprocessedFunction,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<Command> {
-        if let Some(parameters) = self.parameters.content {
-            if !parameters.is_empty() {
-                compiler.errors.push(Error::error(
-                    "parameters for custom functions aren't (yet) supported".to_string(),
-                    parameters[0].span().start..parameters.last.as_ref().unwrap().span().end,
-                ).with_help("Use set functions for the values you want to pass and get them again in the function".to_string()))
+        let parameters = self.parameters.content?;
+
+        compiler.check_arg_count(
+            &self.parameters.open,
+            &parameters,
+            &self.parameters.close,
+            function.signature.args.len(),
+        );
+
+        let index = function.index;
+
+        let mut booleans = vec![];
+        let mut integers = vec![];
+        let mut floats = vec![];
+        let mut strings = vec![];
+
+        for (arg_signature, arg_expression) in function.signature.args.iter().zip(parameters) {
+            match arg_signature.ty {
+                Type::Boolean => booleans.push(
+                    arg_expression
+                        .compile_into(compiler)
+                        .unwrap_or(CommandBoolean::Constant { value: false }),
+                ),
+                Type::Integer => integers.push(
+                    arg_expression
+                        .compile_into(compiler)
+                        .unwrap_or(CommandInteger::Constant { value: 0 }),
+                ),
+                Type::Float => floats.push(
+                    arg_expression
+                        .compile_into(compiler)
+                        .unwrap_or(CommandFloat::Constant { value: (0.).into() }),
+                ),
+                Type::String => strings.push(arg_expression.compile_into(compiler).unwrap_or(
+                    CommandString::Constant {
+                        value: StringOrPlaceholder::Value(String::new()),
+                    },
+                )),
+                _ => {}
             }
         }
 
-        Some(Command::Void(CommandVoid::Lookup { index }))
+        Some(Command::Void(CommandVoid::CallFunction {
+            booleans,
+            integers,
+            floats,
+            strings,
+            index,
+        }))
     }
 
     fn compile_signature<'a, 'compiler, 'snippets, 'uberstates>(
         self,
-        compiler: &'a mut SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates>,
+        compiler: &'a mut SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates>,
     ) -> Option<(
         FunctionIdentifier,
-        ArgContext<'a, 'compiler, 'source, 'snippets, 'uberstates>,
+        ArgContext<'a, 'source, 'compiler, 'snippets, 'uberstates>,
     )> {
         let identifier = compiler.consume_result(
             self.identifier
@@ -584,30 +629,13 @@ impl<'source> ast::FunctionCall<'source> {
 
         let identifier = identifier?;
         let parameters = self.parameters.content?;
-        let arg_count = identifier.arg_count();
 
-        match parameters.len().cmp(&arg_count) {
-            Ordering::Less => {
-                let start = match &parameters.last {
-                    None => self.parameters.open.span_start(),
-                    Some(last) => last.span_end(),
-                };
-                let end = self.parameters.close.span_end();
-
-                compiler
-                    .errors
-                    .push(Error::error("Too few parameters".to_string(), start..end))
-            }
-            Ordering::Equal => {}
-            Ordering::Greater => {
-                let start = parameters[arg_count].span_start();
-                let end = self.parameters.close.span_end();
-
-                compiler
-                    .errors
-                    .push(Error::error("Too many parameters".to_string(), start..end))
-            }
-        }
+        compiler.check_arg_count(
+            &self.parameters.open,
+            &parameters,
+            &self.parameters.close,
+            identifier.arg_count(),
+        );
 
         let context = ArgContext {
             parameters: parameters.into_iter(),
@@ -618,12 +646,43 @@ impl<'source> ast::FunctionCall<'source> {
     }
 }
 
+impl SnippetCompiler<'_, '_, '_, '_> {
+    fn check_arg_count(
+        &mut self,
+        open: &Spanned<Symbol<'('>>,
+        parameters: &ast::Punctuated<ast::Expression, ','>,
+        close: &SpannedOption<Spanned<Symbol<')'>>>,
+        arg_count: usize,
+    ) {
+        match parameters.len().cmp(&arg_count) {
+            Ordering::Less => {
+                let start = match &parameters.last {
+                    None => open.span_start(),
+                    Some(last) => last.span_end(),
+                };
+                let end = close.span_end();
+
+                self.errors
+                    .push(Error::error("Too few parameters".to_string(), start..end))
+            }
+            Ordering::Equal => {}
+            Ordering::Greater => {
+                let start = parameters[arg_count].span_start();
+                let end = close.span_end();
+
+                self.errors
+                    .push(Error::error("Too many parameters".to_string(), start..end))
+            }
+        }
+    }
+}
+
 impl<'source> Compile<'source> for ast::FunctionCall<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
-        if let Some(index) = compiler.function_indices.get(self.identifier.data.0) {
-            return self.compile_custom_function(*index, compiler);
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+        if let Some(function) = compiler.preprocessed.functions.get(self.identifier.data.0) {
+            return self.compile_custom_function(function.clone(), compiler);
         }
 
         let (identifier, mut context) = self.compile_signature(compiler)?;
@@ -1444,9 +1503,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::DealEnemyDamage => Command::Void(CommandVoid::DealEnemyDamage {
                 amount: arg(&mut context)?,
             }),
-            FunctionIdentifier::ForceDealEnemyDamage => Command::Void(CommandVoid::ForceDealEnemyDamage {
-                amount: arg(&mut context)?,
-            }),
+            FunctionIdentifier::ForceDealEnemyDamage => {
+                Command::Void(CommandVoid::ForceDealEnemyDamage {
+                    amount: arg(&mut context)?,
+                })
+            }
         };
 
         if let Some(excess) = context.parameters.next() {
@@ -1757,7 +1818,7 @@ where
 {
     lookup_or_insert(
         identifier,
-        &mut context.compiler.function_indices,
+        &mut context.compiler.preprocessed.functions,
         &mut context.compiler.global.output.command_lookup,
         || CommandVoid::Multi {
             commands: context
@@ -1779,21 +1840,36 @@ where
 
 fn lookup_or_insert<F>(
     identifier: String,
-    function_indices: &mut FxHashMap<String, usize>,
+    functions: &mut FxHashMap<String, PreprocessedFunction>,
     command_lookup: &mut Vec<CommandVoid>,
     command: F,
 ) -> Command
 where
     F: FnOnce() -> CommandVoid,
 {
-    let index = *function_indices.entry(identifier).or_insert_with(|| {
-        let index = command_lookup.len();
-        command_lookup.push(command());
+    let index = functions
+        .entry(identifier)
+        .or_insert_with(|| {
+            let index = command_lookup.len();
+            command_lookup.push(command());
 
-        index
-    });
+            PreprocessedFunction {
+                index,
+                signature: FunctionSignature {
+                    args: smallvec![],
+                    return_ty: None,
+                },
+            }
+        })
+        .index;
 
-    Command::Void(CommandVoid::Lookup { index })
+    Command::Void(CommandVoid::CallFunction {
+        booleans: vec![],
+        integers: vec![],
+        floats: vec![],
+        strings: vec![],
+        index,
+    })
 }
 
 fn shop_identifier_arg<F>(context: &mut ArgContext, f: F) -> Option<UberIdentifier>

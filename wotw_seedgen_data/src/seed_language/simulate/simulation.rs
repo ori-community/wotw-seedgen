@@ -2,7 +2,7 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::{Event, Trigger},
-        simulate::{condition_values::ConditionValues, set_uber_state, Simulate, Variables},
+        simulate::{condition_values::ConditionValues, set_uber_state, Heap, Simulate, Stack},
     },
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -17,9 +17,13 @@ pub trait Simulation: Sized {
         let _ = (uber_identifier, events);
     }
 
-    fn variables(&self) -> &Variables;
+    fn stack(&self) -> &Stack;
 
-    fn variables_mut(&mut self) -> &mut Variables;
+    fn stack_mut(&mut self) -> &mut Stack;
+
+    fn heap(&self) -> &Heap;
+
+    fn heap_mut(&mut self) -> &mut Heap;
 
     fn condition_values(&mut self) -> &mut ConditionValues;
 

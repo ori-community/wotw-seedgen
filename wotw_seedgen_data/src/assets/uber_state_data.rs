@@ -44,6 +44,16 @@ pub struct UberStateAlias {
     pub value: Option<i32>,
 }
 
+impl UberStateAlias {
+    /// A regular alias referring to an entire UberState
+    pub fn regular(uber_identifier: UberIdentifier) -> Self {
+        Self {
+            uber_identifier,
+            value: None,
+        }
+    }
+}
+
 impl Display for UberStateAlias {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.uber_identifier)?;
@@ -219,10 +229,7 @@ impl UberStateData {
                 group_map
                     .entry(dump_member.name)
                     .or_default()
-                    .push(UberStateAlias {
-                        uber_identifier: UberIdentifier::new(group, member),
-                        value: None,
-                    });
+                    .push(UberStateAlias::regular(UberIdentifier::new(group, member)));
 
                 let default_value = match dump_member.value_type {
                     UberStateDumpValueType::Boolean => {

@@ -7,10 +7,10 @@
 
 !include("bonus_core", update_bonus_wheel, any_collected, any_enabled, enable_all, disable_all)
 
-!augment_fun(any_collected, if collected > 0 set_boolean("any_collected", true))
-!augment_fun(any_enabled, if collected > 0 && enabled set_boolean("any_enabled", true))
-!augment_fun(enable_all, if enabled == false store(enabled, true))
-!augment_fun(disable_all, if enabled store(enabled, false))
+!augment_fun(any_collected(), if collected > 0 set_boolean("any_collected", true))
+!augment_fun(any_enabled(), if collected > 0 && enabled set_boolean("any_enabled", true))
+!augment_fun(enable_all(), if enabled == false store(enabled, true))
+!augment_fun(disable_all(), if enabled store(enabled, false))
 
 !builtin_icon(rapid_sword_icon, "icons/bonus/rapidsword.png")
 

@@ -683,6 +683,7 @@ impl ResolvePlaceholders for CommandBoolean {
             Self::CompareZone { operation } => operation.resolve(context),
             Self::LogicOperation { operation } => operation.resolve(context),
             Self::Constant { .. }
+            | Self::FunctionArgument { .. }
             | Self::FetchBoolean { .. }
             | Self::GetBoolean { .. }
             | Self::IsInBox { .. } => {}
@@ -700,7 +701,10 @@ impl ResolvePlaceholders for CommandInteger {
             Self::Arithmetic { operation } => operation.resolve(context),
             Self::FromFloat { float } => float.resolve(context),
             Self::StringLength { string } => string.resolve(context),
-            Self::Constant { .. } | Self::FetchInteger { .. } | Self::GetInteger { .. } => {}
+            Self::Constant { .. }
+            | Self::FunctionArgument { .. }
+            | Self::FetchInteger { .. }
+            | Self::GetInteger { .. } => {}
         }
     }
 }
@@ -714,7 +718,10 @@ impl ResolvePlaceholders for CommandFloat {
             }
             Self::Arithmetic { operation } => operation.resolve(context),
             Self::FromInteger { integer } => integer.resolve(context),
-            Self::Constant { .. } | Self::FetchFloat { .. } | Self::GetFloat { .. } => {}
+            Self::Constant { .. }
+            | Self::FunctionArgument { .. }
+            | Self::FetchFloat { .. }
+            | Self::GetFloat { .. } => {}
         }
     }
 }
@@ -755,7 +762,7 @@ impl ResolvePlaceholders for CommandString {
             Self::FromBoolean { boolean } => boolean.resolve(context),
             Self::FromInteger { integer } => integer.resolve(context),
             Self::FromFloat { float } => float.resolve(context),
-            Self::GetString { .. } | Self::WorldName { .. } => {}
+            Self::FunctionArgument { .. } | Self::GetString { .. } | Self::WorldName { .. } => {}
         }
     }
 }
@@ -776,6 +783,18 @@ impl ResolvePlaceholders for CommandVoid {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Multi { commands } => commands.resolve(context),
+            Self::CallFunction {
+                booleans,
+                integers,
+                floats,
+                strings,
+                ..
+            } => {
+                booleans.resolve(context);
+                integers.resolve(context);
+                floats.resolve(context);
+                strings.resolve(context);
+            }
             Self::If { condition, command } => {
                 condition.resolve(context);
                 command.resolve(context);
@@ -859,14 +878,9 @@ impl ResolvePlaceholders for CommandVoid {
             }
             Self::SetWheelPinned { pinned, .. } => pinned.resolve(context),
             Self::DebugLog { message } => message.resolve(context),
-            Self::DealEnemyDamage { amount } => {
-                amount.resolve(context)
-            },
-            Self::ForceDealEnemyDamage { amount } => {
-                amount.resolve(context)
-            },
-            Self::Lookup { .. }
-            | Self::DefineTimer { .. }
+            Self::DealEnemyDamage { amount } => amount.resolve(context),
+            Self::ForceDealEnemyDamage { amount } => amount.resolve(context),
+            Self::DefineTimer { .. }
             | Self::FreeMessageUninitialized { .. }
             | Self::MessageDestroy { .. }
             | Self::FreeMessageAlignment { .. }

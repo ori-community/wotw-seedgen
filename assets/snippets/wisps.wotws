@@ -9,16 +9,16 @@
 
 !let(max_wisps, 5)
 
-!augment_fun(write_goal_progress_message, {
+!augment_fun(write_goal_progress_message(), {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
     set_boolean("comma", true)
     set_string("color", "")
     if itemTracker.wispsCount == max_wisps set_string("color", "$")
-    write_wisps_message()
+    write_wisps_message(get_string("color"))
     set_string("goal_progress_message", get_string("goal_progress_message") + get_string("wisps_message"))
 })
 
-!augment_fun(check_goals_completed, {
+!augment_fun(check_goals_completed(), {
     if itemTracker.wispsCount < max_wisps set_boolean("goals_completed", false)
 })
 
@@ -26,14 +26,13 @@ on spawn store(itemTracker.wispsRequired, max_wisps)
 
 on change itemTracker.wispsCount update_goals_completed()
 
-!augment_fun(write_goals_incomplete_message, {
+!augment_fun(write_goals_incomplete_message(), {
     if itemTracker.wispsCount < max_wisps {
-        set_string("color", "@")
-        write_wisps_message()
+        write_wisps_message("@")
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("wisps_message"))
     }
 })
 
-fun write_wisps_message() {
-    set_string("wisps_message", get_string("color") + "Wisps: " + itemTracker.wispsCount + "/" + max_wisps + get_string("color"))
+fun write_wisps_message(color: String) {
+    set_string("wisps_message", color + "Wisps: " + itemTracker.wispsCount + "/" + max_wisps + color)
 }

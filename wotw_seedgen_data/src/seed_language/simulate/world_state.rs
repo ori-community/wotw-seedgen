@@ -2,10 +2,7 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::Event,
-        simulate::{
-            condition_values::ConditionValues, CloneSnapshot, Simulation, Snapshot, UberStates,
-            Variables,
-        },
+        simulate::{CloneSnapshot, ConditionValues, Heap, Simulation, Snapshot, Stack, UberStates},
     },
     UberIdentifier,
 };
@@ -13,7 +10,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct WorldState {
     pub uber_states: UberStates,
-    pub variables: Variables,
+    pub stack: Stack,
+    pub heap: Heap,
     pub condition_values: CloneSnapshot<ConditionValues>,
 }
 
@@ -22,7 +20,8 @@ impl WorldState {
     pub fn new(uber_states: UberStates, events: &mut [Event]) -> Self {
         let mut world_state = Self {
             uber_states,
-            variables: Default::default(),
+            stack: Stack::default(),
+            heap: Heap::default(),
             condition_values: CloneSnapshot::new(ConditionValues::default()),
         };
 
@@ -43,14 +42,22 @@ impl Simulation for WorldState {
         self.uber_states.store(uber_identifier, value)
     }
 
-    #[inline]
-    fn variables(&self) -> &Variables {
-        &self.variables
+    fn stack(&self) -> &Stack {
+        &self.stack
+    }
+
+    fn stack_mut(&mut self) -> &mut Stack {
+        &mut self.stack
     }
 
     #[inline]
-    fn variables_mut(&mut self) -> &mut Variables {
-        &mut self.variables
+    fn heap(&self) -> &Heap {
+        &self.heap
+    }
+
+    #[inline]
+    fn heap_mut(&mut self) -> &mut Heap {
+        &mut self.heap
     }
 
     #[inline]

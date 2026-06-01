@@ -73,6 +73,7 @@ impl ContainedReads for CommandBoolean {
             CommandBoolean::LogicOperation { operation } => nested(operation),
             CommandBoolean::FetchBoolean { uber_identifier } => some(*uber_identifier),
             CommandBoolean::Constant { .. }
+            | CommandBoolean::FunctionArgument { .. }
             | CommandBoolean::GetBoolean { .. }
             | CommandBoolean::IsInBox { .. } => none(),
         }
@@ -87,7 +88,9 @@ impl ContainedReads for CommandInteger {
             CommandInteger::FetchInteger { uber_identifier } => some(*uber_identifier),
             CommandInteger::FromFloat { float } => nested(float),
             CommandInteger::StringLength { string } => nested(string),
-            CommandInteger::Constant { .. } | CommandInteger::GetInteger { .. } => none(),
+            CommandInteger::Constant { .. }
+            | CommandInteger::FunctionArgument { .. }
+            | CommandInteger::GetInteger { .. } => none(),
         }
     }
 }
@@ -99,7 +102,9 @@ impl ContainedReads for CommandFloat {
             CommandFloat::Arithmetic { operation } => nested(operation),
             CommandFloat::FetchFloat { uber_identifier } => some(*uber_identifier),
             CommandFloat::FromInteger { integer } => nested(integer),
-            CommandFloat::Constant { .. } | CommandFloat::GetFloat { .. } => none(),
+            CommandFloat::Constant { .. }
+            | CommandFloat::FunctionArgument { .. }
+            | CommandFloat::GetFloat { .. } => none(),
         }
     }
 }
@@ -113,6 +118,7 @@ impl ContainedReads for CommandString {
             CommandString::FromInteger { integer } => nested(integer),
             CommandString::FromFloat { float } => nested(float),
             CommandString::Constant { .. }
+            | CommandString::FunctionArgument { .. }
             | CommandString::GetString { .. }
             | CommandString::WorldName { .. } => none(),
         }

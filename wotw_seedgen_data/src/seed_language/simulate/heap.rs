@@ -1,14 +1,14 @@
 use rustc_hash::FxHashMap;
 
 #[derive(Debug, Default, Clone)]
-pub struct Variables {
+pub struct Heap {
     booleans: FxHashMap<usize, bool>,
     integers: FxHashMap<usize, i32>,
     floats: FxHashMap<usize, f32>,
     strings: FxHashMap<usize, String>,
 }
 
-impl Variables {
+impl Heap {
     #[inline]
     pub fn set_boolean(&mut self, id: usize, value: bool) {
         self.booleans.insert(id, value);
@@ -54,14 +54,14 @@ impl Variables {
 // use std::{cmp::Ordering, iter};
 
 // #[derive(Debug, Default, Clone)]
-// pub struct Variables {
+// pub struct Heap {
 //     booleans: Vec<bool>,
 //     integers: Vec<i32>,
 //     floats: Vec<f32>,
 //     strings: Vec<String>,
 // }
 
-// impl Variables {
+// impl Heap {
 //     #[inline]
 //     pub fn set_boolean(&mut self, id: usize, value: bool) {
 //         set(&mut self.booleans, id, value);

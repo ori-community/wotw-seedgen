@@ -47,7 +47,7 @@ fun update_goals_completed() {
 }
 
 // TODO try shrinking or graying the Trees: etc. labels to make the numbers easier to parse
-!augment_fun(write_progress_message, {
+!augment_fun(write_progress_message(), {
     write_goal_progress_message()
     if get_boolean("comma") {
         set_string("progress_message", get_string("progress_message") + "\n" + get_string("goal_progress_message"))

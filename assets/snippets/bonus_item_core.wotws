@@ -2,7 +2,7 @@
 #name("Bonus Item Core")
 #description("Convenience functions for simple bonus items")
 
-!include("delta_time", tick, delta)
+!include("delta_time", tick)
 
 !builtin_icon(health_regeneration_icon, "icons/bonus/healthregeneration.png")
 !builtin_icon(energy_regeneration_icon, "icons/bonus/energyregeneration.png")
@@ -35,7 +35,7 @@
 !state(health_per_second, Float)
 !export(health_per_second)
 
-!augment_fun(tick, if health_per_second != 0 store(player.health, player.health + health_per_second * delta))
+!augment_fun(tick(delta: Float), if health_per_second != 0 store(player.health, player.health + health_per_second * delta))
 
 !state(health_regenerations, Integer)
 !export(health_regenerations)
@@ -57,7 +57,7 @@ fun health_regeneration() {
 !state(energy_per_second, Float)
 !export(energy_per_second)
 
-!augment_fun(tick, if energy_per_second != 0 store(player.energy, player.energy + energy_per_second * delta))
+!augment_fun(tick(delta: Float), if energy_per_second != 0 store(player.energy, player.energy + energy_per_second * delta))
 
 !state(energy_regenerations, Integer)
 !export(energy_regenerations)

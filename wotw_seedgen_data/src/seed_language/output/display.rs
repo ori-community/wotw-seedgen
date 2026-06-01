@@ -90,6 +90,7 @@ impl Display for CommandBoolean {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandBoolean::Constant { value } => value.fmt(f),
+            CommandBoolean::FunctionArgument { index } => write!(f, "boolean_arg({index})"),
             CommandBoolean::Multi { commands, last } => multi(f, commands, last),
             CommandBoolean::CompareBoolean { operation } => operation.fmt(f),
             CommandBoolean::CompareInteger { operation } => operation.fmt(f),
@@ -112,6 +113,7 @@ impl Display for CommandInteger {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandInteger::Constant { value } => value.fmt(f),
+            CommandInteger::FunctionArgument { index } => write!(f, "integer_arg({index})"),
             CommandInteger::Multi { commands, last } => multi(f, commands, last),
             CommandInteger::Arithmetic { operation } => operation.fmt(f),
             CommandInteger::FetchInteger { uber_identifier } => {
@@ -128,6 +130,7 @@ impl Display for CommandFloat {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandFloat::Constant { value } => value.fmt(f),
+            CommandFloat::FunctionArgument { index } => write!(f, "float_arg({index})"),
             CommandFloat::Multi { commands, last } => multi(f, commands, last),
             CommandFloat::Arithmetic { operation } => operation.fmt(f),
             CommandFloat::FetchFloat { uber_identifier } => write!(f, "fetch({uber_identifier})"),
@@ -141,6 +144,7 @@ impl Display for CommandString {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandString::Constant { value } => write!(f, "{value}"),
+            CommandString::FunctionArgument { index } => write!(f, "string_arg({index})"),
             CommandString::Multi { commands, last } => multi(f, commands, last),
             CommandString::Concatenate { operation } => operation.fmt(f),
             CommandString::GetString { id } => write!(f, "get_string({id})"),
@@ -167,7 +171,38 @@ impl Display for CommandVoid {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             CommandVoid::Multi { commands } => write!(f, "{{ {} }}", commands.iter().format(" ")),
-            CommandVoid::Lookup { index } => write!(f, "lookup({index})"),
+            CommandVoid::CallFunction {
+                booleans,
+                integers,
+                floats,
+                strings,
+                index,
+            } => {
+                if booleans.is_empty()
+                    && integers.is_empty()
+                    && floats.is_empty()
+                    && strings.is_empty()
+                {
+                    write!(f, "call_function({index})")
+                } else {
+                    write!(f, "{{ ")?;
+
+                    for boolean in booleans {
+                        write!(f, "boolean_arg({boolean})")?;
+                    }
+                    for integer in integers {
+                        write!(f, "integer_arg({integer})")?;
+                    }
+                    for float in floats {
+                        write!(f, "float_arg({float})")?;
+                    }
+                    for string in strings {
+                        write!(f, "string_arg({string})")?;
+                    }
+
+                    write!(f, "call_function({index}) }}")
+                }
+            }
             CommandVoid::If { condition, command } => write!(f, "if ({condition}) {{ {command} }}"),
             CommandVoid::DefineTimer { toggle, timer } => {
                 write!(f, "define_timer({toggle}, {timer})")
@@ -394,7 +429,9 @@ impl Display for CommandVoid {
             CommandVoid::CloseWeaponWheel {} => write!(f, "close_weapon_wheel()"),
             CommandVoid::DebugLog { message } => write!(f, "debug_log({message})"),
             CommandVoid::DealEnemyDamage { amount } => write!(f, "deal_enemy_damage({amount})"),
-            CommandVoid::ForceDealEnemyDamage { amount } => write!(f, "force_deal_enemy_damage({amount})"),
+            CommandVoid::ForceDealEnemyDamage { amount } => {
+                write!(f, "force_deal_enemy_damage({amount})")
+            }
         }
     }
 }

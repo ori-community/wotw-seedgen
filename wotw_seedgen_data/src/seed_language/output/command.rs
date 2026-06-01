@@ -46,6 +46,8 @@ pub trait IntoConstant: Sized {
 pub enum CommandBoolean {
     /// Return `value`
     Constant { value: bool },
+    /// Return the `index`th boolean function argument
+    FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
         commands: Vec<CommandVoid>,
@@ -138,6 +140,8 @@ impl From<bool> for CommandBoolean {
 pub enum CommandInteger {
     /// Return `value`
     Constant { value: i32 },
+    /// Return the `index`th boolean function argument
+    FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
         commands: Vec<CommandVoid>,
@@ -191,6 +195,8 @@ impl From<i32> for CommandInteger {
 pub enum CommandFloat {
     /// Return `value`
     Constant { value: OrderedFloat<f32> },
+    /// Return the `index`th boolean function argument
+    FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
         commands: Vec<CommandVoid>,
@@ -247,6 +253,8 @@ impl From<f32> for CommandFloat {
 pub enum CommandString {
     /// Return `value`
     Constant { value: StringOrPlaceholder },
+    /// Return the `index`th boolean function argument
+    FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
         commands: Vec<CommandVoid>,
@@ -385,8 +393,12 @@ pub enum CommandVoid {
     Multi {
         commands: Vec<CommandVoid>,
     },
-    /// Lookup and perform the action at `index`
-    Lookup {
+    /// Call the function at `index` with the given arguments
+    CallFunction {
+        booleans: Vec<CommandBoolean>,
+        integers: Vec<CommandInteger>,
+        floats: Vec<CommandFloat>,
+        strings: Vec<CommandString>,
         index: usize,
     },
     /// Only perform `command` if `condition` evaluates to true

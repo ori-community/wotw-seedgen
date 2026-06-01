@@ -7,7 +7,7 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::Event,
-        simulate::{condition_values::ConditionValues, Simulation, Snapshot, Variables},
+        simulate::{condition_values::ConditionValues, Heap, Simulation, Snapshot, Stack},
     },
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -141,12 +141,20 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
         self.simulation.on_change(uber_identifier, events);
     }
 
-    fn variables(&self) -> &Variables {
-        self.simulation.variables()
+    fn stack(&self) -> &Stack {
+        self.simulation.stack()
     }
 
-    fn variables_mut(&mut self) -> &mut Variables {
-        self.simulation.variables_mut()
+    fn stack_mut(&mut self) -> &mut Stack {
+        self.simulation.stack_mut()
+    }
+
+    fn heap(&self) -> &Heap {
+        self.simulation.heap()
+    }
+
+    fn heap_mut(&mut self) -> &mut Heap {
+        self.simulation.heap_mut()
     }
 
     fn condition_values(&mut self) -> &mut ConditionValues {

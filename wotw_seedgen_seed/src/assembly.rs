@@ -47,6 +47,26 @@ pub enum Trigger {
 /// Mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/seed/instructions
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Command {
+    /// Push an empty stack frame
+    StackPush,
+    /// Copy Boolean Memory 0 into the current stack frame's next boolean
+    StackPushBoolean,
+    /// Copy Integer Memory 0 into the current stack frame's next integer
+    StackPushInteger,
+    /// Copy Float Memory 0 into the current stack frame's next float
+    StackPushFloat,
+    /// Copy String Memory 0 into the current stack frame's next string
+    StackPushString,
+    /// Copy the current stack frame's Boolean `index` into Boolean Memory 0
+    StackCopyBoolean(/*index*/ usize),
+    /// Copy the current stack frame's Integer `index` into Integer Memory 0
+    StackCopyInteger(/*index*/ usize),
+    /// Copy the current stack frame's Float `index` into Float Memory 0
+    StackCopyFloat(/*index*/ usize),
+    /// Copy the current stack frame's String `index` into String Memory 0
+    StackCopyString(/*index*/ usize),
+    /// Pop a stack frame
+    StackPop,
     /// Execute the commands at `index` in command_lookup
     Execute(/*index*/ usize),
     /// Execute the commands at `index` in command_lookup if Boolean Memory 0 is `true`

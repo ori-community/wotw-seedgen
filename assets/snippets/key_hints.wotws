@@ -21,8 +21,8 @@ Twillen tells the zones holding Bow and Bash")
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
 
-!augment_fun(write_progress_message, write_hints())
-!augment_fun(write_map_progress_message, write_hints())
+!augment_fun(write_progress_message(), write_hints())
+!augment_fun(write_map_progress_message(), write_hints())
 
 fun write_hints() {
     if LupoShop.Slot3 {

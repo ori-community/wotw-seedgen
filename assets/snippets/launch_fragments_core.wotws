@@ -6,21 +6,20 @@
 
 !include("progress_helper", write_progress_message)
 
-!augment_fun(write_progress_message, {
-    set_integer("amount", itemTracker.launchFragmentsCount)
-    write_amount()
+!augment_fun(write_progress_message(), {
+    write_amount(itemTracker.launchFragmentsCount)
     set_string("progress_message", get_string("progress_message") + "\n*Launch Fragments* " + get_string("amount"))
 })
 
-fun write_amount() {
+fun write_amount(amount: Integer) {
     set_string("color", "")
-    if get_integer("amount") >= itemTracker.launchFragmentsRequired set_string("color", "$")
-    set_string("amount", get_string("color") + "(" + get_integer("amount") + "/" + itemTracker.launchFragmentsRequired + ")" + get_string("color"))
+    if amount >= itemTracker.launchFragmentsRequired set_string("color", "$")
+    set_string("amount", get_string("color") + "(" + amount + "/" + itemTracker.launchFragmentsRequired + ")" + get_string("color"))
 }
 
 fun launch_fragment() {
     set_integer("amount", itemTracker.launchFragmentsCount + 1)
-    write_amount()
+    write_amount(get_integer("amount"))
     item_message("*Launch Fragment* " + get_string("amount"))
     store(itemTracker.launchFragmentsCount, get_integer("amount"))
 }

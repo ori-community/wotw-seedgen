@@ -1,5 +1,6 @@
 mod command;
 mod content;
+mod error;
 mod evaluate;
 mod expression;
 mod function;
@@ -8,6 +9,7 @@ mod ids;
 mod lint;
 mod literal;
 mod preprocess;
+mod scope;
 
 pub use function::{
     clean_water, empty, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot,
@@ -21,8 +23,11 @@ use crate::{
     assets::{SnippetAccess, UberStateData},
     seed_language::{
         ast::{self, Expression, Snippet, UberStateType},
-        compile::{self, ids::IdResolver},
-        output::{IntermediateOutput, Literal, SnippetDebugOutput},
+        compile::{
+            self, error::operand_error, ids::IdResolver, preprocess::PreprocessedFunction,
+            scope::Scopes,
+        },
+        output::{IntermediateOutput, Literal, SnippetDebugOutput, VariableValue},
         types::{uber_state_type, InferType, Type},
     },
     UberIdentifier,
@@ -35,11 +40,12 @@ use std::{
     collections::hash_map::Entry,
     fmt::Debug,
     io::{self, Write},
+    iter,
     path::PathBuf,
 };
 use wotw_seedgen_parse::{
     Delimited, Error, Identifier, Once, Punctuated, Recoverable, Result, SeparatedNonEmpty,
-    Severity, Source, Span, SpanEnd, SpanStart, Spanned, SpannedOption,
+    Severity, Source, Span, Spanned, SpannedOption,
 };
 
 #[derive(Debug)]
@@ -67,14 +73,14 @@ pub const FREE_MEMORY_START: usize = PRIVATE_MEMORY + 1;
 pub(crate) trait Compile<'source> {
     type Output;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output;
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output;
 }
 
 impl<'source, T: Compile<'source>> Compile<'source> for Spanned<T> {
     type Output = T::Output;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.data.compile(compiler)
     }
 }
@@ -82,7 +88,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Spanned<T> {
 impl<'source, T: Compile<'source>> Compile<'source> for Option<T> {
     type Output = Option<T::Output>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.map(|t| t.compile(compiler))
     }
 }
@@ -90,7 +96,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Option<T> {
 impl<'source, T: Compile<'source>> Compile<'source> for SpannedOption<T> {
     type Output = Option<T::Output>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.into_option().map(|t| t.compile(compiler))
     }
 }
@@ -99,7 +105,7 @@ impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
     type Output = Option<T::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.value.compile(compiler)
     }
 }
@@ -107,7 +113,7 @@ impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
 impl<'source, T: Compile<'source>> Compile<'source> for Vec<T> {
     type Output = Vec<T::Output>; // TODO experiment with returning iterators instead of vectors from collection compile implementations
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
@@ -118,7 +124,7 @@ impl<'source, Open, Content: Compile<'source>, Close> Compile<'source>
     type Output = Option<Content::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.content.compile(compiler)
     }
 }
@@ -127,7 +133,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Once<T> {
     type Output = T::Output;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.0.compile(compiler)
     }
 }
@@ -138,7 +144,7 @@ impl<'source, Item: Compile<'source>, Punctuation> Compile<'source>
     type Output = Vec<Item::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
@@ -149,7 +155,7 @@ impl<'source, Item: Compile<'source>, Separator> Compile<'source>
     type Output = Vec<Item::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
@@ -158,7 +164,7 @@ impl<'source> Compile<'source> for ast::Snippet<'source> {
     type Output = ();
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         self.contents.compile(compiler);
     }
 }
@@ -178,7 +184,7 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
 
 #[derive(Debug)]
 pub(crate) enum ExportedValue {
-    Function(usize),
+    Function(PreprocessedFunction),
     Literal(Literal),
 }
 
@@ -202,21 +208,18 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
 }
 
 // TODO not sure if all these fields are used anymore since pulling some stuff out into global
-pub(crate) struct SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates> {
+pub(crate) struct SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates> {
     pub rng: Pcg64Mcg,
     pub identifier: String, // TODO could be a reference
     pub global: &'compiler mut GlobalCompilerData<'snippets, 'uberstates>,
     pub preprocessed: PreprocessorOutput,
-    pub function_indices: FxHashMap<String, usize>, // TODO could maybe be a reference too?
-    pub function_imports: FxHashMap<String, String>, // TODO could maybe be a reference too?
-    pub variables: FxHashMap<Identifier<'source>, Literal>,
-    pub random_pools: FxHashMap<String, Vec<Literal>>, // TODO could maybe be a reference too?
+    pub scopes: Scopes<'source>,
     pub errors: Vec<Error>,
 }
 
 const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
-impl<'compiler, 'source, 'snippets, 'uberstates>
-    SnippetCompiler<'compiler, 'source, 'snippets, 'uberstates>
+impl<'source, 'compiler, 'snippets, 'uberstates>
+    SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates>
 {
     // TODO weird api
     pub(crate) fn compile<R: Rng>(
@@ -226,45 +229,33 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         global: &'compiler mut GlobalCompilerData<'snippets, 'uberstates>,
         preprocessed: PreprocessorOutput,
     ) -> Self {
-        let function_indices = preprocessed
-            .functions
-            .iter()
-            .cloned()
-            .zip(global.output.command_lookup.len()..)
-            .collect();
-
-        global.output.command_lookup.extend(vec![
-            compile::empty(); // Fill with placeholders for all the functions, this also ensures a sane result if some of the functions fail to compile
-            preprocessed.functions.len()
-        ]);
+        let debug = global.output.debug.is_some();
 
         let mut compiler = Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
             identifier,
             global,
             preprocessed,
-            function_indices,
-            function_imports: Default::default(),
-            variables: Default::default(),
-            random_pools: Default::default(),
-            errors: Default::default(),
+            scopes: Scopes::new(debug),
+            errors: vec![],
         };
 
         ast.compile(&mut compiler);
 
-        // TODO feature gate debug?
         if let Some(debug) = &mut compiler.global.output.debug {
             // TODO now it's inefficient that we're returning the whole compiler, could save some clones here
             // ... on the other hand, the things we're cloning are probably supposed to be references anyway
             debug.snippets.insert(
                 compiler.identifier.clone(),
                 SnippetDebugOutput {
-                    variables: compiler
-                        .variables
+                    // TODO debug symbols for scoped variables
+                    variables: FxHashMap::default(),
+                    function_indices: compiler
+                        .preprocessed
+                        .functions
                         .iter()
-                        .map(|(k, v)| (k.to_string(), format!("{v:?}")))
+                        .map(|(identifier, function)| (identifier.clone(), function.index))
                         .collect(),
-                    function_indices: compiler.function_indices.clone(),
                 },
             );
         }
@@ -272,24 +263,34 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         compiler
     }
 
-    pub(crate) fn resolve<'a>(
-        &'a mut self,
-        identifier: &'a Spanned<Identifier>,
-    ) -> Option<&'a Literal> {
-        let literal = self.variables.get(&identifier.data);
+    pub(crate) fn define_variable<T>(&mut self, identifier: Identifier<'source>, value: T)
+    where
+        T: Into<VariableValue>,
+    {
+        self.scopes.define_variable(identifier.0, value);
+    }
 
-        if literal.is_none() {
+    pub(crate) fn resolve_variable(
+        &mut self,
+        identifier: &Spanned<Identifier<'source>>,
+    ) -> Option<&VariableValue> {
+        let value = self.scopes.resolve_variable(identifier.data.0);
+
+        if value.is_none() {
             self.errors.push(Error::error(
                 "unknown identifier".to_string(),
                 identifier.span(),
             ))
         }
 
-        literal
+        value
     }
 
-    pub(crate) fn resolve_function(&mut self, identifier: &Spanned<Identifier>) -> Option<usize> {
-        let function = self.function_indices.get(identifier.data.0);
+    pub(crate) fn resolve_function(
+        &mut self,
+        identifier: &Spanned<Identifier>,
+    ) -> Option<&PreprocessedFunction> {
+        let function = self.preprocessed.functions.get(identifier.data.0);
 
         if function.is_none() {
             self.errors.push(Error::error(
@@ -298,7 +299,7 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
             ))
         }
 
-        function.copied()
+        function
     }
 
     pub(crate) fn check_snippet_included(&mut self, snippet_name: &Spanned<&str>) -> bool {
@@ -339,7 +340,11 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
         ty
     }
 
-    pub(crate) fn common_type(&mut self, left: &Expression, right: &Expression) -> Option<Type> {
+    pub(crate) fn common_type(
+        &mut self,
+        left: &Expression<'source>,
+        right: &Expression<'source>,
+    ) -> Option<Type> {
         let left_ty = left.infer_type(self);
         let right_ty = right.infer_type(self);
 
@@ -401,13 +406,6 @@ impl<'compiler, 'source, 'snippets, 'uberstates>
     }
 }
 
-fn operand_error(left_ty: Type, right_ty: Type, left: &Expression, right: &Expression) -> Error {
-    Error::error(
-        format!("Cannot perform operation on {left_ty} and {right_ty}"),
-        left.span_start()..right.span_end(),
-    )
-}
-
 impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
     pub fn new<R: Rng, F: SnippetAccess>(
         rng: &mut R,
@@ -453,8 +451,13 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         if let Some(ast) = ast.parsed {
             lint::lint(&ast, &mut errors);
 
-            let preprocessor = Preprocessor::preprocess(&ast);
+            let preprocessor = Preprocessor::preprocess(&ast, &self.global.output);
             errors.extend(preprocessor.errors);
+
+            self.global.output.command_lookup.extend(
+                // Fill with placeholders for all the functions, this also ensures a sane result if some of the functions fail to compile
+                iter::repeat_with(compile::empty).take(preprocessor.output.functions.len()),
+            );
 
             for (path, identifier, value) in &preprocessor.output.config_sets {
                 // TODO do something if set already?

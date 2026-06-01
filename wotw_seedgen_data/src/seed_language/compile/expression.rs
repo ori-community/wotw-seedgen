@@ -3,11 +3,15 @@ use crate::{
     assets::UberStateAlias,
     seed_language::{
         ast::{self, ClientEvent, UberStateType},
+        compile::error::{
+            alias_type_error, operation_error, type_error, type_error_message,
+            uber_state_type_error,
+        },
         output::{
             ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger,
             CommandString, CommandVoid, CommandZone, Comparator, Concatenator, Constant,
             EqualityComparator, ExecuteOperator, IntoConstant, Literal, LogicOperator, Operation,
-            StringOrPlaceholder,
+            Reference, StringOrPlaceholder, VariableValue,
         },
         types::Type,
     },
@@ -23,7 +27,7 @@ impl Command {
     // TODO unidiomatic naming
     pub(crate) fn expect_void<S: Span>(
         self,
-        compiler: &mut SnippetCompiler<'_, '_, '_, '_>,
+        compiler: &mut SnippetCompiler,
         span: S,
     ) -> Option<CommandVoid> {
         let result = match self {
@@ -41,7 +45,7 @@ impl Command {
 impl<'source> ast::Expression<'source> {
     pub(crate) fn compile_into<T: CompileInto>(
         self,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<T> {
         match self {
             ast::Expression::Value(value) => value.compile_into(compiler),
@@ -53,16 +57,16 @@ impl<'source> ast::Expression<'source> {
 impl<'source> ast::ExpressionValue<'source> {
     pub(crate) fn compile_into<T: CompileInto>(
         self,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<T> {
         match self {
             ast::ExpressionValue::Group(group) => group.content?.0.compile_into(compiler),
             ast::ExpressionValue::Action(action) => T::compile_action(action, compiler),
             ast::ExpressionValue::Literal(literal) => T::compile_literal(literal, compiler),
             ast::ExpressionValue::Identifier(identifier) => compiler
-                .resolve(&identifier)
+                .resolve_variable(&identifier)
                 .cloned()
-                .and_then(|literal| T::coerce_literal(literal, identifier.span, compiler)),
+                .and_then(|variable| T::coerce_variable(variable, identifier.span, compiler)),
         }
     }
 }
@@ -70,7 +74,7 @@ impl<'source> ast::ExpressionValue<'source> {
 impl<'source> Compile<'source> for ast::Operation<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self.operator.data {
             ast::Operator::Arithmetic(operator) => {
                 let operator = operator.compile(compiler);
@@ -156,7 +160,7 @@ impl<'source> ast::Operation<'source> {
     fn compile_operation<Item, Operator, Output>(
         self,
         operator: Operator,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<Output>
     where
         Item: CompileInto + IntoConstant,
@@ -192,7 +196,7 @@ impl<'source> ast::Operation<'source> {
 impl<'source> Compile<'source> for ast::ArithmeticOperator {
     type Output = ArithmeticOperator;
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self {
             ast::ArithmeticOperator::Add => ArithmeticOperator::Add,
             ast::ArithmeticOperator::Subtract => ArithmeticOperator::Subtract,
@@ -205,7 +209,7 @@ impl<'source> Compile<'source> for ast::ArithmeticOperator {
 impl<'source> Compile<'source> for ast::LogicOperator {
     type Output = LogicOperator;
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self {
             ast::LogicOperator::And => LogicOperator::And,
             ast::LogicOperator::Or => LogicOperator::Or,
@@ -216,7 +220,7 @@ impl<'source> Compile<'source> for ast::LogicOperator {
 impl<'source> Compile<'source> for ast::Comparator {
     type Output = Comparator;
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Comparator::Equal => Comparator::Equal,
             ast::Comparator::NotEqual => Comparator::NotEqual,
@@ -238,16 +242,35 @@ pub(crate) trait CompileInto: Sized {
         compiler: &mut SnippetCompiler,
     ) -> Option<Self>;
 
+    fn coerce_reference(
+        reference: Reference,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self>;
+
+    fn coerce_variable(
+        variable: VariableValue,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        match variable {
+            VariableValue::Literal(literal) => Self::coerce_literal(literal, span, compiler),
+            VariableValue::Reference(reference) => {
+                Self::coerce_reference(reference, span, compiler)
+            }
+        }
+    }
+
     fn compile_action<'source>(
         action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<Self> {
         Self::compile_command(action, compiler)
     }
 
     fn compile_command<'source, T>(
         ast: T,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<Self>
     where
         T: Compile<'source, Output = Option<Command>> + Span,
@@ -262,7 +285,7 @@ pub(crate) trait CompileInto: Sized {
 
     fn compile_literal<'source>(
         literal: Spanned<ast::Literal<'source>>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<Self> {
         Self::coerce_literal(literal.data.compile(compiler)?, literal.span, compiler)
     }
@@ -293,7 +316,20 @@ impl CompileInto for CommandBoolean {
                 },
                 Some(value) => Ok(create_quest_command(uber_identifier, value)),
             },
-            other => Err(type_error(other.literal_type(), Type::Boolean, span)),
+            other => Err(type_error(other.ty(), Type::Boolean, span)),
+        };
+
+        compiler.consume_result(result)
+    }
+
+    fn coerce_reference(
+        reference: Reference,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        let result = match reference {
+            Reference::BooleanStack(index) => Ok(CommandBoolean::FunctionArgument { index }),
+            other => Err(type_error(other.ty(), Type::Boolean, span)),
         };
 
         compiler.consume_result(result)
@@ -335,7 +371,20 @@ impl CompileInto for CommandInteger {
                     compiler,
                 )),
             },
-            other => Err(type_error(other.literal_type(), Type::Integer, span)),
+            other => Err(type_error(other.ty(), Type::Integer, span)),
+        };
+
+        compiler.consume_result(result)
+    }
+
+    fn coerce_reference(
+        reference: Reference,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        let result = match reference {
+            Reference::IntegerStack(index) => Ok(CommandInteger::FunctionArgument { index }),
+            other => Err(type_error(other.ty(), Type::Integer, span)),
         };
 
         compiler.consume_result(result)
@@ -385,7 +434,23 @@ impl CompileInto for CommandFloat {
                     compiler,
                 )),
             },
-            other => Err(type_error(other.literal_type(), Type::Float, span)),
+            other => Err(type_error(other.ty(), Type::Float, span)),
+        };
+
+        compiler.consume_result(result)
+    }
+
+    fn coerce_reference(
+        reference: Reference,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        let result = match reference {
+            Reference::FloatStack(index) => Ok(CommandFloat::FunctionArgument { index }),
+            Reference::IntegerStack(index) => Ok(CommandFloat::FromInteger {
+                integer: Box::new(CommandInteger::FunctionArgument { index }),
+            }),
+            other => Err(type_error(other.ty(), Type::Float, span)),
         };
 
         compiler.consume_result(result)
@@ -452,6 +517,27 @@ impl CompileInto for CommandString {
 
         compiler.consume_result(result)
     }
+
+    fn coerce_reference(
+        reference: Reference,
+        _span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        let result = match reference {
+            Reference::StringStack(index) => Ok(CommandString::FunctionArgument { index }),
+            Reference::BooleanStack(index) => Ok(CommandString::FromBoolean {
+                boolean: Box::new(CommandBoolean::FunctionArgument { index }),
+            }),
+            Reference::IntegerStack(index) => Ok(CommandString::FromInteger {
+                integer: Box::new(CommandInteger::FunctionArgument { index }),
+            }),
+            Reference::FloatStack(index) => Ok(CommandString::FromFloat {
+                float: Box::new(CommandFloat::FunctionArgument { index }),
+            }),
+        };
+
+        compiler.consume_result(result)
+    }
 }
 
 impl CompileInto for CommandZone {
@@ -468,6 +554,18 @@ impl CompileInto for CommandZone {
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
         <Zone as CompileInto>::coerce_literal(literal, span, compiler).map(Self::from)
+    }
+
+    fn coerce_reference(
+        reference: Reference,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        compiler
+            .errors
+            .push(type_error(reference.ty(), Type::Zone, span));
+
+        None
     }
 }
 
@@ -511,6 +609,27 @@ impl CompileInto for Command {
 
         Some(command)
     }
+
+    fn coerce_reference(
+        reference: Reference,
+        _span: Range<usize>,
+        _compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        Some(match reference {
+            Reference::BooleanStack(index) => {
+                Command::Boolean(CommandBoolean::FunctionArgument { index })
+            }
+            Reference::IntegerStack(index) => {
+                Command::Integer(CommandInteger::FunctionArgument { index })
+            }
+            Reference::FloatStack(index) => {
+                Command::Float(CommandFloat::FunctionArgument { index })
+            }
+            Reference::StringStack(index) => {
+                Command::String(CommandString::FunctionArgument { index })
+            }
+        })
+    }
 }
 
 impl CompileInto for usize {
@@ -525,13 +644,14 @@ impl CompileInto for usize {
     ) -> Option<Self> {
         compiler
             .errors
-            .push(type_error(literal.literal_type(), Type::Action, span));
+            .push(type_error(literal.ty(), Type::Action, span));
+
         None
     }
 
     fn compile_action<'source>(
         action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'_, 'source, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
     ) -> Option<Self> {
         let span = action.span();
         let command = action.compile(compiler)?.expect_void(compiler, span)?;
@@ -540,6 +660,18 @@ impl CompileInto for usize {
         compiler.global.output.command_lookup.push(command);
 
         Some(index)
+    }
+
+    fn coerce_reference(
+        reference: Reference,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        compiler
+            .errors
+            .push(type_error(reference.ty(), Type::Action, span));
+
+        None
     }
 }
 
@@ -564,6 +696,18 @@ impl<T: CompileIntoLiteral> CompileInto for T {
         let result = T::coerce_literal(literal, span, compiler);
         compiler.consume_result(result)
     }
+
+    fn coerce_reference(
+        _reference: Reference,
+        span: Range<usize>,
+        compiler: &mut SnippetCompiler,
+    ) -> Option<Self> {
+        compiler
+            .errors
+            .push(Error::error("expected literal".to_string(), span));
+
+        None
+    }
 }
 
 impl CompileIntoLiteral for bool {
@@ -574,7 +718,7 @@ impl CompileIntoLiteral for bool {
     ) -> Result<Self, Error> {
         match literal {
             Literal::Boolean(value) => Ok(value),
-            other => Err(type_error(other.literal_type(), Type::Boolean, span)),
+            other => Err(type_error(other.ty(), Type::Boolean, span)),
         }
     }
 }
@@ -587,7 +731,7 @@ impl CompileIntoLiteral for i32 {
     ) -> Result<Self, Error> {
         match literal {
             Literal::Integer(value) => Ok(value),
-            other => Err(type_error(other.literal_type(), Type::Integer, span)),
+            other => Err(type_error(other.ty(), Type::Integer, span)),
         }
     }
 }
@@ -601,7 +745,7 @@ impl CompileIntoLiteral for OrderedFloat<f32> {
         match literal {
             Literal::Integer(value) => Ok((value as f32).into()),
             Literal::Float(value) => Ok(value),
-            other => Err(type_error(other.literal_type(), Type::Float, span)),
+            other => Err(type_error(other.ty(), Type::Float, span)),
         }
     }
 }
@@ -620,10 +764,10 @@ impl CompileIntoLiteral for Icon {
             Literal::Constant(constant) => Equipment::coerce_constant(constant)
                 .map(Icon::Equipment)
                 .or_else(|| OpherIcon::coerce_constant(constant).map(Icon::Opher))
-                .ok_or_else(|| type_error(constant.literal_type(), Type::Icon, span)),
+                .ok_or_else(|| type_error(constant.ty(), Type::Icon, span)),
             Literal::IconAsset(path) => Ok(Icon::File(Cow::Owned(path))),
             Literal::CustomIcon(path) => Ok(Icon::Bundle(path)),
-            other => Err(type_error(other.literal_type(), Type::Icon, span)),
+            other => Err(type_error(other.ty(), Type::Icon, span)),
         }
     }
 }
@@ -639,7 +783,7 @@ impl CompileIntoLiteral for String {
                 StringOrPlaceholder::Value(value) => Ok(value),
                 _ => Err(Error::error("expected string literal".to_string(), span)),
             },
-            other => Err(type_error(other.literal_type(), Type::String, span)),
+            other => Err(type_error(other.ty(), Type::String, span)),
         }
     }
 }
@@ -652,7 +796,7 @@ impl CompileIntoLiteral for StringOrPlaceholder {
     ) -> Result<Self, Error> {
         match literal {
             Literal::String(value) => Ok(value),
-            other => Err(type_error(other.literal_type(), Type::String, span)),
+            other => Err(type_error(other.ty(), Type::String, span)),
         }
     }
 }
@@ -676,7 +820,7 @@ impl CompileIntoLiteral for UberIdentifier {
                     compiler,
                 )),
             },
-            other => Err(type_error(other.literal_type(), Type::UberIdentifier, span)),
+            other => Err(type_error(other.ty(), Type::UberIdentifier, span)),
         }
     }
 }
@@ -698,7 +842,7 @@ impl<T: CompileIntoConstant> CompileIntoLiteral for T {
             _ => None,
         };
 
-        t.ok_or_else(|| type_error(literal.literal_type(), T::TYPE, span))
+        t.ok_or_else(|| type_error(literal.ty(), T::TYPE, span))
     }
 }
 
@@ -986,64 +1130,4 @@ fn create_quest_command(uber_identifier: UberIdentifier, value: i32) -> CommandB
             right: value.into(),
         }),
     }
-}
-
-// TODO this could accept Option<Type> as found to still provide an error message if type inference fails
-#[inline]
-fn type_error(found: Type, expected: Type, span: Range<usize>) -> Error {
-    Error::error(type_error_message(found, expected), span)
-}
-
-#[inline]
-fn type_error_message(found: Type, expected: Type) -> String {
-    format!("expected {expected}, but found {found}")
-}
-
-#[inline]
-fn alias_type_error(
-    expected: Type,
-    span: Range<usize>,
-    uber_identifier: UberIdentifier,
-    compiler: &SnippetCompiler,
-) -> Error {
-    match compiler
-        .global
-        .uber_state_data
-        .id_lookup
-        .get(&uber_identifier)
-    {
-        None => Error::error(
-            "alias doesn't resolve to a valid UberIdentifier".to_string(),
-            span,
-        )
-        .with_help("check the loc_data or state_data entry that defines this alias".to_string()),
-        Some(uber_state) => type_error(Type::Boolean, expected, span).with_help(format!(
-            "this alias resolves to an integer comparison, maybe you can use the underlying UberIdentifier {}?",
-            uber_state.preferred_name()
-        )),
-    }
-}
-
-#[inline]
-fn operation_error(target: Type, span: Range<usize>) -> Error {
-    Error::error(operation_error_message(target), span)
-}
-
-#[inline]
-fn operation_error_message(target: Type) -> String {
-    format!("Cannot perform operation on {target}")
-}
-
-#[inline]
-fn uber_state_type_error(found: UberStateType, expected: Type, span: Range<usize>) -> Error {
-    let mut error = Error::error(format!("cannot use {found} UberState as {expected}"), span);
-
-    if matches!(expected, Type::Boolean) {
-        error.help = Some(
-            "if you want to trigger on every change of the state, use \"on change <UberIdentifier>\""
-                .to_string(),
-        )
-    }
-
-    error
 }

@@ -8,16 +8,16 @@
 
 !let(max_quests, 12)
 
-!augment_fun(write_goal_progress_message, {
+!augment_fun(write_goal_progress_message(), {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
     set_boolean("comma", true)
     set_string("color", "")
     if itemTracker.questsCount == max_quests set_string("color", "$")
-    write_quests_message()
+    write_quests_message(get_string("color"))
     set_string("goal_progress_message", get_string("goal_progress_message") + get_string("quest_message"))
 })
 
-!augment_fun(check_goals_completed, {
+!augment_fun(check_goals_completed(), {
     if itemTracker.questsCount < max_quests set_boolean("goals_completed", false)
 })
 
@@ -51,14 +51,13 @@ on GladesTown.RegrowTheGlades == false store(itemTracker.questsCount, itemTracke
 
 on change itemTracker.questsCount update_goals_completed()
 
-!augment_fun(write_goals_incomplete_message, {
+!augment_fun(write_goals_incomplete_message(), {
     if itemTracker.questsCount < max_quests {
-        set_string("color", "@")
-        write_quests_message()
+        write_quests_message("@")
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("quest_message"))
     }
 })
 
-fun write_quests_message() {
-    set_string("quest_message", get_string("color") + "Quests: " + itemTracker.questsCount + "/" + max_quests + get_string("color"))
+fun write_quests_message(color: String) {
+    set_string("quest_message", color + "Quests: " + itemTracker.questsCount + "/" + max_quests + color)
 }

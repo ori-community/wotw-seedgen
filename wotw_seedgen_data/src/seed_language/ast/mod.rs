@@ -187,8 +187,17 @@ pub struct Fun;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct FunctionDefinition<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub empty_args: (Symbol<'('>, Symbol<')'>),
+    pub signature: FunctionSignature<'source>,
     pub actions: Delimited<'{', Vec<Action<'source>>, '}'>,
+}
+
+pub type FunctionSignature<'source> = Delimited<'(', Punctuated<FunctionArg<'source>, ','>, ')'>;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct FunctionArg<'source> {
+    pub identifier: Spanned<Identifier<'source>>,
+    pub colon: Symbol<':'>,
+    pub ty: Spanned<Type>,
 }
 
 // TODO I think I want a let-style syntax that compiles into all the set and get functions and then remove those to solve the confusion around store vs. set
@@ -580,6 +589,7 @@ pub struct AugmentFun;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct AugmentFunArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
+    pub signature: FunctionSignature<'source>,
     pub action: CommandArg<Action<'source>>,
 }
 

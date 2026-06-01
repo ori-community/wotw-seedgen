@@ -1,5 +1,6 @@
 mod args;
 mod command;
+mod function;
 
 use std::mem;
 

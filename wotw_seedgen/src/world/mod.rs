@@ -29,7 +29,7 @@ use wotw_seedgen_data::{
     seed_language::{
         output::Event,
         simulate::{
-            ConditionValues, Simulation, SimulationCache, Snapshot, UberStates, Variables,
+            ConditionValues, Heap, Simulation, SimulationCache, Snapshot, Stack, UberStates,
             WorldState,
         },
     },
@@ -508,13 +508,23 @@ impl Simulation for World<'_, '_> {
     }
 
     #[inline]
-    fn variables(&self) -> &Variables {
-        self.state.variables()
+    fn stack(&self) -> &Stack {
+        self.state.stack()
     }
 
     #[inline]
-    fn variables_mut(&mut self) -> &mut Variables {
-        self.state.variables_mut()
+    fn stack_mut(&mut self) -> &mut Stack {
+        self.state.stack_mut()
+    }
+
+    #[inline]
+    fn heap(&self) -> &Heap {
+        self.state.heap()
+    }
+
+    #[inline]
+    fn heap_mut(&mut self) -> &mut Heap {
+        self.state.heap_mut()
     }
 
     fn condition_values(&mut self) -> &mut ConditionValues {
