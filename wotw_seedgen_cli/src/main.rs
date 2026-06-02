@@ -2,6 +2,7 @@ mod cli;
 mod http_server;
 mod import_uber_states;
 mod log_config;
+mod paths;
 mod plando;
 mod preset;
 mod regenerate;
@@ -12,6 +13,7 @@ use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
 use import_uber_states::import_uber_states;
+use paths::paths;
 use plando::plando;
 use preset::{universe_preset, world_preset};
 use regenerate::regenerate;
@@ -39,6 +41,7 @@ fn main() -> Result<(), Error> {
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
         Cli::Regenerate { args } => regenerate(args),
+        Cli::Paths => paths(),
         Cli::ImportUberStates => import_uber_states(),
         Cli::HttpServer { args } => http_server(args),
         Cli::SeedLsp => {

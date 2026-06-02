@@ -70,6 +70,8 @@ pub enum Cli {
         #[command(flatten)]
         args: RegenerateArgs,
     },
+    /// Display which local paths seedgen is using
+    Paths,
     /// Import an UberState dump
     ImportUberStates,
     /// Start the http server
