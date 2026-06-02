@@ -85,4 +85,5 @@ pub enum VerboseTarget {
     Spawn,
     Entrances,
     OptimizeGraph,
+    SeedCompile,
 }

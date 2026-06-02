@@ -27,6 +27,7 @@ pub struct LogConfig {
     trace_spawn: LevelFilter,
     trace_entrances: LevelFilter,
     trace_optimize_graph: LevelFilter,
+    trace_seed_compile: LevelFilter,
     trace_uber_states: Option<Vec<UberIdentifier>>,
 }
 
@@ -39,6 +40,7 @@ const WEIGHT_MOD: &str = "wotw_seedgen::generator::solutions::weight";
 const SPAWN_MOD: &str = "wotw_seedgen::generator::spawn";
 const ENTRANCES_MOD: &str = "wotw_seedgen::generator::entrances";
 const OPTIMIZE_GRAPH_MOD: &str = "wotw_seedgen_data::logic_language::optimize";
+const SEED_COMPILE_MOD: &str = "wotw_seedgen_seed::compile::command";
 
 impl Default for LogConfig {
     fn default() -> Self {
@@ -52,6 +54,7 @@ impl Default for LogConfig {
             trace_spawn: LevelFilter::Info,
             trace_entrances: LevelFilter::Info,
             trace_optimize_graph: LevelFilter::Info,
+            trace_seed_compile: LevelFilter::Info,
             trace_uber_states: None,
         }
     }
@@ -70,6 +73,7 @@ impl Index<VerboseTarget> for LogConfig {
             VerboseTarget::Spawn => &self.trace_spawn,
             VerboseTarget::Entrances => &self.trace_entrances,
             VerboseTarget::OptimizeGraph => &self.trace_optimize_graph,
+            VerboseTarget::SeedCompile => &self.trace_seed_compile,
         }
     }
 }
@@ -85,6 +89,7 @@ impl IndexMut<VerboseTarget> for LogConfig {
             VerboseTarget::Spawn => &mut self.trace_spawn,
             VerboseTarget::Entrances => &mut self.trace_entrances,
             VerboseTarget::OptimizeGraph => &mut self.trace_optimize_graph,
+            VerboseTarget::SeedCompile => &mut self.trace_seed_compile,
         }
     }
 }
@@ -137,6 +142,7 @@ impl LogConfig {
             trace_spawn,
             trace_entrances,
             trace_optimize_graph,
+            trace_seed_compile,
             trace_uber_states,
         } = self;
 
@@ -156,6 +162,7 @@ impl LogConfig {
                 .level_for(SPAWN_MOD, trace_spawn)
                 .level_for(ENTRANCES_MOD, trace_entrances)
                 .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
+                .level_for(SEED_COMPILE_MOD, trace_seed_compile)
                 .level_for("perf_counters", LevelFilter::Off)
                 .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?);
 

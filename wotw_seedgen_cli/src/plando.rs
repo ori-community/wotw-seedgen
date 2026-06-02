@@ -1,5 +1,6 @@
 use crate::{
     cli::{GenerationArgs, PlandoArgs},
+    log_config::LogConfig,
     seed::launch_seed,
     Error,
 };
@@ -26,7 +27,10 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         out,
         watch,
         generation_args: GenerationArgs { debug, launch },
+        verbose_args,
     } = args;
+
+    LogConfig::from_args(verbose_args).apply()?;
 
     let path = assets::canonicalize(path)?;
 

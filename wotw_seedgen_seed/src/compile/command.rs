@@ -1,6 +1,9 @@
+use std::fmt::Display;
+
 use super::{args::Args, Compile, CompileContext};
 use crate::assembly::{Command, Trigger};
 use indexmap::map::Entry;
+use log::trace;
 use wotw_seedgen_data::seed_language::output::{
     self as input, AsConstant, CommandFloat, CommandVoid, Comparator, EqualityComparator,
 };
@@ -77,6 +80,8 @@ impl Compile for input::CommandBoolean {
     type Output = (Vec<Command>, MemoryUsed);
 
     fn compile(self, context: &mut CompileContext) -> Self::Output {
+        trace_compile_non_constant(&self);
+
         match self {
             Self::Constant { value } => (vec![Command::SetBoolean(value)], MemoryUsed::ONE_BOOLEAN),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
@@ -144,6 +149,8 @@ impl Compile for input::CommandInteger {
     type Output = (Vec<Command>, MemoryUsed);
 
     fn compile(self, context: &mut CompileContext) -> Self::Output {
+        trace_compile_non_constant(&self);
+
         match self {
             Self::Constant { value } => (vec![Command::SetInteger(value)], MemoryUsed::ONE_INTEGER),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
@@ -178,6 +185,8 @@ impl Compile for input::CommandFloat {
     type Output = (Vec<Command>, MemoryUsed);
 
     fn compile(self, context: &mut CompileContext) -> Self::Output {
+        trace_compile_non_constant(&self);
+
         match self {
             Self::Constant { value } => {
                 (vec![Command::SetFloat(value.into())], MemoryUsed::ONE_FLOAT)
@@ -206,6 +215,8 @@ impl Compile for input::CommandString {
     type Output = (Vec<Command>, MemoryUsed);
 
     fn compile(self, context: &mut CompileContext) -> Self::Output {
+        trace_compile_non_constant(&self);
+
         match self {
             Self::Constant { value } => value.compile(context),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
@@ -249,6 +260,8 @@ impl Compile for input::CommandZone {
     type Output = (Vec<Command>, MemoryUsed);
 
     fn compile(self, context: &mut CompileContext) -> Self::Output {
+        trace_compile_non_constant(&self);
+
         match self {
             Self::Constant { value } => (
                 vec![Command::SetInteger(value as i32)],
@@ -271,6 +284,8 @@ impl Compile for input::CommandVoid {
     type Output = (Vec<Command>, MemoryUsed);
 
     fn compile(self, context: &mut CompileContext) -> Self::Output {
+        trace!("compiling {self}");
+
         match self {
             Self::Multi { commands } => multi(commands, context),
             Self::Lookup { index } => (vec![Command::Execute(index)], MemoryUsed::ZERO),
@@ -639,4 +654,13 @@ fn multi_with_return<T: Compile<Output = (Vec<Command>, MemoryUsed)>>(
     commands.extend(last);
 
     (commands, memory_used)
+}
+
+fn trace_compile_non_constant<T>(t: &T)
+where
+    T: AsConstant + Display,
+{
+    if t.as_constant().is_none() {
+        trace!("compiling {t}")
+    }
 }

@@ -1,7 +1,7 @@
 use clap::Args;
 use std::path::PathBuf;
 
-use super::GenerationArgs;
+use super::{GenerationArgs, VerboseArgs};
 
 #[derive(Args)]
 pub struct PlandoArgs {
@@ -18,4 +18,6 @@ pub struct PlandoArgs {
     pub watch: bool,
     #[command(flatten)]
     pub generation_args: GenerationArgs,
+    #[command(flatten)]
+    pub verbose_args: VerboseArgs,
 }

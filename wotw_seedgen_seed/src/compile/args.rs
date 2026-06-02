@@ -249,7 +249,11 @@ impl ArgDestination {
             }
         };
 
-        debug_assert!(*used < RESERVED_MEMORY);
+        assert!(
+            *used < RESERVED_MEMORY,
+            "failed to compile overly complex expression"
+        );
+
         let copies = (command(0, *used), command(*used, index));
 
         *used += 1;
