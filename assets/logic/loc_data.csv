@@ -100,7 +100,7 @@ GladesTown.HandToHandPouch, Glades, QuestItem, Pouch, 14019, 26318, 2, -282, -41
 GladesTown.HandToHandLantern, Glades, QuestItem, Lantern, 14019, 26318, 6, -426, -4155, -428.7, -4153.2
 GladesTown.HandToHandCanteen, Glades, QuestItem, Canteen, 14019, 26318, 9, -410, -4142, -403.2, -4142
 GladesTown.FamilyReunionKey, Glades, QuestItem, Key, 6, 500, , -385, -4161, -382, -4155.3
-GladesTown.AcornQI, Glades, QuestItem, Acorn, 14019, 2782, , -10.5, -4549.7, -366, -4183.6
+GladesTown.AcornQI, Glades, QuestItem, Acorn, 14019, 2782, , -10.5, -4549.7, -374, -4183.6
 GladesTown.MokiAcornQuest, Glades, QuestItem, 500 SpiritLight, 14019, 33776, 3, -358, -4185, -360.1, -4183.6
 GladesTown.HoleHutEF, Glades, EnergyFragment, , 42178, 52786, , -116.0, -4538.5, -227.72, -4092.33
 GladesTown.AboveGromHF, Glades, HealthFragment, , 44310, 29043, , -326.3, -4102.1, -326.30994, -4101.12
