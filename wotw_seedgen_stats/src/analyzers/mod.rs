@@ -11,6 +11,7 @@ mod spawn_items;
 mod spawn_location;
 mod spawn_region;
 mod step_size;
+mod total_spirit_light;
 mod zone_spirit_light;
 mod zone_unlock;
 // TODO idea: progression_location analyzer for which locations get chosen for progression
@@ -30,6 +31,7 @@ pub use spawn_items::SpawnItemStats;
 pub use spawn_location::SpawnLocationStats;
 pub use spawn_region::SpawnRegionStats;
 pub use step_size::StepSizeStats;
+pub use total_spirit_light::TotalSpiritLightStats;
 pub use zone_spirit_light::ZoneSpiritLightStats;
 pub use zone_unlock::ZoneUnlockStats;
 

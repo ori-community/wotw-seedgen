@@ -15,7 +15,8 @@ use wotw_seedgen_stats::{
     analyzers::{
         Analyzer, EarlySkillsStats, FirstWeaponStats, ItemLocationStats, ItemUnlockStats,
         ItemZoneStats, LocationItemStats, ProgressionStats, SpawnItemCountStats, SpawnItemStats,
-        SpawnLocationStats, SpawnRegionStats, StepSizeStats, ZoneSpiritLightStats, ZoneUnlockStats,
+        SpawnLocationStats, SpawnRegionStats, StepSizeStats, TotalSpiritLightStats,
+        ZoneSpiritLightStats, ZoneUnlockStats,
     },
     storage_access, ChainedAnalyzers, Stats, StatsGenerator,
 };
@@ -172,6 +173,9 @@ impl From<cli::Analyzer> for Box<dyn Analyzer> {
             cli::Analyzer::SpawnRegion => Box::new(SpawnRegionStats),
             cli::Analyzer::StepSize { result_bucket_size } => {
                 Box::new(StepSizeStats { result_bucket_size })
+            }
+            cli::Analyzer::TotalSpiritLight { result_bucket_size } => {
+                Box::new(TotalSpiritLightStats { result_bucket_size })
             }
             cli::Analyzer::ZoneSpiritLight {
                 zone,

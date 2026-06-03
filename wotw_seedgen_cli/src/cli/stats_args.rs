@@ -95,6 +95,16 @@ pub enum Analyzer {
         #[arg(default_value = "1")]
         result_bucket_size: NonZeroUsize,
     },
+    #[command(about = format!(
+        "Analyzes how much Spirit Light is in a seed\n\
+        Optionally use '{literal}total-spirit-light:<result-bucket-size>{reset}' to group results together in buckets",
+        literal = LITERAL.render(),
+        reset = Reset.render(),
+    ))]
+    TotalSpiritLight {
+        #[arg(default_value = "1")]
+        result_bucket_size: NonZeroUsize,
+    },
     // TODO test
     // TODO available values
     #[command(about = format!(
