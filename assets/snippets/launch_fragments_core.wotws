@@ -11,6 +11,10 @@
 
 !include("progress_helper", write_progress_message)
 
+on change required {
+  store(itemTracker.launchFragmentsRequired, required)
+}
+
 !augment_fun(write_progress_message, {
     set_integer("amount", collected)
     write_amount()
@@ -28,6 +32,7 @@ fun launch_fragment() {
     write_amount()
     item_message("*Launch Fragment* " + get_string("amount"))
     store(collected, get_integer("amount"))
+    store(itemTracker.launchFragmentsCount, get_integer("amount"))
 }
 !export(launch_fragment)
 
