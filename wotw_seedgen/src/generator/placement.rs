@@ -181,11 +181,13 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
             debug_assert!(spirit_light_placements <= needs_placement);
 
+            let total_spirit_light = TOTAL_SPIRIT_LIGHT + world.output.spirit_light_change;
             world.spirit_light_placements_remaining = spirit_light_placements as usize;
             // TODO how should !add_item(spirit_light(100)) behave?
+            // TODO breaks at very low spirit light totals
             world
                 .spirit_light_provider
-                .init(TOTAL_SPIRIT_LIGHT, world.spirit_light_placements_remaining);
+                .init(total_spirit_light, world.spirit_light_placements_remaining);
         }
 
         let ordering_distribution = OrderingDistribution::new(rng);

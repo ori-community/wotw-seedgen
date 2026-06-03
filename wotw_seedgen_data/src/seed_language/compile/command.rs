@@ -69,6 +69,12 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::RemoveItem(_, command) => {
                 command.compile(compiler);
             }
+            ast::Command::AddSpiritLight(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::RemoveSpiritLight(_, command) => {
+                command.compile(compiler);
+            }
             ast::Command::ItemData(_, command) => {
                 command.compile(compiler);
             }
@@ -610,6 +616,26 @@ fn compile_item_pool_change<'source, const FACTOR: i32>(
             .item_pool_changes
             .entry(item)
             .or_default() += amount * FACTOR;
+    }
+}
+
+impl<'source> Compile<'source> for ast::AddSpiritLightArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        if let Some(amount) = self.0.evaluate::<i32>(compiler) {
+            compiler.global.output.spirit_light_change += amount;
+        }
+    }
+}
+
+impl<'source> Compile<'source> for ast::RemoveSpiritLightArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'_, 'source, '_, '_>) -> Self::Output {
+        if let Some(amount) = self.0.evaluate::<i32>(compiler) {
+            compiler.global.output.spirit_light_change -= amount;
+        }
     }
 }
 

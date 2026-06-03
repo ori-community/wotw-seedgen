@@ -8,16 +8,17 @@ use wotw_seedgen_data::{
     },
     seed_language::{
         ast::{
-            Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs, ChangeItemPoolArgs,
-            ClientEvent, Command, CommandArg, CommandIf, CommandRepeat, ConfigArgs, ConfigType,
-            ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
-            ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs,
-            ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
-            ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation,
-            PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-            RemoveItemArgs, RemoveLocationArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span,
-            SpawnArgs, StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier,
-            UberIdentifierName, UberIdentifierNumeric, UberStateType, ZoneOfArgs,
+            Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
+            ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandRepeat,
+            ConfigArgs, ConfigType, ConstantDiscriminants, Content, CountInZoneArgs,
+            CountInZoneBinding, Event, Expression, ExpressionValue, FunctionCall,
+            FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
+            ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
+            LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
+            RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
+            RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
+            StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+            UberIdentifierNumeric, UberStateType, ZoneOfArgs,
         },
         compile::FunctionIdentifier,
         types::Type,
@@ -132,6 +133,7 @@ where
 impl<Open, Content, Close> CompletionInSpan for Delimited<Open, Content, Close>
 where
     Open: SpanStart,
+    // TODO why this unused bound?
     Content: Completion + ErrCompletion,
     Close: SpanEnd,
 {
@@ -804,6 +806,12 @@ impl CompletionInSpan for Command<'_> {
             Command::RemoveItem(remove_item, args) => {
                 args.span_checked_completion((remove_item, args).span(), index, cache)
             }
+            Command::AddSpiritLight(add_spirit_light, args) => {
+                args.span_checked_completion((add_spirit_light, args).span(), index, cache)
+            }
+            Command::RemoveSpiritLight(remove_spirit_light, args) => {
+                args.span_checked_completion((remove_spirit_light, args).span(), index, cache)
+            }
             Command::ItemData(item_data, args) => {
                 args.span_checked_completion((item_data, args).span(), index, cache)
             }
@@ -1044,6 +1052,30 @@ impl CompletionInSpan for ChangeItemPoolArgs<'_> {
 impl ErrCompletion for ChangeItemPoolArgs<'_> {
     fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         Action::err_completion(cache)
+    }
+}
+
+impl CompletionInSpan for AddSpiritLightArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for AddSpiritLightArgs<'_> {
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(cache)
+    }
+}
+
+impl CompletionInSpan for RemoveSpiritLightArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for RemoveSpiritLightArgs<'_> {
+    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
+        Expression::err_completion(cache)
     }
 }
 

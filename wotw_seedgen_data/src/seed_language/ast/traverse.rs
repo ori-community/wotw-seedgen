@@ -5,15 +5,16 @@ use wotw_seedgen_parse::{
 };
 
 use crate::seed_language::ast::{
-    Action, ActionCondition, AddItemArgs, Annotation, AugmentFunArgs, BuiltinIconArgs,
-    ChangeItemPoolArgs, Command, CommandArg, CommandArgs, CommandIf, CommandRepeat, ConfigArgs,
-    Content, CountInZoneArgs, CountInZoneBinding, Event, ExportArgs, Expression, ExpressionValue,
-    FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
-    ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
+    Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
+    BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandArgs, CommandIf,
+    CommandRepeat, ConfigArgs, Content, CountInZoneArgs, CountInZoneBinding, Event, ExportArgs,
+    Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs,
+    ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
     ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
     RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-    RemoveItemArgs, RemoveLocationArgs, SetConfigArgs, SetLogicStateArgs, Snippet, SpawnArgs,
-    StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier, ZoneOfArgs,
+    RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs,
+    Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
+    ZoneOfArgs,
 };
 
 #[must_use]
@@ -353,6 +354,14 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
+            Self::AddSpiritLight(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
+            Self::RemoveSpiritLight(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
             Self::ItemData(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
@@ -556,6 +565,18 @@ impl<H: Handler> Traverse<H> for AddItemArgs<'_> {
 }
 
 impl<H: Handler> Traverse<H> for RemoveItemArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for AddSpiritLightArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for RemoveSpiritLightArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.0.traverse(handler);
     }

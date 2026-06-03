@@ -468,6 +468,14 @@ pub enum Command<'source> {
     Repeat(Spanned<Repeat>, CommandRepeat<'source>),
     AddItem(Spanned<AddItem>, CommandArgs<AddItemArgs<'source>>),
     RemoveItem(Spanned<RemoveItem>, CommandArgs<RemoveItemArgs<'source>>),
+    AddSpiritLight(
+        Spanned<AddSpiritLight>,
+        CommandArgs<AddSpiritLightArgs<'source>>,
+    ),
+    RemoveSpiritLight(
+        Spanned<RemoveSpiritLight>,
+        CommandArgs<RemoveSpiritLightArgs<'source>>,
+    ),
     ItemData(Spanned<ItemData>, CommandArgs<ItemDataArgs<'source>>),
     ItemDataName(
         Spanned<ItemDataName>,
@@ -703,6 +711,20 @@ pub struct ChangeItemPoolArgs<'source> {
     pub item: Action<'source>,
     pub amount: CommandArg<Expression<'source>>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct AddSpiritLight;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct AddSpiritLightArgs<'source>(pub Expression<'source>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct RemoveSpiritLight;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct RemoveSpiritLightArgs<'source>(pub Expression<'source>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
