@@ -23,8 +23,6 @@ impl SpawnAnchors {
             .filter_map(Node::try_as_anchor_ref)
             .filter(|anchor| anchor.can_spawn())
         {
-            eprintln!("anchor {}", anchor.identifier);
-
             if spawn_locations.contains(&anchor.identifier.as_str()) {
                 teleporters.push(identifiers.len());
 
