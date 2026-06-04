@@ -8350,8 +8350,14 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       Bash  # so many skeeto friends oriGlow
       SentryJump=1
       DoubleJump, TripleJump
-    kii: DoubleJump, Sword  # bait a skeeto and pogo it (is one way of doing it)
-    unsafe: DoubleJump  # Climb the left wall to get on the right wall, let ori slide slowly then double jump and quickly turn around to catch the other side of the wall
+    kii:
+      DoubleJump, Sword  # bait a skeeto and pogo it (is one way of doing it)
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
+    unsafe:
+      DoubleJump  # Climb the left wall to get on the right wall, let ori slide slowly then double jump and quickly turn around to catch the other side of the wall
+      Shuriken=1, Sword OR Hammer
+      GrenadeJump OR AbilitySwap=1
   pickup WoodsMain.UpperKS:
     moki, BreakWall=3:
       Glide OR Launch
@@ -8365,22 +8371,38 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
     kii:
       BreakWall=3, DoubleJump OR Bash
       BreakWall=3, Sword, Dash  # Pogo the skeetos
-      Combat=Balloon, Glide OR DoubleJump OR Bash  # kill the balloon near the bulb
-      Damage=20, Glide OR DoubleJump OR Bash  # lure the balloon
+      Combat=Balloon, Glide OR DoubleJump OR Bash OR Launch  # kill the balloon near the bulb
+      Damage=20, Glide OR DoubleJump OR Bash OR Launch  # lure the balloon
+      # Glitched
+      # HammerSJump=1  # Hammer solves combat and BreakWall by itself
+      # GrenadeJump=2, Sword, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # gjump to the platform above the door, gjump again then hover
+      # Combat=3xSkeeto, GrenadeJump=2, Dash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      Hammer, Combat=Balloon  # seems like there is a micro ledge on the wall bellow the pickup which reset your upslash
-      BreakWall=3, SentryJump=1  # start your double jump from the higher floor near the spikes / bash the mosquitos / sjump from the platform next to the door to reach the platformtform above the door, sjump from there and sword combo + up slash
+      Launch  # bait the balloon then launch at the right time to avoid a dboost
+      Sword OR Hammer OR SentrySwap=1  # https://youtu.be/IE9zlqzofF8
+      GrenadeJump, BreakWall=3 OR Combat=Balloon OR Damage=20
+      AbilitySwap=1, BreakWall=3 OR Combat=Balloon OR Damage=20
   pickup WoodsMain.LeftKS:
     moki: Combat=Balloon, Glide
-    gorlek, Combat=Balloon:
-      Damage=15, DoubleJump, TripleJump OR Dash
-      Launch
+    gorlek:
+      Glide, Damage=20
+      Combat=Balloon:
+        Damage=15, DoubleJump, TripleJump OR Dash
+        Launch
     kii:
-      DoubleJump, Combat=Balloon, Damage=15
-      DoubleJump, Damage=20
-      Bash, Dash, Combat=Balloon  # bait the skeetos
+      Combat=Balloon OR Damage=20:
+        Damage=15, DoubleJump OR Dash OR Hammer
+        Launch
+        Bash, Dash  # bait the skeetos
+      # Glitched
+      # Combat=Balloon OR Damage=20:
+      #   AerialHammerJump
+      #   Damage=15, SwordSJump=1 OR GrenadeJump=2
+      #   Bash, Damage=15, GrenadeJump=1
+      #   GrenadeJump=1, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2
     unsafe:
       DoubleJump, TripleJump  # tjump on the wall above
+      Bash OR Glide OR Launch OR AerialHammerJump OR GrenadeJump
   pickup WoodsMain.BelowKeystonesSL:  # Make sure it's not redundant with WallOreLedge->BelowKeystonesSL
     gorlek:
       Launch
@@ -8390,9 +8412,11 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       DoubleJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Sword, Damage=15  # Pogo the plant
       Dash  # reset dash on the wall
+      # Glitched
+      # GlideJump
     unsafe:
       DoubleJump  # get a wall jump after dropping down
-      AbilitySwap=1
+      GlideJump OR AbilitySwap=1
 
   conn WoodsMain.InFrontLowerKS:
     moki, WoodsMain.KSRoomYellowBarrierBroken:
@@ -8407,28 +8431,38 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       Glide, DoubleJump, TripleJump  # glide and triple jump to reach the floating platform
     kii:
       WoodsMain.KSRoomYellowBarrierBroken:
-        Bash  # baiting 1 or 2 Skeetos
+        Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # baiting 1 or 2 Skeetos. Energy weapon after the plant to reach the floating platform
         Spear=3 OR Shuriken=3 OR Sentry=3 OR Blaze=4 OR Flash=3 OR Sentry=3
         Damage=15, Spear=2 OR Shuriken=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
         Damage=25, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Glide, Dash, DoubleJump, Sword OR Hammer  # glide, dash when just bellow the pickup, double jump and up slash to reach the floating platform
       Bash, DoubleJump, TripleJump
       Glide, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # glide under the pickup then djump-> upslash -> energy to get on the floasting platform (with sentry or flash you can get onto the ks platform instead)
+      # Glitched
+      # no glide jumps paths without the yellow wall to prevetn kii players from figuring out that you can't hug walls during glide jumps
+      # WoodsMain.KSRoomYellowBarrierBroken:
+      #   GlideJump
+      # AerialHammerJump, Dash OR Glide
+      # AerialHammerJump, TripleJump, Sword
     unsafe:
       WoodsMain.KSRoomYellowBarrierBroken:
-        # Bash, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR Damage=15 # was in kii but only Bash is kii aswell
-        Spear=2 OR Sentry=2 OR Blaze=2 OR Flash=2 OR Sentry=2
+        Bash OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR GlideJump OR AbilitySwap=1
         Damage=15, Spear=1 OR Shuriken=1 OR Sentry=1 OR Blaze=1 OR Flash=1 OR Sentry=1
         # fiendly spikes and slide from the ceiling to the platform
-        Shuriken=1 OR Damage=15
+        Shuriken=1 OR Damage=15  # https://youtu.be/eNK5iqGBa8I
       AbilitySwap=3
+      Glide, BlazeSwap=1 OR SentrySwap=1
+      GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1
   conn WoodsMain.GiantSkull:
     moki: WoodsMain.KeystoneDoor
   conn WoodsMain.WallOreLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer
-    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Bash OR Grenade=1 OR Bow=1 OR PauseFloat OR FlashSwap
+    kii:
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # Damage=20, GrenadeJump=1  # jump into the lower platform with the balloon and health refill then gjump
+    unsafe: Bash OR Grenade=1 OR Bow=1 OR GrenadeCancel OR PauseFloat OR FlashSwap
   conn WoodsMain.BelowFourKeystoneRoom: free
 
 anchor WoodsMain.InFrontLowerKS at 927, -4186:  # Just in front of the KS you get by going through the yellow wall path
