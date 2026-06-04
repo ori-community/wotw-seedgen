@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::{file_create, file_err},
-    seed_language::compile::PRIVATE_MEMORY,
+    seed_language::compile::FREE_MEMORY_START,
 };
 
 /// String -> usize resolver for various ids which can use a lockfile to persist choices between compilations.
@@ -92,13 +92,13 @@ impl Drop for IdResolver {
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub boolean: IdMap<PRIVATE_MEMORY>,
+    pub boolean: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub integer: IdMap<PRIVATE_MEMORY>,
+    pub integer: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub float: IdMap<PRIVATE_MEMORY>,
+    pub float: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub string: IdMap<PRIVATE_MEMORY>,
+    pub string: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     pub boolean_state: IdMap<0>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]

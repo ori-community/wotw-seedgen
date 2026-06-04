@@ -60,9 +60,9 @@ enum CompileState {
 // TODO how much is needed
 pub const RESERVED_MEMORY: usize = 20;
 /// Memory slot for hardcoded calculations
-// TODO are there off by one errors here? RESERVED_MEMORY seems to exclude its value as index,
-// so maybe the PRIVATE_MEMORY index is supposed to be the value of RESERVED_MEMORY itself.
-pub const PRIVATE_MEMORY: usize = RESERVED_MEMORY + 1;
+pub const PRIVATE_MEMORY: usize = RESERVED_MEMORY;
+/// Start of freely assignable memory
+pub const FREE_MEMORY_START: usize = PRIVATE_MEMORY + 1;
 
 pub(crate) trait Compile<'source> {
     type Output;

@@ -5,7 +5,7 @@ use crate::{
             parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
             FunctionCall, Literal, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
         },
-        compile::{Compiler, PRIVATE_MEMORY},
+        compile::{Compiler, FREE_MEMORY_START},
         output::{CommandVoid, IntermediateOutput},
     },
     Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
@@ -329,7 +329,7 @@ fn operator_precedence() {
         assert_eq!(
             output.events[0].command,
             CommandVoid::SetInteger {
-                id: PRIVATE_MEMORY,
+                id: FREE_MEMORY_START,
                 value: value.into()
             }
         );
