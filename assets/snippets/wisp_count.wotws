@@ -2,25 +2,13 @@
 #name("Wisp Count")
 #description("Counts the amount of collected Wisps")
 
-!export(count_wisps)
-fun count_wisps() {
-    set_integer("wisp_count", 0)
-    if EastHollow.ForestsVoice increment_wisp_count()
-    if WestPools.ForestsStrength increment_wisp_count()
-    if LowerReach.ForestsMemory increment_wisp_count()
-    if UpperDepths.ForestsEyes increment_wisp_count()
-    if WindtornRuins.Seir increment_wisp_count()
-}
-fun increment_wisp_count() {
-    set_integer("wisp_count", get_integer("wisp_count") + 1)
-}
-
-!export(on_change_wisp_count)
-fun on_change_wisp_count() {
-    count_wisps()
-}
-on change EastHollow.ForestsVoice on_change_wisp_count()
-on change WestPools.ForestsStrength on_change_wisp_count()
-on change LowerReach.ForestsMemory on_change_wisp_count()
-on change UpperDepths.ForestsEyes on_change_wisp_count()
-on change WindtornRuins.Seir on_change_wisp_count()
+on EastHollow.ForestsVoice store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+on EastHollow.ForestsVoice == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+on WestPools.ForestsStrength store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+on WestPools.ForestsStrength == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+on LowerReach.ForestsMemory store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+on LowerReach.ForestsMemory == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+on UpperDepths.ForestsEyes store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+on UpperDepths.ForestsEyes == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+on WindtornRuins.Seir store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+on WindtornRuins.Seir == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)

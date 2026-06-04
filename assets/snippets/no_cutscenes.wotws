@@ -2,7 +2,7 @@
 #name("No Cutscenes")
 #description("Skips several short cutscenes and dialogues")
 
-!include("wisp_count", on_change_wisp_count)
+!include("wisp_count")
 !include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
 
 on spawn {
@@ -81,7 +81,7 @@ on skills.glide store(EastHollow.DepthsOpen, true)
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3)
 on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)
 
-!augment_fun(on_change_wisp_count, if get_integer("wisp_count") >= 4 store(windtornRuinsGroup.openedDesertRuins, true))
+on itemTracker.wispsCount >= 4 store(windtornRuinsGroup.openedDesertRuins, true)
 
 on lightcatchers if GladesTown.TuleySpawned store(tuleyShop.lightcatchers, true)
 on sela_flowers if GladesTown.TuleySpawned store(tuleyShop.selaFlowers, true)

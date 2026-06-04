@@ -11,66 +11,54 @@
 !augment_fun(write_goal_progress_message, {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
     set_boolean("comma", true)
-    count_quests()
     set_string("color", "")
-    if get_integer("quest_count") == max_quests set_string("color", "$")
+    if itemTracker.questsCount == max_quests set_string("color", "$")
     write_quests_message()
     set_string("goal_progress_message", get_string("goal_progress_message") + get_string("quest_message"))
 })
 
 !augment_fun(check_goals_completed, {
-    count_quests()
-    if get_integer("quest_count") < max_quests set_boolean("goals_completed", false)
+    if itemTracker.questsCount < max_quests set_boolean("goals_completed", false)
 })
 
 on spawn store(itemTracker.questsRequired, max_quests)
 
-fun on_change_quest_count() {
-  update_goals_completed()
-  store(itemTracker.questsCount, get_integer("quest_count"))
-}
+on MarshSpawn.TokkKeystoneQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+// TODO optimization for state > n == false?
+on MarshSpawn.TokkKeystoneQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on MarshSpawn.TokkTabletQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on MarshSpawn.TokkTabletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on OuterWellspring.TheLostCompass store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on OuterWellspring.TheLostCompass == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on MarshSpawn.MokkFangQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on MarshSpawn.MokkFangQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on questUberStateGroup.familyReunionQuest >= 4 store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on questUberStateGroup.familyReunionQuest >= 4 == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on GladesTown.LastTree store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on GladesTown.LastTree == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on questUberStateGroup.desertCogQuest >= 5 store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on questUberStateGroup.desertCogQuest >= 5 == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on WindtornRuins.HandToHandComplete store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on WindtornRuins.HandToHandComplete == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on GladesTown.MokiAcornQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on GladesTown.MokiAcornQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on EastHollow.KwolokAmuletQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on EastHollow.KwolokAmuletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on GladesTown.RebuildTheGlades store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on GladesTown.RebuildTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on GladesTown.RegrowTheGlades store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on GladesTown.RegrowTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 
-on change npcsStateGroup.marshKeystoneQuest on_change_quest_count()
-on change npcsStateGroup.inkwaterWellQuest on_change_quest_count()
-on change questUberStateGroup.lostCompassQuest on_change_quest_count()
-on change questUberStateGroup.braveMokiQuest on_change_quest_count()
-on change questUberStateGroup.familyReunionQuest on_change_quest_count()
-on change hubUberStateGroup.gardenerProjectTree on_change_quest_count()
-on change questUberStateGroup.desertCogQuest on_change_quest_count()
-on change questUberStateGroup.tradeSequenceQuest on_change_quest_count()
-on change questUberStateGroup.darkCaveQuest on_change_quest_count()
-on change questUberStateGroup.kwoloksWisdomQuest on_change_quest_count()
-on change questUberStateGroup.rebuildGladesQuest on_change_quest_count()
-on change questUberStateGroup.regrowGladesQuest on_change_quest_count()
+on change itemTracker.questsCount update_goals_completed()
 
 !augment_fun(write_goals_incomplete_message, {
-    count_quests()
-    if get_integer("quest_count") < max_quests {
+    if itemTracker.questsCount < max_quests {
         set_string("color", "@")
         write_quests_message()
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("quest_message"))
     }
 })
 
-fun count_quests() {
-    set_integer("quest_count", 0)
-    if MarshSpawn.TokkKeystoneQuest increment_quest_count()
-    if MarshSpawn.TokkTabletQuest increment_quest_count()
-    if OuterWellspring.TheLostCompass increment_quest_count()
-    if MarshSpawn.MokkFangQuest increment_quest_count()
-    if questUberStateGroup.familyReunionQuest >= 4 increment_quest_count()
-    if GladesTown.LastTree increment_quest_count()
-    if questUberStateGroup.desertCogQuest >= 5 increment_quest_count()
-    if WindtornRuins.HandToHandComplete increment_quest_count()
-    if GladesTown.MokiAcornQuest increment_quest_count()
-    if EastHollow.KwolokAmuletQuest increment_quest_count()
-    if GladesTown.RebuildTheGlades increment_quest_count()
-    if GladesTown.RegrowTheGlades increment_quest_count()
-}
-fun increment_quest_count() {
-    set_integer("quest_count", get_integer("quest_count") + 1)
-}
-
 fun write_quests_message() {
-    set_string("quest_message", get_string("color") + "Quests: " + get_integer("quest_count") + "/" + max_quests + get_string("color"))
+    set_string("quest_message", get_string("color") + "Quests: " + itemTracker.questsCount + "/" + max_quests + get_string("color"))
 }

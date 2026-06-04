@@ -11,71 +11,58 @@
 !augment_fun(write_goal_progress_message, {
     if get_boolean("comma") set_string("goal_progress_message", get_string("goal_progress_message") + ", ")
     set_boolean("comma", true)
-    count_trees()
     set_string("color", "")
-    if get_integer("tree_count") == max_trees set_string("color", "$")
+    if itemTracker.treesCount == max_trees set_string("color", "$")
     write_trees_message()
     set_string("goal_progress_message", get_string("goal_progress_message") + get_string("trees_message"))
 })
 
 !augment_fun(check_goals_completed, {
-    count_trees()
-    if get_integer("tree_count") < max_trees set_boolean("goals_completed", false)
+    if itemTracker.treesCount < max_trees set_boolean("goals_completed", false)
 })
 
 on spawn store(itemTracker.treesRequired, max_trees)
 
-fun on_change_tree_count() {
-  update_goals_completed()
-  store(itemTracker.treesCount, get_integer("tree_count"))
-}
+on MarshSpawn.RegenTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on MarshSpawn.RegenTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on MarshSpawn.DamageTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on MarshSpawn.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on HowlsDen.SwordTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on HowlsDen.SwordTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on HowlsDen.DoubleJumpTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on HowlsDen.DoubleJumpTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on MarshPastOpher.BowTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on MarshPastOpher.BowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on WestHollow.DashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on WestHollow.DashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on EastHollow.BashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on EastHollow.BashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on GladesTown.DamageTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on GladesTown.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on InnerWellspring.GrappleTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on InnerWellspring.GrappleTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on UpperReach.GrenadeTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on UpperReach.GrenadeTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on UpperPools.WaterDashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on UpperPools.WaterDashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on LowerDepths.FlashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on LowerDepths.FlashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on LowerWastes.BurrowTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on LowerWastes.BurrowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+on WeepingRidge.LaunchTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on WeepingRidge.LaunchTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
 
-on change MarshSpawn.RegenTree on_change_tree_count()
-on change MarshSpawn.DamageTree on_change_tree_count()
-on change HowlsDen.SwordTree on_change_tree_count()
-on change HowlsDen.DoubleJumpTree on_change_tree_count()
-on change MarshPastOpher.BowTree on_change_tree_count()
-on change WestHollow.DashTree on_change_tree_count()
-on change EastHollow.BashTree on_change_tree_count()
-on change GladesTown.DamageTree on_change_tree_count()
-on change InnerWellspring.GrappleTree on_change_tree_count()
-on change UpperReach.GrenadeTree on_change_tree_count()
-on change UpperPools.WaterDashTree on_change_tree_count()
-on change LowerDepths.FlashTree on_change_tree_count()
-on change LowerWastes.BurrowTree on_change_tree_count()
-on change WeepingRidge.LaunchTree on_change_tree_count()
+on change itemTracker.treesCount update_goals_completed()
 
 // TODO maybe do a fancier feedback message pointing out what exactly you are missing?
 !augment_fun(write_goals_incomplete_message, {
-    count_trees()
-    if get_integer("tree_count") < max_trees {
+    if itemTracker.treesCount < max_trees {
         set_string("color", "@")
         write_trees_message()
         set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("trees_message"))
     }
 })
 
-fun count_trees() {
-    set_integer("tree_count", 0)
-    if MarshSpawn.RegenTree increment_tree_count()
-    if MarshSpawn.DamageTree increment_tree_count()
-    if HowlsDen.SwordTree increment_tree_count()
-    if HowlsDen.DoubleJumpTree increment_tree_count()
-    if MarshPastOpher.BowTree increment_tree_count()
-    if WestHollow.DashTree increment_tree_count()
-    if EastHollow.BashTree increment_tree_count()
-    if GladesTown.DamageTree increment_tree_count()
-    if InnerWellspring.GrappleTree increment_tree_count()
-    if UpperReach.GrenadeTree increment_tree_count()
-    if UpperPools.WaterDashTree increment_tree_count()
-    if LowerDepths.FlashTree increment_tree_count()
-    if LowerWastes.BurrowTree increment_tree_count()
-    if WeepingRidge.LaunchTree increment_tree_count()
-}
-fun increment_tree_count() {
-    set_integer("tree_count", get_integer("tree_count") + 1)
-}
-
 fun write_trees_message() {
-    set_string("trees_message", get_string("color") + "Trees: " + get_integer("tree_count") + "/" + max_trees + get_string("color"))
+    set_string("trees_message", get_string("color") + "Trees: " + itemTracker.treesCount + "/" + max_trees + get_string("color"))
 }

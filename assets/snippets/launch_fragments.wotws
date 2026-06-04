@@ -6,9 +6,9 @@
 !config(required, "Required", "How many Launch Fragments are required to get Launch", Integer, 3)
 !tags("Launch Fragments (" + required + "/" + total + ")")
 
-!include("launch_fragments_core", launch_fragment, required as required_state)
+!include("launch_fragments_core", launch_fragment)
 
-on spawn store(required_state, required)
+on spawn store(itemTracker.launchFragmentsRequired, required)
 
 !add_item(launch_fragment(), total)
 
