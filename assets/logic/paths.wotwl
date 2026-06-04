@@ -8439,7 +8439,7 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       Bash, DoubleJump, TripleJump
       Glide, DoubleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # glide under the pickup then djump-> upslash -> energy to get on the floasting platform (with sentry or flash you can get onto the ks platform instead)
       # Glitched
-      # no glide jumps paths without the yellow wall to prevetn kii players from figuring out that you can't hug walls during glide jumps
+      # no glide jumps paths without the yellow wall to prevent kii players from having to figure out that you can't hug walls during glide jumps
       # WoodsMain.KSRoomYellowBarrierBroken:
       #   GlideJump
       # AerialHammerJump, Dash OR Glide
@@ -8502,25 +8502,31 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
       Glide, DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Glide, Dash, Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
       Glide, Dash, Sword  # pogo the plant
+      # Glitched
+      # SentryJump=1 OR AerialHammerJump
+      # GrenadeJump=1, DoubleJump OR Hammer 
     unsafe:
       Glide, DoubleJump  # need a really precise vertical boost from the wind
       Glide, Dash, Spear=1 OR Blaze=1
-
+      Glide, BlazeSwap=1 OR SentrySwap=1
+      GlideJump OR SentryJump=1 OR AerialHammerJump OR WallHammerJump OR CoyoteHammerJump OR AbilitySwap=2
+      GrenadeJump, DoubleJump OR Sword OR Hammer
   conn WoodsMain.BalloonLure:
     moki: Combat=Balloon, Bash, DoubleJump OR Dash OR Glide OR Launch  # bash for the rude placement of the tentacle
     gorlek, Combat=Balloon:
-      Bash, Sword
+      Bash, Sword OR Grenade=1
       Bash, HammerSJump=1
     kii:
       # Moki/gorlek paths ignoring the balloon
-      Bash, DoubleJump OR Dash OR Glide OR Sword
+      Bash, Grenade=1 OR DoubleJump OR Dash OR Glide OR Sword
       # new paths
       Bash, Hammer OR Shuriken=1 OR Damage=15
       Launch OR Glide
       Combat=Tentacle, DoubleJump OR Dash OR Glide OR Sword OR Hammer
     unsafe:
-      Bash
-      Combat=Tentacle, Damage=15
+      Bash OR PauseFloat OR AbilitySwap=2
+      GrenadeJump, Damage=15
+      Damage=15, Damage=15
   conn WoodsMain.FourKeystoneRoom:
     moki: WoodsMain.KeystoneDoor
 
