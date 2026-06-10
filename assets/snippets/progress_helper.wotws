@@ -9,6 +9,8 @@ By default those are bound to
 - Alt+3 (quests)
 ")
 
+!config(entrance_helper, "Entrance Helper", "Documents entrance connections", Boolean, true)
+
 // TODO there's a regression here because previously progress messages were in a consistent order
 // To add a progress message from your header, use the write_progress_message event and append your progress message to the string with id progress_message
 // If you also want to add to the progress displayed over the map, use the write_map_progress_message event and append to the string with id progress_message
@@ -145,6 +147,19 @@ on reload {
     set_wheel_item_all_actions("root", RightBottom, show_teleporter_progress())
 }
 
+!if entrance_helper {
+    on reload {
+        set_wheel_item_data(
+            "root",
+            BottomRight,
+            "Entrance Progress",
+            "[Ability1]View Progress",
+            Placeholder,
+        )
+        set_wheel_item_all_actions("root", BottomRight, show_entrance_progress())
+    }
+}
+
 on progress_message {
     write_progress_message()
     controlled_priority_message("progress_message", get_string("progress_message"), 4)
@@ -194,6 +209,10 @@ on binding1 if disable_keybinds == false {
 }
 on binding2 if disable_keybinds == false show_quest_progress()
 on binding3 if disable_keybinds == false show_teleporter_progress()
+
+!if entrance_helper {
+    on binding4 if disable_keybinds == false show_entrance_progress()
+}
 
 fun write_tree_progress() {
     set_string("tree_progress", "#Trees found#: ")
@@ -452,4 +471,198 @@ fun teleporter_string_piece(teleporter: String) {
     if get_boolean("comma") set_string("teleporter_progress", get_string("teleporter_progress") + ", ")
     set_string("teleporter_progress", get_string("teleporter_progress") + teleporter)
     set_boolean("comma", true)
+}
+
+!if entrance_helper {
+    fun show_entrance_progress() {
+        write_entrance_progress()
+        controlled_priority_message("entrance_progress", get_string("entrance_progress"), 4)
+    }
+
+    on change entrances.lupoShopEntrance update_entrance_progress()
+    on change entrances.lupoShopExit update_entrance_progress()
+    on change entrances.lastHutEntrance update_entrance_progress()
+    on change entrances.lastHutExit update_entrance_progress()
+    on change entrances.hutAboveMotayEntrance update_entrance_progress()
+    on change entrances.hutAboveMotayExit update_entrance_progress()
+    on change entrances.holeHutEntrance update_entrance_progress()
+    on change entrances.holeHutExit update_entrance_progress()
+    on change entrances.mokiFatherHutEntrance update_entrance_progress()
+    on change entrances.mokiFatherHutExit update_entrance_progress()
+    on change entrances.hutAboveOpherEntrance update_entrance_progress()
+    on change entrances.hutAboveOpherExit update_entrance_progress()
+    on change entrances.caveEntrance update_entrance_progress()
+    on change entrances.caveExit update_entrance_progress()
+    on change entrances.wellspringFirstFloorEntranceBottom update_entrance_progress()
+    on change entrances.wellspringFirstFloorExitBottom update_entrance_progress()
+    on change entrances.wellspringFirstFloorEntranceTop update_entrance_progress()
+    on change entrances.wellspringFirstFloorExitTop update_entrance_progress()
+    on change entrances.wellspringSecondFloorEntrance update_entrance_progress()
+    on change entrances.wellspringSecondFloorExit update_entrance_progress()
+    on change entrances.wellspringThirdFloorEntrance update_entrance_progress()
+    on change entrances.wellspringThirdFloorExit update_entrance_progress()
+    on change entrances.reachSeedHutEntrance update_entrance_progress()
+    on change entrances.reachSeedHutExit update_entrance_progress()
+    on change entrances.teddyHutEntrance update_entrance_progress()
+    on change entrances.teddyHutExit update_entrance_progress()
+    on change entrances.ruinsEntrance update_entrance_progress()
+    on change entrances.ruinsExit update_entrance_progress()
+    on change entrances.willowsEndEntrance update_entrance_progress()
+    on change entrances.willowsEndExitBottom update_entrance_progress()
+    on change entrances.willowsEndExitTop update_entrance_progress()
+    on change entrances.shriekRoomExit update_entrance_progress()
+    on change knownEntranceConnections.lupoShopEntrance update_entrance_progress()
+    on change knownEntranceConnections.lupoShopExit update_entrance_progress()
+    on change knownEntranceConnections.lastHutEntrance update_entrance_progress()
+    on change knownEntranceConnections.lastHutExit update_entrance_progress()
+    on change knownEntranceConnections.hutAboveMotayEntrance update_entrance_progress()
+    on change knownEntranceConnections.hutAboveMotayExit update_entrance_progress()
+    on change knownEntranceConnections.holeHutEntrance update_entrance_progress()
+    on change knownEntranceConnections.holeHutExit update_entrance_progress()
+    on change knownEntranceConnections.mokiFatherHutEntrance update_entrance_progress()
+    on change knownEntranceConnections.mokiFatherHutExit update_entrance_progress()
+    on change knownEntranceConnections.hutAboveOpherEntrance update_entrance_progress()
+    on change knownEntranceConnections.hutAboveOpherExit update_entrance_progress()
+    on change knownEntranceConnections.caveEntrance update_entrance_progress()
+    on change knownEntranceConnections.caveExit update_entrance_progress()
+    on change knownEntranceConnections.wellspringFirstFloorEntranceBottom update_entrance_progress()
+    on change knownEntranceConnections.wellspringFirstFloorExitBottom update_entrance_progress()
+    on change knownEntranceConnections.wellspringFirstFloorEntranceTop update_entrance_progress()
+    on change knownEntranceConnections.wellspringFirstFloorExitTop update_entrance_progress()
+    on change knownEntranceConnections.wellspringSecondFloorEntrance update_entrance_progress()
+    on change knownEntranceConnections.wellspringSecondFloorExit update_entrance_progress()
+    on change knownEntranceConnections.wellspringThirdFloorEntrance update_entrance_progress()
+    on change knownEntranceConnections.wellspringThirdFloorExit update_entrance_progress()
+    on change knownEntranceConnections.reachSeedHutEntrance update_entrance_progress()
+    on change knownEntranceConnections.reachSeedHutExit update_entrance_progress()
+    on change knownEntranceConnections.teddyHutEntrance update_entrance_progress()
+    on change knownEntranceConnections.teddyHutExit update_entrance_progress()
+    on change knownEntranceConnections.ruinsEntrance update_entrance_progress()
+    on change knownEntranceConnections.ruinsExit update_entrance_progress()
+    on change knownEntranceConnections.willowsEndEntrance update_entrance_progress()
+    on change knownEntranceConnections.willowsEndExitBottom update_entrance_progress()
+    on change knownEntranceConnections.willowsEndExitTop update_entrance_progress()
+    on change knownEntranceConnections.shriekRoomExit update_entrance_progress()
+    fun update_entrance_progress() {
+        write_entrance_progress()
+        set_message_text("entrance_progress", get_string("entrance_progress"))
+    }
+
+    !let(door_side_color, "<hex_ffaa00cc>")
+    !let(outside, door_side_color + "Outside</>")
+    !let(inside, door_side_color + "Inside</>")
+    !let(lupo_shop_outside, "#Lupo Shop# " + outside)
+    !let(lupo_shop_inside, "#Lupo Shop# " + inside)
+    !let(last_hut_outside, "#Last Hut# " + outside)
+    !let(last_hut_inside, "#Last Hut# " + inside)
+    !let(hut_above_motay_outside, "#Hut Above Motay# " + outside)
+    !let(hut_above_motay_inside, "#Hut Above Motay# " + inside)
+    !let(tree_hut_outside, "#Tree Hut# " + outside)
+    !let(tree_hut_inside, "#Tree Hut# " + inside)
+    !let(moki_father_hut_outside, "#Moki Father Hut# " + outside)
+    !let(moki_father_hut_inside, "#Moki Father Hut# " + inside)
+    !let(storage_hut_outside, "#Storage Hut# " + outside)
+    !let(storage_hut_inside, "#Storage Hut# " + inside)
+    !let(cave_outside, "#Cave# " + outside)
+    !let(cave_inside, "#Cave# " + inside)
+    !let(wellspring_1st_floor_bottom_outside, "#Wellspring 1st Floor Bottom# " + outside)
+    !let(wellspring_1st_floor_bottom_inside, "#Wellspring 1st Floor Bottom# " + inside)
+    !let(wellspring_1st_floor_top_outside, "#Wellspring 1st Floor Top# " + outside)
+    !let(wellspring_1st_floor_top_inside, "#Wellspring 1st Floor Top# " + inside)
+    !let(wellspring_2nd_floor_outside, "#Wellspring 2nd Floor# " + outside)
+    !let(wellspring_2nd_floor_inside, "#Wellspring 2nd Floor# " + inside)
+    !let(wellspring_3rd_floor_outside, "#Wellspring 3rd Floor# " + outside)
+    !let(wellspring_3rd_floor_inside, "#Wellspring 3rd Floor# " + inside)
+    !let(reach_hut_outside, "#Reach Hut# " + outside)
+    !let(reach_hut_inside, "#Reach Hut# " + inside)
+    !let(teddy_hut_outside, "#Teddy Hut# " + outside)
+    !let(teddy_hut_inside, "#Teddy Hut# " + inside)
+    !let(ruins_outside, "#Ruins# " + outside)
+    !let(ruins_inside, "#Ruins# " + inside)
+    !let(willow_bottom_outside, "#Willow Bottom# " + outside)
+    !let(willow_bottom_inside, "#Willow Bottom# " + inside)
+    !let(willow_top_outside, "#Willow Top# " + outside)
+    !let(willow_top_inside, "#Willow Top# " + inside)
+
+    fun write_entrance_progress() {
+        // negative margin hack
+        set_string("entrance_progress", "<ls_-1.5><hex_00000000>.</></>\n<s_0.7><ls_0.7>")
+        entrance_string_piece(lupo_shop_outside, knownEntranceConnections.lupoShopEntrance, entrances.lupoShopEntrance)
+        entrance_string_piece("\n" + lupo_shop_inside, knownEntranceConnections.lupoShopExit, entrances.lupoShopExit)
+        entrance_string_piece("\n" + last_hut_outside, knownEntranceConnections.lastHutEntrance, entrances.lastHutEntrance)
+        entrance_string_piece("\n" + last_hut_inside, knownEntranceConnections.lastHutExit, entrances.lastHutExit)
+        entrance_string_piece("\n" + hut_above_motay_outside, knownEntranceConnections.hutAboveMotayEntrance, entrances.hutAboveMotayEntrance)
+        entrance_string_piece("\n" + hut_above_motay_inside, knownEntranceConnections.hutAboveMotayExit, entrances.hutAboveMotayExit)
+        entrance_string_piece("\n" + tree_hut_outside, knownEntranceConnections.holeHutEntrance, entrances.holeHutEntrance)
+        entrance_string_piece("\n" + tree_hut_inside, knownEntranceConnections.holeHutExit, entrances.holeHutExit)
+        entrance_string_piece("\n" + moki_father_hut_outside, knownEntranceConnections.mokiFatherHutEntrance, entrances.mokiFatherHutEntrance)
+        entrance_string_piece("\n" + moki_father_hut_inside, knownEntranceConnections.mokiFatherHutExit, entrances.mokiFatherHutExit)
+        entrance_string_piece("\n" + storage_hut_outside, knownEntranceConnections.hutAboveOpherEntrance, entrances.hutAboveOpherEntrance)
+        entrance_string_piece("\n" + storage_hut_inside, knownEntranceConnections.hutAboveOpherExit, entrances.hutAboveOpherExit)
+        entrance_string_piece("\n" + cave_outside, knownEntranceConnections.caveEntrance, entrances.caveEntrance)
+        entrance_string_piece("\n" + cave_inside, knownEntranceConnections.caveExit, entrances.caveExit)
+        entrance_string_piece("\n" + wellspring_1st_floor_bottom_outside, knownEntranceConnections.wellspringFirstFloorEntranceBottom, entrances.wellspringFirstFloorEntranceBottom)
+        entrance_string_piece("\n" + wellspring_1st_floor_bottom_inside, knownEntranceConnections.wellspringFirstFloorExitBottom, entrances.wellspringFirstFloorExitBottom)
+        entrance_string_piece("\n" + wellspring_1st_floor_top_outside, knownEntranceConnections.wellspringFirstFloorEntranceTop, entrances.wellspringFirstFloorEntranceTop)
+        entrance_string_piece("\n" + wellspring_1st_floor_top_inside, knownEntranceConnections.wellspringFirstFloorExitTop, entrances.wellspringFirstFloorExitTop)
+        entrance_string_piece("\n" + wellspring_2nd_floor_outside, knownEntranceConnections.wellspringSecondFloorEntrance, entrances.wellspringSecondFloorEntrance)
+        entrance_string_piece("\n" + wellspring_2nd_floor_inside, knownEntranceConnections.wellspringSecondFloorExit, entrances.wellspringSecondFloorExit)
+        entrance_string_piece("\n" + wellspring_3rd_floor_outside, knownEntranceConnections.wellspringThirdFloorEntrance, entrances.wellspringThirdFloorEntrance)
+        entrance_string_piece("\n" + wellspring_3rd_floor_inside, knownEntranceConnections.wellspringThirdFloorExit, entrances.wellspringThirdFloorExit)
+        entrance_string_piece("\n" + reach_hut_outside, knownEntranceConnections.reachSeedHutEntrance, entrances.reachSeedHutEntrance)
+        entrance_string_piece("\n" + reach_hut_inside, knownEntranceConnections.reachSeedHutExit, entrances.reachSeedHutExit)
+        entrance_string_piece("\n" + teddy_hut_outside, knownEntranceConnections.teddyHutEntrance, entrances.teddyHutEntrance)
+        entrance_string_piece("\n" + teddy_hut_inside, knownEntranceConnections.teddyHutExit, entrances.teddyHutExit)
+        entrance_string_piece("\n" + ruins_outside, knownEntranceConnections.ruinsEntrance, entrances.ruinsEntrance)
+        entrance_string_piece("\n" + ruins_inside, knownEntranceConnections.ruinsExit, entrances.ruinsExit)
+        entrance_string_piece("\n" + willow_bottom_outside, knownEntranceConnections.willowsEndEntrance, entrances.willowsEndEntrance)
+        entrance_string_piece("\n" + willow_bottom_inside, knownEntranceConnections.willowsEndExitBottom, entrances.willowsEndExitBottom)
+        entrance_string_piece("\n" + willow_top_outside, knownEntranceConnections.willowsEndExitTop, entrances.willowsEndExitTop)
+        entrance_string_piece("\n" + willow_top_inside, knownEntranceConnections.shriekRoomExit, entrances.shriekRoomExit)
+    }
+
+    fun entrance_string_piece(entrance: String, known: Boolean, target: Integer) {
+        set_string("entrance_progress", get_string("entrance_progress") + entrance)
+        if known {
+            entrance(target)
+            set_string("entrance_progress", get_string("entrance_progress") + get_string("entrance"))
+        }
+        if known == false set_string("entrance_progress", get_string("entrance_progress") + " - <hex_ffffff80>Undiscovered</>")
+    }
+
+    fun entrance(target: Integer) {
+        if target == 0 set_string("entrance", " - @Closed@")
+        if target == 1 set_string("entrance", " to " + lupo_shop_outside)
+        if target == 2 set_string("entrance", " to " + lupo_shop_inside)
+        if target == 3 set_string("entrance", " to " + last_hut_outside)
+        if target == 4 set_string("entrance", " to " + last_hut_inside)
+        if target == 5 set_string("entrance", " to " + hut_above_motay_outside)
+        if target == 6 set_string("entrance", " to " + hut_above_motay_inside)
+        if target == 7 set_string("entrance", " to " + tree_hut_outside)
+        if target == 8 set_string("entrance", " to " + tree_hut_inside)
+        if target == 9 set_string("entrance", " to " + moki_father_hut_outside)
+        if target == 10 set_string("entrance", " to " + moki_father_hut_inside)
+        if target == 11 set_string("entrance", " to " + storage_hut_outside)
+        if target == 12 set_string("entrance", " to " + storage_hut_inside)
+        if target == 13 set_string("entrance", " to " + cave_outside)
+        if target == 14 set_string("entrance", " to " + cave_inside)
+        if target == 15 set_string("entrance", " to " + wellspring_1st_floor_bottom_outside)
+        if target == 16 set_string("entrance", " to " + wellspring_1st_floor_bottom_inside)
+        if target == 17 set_string("entrance", " to " + wellspring_1st_floor_top_outside)
+        if target == 18 set_string("entrance", " to " + wellspring_1st_floor_top_inside)
+        if target == 19 set_string("entrance", " to " + wellspring_2nd_floor_outside)
+        if target == 20 set_string("entrance", " to " + wellspring_2nd_floor_inside)
+        if target == 21 set_string("entrance", " to " + wellspring_3rd_floor_outside)
+        if target == 22 set_string("entrance", " to " + wellspring_3rd_floor_inside)
+        if target == 23 set_string("entrance", " to " + reach_hut_outside)
+        if target == 24 set_string("entrance", " to " + reach_hut_inside)
+        if target == 25 set_string("entrance", " to " + teddy_hut_outside)
+        if target == 26 set_string("entrance", " to " + teddy_hut_inside)
+        if target == 27 set_string("entrance", " to " + ruins_outside)
+        if target == 28 set_string("entrance", " to " + ruins_inside)
+        if target == 29 set_string("entrance", " to " + willow_bottom_outside)
+        if target == 30 set_string("entrance", " to " + willow_bottom_inside)
+        if target == 31 set_string("entrance", " to " + willow_top_outside)
+        if target == 32 set_string("entrance", " to " + willow_top_inside)
+    }
 }
