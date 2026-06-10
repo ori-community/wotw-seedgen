@@ -340,13 +340,24 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
         ty
     }
 
+    pub(crate) fn infer_type<T: InferType<'source> + Span>(&mut self, t: &T) -> Option<Type> {
+        let ty = t.infer_type(self);
+
+        if ty.is_none() {
+            self.errors
+                .push(Error::error("Cannot infer type".to_string(), t.span()));
+        }
+
+        ty
+    }
+
     pub(crate) fn common_type(
         &mut self,
         left: &Expression<'source>,
         right: &Expression<'source>,
     ) -> Option<Type> {
-        let left_ty = left.infer_type(self);
-        let right_ty = right.infer_type(self);
+        let left_ty = self.infer_type(left);
+        let right_ty = self.infer_type(right);
 
         let (left_ty, right_ty) = (left_ty?, right_ty?);
 
