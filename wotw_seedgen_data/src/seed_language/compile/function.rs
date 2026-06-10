@@ -668,7 +668,7 @@ impl SnippetCompiler<'_, '_, '_, '_> {
             Ordering::Equal => {}
             Ordering::Greater => {
                 let start = parameters[arg_count].span_start();
-                let end = close.span_end();
+                let end = parameters.last().unwrap().span_end();
 
                 self.errors
                     .push(Error::error("Too many parameters".to_string(), start..end))

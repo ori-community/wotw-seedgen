@@ -101,6 +101,36 @@ impl<Item, Punctuation> Punctuated<Item, Punctuation> {
     pub fn is_empty(&self) -> bool {
         self.items.is_empty() && self.last.is_none()
     }
+
+    #[inline]
+    pub fn first(&self) -> Option<&Item> {
+        self.items
+            .first()
+            .map(|(item, _)| item)
+            .or(self.last.as_ref())
+    }
+
+    #[inline]
+    pub fn first_mut(&mut self) -> Option<&mut Item> {
+        self.items
+            .first_mut()
+            .map(|(item, _)| item)
+            .or(self.last.as_mut())
+    }
+
+    #[inline]
+    pub fn last(&self) -> Option<&Item> {
+        self.last
+            .as_ref()
+            .or_else(|| self.items.last().map(|(item, _)| item))
+    }
+
+    #[inline]
+    pub fn last_mut(&mut self) -> Option<&mut Item> {
+        self.last
+            .as_mut()
+            .or_else(|| self.items.last_mut().map(|(item, _)| item))
+    }
 }
 
 impl<Item, Punctuation> IntoIterator for Punctuated<Item, Punctuation> {
