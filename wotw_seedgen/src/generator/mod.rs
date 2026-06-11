@@ -17,7 +17,7 @@ use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
     logic_language::output::Graph,
     seed_language::{compile::Compiler, output::IntermediateOutput, simulate::UberStates},
-    UniverseSettings,
+    UniverseSettings, WorldSettings,
 };
 use wotw_seedgen_seed::Seed;
 
@@ -60,7 +60,7 @@ pub fn generate_seed<F: SnippetAccess>(
             );
 
             // TODO this is inefficient because we probably do a lot of redundant work between the worlds
-            let output = parse_snippets(&world_settings.snippets, compiler)?;
+            let output = parse_snippets(world_settings, compiler)?;
 
             Ok((world_settings, output))
         })
@@ -113,10 +113,13 @@ pub fn generate_seed<F: SnippetAccess>(
 const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
 
 fn parse_snippets(
-    snippets: &[String],
+    world_settings: &WorldSettings,
     mut compiler: Compiler,
 ) -> Result<IntermediateOutput, String> {
-    for identifier in iter::once("seed_core").chain(snippets.iter().map(String::as_str)) {
+    for identifier in iter::once("seed_core")
+        .chain(world_settings.inline_snippets.keys().map(String::as_str))
+        .chain(world_settings.snippets.iter().map(String::as_str))
+    {
         compiler
             .compile_snippet(identifier)
             .map_err(|err| format!("Failed to read snippet \"{identifier}\": {err}"))?;
