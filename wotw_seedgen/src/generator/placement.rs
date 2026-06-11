@@ -22,7 +22,13 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
+use std::{
+    cmp::Ordering,
+    fmt::{Display, Write},
+    iter, mem,
+    ops::RangeFrom,
+    sync::LazyLock,
+};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     logic_language::output::Node,
@@ -769,29 +775,42 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                 .worlds
                 .into_iter()
                 .zip(placeholder_maps)
-                .map(|(mut world_context, placeholder_map)| {
+                .map(|(world_context, placeholder_map)| {
+                    let WorldContext {
+                        world,
+                        mut output,
+                        index: world_index,
+                        ..
+                    } = world_context;
+
                     assert!(
-                        world_context.output.icons.is_empty(),
+                        output.icons.is_empty(),
                         "custom icons in seedgen aren't supported"
                     ); // TODO custom icons in snippets
 
-                    let spawn = &world_context.world.graph.nodes[world_context.world.spawn];
-                    world_context.output.spawn = Some(*spawn.position().unwrap());
+                    let spawn = &world.graph.nodes[world.spawn];
+                    output.spawn = Some(*spawn.position().unwrap());
 
                     // Debug variant for the uppercase formatting
-                    world_context
-                        .output
-                        .tags
-                        .push(format!("{:?}", world_context.world.settings.difficulty));
+                    output.tags.push(format!("{:?}", world.settings.difficulty));
+
+                    if let Some(loop_size) = world.settings.randomize_entrances {
+                        let mut random_entrances = "Random Entrances".to_string();
+
+                        if loop_size.get() > 2 {
+                            let _ = write!(&mut random_entrances, " (Loop Size {loop_size})");
+                        }
+
+                        output.tags.push(random_entrances);
+                    }
 
                     let seedgen_info = SeedgenInfo {
                         universe_settings: self.settings.clone(),
-                        world_index: world_context.index,
+                        world_index,
                         spawn_identifier: spawn.identifier().to_string(),
                     };
 
-                    Seed::new(world_context.output, placeholder_map, debug)
-                        .with_seedgen_info(seedgen_info)
+                    Seed::new(output, placeholder_map, debug).with_seedgen_info(seedgen_info)
                 })
                 .collect(),
             spoiler: self.spoiler,
