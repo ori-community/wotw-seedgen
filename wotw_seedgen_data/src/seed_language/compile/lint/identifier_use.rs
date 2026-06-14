@@ -3,16 +3,10 @@ use std::{hash::BuildHasher, ops::Range};
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_parse::{Error, Identifier, Spanned};
 
-use crate::seed_language::ast::{self, Handler, Traverse};
-
-pub fn lint(ast: &ast::Snippet, errors: &mut Vec<Error>) {
-    let mut unused = Unused::default();
-    ast.traverse(&mut unused);
-    unused.finish(errors);
-}
+use crate::seed_language::ast::Handler;
 
 #[derive(Default)]
-struct Unused {
+pub struct Unused {
     defs: FxHashMap<u64, Range<usize>>,
     uses: FxHashSet<u64>,
 }
@@ -42,7 +36,7 @@ impl Handler for Unused {
 }
 
 impl Unused {
-    fn finish(self, errors: &mut Vec<Error>) {
+    pub fn finish(self, errors: &mut Vec<Error>) {
         for (def, span) in self.defs {
             if !self.uses.contains(&def) {
                 errors.push(Error::warning("unused value".to_string(), span));

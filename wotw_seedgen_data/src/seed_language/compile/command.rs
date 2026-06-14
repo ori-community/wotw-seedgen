@@ -538,7 +538,7 @@ fn boolean_uber_state<S: Span>(
     span: S,
 ) -> Result<UberIdentifier> {
     uber_state::<8, 100>(
-        &mut compiler.global.ids.boolean_state,
+        &mut compiler.global.id_resolver.boolean_state,
         &compiler.identifier,
         identifier,
         span,
@@ -551,7 +551,7 @@ fn integer_uber_state<S: Span>(
     span: S,
 ) -> Result<UberIdentifier> {
     uber_state::<9, 100>(
-        &mut compiler.global.ids.integer_state,
+        &mut compiler.global.id_resolver.integer_state,
         &compiler.identifier,
         identifier,
         span,
@@ -564,7 +564,7 @@ fn float_uber_state<S: Span>(
     span: S,
 ) -> Result<UberIdentifier> {
     uber_state::<10, 25>(
-        &mut compiler.global.ids.float_state,
+        &mut compiler.global.id_resolver.float_state,
         &compiler.identifier,
         identifier,
         span,

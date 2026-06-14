@@ -24,8 +24,8 @@ use crate::{
     seed_language::{
         ast::{self, Expression, Snippet, UberStateType},
         compile::{
-            self, error::operand_error, ids::IdResolver, preprocess::PreprocessedFunction,
-            scope::Scopes,
+            self, error::operand_error, ids::IdResolver, lint::LintData,
+            preprocess::PreprocessedFunction, scope::Scopes,
         },
         output::{IntermediateOutput, Literal, SnippetDebugOutput, VariableValue},
         types::{uber_state_type, InferType, Type},
@@ -53,7 +53,7 @@ pub struct Compiler<'snippets, 'uberstates> {
     rng: Pcg64Mcg,
     global: GlobalCompilerData<'snippets, 'uberstates>,
     compiled_snippets: FxHashMap<String, CompileState>,
-    errors: Vec<(Source, Vec<Error>)>,
+    errors: FxHashMap<String, (Source, Vec<Error>)>,
 }
 
 #[derive(Debug)]
@@ -177,9 +177,10 @@ pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
     pub exported_values: FxHashMap<String, FxHashMap<String, ExportedValue>>,
-    pub ids: IdResolver,
+    pub id_resolver: IdResolver,
     // TODO could be a reference
     pub config: FxHashMap<String, FxHashMap<String, String>>,
+    pub lint_data: Option<LintData>,
 }
 
 #[derive(Debug)]
@@ -194,6 +195,7 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
         snippet_access: &'snippets dyn SnippetAccess,
         config: FxHashMap<String, FxHashMap<String, String>>,
         lockfile: Option<PathBuf>,
+        lint: bool,
         debug: bool,
     ) -> Self {
         Self {
@@ -201,9 +203,21 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             uber_state_data,
             snippet_access,
             exported_values: Default::default(),
-            ids: IdResolver::new(lockfile),
+            id_resolver: IdResolver::new(lockfile),
             config,
+            lint_data: lint.then(|| LintData::default()),
         }
+    }
+
+    pub(crate) fn finish(
+        self,
+        errors: &mut FxHashMap<String, (Source, Vec<Error>)>,
+    ) -> IntermediateOutput {
+        if let Some(lint_data) = self.lint_data {
+            lint_data.finish(errors);
+        }
+
+        self.output
     }
 }
 
@@ -241,6 +255,10 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
         };
 
         ast.compile(&mut compiler);
+
+        if let Some(lint_data) = &mut compiler.global.lint_data {
+            lint_data.finish_snippet(&compiler.identifier);
+        }
 
         if let Some(debug) = &mut compiler.global.output.debug {
             // TODO now it's inefficient that we're returning the whole compiler, could save some clones here
@@ -425,6 +443,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         uber_state_data: &'uberstates UberStateData,
         config: FxHashMap<String, FxHashMap<String, String>>,
         lockfile: Option<PathBuf>,
+        lint: bool,
         debug: bool,
     ) -> Self {
         Self {
@@ -434,6 +453,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
                 snippet_access,
                 config,
                 lockfile,
+                lint,
                 debug,
             ),
             compiled_snippets: Default::default(),
@@ -460,7 +480,9 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         let mut errors = ast.errors;
 
         if let Some(ast) = ast.parsed {
-            lint::lint(&ast, &mut errors);
+            if self.global.lint_data.is_some() {
+                lint::lint_ast(&ast, &mut errors);
+            }
 
             let preprocessor = Preprocessor::preprocess(&ast, &self.global.output);
             errors.extend(preprocessor.errors);
@@ -503,16 +525,18 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
             errors.extend(compiler.errors);
         }
 
-        self.errors.push((source, errors));
+        self.errors.insert(identifier.to_string(), (source, errors));
 
         *self.compiled_snippets.get_mut(identifier).unwrap() = CompileState::Finished;
 
         Ok(())
     }
 
-    pub fn finish(self) -> CompileResult {
+    pub fn finish(mut self) -> CompileResult {
+        let output = self.global.finish(&mut self.errors);
+
         CompileResult {
-            output: self.global.output,
+            output,
             errors: self.errors,
         }
     }
@@ -521,7 +545,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
 #[derive(Debug, Clone)]
 pub struct CompileResult {
     pub output: IntermediateOutput,
-    pub errors: Vec<(Source, Vec<Error>)>,
+    pub errors: FxHashMap<String, (Source, Vec<Error>)>,
 }
 
 impl CompileResult {
@@ -530,7 +554,7 @@ impl CompileResult {
 
         let mut error_count = 0;
 
-        for (source, errors) in self.errors {
+        for (source, errors) in self.errors.into_values() {
             for error in errors {
                 if error.kind.severity() == Severity::Error {
                     error_count += 1;

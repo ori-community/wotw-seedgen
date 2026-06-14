@@ -180,36 +180,71 @@ fn string_literal(context: &mut ArgContext) -> Option<String> {
     spanned_string_literal(context).map(|(value, _)| value)
 }
 
-fn boolean_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.boolean.id(id))
+fn read_boolean_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context)
+        .map(|(id, span)| context.compiler.global.read_boolean_id(id, span))
 }
 
-fn integer_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.integer.id(id))
+fn write_boolean_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_boolean_id(id))
 }
 
-fn float_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.float.id(id))
+fn read_integer_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context)
+        .map(|(id, span)| context.compiler.global.read_integer_id(id, span))
 }
 
-fn string_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.string.id(id))
+fn write_integer_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_integer_id(id))
 }
 
-fn message_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.message.id(id))
+fn read_float_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context)
+        .map(|(id, span)| context.compiler.global.read_float_id(id, span))
 }
 
-fn box_trigger_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.box_trigger.id(id))
+fn write_float_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_float_id(id))
+}
+
+fn read_string_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context)
+        .map(|(id, span)| context.compiler.global.read_string_id(id, span))
+}
+
+fn write_string_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_string_id(id))
+}
+
+fn read_message_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context)
+        .map(|(id, span)| context.compiler.global.read_message_id(id, span))
+}
+
+fn write_message_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_message_id(id))
+}
+
+fn read_box_trigger_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context)
+        .map(|(id, span)| context.compiler.global.read_box_trigger_id(id, span))
+}
+
+fn write_box_trigger_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_box_trigger_id(id))
+}
+
+fn read_warp_icon_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context)
+        .map(|(id, span)| context.compiler.global.read_warp_icon_id(id, span))
+}
+
+fn write_warp_icon_id(context: &mut ArgContext) -> Option<usize> {
+    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_warp_icon_id(id))
 }
 
 fn wheel_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.wheel.id(id))
-}
-
-fn warp_icon_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.ids.warp_icon.id(id))
+    string_literal(context).map(|id| context.compiler.global.id_resolver.wheel.id(id))
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, Display, VariantArray)]
@@ -708,7 +743,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 }
             }
             FunctionIdentifier::GetBoolean => Command::Boolean(CommandBoolean::GetBoolean {
-                id: boolean_id(&mut context)?,
+                id: read_boolean_id(&mut context)?,
             }),
             FunctionIdentifier::IsInBox => Command::Boolean(CommandBoolean::IsInBox {
                 x1: boxed_arg(&mut context)?,
@@ -717,7 +752,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 y2: boxed_arg(&mut context)?,
             }),
             FunctionIdentifier::GetInteger => Command::Integer(CommandInteger::GetInteger {
-                id: integer_id(&mut context)?,
+                id: read_integer_id(&mut context)?,
             }),
             FunctionIdentifier::ToInteger => {
                 let float = arg::<CommandFloat>(&mut context)?;
@@ -735,7 +770,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 string: boxed_arg(&mut context)?,
             }),
             FunctionIdentifier::GetFloat => Command::Float(CommandFloat::GetFloat {
-                id: float_id(&mut context)?,
+                id: read_float_id(&mut context)?,
             }),
             FunctionIdentifier::ToFloat => {
                 let integer = arg::<CommandInteger>(&mut context)?;
@@ -750,7 +785,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::Float(command)
             }
             FunctionIdentifier::GetString => Command::String(CommandString::GetString {
-                id: string_id(&mut context)?,
+                id: read_string_id(&mut context)?,
             }),
             FunctionIdentifier::ToString => {
                 let (arg, span) = spanned_arg(&mut context)?;
@@ -977,35 +1012,35 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }
             FunctionIdentifier::ControlledPriorityMessage => {
                 Command::Void(CommandVoid::QueuedMessage {
-                    id: Some(message_id(&mut context)?),
+                    id: Some(write_message_id(&mut context)?),
                     priority: true,
                     message: arg(&mut context)?,
                     timeout: Some(arg(&mut context)?),
                 })
             }
             FunctionIdentifier::FreeMessage => Command::Void(CommandVoid::FreeMessage {
-                id: message_id(&mut context)?,
+                id: write_message_id(&mut context)?,
                 message: arg(&mut context)?,
             }),
             FunctionIdentifier::FreeMessageUninitialized => {
                 Command::Void(CommandVoid::FreeMessageUninitialized {
-                    id: message_id(&mut context)?,
+                    id: write_message_id(&mut context)?,
                 })
             }
             FunctionIdentifier::DestroyMessage => Command::Void(CommandVoid::MessageDestroy {
-                id: message_id(&mut context)?,
+                id: read_message_id(&mut context)?,
             }),
             FunctionIdentifier::SetMessageText => Command::Void(CommandVoid::MessageText {
-                id: message_id(&mut context)?,
+                id: read_message_id(&mut context)?,
                 message: arg(&mut context)?,
             }),
             FunctionIdentifier::SetMessageTimeout => Command::Void(CommandVoid::MessageTimeout {
-                id: message_id(&mut context)?,
+                id: read_message_id(&mut context)?,
                 timeout: arg(&mut context)?,
             }),
             FunctionIdentifier::SetMessageBackground => {
                 Command::Void(CommandVoid::MessageBackground {
-                    id: message_id(&mut context)?,
+                    id: read_message_id(&mut context)?,
                     background: arg(&mut context)?,
                 })
             }
@@ -1013,32 +1048,32 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             // maybe also make
             FunctionIdentifier::SetMessagePosition => {
                 Command::Void(CommandVoid::FreeMessagePosition {
-                    id: message_id(&mut context)?,
+                    id: read_message_id(&mut context)?,
                     x: arg(&mut context)?,
                     y: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::SetMessageAlignment => {
                 Command::Void(CommandVoid::FreeMessageAlignment {
-                    id: message_id(&mut context)?,
+                    id: read_message_id(&mut context)?,
                     alignment: arg(&mut context)?,
                 })
             }
 
             FunctionIdentifier::SetMessageHorizontalAnchor => {
                 Command::Void(CommandVoid::FreeMessageHorizontalAnchor {
-                    id: message_id(&mut context)?,
+                    id: read_message_id(&mut context)?,
                     horizontal_anchor: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::SetMessageVerticalAnchor => {
                 Command::Void(CommandVoid::FreeMessageVerticalAnchor {
-                    id: message_id(&mut context)?,
+                    id: read_message_id(&mut context)?,
                     vertical_anchor: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::SetMessageCorner => {
-                let id = message_id(&mut context)?;
+                let id = read_message_id(&mut context)?;
 
                 let commands = match arg(&mut context)? {
                     Corner::TopLeft => vec![
@@ -1218,23 +1253,23 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }
             FunctionIdentifier::SetMessageBoxWidth => {
                 Command::Void(CommandVoid::FreeMessageBoxWidth {
-                    id: message_id(&mut context)?,
+                    id: read_message_id(&mut context)?,
                     width: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::SetMessageCoordinateSystem => {
                 Command::Void(CommandVoid::FreeMessageCoordinateSystem {
-                    id: message_id(&mut context)?,
+                    id: read_message_id(&mut context)?,
                     coordinate_system: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::FreeMessageShow => Command::Void(CommandVoid::FreeMessageShow {
-                id: message_id(&mut context)?,
+                id: read_message_id(&mut context)?,
                 fade: arg(&mut context)?,
                 sound: arg(&mut context)?,
             }),
             FunctionIdentifier::FreeMessageHide => Command::Void(CommandVoid::FreeMessageHide {
-                id: message_id(&mut context)?,
+                id: read_message_id(&mut context)?,
                 fade: arg(&mut context)?,
             }),
             FunctionIdentifier::Store => store(true, &mut context)?,
@@ -1257,24 +1292,24 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 })
             }
             FunctionIdentifier::SetBoolean => Command::Void(CommandVoid::SetBoolean {
-                id: boolean_id(&mut context)?,
+                id: write_boolean_id(&mut context)?,
                 value: arg(&mut context)?,
             }),
             FunctionIdentifier::SetInteger => Command::Void(CommandVoid::SetInteger {
-                id: integer_id(&mut context)?,
+                id: write_integer_id(&mut context)?,
                 value: arg(&mut context)?,
             }),
             FunctionIdentifier::SetFloat => Command::Void(CommandVoid::SetFloat {
-                id: float_id(&mut context)?,
+                id: write_float_id(&mut context)?,
                 value: arg(&mut context)?,
             }),
             FunctionIdentifier::SetString => Command::Void(CommandVoid::SetString {
-                id: string_id(&mut context)?,
+                id: write_string_id(&mut context)?,
                 value: arg(&mut context)?,
             }),
 
             FunctionIdentifier::BoxTrigger => Command::Void(CommandVoid::BoxTrigger {
-                id: box_trigger_id(&mut context)?,
+                id: write_box_trigger_id(&mut context)?,
                 x1: boxed_arg(&mut context)?,
                 y1: boxed_arg(&mut context)?,
                 x2: boxed_arg(&mut context)?,
@@ -1282,18 +1317,18 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             }),
             FunctionIdentifier::BoxTriggerDestroy => {
                 Command::Void(CommandVoid::BoxTriggerDestroy {
-                    id: box_trigger_id(&mut context)?,
+                    id: read_box_trigger_id(&mut context)?,
                 })
             }
             FunctionIdentifier::BoxTriggerEnterCallback => {
                 Command::Void(CommandVoid::BoxTriggerEnterCallback {
-                    id: box_trigger_id(&mut context)?,
+                    id: read_box_trigger_id(&mut context)?,
                     action: arg(&mut context)?,
                 })
             }
             FunctionIdentifier::BoxTriggerLeaveCallback => {
                 Command::Void(CommandVoid::BoxTriggerLeaveCallback {
-                    id: box_trigger_id(&mut context)?,
+                    id: read_box_trigger_id(&mut context)?,
                     action: arg(&mut context)?,
                 })
             }
@@ -1341,16 +1376,16 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 })
             }
             FunctionIdentifier::CreateWarpIcon => Command::Void(CommandVoid::CreateWarpIcon {
-                id: warp_icon_id(&mut context)?,
+                id: write_warp_icon_id(&mut context)?,
                 x: arg(&mut context)?,
                 y: arg(&mut context)?,
             }),
             FunctionIdentifier::SetWarpIconLabel => Command::Void(CommandVoid::SetWarpIconLabel {
-                id: warp_icon_id(&mut context)?,
+                id: read_warp_icon_id(&mut context)?,
                 label: arg(&mut context)?,
             }),
             FunctionIdentifier::DestroyWarpIcon => Command::Void(CommandVoid::DestroyWarpIcon {
-                id: warp_icon_id(&mut context)?,
+                id: read_warp_icon_id(&mut context)?,
             }),
             FunctionIdentifier::SetShopItemData => {
                 let uber_identifier = ui_shop_identifier_arg(&mut context)?;

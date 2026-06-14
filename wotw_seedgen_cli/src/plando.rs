@@ -136,6 +136,7 @@ fn compile(
         &cache.uber_state_data,
         Default::default(),
         Some(lockfile),
+        true,
         debug,
     );
 

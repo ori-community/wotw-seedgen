@@ -210,6 +210,7 @@ fn test_compiler_with_config<'snippets, F: SnippetAccess>(
         config,
         None,
         false,
+        false,
     )
 }
 

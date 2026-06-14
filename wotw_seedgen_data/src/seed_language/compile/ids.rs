@@ -1,7 +1,7 @@
 use std::{
     fs::File,
     marker::PhantomData,
-    ops::{Deref, DerefMut},
+    ops::{Deref, DerefMut, Range},
     path::PathBuf,
 };
 
@@ -12,8 +12,122 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::{file_create, file_err},
-    seed_language::compile::FREE_MEMORY_START,
+    seed_language::compile::{GlobalCompilerData, FREE_MEMORY_START},
 };
+
+impl GlobalCompilerData<'_, '_> {
+    pub fn read_boolean_id(&mut self, id: String, span: Range<usize>) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.boolean.read(id.clone(), span);
+        }
+
+        self.id_resolver.ids.boolean.id(id)
+    }
+
+    pub fn write_boolean_id(&mut self, id: String) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.boolean.write(id.clone());
+        }
+
+        self.id_resolver.ids.boolean.id(id)
+    }
+
+    pub fn read_integer_id(&mut self, id: String, span: Range<usize>) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.integer.read(id.clone(), span);
+        }
+
+        self.id_resolver.ids.integer.id(id)
+    }
+
+    pub fn write_integer_id(&mut self, id: String) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.integer.write(id.clone());
+        }
+
+        self.id_resolver.ids.integer.id(id)
+    }
+
+    pub fn read_float_id(&mut self, id: String, span: Range<usize>) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.float.read(id.clone(), span);
+        }
+
+        self.id_resolver.ids.float.id(id)
+    }
+
+    pub fn write_float_id(&mut self, id: String) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.float.write(id.clone());
+        }
+
+        self.id_resolver.ids.float.id(id)
+    }
+
+    pub fn read_string_id(&mut self, id: String, span: Range<usize>) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.string.read(id.clone(), span);
+        }
+
+        self.id_resolver.ids.string.id(id)
+    }
+
+    pub fn write_string_id(&mut self, id: String) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.string.write(id.clone());
+        }
+
+        self.id_resolver.ids.string.id(id)
+    }
+
+    pub fn read_message_id(&mut self, id: String, span: Range<usize>) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.message.read(id.clone(), span);
+        }
+
+        self.id_resolver.ids.message.id(id)
+    }
+
+    pub fn write_message_id(&mut self, id: String) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.message.write(id.clone());
+        }
+
+        self.id_resolver.ids.message.id(id)
+    }
+
+    pub fn read_box_trigger_id(&mut self, id: String, span: Range<usize>) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.box_trigger.read(id.clone(), span);
+        }
+
+        self.id_resolver.ids.box_trigger.id(id)
+    }
+
+    pub fn write_box_trigger_id(&mut self, id: String) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.box_trigger.write(id.clone());
+        }
+
+        self.id_resolver.ids.box_trigger.id(id)
+    }
+
+    pub fn read_warp_icon_id(&mut self, id: String, span: Range<usize>) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.warp_icon.read(id.clone(), span);
+        }
+
+        self.id_resolver.ids.warp_icon.id(id)
+    }
+
+    pub fn write_warp_icon_id(&mut self, id: String) -> usize {
+        if let Some(lint_data) = &mut self.lint_data {
+            lint_data.id_use.warp_icon.write(id.clone());
+        }
+
+        self.id_resolver.ids.warp_icon.id(id)
+    }
+}
 
 /// String -> usize resolver for various ids which can use a lockfile to persist choices between compilations.
 ///
@@ -92,13 +206,13 @@ impl Drop for IdResolver {
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub boolean: IdMap<FREE_MEMORY_START>,
+    boolean: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub integer: IdMap<FREE_MEMORY_START>,
+    integer: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub float: IdMap<FREE_MEMORY_START>,
+    float: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub string: IdMap<FREE_MEMORY_START>,
+    string: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     pub boolean_state: IdMap<0>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
@@ -106,13 +220,13 @@ pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     pub float_state: IdMap<0>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub message: IdMap<0>,
+    message: IdMap<0>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub box_trigger: IdMap<0>,
+    box_trigger: IdMap<0>,
     // never empty
     pub wheel: IdMap<0, IdMapWheel>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub warp_icon: IdMap<0>,
+    warp_icon: IdMap<0>,
 }
 
 impl Ids {

@@ -56,6 +56,7 @@ pub fn generate_seed<F: SnippetAccess>(
                 uber_state_data,
                 world_settings.snippet_config.clone(),
                 None,
+                true,
                 debug,
             );
 

@@ -235,6 +235,7 @@ impl Backend<Cache> {
                     &cache.uber_state_data,
                     Default::default(),
                     None,
+                    true,
                     false,
                 );
 
@@ -246,7 +247,7 @@ impl Backend<Cache> {
 
             let (source, errors) = result
                 .errors
-                .into_iter()
+                .into_values()
                 .find(|(source, _)| source.id[..source.id.len() - 6].ends_with(identifier))
                 .unwrap();
 
