@@ -617,8 +617,8 @@ fun teleporter_string_piece(teleporter: String) {
         entrance_string_piece("\n" + ruins_inside, knownEntranceConnections.ruinsExit, entrances.ruinsExit)
         entrance_string_piece("\n" + willow_bottom_outside, knownEntranceConnections.willowsEndEntrance, entrances.willowsEndEntrance)
         entrance_string_piece("\n" + willow_bottom_inside, knownEntranceConnections.willowsEndExitBottom, entrances.willowsEndExitBottom)
-        entrance_string_piece("\n" + willow_top_outside, knownEntranceConnections.willowsEndExitTop, entrances.willowsEndExitTop)
-        entrance_string_piece("\n" + willow_top_inside, knownEntranceConnections.shriekRoomExit, entrances.shriekRoomExit)
+        entrance_string_piece("\n" + willow_top_outside, knownEntranceConnections.shriekRoomExit, entrances.shriekRoomExit)
+        entrance_string_piece("\n" + willow_top_inside, knownEntranceConnections.willowsEndExitTop, entrances.willowsEndExitTop)
     }
 
     fun entrance_string_piece(entrance: String, known: Boolean, target: Integer) {
