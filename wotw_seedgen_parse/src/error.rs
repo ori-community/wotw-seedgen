@@ -3,7 +3,7 @@ use itertools::Itertools;
 use std::{
     error,
     fmt::{self, Display},
-    io,
+    io::{self, IsTerminal},
     ops::Range,
 };
 
@@ -113,32 +113,48 @@ impl Error {
     /// Write this [`Error`] to an implementor of [`Write`] using the [`ariadne`] crate.
     ///
     /// [`Write`]: io::Write
-    pub fn write_pretty<W: io::Write>(&self, source: &Source, w: W) -> io::Result<()> {
+    pub fn write_pretty<W>(&self, source: &Source, w: &mut W) -> io::Result<()>
+    where
+        W: io::Write + IsTerminal,
+    {
+        let is_terminal = w.is_terminal();
         let id = source.id.as_str();
 
-        if source.content.is_empty() {
+        let report = if source.content.is_empty() {
             // the error printing library (ariadne) seems to panic in this case
             Report::<(&str, _)>::build(self.kind.severity().into(), id, 0)
                 .with_message("Empty Input")
-                .finish()
-                .write((id, ariadne::Source::from("")), w)
         } else {
-            let mut report = Report::build(self.kind.severity().into(), id, self.span.start)
-                .with_config(Config::default().with_index_type(ariadne::IndexType::Byte))
-                .with_label(
-                    Label::new((id, self.span.clone()))
-                        .with_message(self.kind.to_string().fg(Color::Red))
-                        .with_color(Color::Red),
-                );
+            let mut message = self.kind.to_string();
+
+            if is_terminal {
+                message = message.fg(Color::Red).to_string();
+            }
+
+            let mut label = Label::new((id, self.span.clone())).with_message(message);
+
+            if is_terminal {
+                label = label.with_color(Color::Red);
+            }
+
+            let mut report =
+                Report::build(self.kind.severity().into(), id, self.span.start).with_label(label);
 
             if let Some(help) = &self.help {
                 report.set_help(help);
             }
 
             report
-                .finish()
-                .write((id, ariadne::Source::from(&source.content)), w)
-        }
+        };
+
+        report
+            .with_config(
+                Config::default()
+                    .with_index_type(ariadne::IndexType::Byte)
+                    .with_color(is_terminal),
+            )
+            .finish()
+            .write((id, ariadne::Source::from(&source.content)), w)
     }
 }
 
