@@ -1,33 +1,26 @@
 use std::{ops::Range, sync::LazyLock};
 
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
-use wotw_seedgen_data::{
-    parse::{
-        Delimited, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart, Spanned,
-        SpannedOption,
+use wotw_seedgen_data::{parse::{
+    Delimited, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart, Spanned,
+    SpannedOption,
+}, seed_language::{
+    ast::{
+        Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
+        ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandRepeat,
+        ConfigArgs, ConfigType, ConstantDiscriminants, Content, CountInZoneArgs,
+        CountInZoneBinding, Event, Expression, ExpressionValue, FunctionCall,
+        FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
+        ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
+        LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
+        RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
+        RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
+        StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+        UberIdentifierNumeric, UberStateType, ZoneOfArgs,
     },
-    seed_language::{
-        ast::{
-            Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
-            ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandRepeat,
-            ConfigArgs, ConfigType, ConstantDiscriminants, Content, CountInZoneArgs,
-            CountInZoneBinding, Event, Expression, ExpressionValue, FunctionCall,
-            FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
-            ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-            LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
-            RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
-            RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
-            StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
-            UberIdentifierNumeric, UberStateType, ZoneOfArgs,
-        },
-        compile::FunctionIdentifier,
-        types::Type,
-    },
-    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
-    LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VariantArray, VariantNames,
-    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
-};
-
+    compile::FunctionIdentifier,
+    types::Type,
+}, Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon, MapIcon, GenericIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VariantArray, VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone};
 use crate::seed::cache::CacheValues;
 
 // TODO add controlflow functionality to handler trait and use it here?
@@ -395,6 +388,12 @@ static EQUIPMENT_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
 static ZONE_COMPLETION: LazyLock<Vec<CompletionItem>> =
     LazyLock::new(|| enum_member_completions_full(Zone::VARIANTS, "Zone", |zone| *zone as u8));
 
+static GENERIC_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full(GenericIcon::VARIANTS, "GenericIcon", |generic_icon| {
+        *generic_icon as u8
+    })
+});
+
 static OPHER_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
     enum_member_completions_full(OpherIcon::VARIANTS, "OpherIcon", |opher_icon| {
         *opher_icon as u8
@@ -490,6 +489,7 @@ fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem
         ConstantDiscriminants::WeaponUpgrade => WEAPON_UPGRADE_COMPLETION.clone(),
         ConstantDiscriminants::Equipment => EQUIPMENT_COMPLETION.clone(),
         ConstantDiscriminants::Zone => ZONE_COMPLETION.clone(),
+        ConstantDiscriminants::GenericIcon => GENERIC_ICON_COMPLETION.clone(),
         ConstantDiscriminants::OpherIcon => OPHER_ICON_COMPLETION.clone(),
         ConstantDiscriminants::LupoIcon => LUPO_ICON_COMPLETION.clone(),
         ConstantDiscriminants::GromIcon => GROM_ICON_COMPLETION.clone(),

@@ -757,6 +757,7 @@ impl CompileIntoLiteral for Icon {
         _compiler: &mut SnippetCompiler,
     ) -> Result<Self, Error> {
         match literal {
+            Literal::Constant(Constant::GenericIcon(value)) => Ok(Icon::Generic(value)),
             Literal::Constant(Constant::Shard(value)) => Ok(Icon::Shard(value)),
             Literal::Constant(Constant::LupoIcon(value)) => Ok(Icon::Lupo(value)),
             Literal::Constant(Constant::GromIcon(value)) => Ok(Icon::Grom(value)),

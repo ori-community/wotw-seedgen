@@ -80,6 +80,7 @@ impl Display for Constant {
             Constant::WeaponUpgrade(value) => value.fmt(f),
             Constant::Equipment(value) => value.fmt(f),
             Constant::Zone(value) => value.fmt(f),
+            Constant::GenericIcon(value) => value.fmt(f),
             Constant::OpherIcon(value) => value.fmt(f),
             Constant::LupoIcon(value) => value.fmt(f),
             Constant::GromIcon(value) => value.fmt(f),

@@ -11,10 +11,10 @@ use wotw_seedgen_derive::FromStr;
 
 use crate::{Equipment, Shard};
 
-// TODO some default icon?
 /// Icons which can be used in shops or wheels
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Icon {
+    Generic(GenericIcon),
     Shard(Shard),
     Equipment(Equipment),
     Opher(OpherIcon),
@@ -28,6 +28,7 @@ pub enum Icon {
 impl Display for Icon {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Icon::Generic(generic_icon) => write!(f, "{generic_icon} icon"),
             Icon::Shard(shard) => write!(f, "{shard} icon"),
             Icon::Equipment(equipment) => write!(f, "{equipment} icon"),
             Icon::Opher(opher_icon) => write!(f, "{opher_icon} icon"),
@@ -38,6 +39,27 @@ impl Display for Icon {
             Icon::Bundle(path) => write!(f, "bundled icon at \"{path}\""),
         }
     }
+}
+
+/// Generic icons
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Deserialize_repr,
+    Serialize_repr,
+    Display,
+    FromStr,
+    VariantArray,
+)]
+#[repr(u8)]
+pub enum GenericIcon {
+    Placeholder = 0,
 }
 
 /// Icons used in the Opher shop

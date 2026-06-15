@@ -24,8 +24,7 @@ use wotw_seedgen_derive::FromStr;
 )]
 #[repr(u8)]
 pub enum Shard {
-    /// None
-    Placeholder = 0,
+    /// None = 0. Not technically a shard and only used as an icon -> `Icon::Placeholder`.
     /// GlassCannon
     Overcharge = 1,
     TripleJump = 2,

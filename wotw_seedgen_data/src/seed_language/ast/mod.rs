@@ -29,6 +29,7 @@ pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
     SeparatedNonEmpty, Span, Spanned, Symbol,
 };
+use crate::icon::GenericIcon;
 
 pub type Delimited<const OPEN: char, Content, const CLOSE: char> =
     wotw_seedgen_parse::Delimited<Spanned<Symbol<OPEN>>, Content, Spanned<Symbol<CLOSE>>>;
@@ -390,6 +391,7 @@ pub enum Constant {
     WeaponUpgrade(#[ast(with = "constant_ast::<WeaponUpgrade, E>")] WeaponUpgrade),
     Equipment(#[ast(with = "constant_ast::<Equipment, E>")] Equipment),
     Zone(#[ast(with = "constant_ast::<Zone, E>")] Zone),
+    GenericIcon(#[ast(with = "constant_ast::<GenericIcon, E>")] GenericIcon),
     OpherIcon(#[ast(with = "constant_ast::<OpherIcon, E>")] OpherIcon),
     LupoIcon(#[ast(with = "constant_ast::<LupoIcon, E>")] LupoIcon),
     GromIcon(#[ast(with = "constant_ast::<GromIcon, E>")] GromIcon),

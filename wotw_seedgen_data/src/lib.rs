@@ -30,7 +30,7 @@ mod zone;
 
 pub use eq_ignore::EqIgnore;
 pub use equipment::{EquipSlot, Equipment};
-pub use icon::{GromIcon, Icon, LupoIcon, MapIcon, OpherIcon, TuleyIcon};
+pub use icon::{GromIcon, Icon, LupoIcon, MapIcon, GenericIcon, OpherIcon, TuleyIcon};
 pub use message::{Alignment, CoordinateSystem, Corner, HorizontalAnchor, VerticalAnchor};
 pub use position::Position;
 pub use settings::{

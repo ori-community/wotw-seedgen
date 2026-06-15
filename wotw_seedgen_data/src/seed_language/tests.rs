@@ -1,17 +1,11 @@
-use crate::{
-    assets::{AssetFileAccess, SnippetAccess, SnippetFileAccess, TestAccess, UberStateData},
-    seed_language::{
-        ast::{
-            parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
-            FunctionCall, Literal, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
-        },
-        compile::{Compiler, FREE_MEMORY_START},
-        output::{CommandVoid, IntermediateOutput},
+use crate::{assets::{AssetFileAccess, SnippetAccess, SnippetFileAccess, TestAccess, UberStateData}, seed_language::{
+    ast::{
+        parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
+        FunctionCall, Literal, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
     },
-    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
-    LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
-    WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
-};
+    compile::{Compiler, FREE_MEMORY_START},
+    output::{CommandVoid, IntermediateOutput},
+}, Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon, HorizontalAnchor, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone};
 use rustc_hash::FxHashMap;
 use std::{
     array,
@@ -270,6 +264,9 @@ fn coersions() {
             ConstantDiscriminants::Zone => {
                 test_variants::<Zone>(|zone| format!("if current_zone() == {zone} {{}}"))
             }
+            ConstantDiscriminants::GenericIcon => test_variants::<GenericIcon>(|generic_icon| {
+                format!("set_shop_item_icon(OpherShop.Slot9, {generic_icon})")
+            }),
             ConstantDiscriminants::OpherIcon => test_variants::<OpherIcon>(|opher_icon| {
                 format!("set_shop_item_icon(OpherShop.Slot9, {opher_icon})")
             }),
