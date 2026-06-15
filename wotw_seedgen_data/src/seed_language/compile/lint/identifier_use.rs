@@ -1,13 +1,14 @@
 use std::{hash::BuildHasher, ops::Range};
 
-use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
+use indexmap::IndexMap;
+use rustc_hash::{FxBuildHasher, FxHashSet};
 use wotw_seedgen_parse::{Error, Identifier, Spanned};
 
 use crate::seed_language::ast::Handler;
 
 #[derive(Default)]
 pub struct Unused {
-    defs: FxHashMap<u64, Range<usize>>,
+    defs: IndexMap<u64, Range<usize>, FxBuildHasher>,
     uses: FxHashSet<u64>,
 }
 
