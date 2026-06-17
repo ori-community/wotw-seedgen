@@ -8511,27 +8511,30 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
       Glide, BlazeSwap=1 OR SentrySwap=1
       GlideJump OR SentryJump=1 OR AerialHammerJump OR WallHammerJump OR CoyoteHammerJump OR AbilitySwap=2
       GrenadeJump, DoubleJump OR Sword OR Hammer
+
   conn WoodsMain.BalloonLure:
-    moki: Combat=Balloon, Bash, DoubleJump OR Dash OR Glide OR Launch  # bash for the rude placement of the tentacle
-    gorlek, Combat=Balloon:
-      Bash, Sword OR Grenade=1
-      Bash, HammerSJump=1
+    moki: Combat=2xBalloon, Bash, DoubleJump OR Dash OR Glide OR Launch  # bash for the rude placement of the tentacle
+    gorlek, Combat=2xBalloon: Bash, Sword OR Grenade=1 OR HammerSJump=1
     kii:
-      # Moki/gorlek paths ignoring the balloon
-      Bash, Grenade=1 OR DoubleJump OR Dash OR Glide OR Sword
+      # Moki/gorlek paths ignoring balloons
+      Bash, Grenade=1 OR DoubleJump OR Dash OR Sword
       # new paths
       Bash, Hammer OR Shuriken=1 OR Damage=15
       Launch OR Glide
-      Combat=Tentacle, DoubleJump OR Dash OR Glide OR Sword OR Hammer
+      Combat=Tentacle, DoubleJump
+      # Glitched
+      # SentryJump=1  # Sword/Hammer solves the tentacle combat requirement
     unsafe:
-      Bash OR PauseFloat OR AbilitySwap=2
-      GrenadeJump, Damage=15
-      Damage=15, Damage=15
+      Bash OR Sword OR Hammer
+      Combat=Tentacle OR Damage=10:
+        Dash OR PauseFloat OR AbilitySwap=2
+        GrenadeJump  # https://youtu.be/ge8ucSQKqhI
+        Damage=15, GrenadeCancel OR BlazeSwap=1 OR SentrySwap=1 OR Damage=15
   conn WoodsMain.FourKeystoneRoom:
     moki: WoodsMain.KeystoneDoor
 
-anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you lure a balloon through to break a yellow wall - mostly exists for the lure specifically since paths for it would otherwise be awkward
-  refill Checkpoint
+anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind column next to the giant falling skull
+  # refill Checkpoint  # Checkpoint at 1056, -4144 but not accounting for it because it respawns you inside a tentacle
 
   state WoodsMain.BalloonLureBlobDestroyed:
     moki: BreakWall=3, Glide
@@ -8555,8 +8558,9 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
     unsafe, WoodsMain.BalloonLureBlobDestroyed:
       Launch  # Use launch invulnerability to protect you from balloon's explosions
       DoubleJump, Dash, Bash, Grenade=1  # Bait the enemy by jumping and imediately dashing against the left wall, double wall off the wall to  get to the edge near the spikes and bash grenade. Launch the grenade near the right edge and bash it to get to the left edge. If you are too slow, the enemy will die from the explosion after your bash
-
-  # WoodsMain.YellowWallSL now accessible with conn BelowHiddenOre: pickup WoodsMain.YellowWallSL
+      BreakWall=3, GrenadeJump
+      WallHammerJump, Combat=Balloon OR Damage=20
+      CoyoteHammerJump, Combat=Balloon OR Damage=20
 
   conn WoodsMain.BelowHiddenOre:
     moki: WoodsMain.BalloonLureBlobDestroyed, Glide
@@ -8567,11 +8571,8 @@ anchor WoodsMain.BalloonLure at 1056, -4144:  # At the bottom of the shaft you l
     unsafe, WoodsMain.BalloonLureBlobDestroyed:
       DoubleJump, TripleJump
       DoubleJump, Sword  # pogo the balloon
-      DoubleJump, Bash, Grenade=1  # land on the ledge near the spikes bellow the breakable wall
-      DoubleJump, SentryJump=1  # land on the ledge near the spikes bellow the breakable wall
-      Dash, Bash, Grenade=2
-      Bash, Grenade=3  # bash grenade to get on the skull, bash a tentacle projectile and the bashable plant to get to the blowing enemy level, 2nd bash grenade to get near the spikes and last one to reach the connection
-      SentryJump=3  # jump + sword combo to reach the skull, sword combo to reach the tentacle. use your sjumps to get to the connection
+      Bash, Grenade=1, DoubleJump OR Grenade=1  # land on the ledge near the spikes bellow the breakable wall
+      DoubleJump, GrenadeJump OR SentryJump=1  # land on the ledge near the spikes bellow the breakable wall
   conn WoodsMain.GiantSkull:
     moki:
       Glide OR Launch
