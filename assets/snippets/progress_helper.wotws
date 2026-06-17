@@ -28,7 +28,7 @@ By default those are bound to
 !builtin_icon(wisp_progress_icon, "icons/wheel/wisps_progress.png") // TODO why do others have blue and this one not
 !builtin_icon(quest_progress_icon, "icons/wheel/quests_progress.blue.png") // TODO some filenames are singular, some plural...
 !builtin_icon(teleporter_icon, "icons/game/teleporter.png")
-!builtin_icon(entrance_connections_icon, "icons/wheel/entrance_connections.blue")
+!builtin_icon(entrance_connections_icon, "icons/wheel/entrance_connections.blue.png")
 
 !export(write_progress_message)
 fun write_progress_message() {
