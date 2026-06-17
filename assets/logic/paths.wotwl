@@ -8173,7 +8173,7 @@ anchor WoodsMain.AfterKuMeet at 856, -4192:  # At the upper ledge opening up to 
       AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
       GrenadeJump, DoubleJump
       BlazeSwap=2 OR SentrySwap=2:
-        DoubleJump OR Glide OR Sword OR Hammer OR Blaze=1 OR Sentry=1 
+        DoubleJump OR Glide OR Sword OR Hammer OR Blaze=1 OR Sentry=1
       BlazeSwap=1 OR SentrySwap=1:
         Dash OR GlideJump OR PauseFloat
   conn WoodsMain.BelowFourKeystoneRoom:
@@ -8290,12 +8290,12 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
       Glide, DoubleJump
       Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Glide, Dash OR Sword OR Hammer  # for the weapons, glide below and use the up attack
-    kii:  # GlideJump would work but the breakable wall makes it a bit awkward for kii. And it you can break the wall, you can just use glide + one weapoon usage instead 
+    kii:  # GlideJump would work but the breakable wall makes it a bit awkward for kii. And it you can break the wall, you can just use glide + one weapoon usage instead
       Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       # BreakWall=20, Dash  # Breakwall so you have more space for a coyote dash. Reset dash on the left wall
       Dash  # Coyote dash. Reset dash on the left wall
-  
+
   conn WoodsMain.BelowFourKeystoneRoom: free
   conn WoodsMain.FourKeystoneRoom:
     moki:
@@ -8504,7 +8504,7 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
       Glide, Dash, Sword  # pogo the plant
       # Glitched
       # SentryJump=1 OR AerialHammerJump
-      # GrenadeJump=1, DoubleJump OR Hammer 
+      # GrenadeJump=1, DoubleJump OR Hammer
     unsafe:
       Glide, DoubleJump  # need a really precise vertical boost from the wind
       Glide, Dash, Spear=1 OR Blaze=1
@@ -8540,14 +8540,18 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
     moki: BreakWall=3, Glide
     gorlek: BreakWall=3, Launch
     kii:
-      Combat=Balloon, Glide OR Launch
-      Damage=20, Glide OR Launch
-      DoubleJump, BreakWall=3
-      DoubleJump, Damage=20, TripleJump OR Dash
+      Bow=1 OR Spear=1 OR Sentry=1  # Just shoot at the blob
+      BreakWall=3, DoubleJump
+      Damage=20, Glide OR Launch  # dboost on the balloon while its close to the blob
+      DoubleJump, Damage=20, TripleJump OR Dash  # same as above
+      # Glitched
+      # SentryJump=1
     unsafe:
-      DoubleJump, Combat=Balloon, Dash OR TripleJump
+      Grenade=1 OR Shuriken=1  # just shoot at the blob
+      Sword OR Hammer  # wall jump just before the spikes then upslash to reach the ledge near the spikes
+      BreakWall=3, GrenadeJump OR AbilitySwap=1 OR Damage=15  # I think Blaze is the only weapon which can't break this blob on its own
+      DoubleJump, Flap OR Combat=Balloon OR Damage=4  # https://youtu.be/xaUHPg2MUwc  / dboost on the blob itself
       Launch  # Use launch invulnerability to protect you from balloon's explosions
-      DoubleJump, Flap  # Damage=10 if you don't want to bait the plant. https://youtu.be/xaUHPg2MUwc
   state WoodsMain.BalloonLureYellowBarrierBroken:
     moki: WoodsMain.BalloonLureBlobDestroyed, Flap, Glide
     gorlek: WoodsMain.BalloonLureBlobDestroyed, Flap, Launch
@@ -8557,34 +8561,36 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
       DoubleJump, TripleJump, Flap OR Damage=20 OR Combat=Balloon
     unsafe, WoodsMain.BalloonLureBlobDestroyed:
       Launch  # Use launch invulnerability to protect you from balloon's explosions
-      DoubleJump, Dash, Bash, Grenade=1  # Bait the enemy by jumping and imediately dashing against the left wall, double wall off the wall to  get to the edge near the spikes and bash grenade. Launch the grenade near the right edge and bash it to get to the left edge. If you are too slow, the enemy will die from the explosion after your bash
-      BreakWall=3, GrenadeJump
-      WallHammerJump, Combat=Balloon OR Damage=20
-      CoyoteHammerJump, Combat=Balloon OR Damage=20
+      Combat=Balloon OR Damage=10:  # dboost on the skeeto instead
+        GrenadeJump OR WallHammerJump OR CoyoteHammerJump
+        DoubleJump, Bash, Grenade=1
 
   conn WoodsMain.BelowHiddenOre:
     moki: WoodsMain.BalloonLureBlobDestroyed, Glide
     gorlek: WoodsMain.BalloonLureBlobDestroyed, Launch
     kii, WoodsMain.BalloonLureBlobDestroyed:
-      DoubleJump, TripleJump, Combat=Balloon OR Damage=20  # Don't need the balloon for anything but he's really annoying to avoid
+      DoubleJump, TripleJump, Flap OR Combat=Balloon OR Damage=20  # Don't need the balloon for anything but he's really annoying to avoid
       DoubleJump, Dash, Sword  # pogo the balloon
+      # Glitched
+      # AerialHammerJump OR SentryJump=1
     unsafe, WoodsMain.BalloonLureBlobDestroyed:
-      DoubleJump, TripleJump
+      DoubleJump, TripleJump OR BlazeSwap=1 OR SentrySwap=1
       DoubleJump, Sword  # pogo the balloon
-      Bash, Grenade=1, DoubleJump OR Grenade=1  # land on the ledge near the spikes bellow the breakable wall
-      DoubleJump, GrenadeJump OR SentryJump=1  # land on the ledge near the spikes bellow the breakable wall
+      Bash, Grenade=1, DoubleJump OR Grenade=1 OR Damage=15  # land on the ledge near the spikes bellow the blob
+      GrenadeJump OR SentryJump=1  # land on the ledge near the spikes bellow the blob
+      AbilitySwap=2
+      Damage=15, BlazeSwap=1 OR SentrySwap=1
   conn WoodsMain.GiantSkull:
     moki:
       Glide OR Launch
-      DoubleJump, Dash
+      DoubleJump, Dash, Bash OR Combat=Tentacle
     gorlek:
-      DoubleJump, TripleJump OR Sword
+      Combat=Tentacle, DoubleJump, TripleJump OR Sword
+      Damage=10, DoubleJump, TripleJump OR Dash OR Sword
       Bash, DoubleJump OR Dash
     kii:
-      Dash
-      DoubleJump, Hammer OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Damage=15
-      Bash, Hammer OR Shuriken=1 OR Sentry=2
-      Grenade=1, Bash
+      Dash OR Bash
+      DoubleJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
     unsafe:
       DoubleJump  # Specific bait to jump over the tentacle. You can take 10hp of contact damage instead. https://youtu.be/oE3V_4WgTnY
 
@@ -16299,7 +16305,7 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       # WillowsEnd.PortalShortcut, AerialHammerJump OR GrenadeJump=2
       # Bash, Grenade=1, GlideJump, WillowsEnd.PortalShortcut OR Grenade=1 OR Damage=80
       # Bash, Grenade=1, DoubleJump, GlideJump, Damage=40
-      # DoubleJump, GlideJump, Damage=40, Bash, Sword OR Hammer OR Spear=1  # Condition to enter the portal. Then dboost in spikes to reach the elemental 
+      # DoubleJump, GlideJump, Damage=40, Bash, Sword OR Hammer OR Spear=1  # Condition to enter the portal. Then dboost in spikes to reach the elemental
       # WillowsEnd.PortalShortcut, DoubleJump, GlideJump, Sword OR Hammer OR Spear=1  # Condition to enter the portal
       # WillowsEnd.PortalShortcut, GrenadeJump=1, Damage=80  # only need one dboost but the portal can be weird
       # WillowsEnd.PortalShortcut, GrenadeJump=1, DoubleJump, TripleJump OR Sword OR Hammer OR Flash=1 OR GlideJump OR Damage=40
