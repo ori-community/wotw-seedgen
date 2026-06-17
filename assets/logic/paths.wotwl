@@ -8539,7 +8539,7 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
   state WoodsMain.BalloonLureBlobDestroyed:
     moki: BreakWall=3, Glide
     gorlek: BreakWall=3, Launch
-    kii:
+    kii:  # killing the balloon with an actual weapon is always redundant with using your weapon on the blob instead
       Bow=1 OR Spear=1 OR Sentry=1  # Just shoot at the blob
       BreakWall=3, DoubleJump
       Damage=20, Glide OR Launch  # dboost on the balloon while its close to the blob
@@ -8550,7 +8550,7 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
       Grenade=1 OR Shuriken=1  # just shoot at the blob
       Sword OR Hammer  # wall jump just before the spikes then upslash to reach the ledge near the spikes
       BreakWall=3, GrenadeJump OR AbilitySwap=1 OR Damage=15  # I think Blaze is the only weapon which can't break this blob on its own
-      DoubleJump, Flap OR Combat=Balloon OR Damage=4  # https://youtu.be/xaUHPg2MUwc  / dboost on the blob itself
+      DoubleJump, Flap OR Damage=4  # https://youtu.be/xaUHPg2MUwc  / dboost on the blob itself
       Launch  # Use launch invulnerability to protect you from balloon's explosions
   state WoodsMain.BalloonLureYellowBarrierBroken:
     moki: WoodsMain.BalloonLureBlobDestroyed, Flap, Glide
