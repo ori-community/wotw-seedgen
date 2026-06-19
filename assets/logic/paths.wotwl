@@ -8549,6 +8549,7 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
     unsafe:
       Grenade=1 OR Shuriken=1  # just shoot at the blob
       Sword OR Hammer  # wall jump just before the spikes then upslash to reach the ledge near the spikes
+      Blaze=2  # https://youtu.be/zYydaGcqk78  Not sure what's up with this wall jump. Only spamming jump + holding right after using blaze
       BreakWall=3, GrenadeJump OR AbilitySwap=1 OR Damage=15  # I think Blaze is the only weapon which can't break this blob on its own
       DoubleJump, Flap OR Damage=4  # https://youtu.be/xaUHPg2MUwc  / dboost on the blob itself
       Launch  # Use launch invulnerability to protect you from balloon's explosions
@@ -8596,9 +8597,8 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
 
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
   state WoodsMain.BalloonLureBlobDestroyed:
-    moki:
-      Sword OR Hammer
-      BreakWall=3, Grenade OR Blaze
+    moki: Sword OR Hammer OR Grenade=1 OR Blaze=1
+    #kii: ShurikenBreak=3
     unsafe: ShurikenBreak=3 OR Sentry=1
 
   pickup WoodsMain.HiddenOre:
@@ -8608,15 +8608,19 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
     kii:
       DoubleJump, Bash, Damage=15  # bash the plant and the skeeto, wall jump on the right wall, Damage for slower reaction times to tp anywhere/just jumping back to safety
       Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
+      # Glitched
+      # AerialHammerJump, TripleJump, Bash OR Damage=15
+      # SwordSJump=1, DoubleJump, TripleJump  # sjump toward the right wall. No hsjump path because it doesn't work when being too close from the furnace.
+      # SwordSJump=1, Damage=30
+      # SwordSJump=1, Damage=15, DoubleJump OR GlideJump OR SwordSJump=1
     unsafe:
       SwordSJump=1  # Sjump onto the wall, use the sword for movement. It looks possible with Hammer, but I can't get it to work.
-      HammerSJump=2  # Sword sjump paths are redundant with the above
-      HammerSJump=1, Shuriken=1 OR BlazeSwap=1 OR DoubleJump OR Dash OR Glide OR Damage=15 OR PauseFloat  # Sjump from a micro ledge at very edge of the fire pit. The damage path requires jumping onto the left wall and climbing up. This is doable with sjump+sentry, but why would you do that when you could just sjump twice?
-      SwordJump, TripleJump, Damage=15  # Double jump onto the wall, then double sword jump into the spikes.
+      HammerSJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15 OR PauseFloat  # Sjump from a micro ledge at very edge of the fire pit
+      Sword, DoubleJump, TripleJump  # Pogo the skeeto
       DoubleJump, GrenadeJump  # Micro ledge at the right edge of the fire pit, micro ledge at the right edge of the spikes. Use both.
       Bash  # The skeeto is uncooperative, but it's doable.
-      BlazeSwap=6 OR FlashSwap  # Probably room for improvement, I'm not good at swaps
-      AerialHammerJump OR GlideHammerJump  # Start from the ledge on the right of the fire pit. With Djump, you need to wjump on the small wall under the spikes to reach the wall on the right
+      AbilitySwap=3  # https://youtu.be/6GX5TT_KxIY
+      AerialHammerJump OR GlideHammerJump OR WallHammerJump  # Start from the ledge on the right of the fire pit. With Djump, you need to wjump on the small wall under the spikes to reach the wall on the right
   pickup WoodsMain.YellowWallSL:
     moki: WoodsMain.BalloonLureYellowBarrierBroken
 
@@ -8626,12 +8630,14 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
     kii:
       DoubleJump, Damage=45
       DoubleJump, Damage=15, TripleJump OR Bash  # With bash, bait the skeeto
+      # AerialHammerJump, TripleJump OR Damage=15
     unsafe:
-      DoubleJump, Damage=30 OR Bash  # With bash, bait the skeeto
+      DoubleJump, Damage=30 OR Bash OR GrenadeJump  # With bash, bait the skeeto
       DoubleJump, Damage=15, Shuriken=2 OR Flash=2 OR Sentry=2
+      AerialHammerJump OR AbilitySwap=4
+      GrenadeJump, Damage=15, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15  # regen in friendly spikes
   conn WoodsMain.BalloonLure:
-    moki: WoodsMain.BalloonLureBlobDestroyed, Combat=Tentacle OR Bash
-    unsafe: WoodsMain.BalloonLureBlobDestroyed
+    moki: WoodsMain.BalloonLureBlobDestroyed
 
 anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
   refill Checkpoint
