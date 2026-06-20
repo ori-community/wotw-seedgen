@@ -8645,21 +8645,27 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
 
   pickup WoodsMain.PetrifiedHowlSL: free
 
-  conn WoodsMain.AboveHowl:
+  conn WoodsMain.AboveHowl:  # Make sure lower difficulty doesn't already solve this connection by going to WoodsMain.BrokenOwl first
     moki: Launch, DoubleJump OR Dash OR Bash OR Glide  # if you don't think of going straight up, these can also carry you through the way around
     gorlek:
       Launch
       Bash, Grenade=1  # it's a checkpoint, you have retries to figure it out
       SentryJump=1, DoubleJump, TripleJump
       SentryJump=1, DoubleJump, Dash
-    kii: DoubleJump, Bash  # Bash the tentacle projectile
+    kii:
+      DoubleJump, Bash  # Bash the tentacle projectile
+      # Glitched
+      # GlideJump, AerialHammerJump
+      # GrenadeJump=1, DoubleJump, TripleJump
+      # GrenadeJump=1, DoubleJump, Hammer, Spear=1 OR Shuriken=1 OR Vlaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash
-      DoubleJump, TripleJump
-  conn WoodsMain.BrokenOwl:  # Be carefull that it's not redundant with the AboveHowl connection
+      DoubleJump, TripleJump OR GrenadeJump
+      AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
+  conn WoodsMain.BrokenOwl:  # Check for redundancy with AboveHowl connection
     moki: BreakWall=3, Bash, Glide
     gorlek:
-      BreakWall=3, Glide, Damage=10  # just easy to catch a projectile
+      BreakWall=3, Glide, Damage=10  # damage non mandatory but its hard to avoid projectiles
       BreakWall=3, DoubleJump, Bash, Damage=15  # different ways to solve
       Bash, DoubleJump, TripleJump
       Dash, DoubleJump, TripleJump, Damage=10  # just easy to catch a projectile
@@ -8667,6 +8673,8 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
       BreakWall=3, Glide
       DoubleJump, Sword  # pogo the tentacles
       Dash, DoubleJump, TripleJump
+      # Glitched
+      # AerialHammerJump, Damage=10  # hard to avoid the first tentacle
   conn WoodsMain.BelowHiddenOre:
     moki:
       Glide
@@ -8679,7 +8687,9 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
       Damage=15, Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
       Damage=15, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
         Damage=15
+        Bash, Grenade=1
       Damage=30, Damage=15
+      Damage=30, Bash, Grenade=1
     unsafe: free  # Friendly spikes truly are the best friends of rando players
 
 # checkpoint at 824, -4068
@@ -8810,7 +8820,7 @@ anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
       Burrow, Shuriken=4  # not in kii cause you use 2 shurikens in a row
       Burrow, Sword
 
-anchor WoodsMain.AboveHowl at 916, -4046:  # At the semisolid above silenced Howl
+anchor WoodsMain.AboveHowl at 907, -4044:  # At the semisolid above silenced Howl
   pickup WoodsMain.CollapsingOwlSL: free
 
   conn WoodsMain.PetrifiedHowl: free
