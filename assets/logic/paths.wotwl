@@ -8649,11 +8649,10 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
     moki: Launch, DoubleJump OR Dash OR Bash OR Glide  # if you don't think of going straight up, these can also carry you through the way around
     gorlek:
       Launch
-      Bash, Grenade=1  # it's a checkpoint, you have retries to figure it out
       SentryJump=1, DoubleJump, TripleJump
       SentryJump=1, DoubleJump, Dash
     kii:
-      DoubleJump, Bash  # Bash the tentacle projectile
+      Bash, DoubleJump OR Grenade=1  # either bash a grenade or the tentacle projectile to reach the bashable plant
       # Glitched
       # SentryJump=1
       # GlideJump, AerialHammerJump
