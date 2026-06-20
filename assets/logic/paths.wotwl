@@ -8655,13 +8655,14 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
     kii:
       DoubleJump, Bash  # Bash the tentacle projectile
       # Glitched
+      # SentryJump=1
       # GlideJump, AerialHammerJump
       # GrenadeJump=1, DoubleJump, TripleJump
       # GrenadeJump=1, DoubleJump, Hammer, Spear=1 OR Shuriken=1 OR Vlaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash
       DoubleJump, TripleJump OR GrenadeJump
-      AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
   conn WoodsMain.BrokenOwl:  # Check for redundancy with AboveHowl connection
     moki: BreakWall=3, Bash, Glide
     gorlek:
