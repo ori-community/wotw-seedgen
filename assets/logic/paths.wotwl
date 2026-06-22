@@ -8655,7 +8655,7 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
       Bash, DoubleJump OR Grenade=1  # either bash a grenade or the tentacle projectile to reach the bashable plant
       # Glitched
       # SentryJump=1
-      # GlideJump, AerialHammerJump
+      # AerialHammerJump, TripleJump  # hjump + glide jump works as well but it's redundant with the glide+breakwall path towards BrokenOwl
       # GrenadeJump=1, DoubleJump, TripleJump
       # GrenadeJump=1, DoubleJump, Hammer, Spear=1 OR Shuriken=1 OR Vlaze=1 OR Flash=1 OR Sentry=1
     unsafe:
@@ -8705,16 +8705,24 @@ anchor WoodsMain.BrokenOwl at 848, -4058:  # At the collapsing petrified Owl
       Dash, Damage=15
       Bash OR SentryJump=1
     kii:
-      Damage=15, Hammer OR Sword
+      Hammer
+      Sword, Damage=15
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1, GrenadeJump=1 OR Sword
+      # Damage=15, GrenadeJump=1
     unsafe:
-      Dash OR Sword OR Damage=15  # With sword, pogo the skeeto
-
+      Sword # pogo the skeeto
+      Dash OR GlideJump OR GrenadeJump OR SpearJump=1 OR AbilitySwap=1 OR Damage=15
   conn WoodsMain.TrialStart:
     moki:
       DoubleJump OR Launch
       Bash, Grenade=1
     gorlek: Bash OR Hammer OR SwordSJump=1
-    kii: Sword  # Pogo a skeeto
+    kii:
+      Sword  # Pogo a skeeto
+      # Glitched
+      # GlideJump OR GrenadeJump=2
     unsafe: free  # just die/reload
   conn WoodsMain.TrialEnd:
     unsafe:
