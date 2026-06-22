@@ -261,11 +261,11 @@ impl CommonItem {
                 command: CommonWriteCommand::SetBooleanTrue,
             } => Some(Self::CleanWater),
             CommonUberStateWrite {
-                uber_identifier: CommonUberIdentifier::MaxHealth,
+                uber_identifier: CommonUberIdentifier::BaseMaxHealth,
                 command: CommonWriteCommand::AddInteger(5),
             } => Some(Self::HealthFragment),
             CommonUberStateWrite {
-                uber_identifier: CommonUberIdentifier::MaxEnergy,
+                uber_identifier: CommonUberIdentifier::BaseMaxEnergy,
                 command: CommonWriteCommand::AddFloat(OrderedFloat(0.5)),
             } => Some(Self::EnergyFragment),
             CommonUberStateWrite {

@@ -142,25 +142,25 @@ pub trait Simulation: Sized {
     }
 
     #[inline]
-    fn store_max_health(&mut self, value: i32, events: &[Event]) {
-        self.store_integer(UberIdentifier::MAX_HEALTH, value, events);
+    fn store_base_max_health(&mut self, value: i32, events: &[Event]) {
+        self.store_integer(UberIdentifier::BASE_MAX_HEALTH, value, events);
     }
 
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
-    fn add_max_health(&mut self, add: i32, events: &[Event]) {
-        self.add_integer(UberIdentifier::MAX_HEALTH, add, events);
+    fn add_base_max_health(&mut self, add: i32, events: &[Event]) {
+        self.add_integer(UberIdentifier::BASE_MAX_HEALTH, add, events);
     }
 
     #[inline]
-    fn store_max_energy(&mut self, value: f32, events: &[Event]) {
-        self.store_float(UberIdentifier::MAX_ENERGY, value, events);
+    fn store_base_max_energy(&mut self, value: f32, events: &[Event]) {
+        self.store_float(UberIdentifier::BASE_MAX_ENERGY, value, events);
     }
 
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
-    fn add_max_energy(&mut self, add: f32, events: &[Event]) {
-        self.add_float(UberIdentifier::MAX_ENERGY, add, events);
+    fn add_base_max_energy(&mut self, add: f32, events: &[Event]) {
+        self.add_float(UberIdentifier::BASE_MAX_ENERGY, add, events);
     }
 
     #[inline]
@@ -215,7 +215,7 @@ pub trait Simulation: Sized {
 
     #[inline]
     fn base_max_health(&self) -> f32 {
-        self.fetch(UberIdentifier::MAX_HEALTH).expect_integer() as f32
+        self.fetch(UberIdentifier::BASE_MAX_HEALTH).expect_integer() as f32
     }
 
     /// Returns the maximum health
@@ -241,7 +241,7 @@ pub trait Simulation: Sized {
 
     #[inline]
     fn base_max_energy(&self) -> f32 {
-        self.fetch(UberIdentifier::MAX_ENERGY).expect_float()
+        self.fetch(UberIdentifier::BASE_MAX_ENERGY).expect_float()
     }
 
     /// Returns the maximum energy

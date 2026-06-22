@@ -429,7 +429,7 @@ fn side_effects<S: Simulation>(
 
     if matches!(uber_identifier, VOICE | STRENGTH | MEMORY | EYES | HEART) && value == true {
         // TODO not strictly correct but not sure what else to do
-        simulation.add_max_health(10, events);
-        simulation.add_max_energy(1., events);
+        simulation.add_base_max_health(10, events);
+        simulation.add_base_max_energy(1., events);
     }
 }

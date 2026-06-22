@@ -49,8 +49,8 @@ all arenas are completed and all boss combat phases are skipped")
     !set_logic_state("SkipMora2")
     on willowsEndGroup.petrifiedOwlBossState == 1 {
         store(willowsEndGroup.petrifiedOwlBossState, 2)
-        store(player.health, 999)
-        store(player.energy, 999)
+        store(player.health, player.maxHealth)
+        store(player.energy, player.maxEnergy)
     }
     on willowsEndGroup.petrifiedOwlBossState == 3 {
         force_deal_enemy_damage(10000)

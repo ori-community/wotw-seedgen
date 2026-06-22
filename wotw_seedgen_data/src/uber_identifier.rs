@@ -136,10 +136,10 @@ impl UberIdentifier {
     pub const KEYSTONES: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 2);
     pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 3); // TODO client needs to add this
     pub const CLEAN_WATER: UberIdentifier = UberIdentifier::new(RANDO_STATE_GROUP, 2000);
-    pub const MAX_HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 10);
+    pub const BASE_MAX_HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 10);
     pub const HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 11);
-    pub const MAX_ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 12);
-    pub const ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 13);
+    pub const BASE_MAX_ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 20);
+    pub const ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 21);
     pub const RANDOM_SPIRIT_LIGHT: UberIdentifier = UberIdentifier::new(SETTINGS_GROUP, 0);
 }
 
@@ -241,9 +241,9 @@ pub enum CommonUberIdentifier {
     Keystones,
     ShardSlots,
     CleanWater,
-    MaxHealth,
+    BaseMaxHealth,
     Health,
-    MaxEnergy,
+    BaseMaxEnergy,
     Energy,
     Skill(Skill),
     Shard(Shard),
@@ -259,8 +259,8 @@ impl CommonUberIdentifier {
             Self::Keystones => MapIcon::Keystone,
             Self::ShardSlots => MapIcon::ShardSlot,
             Self::CleanWater => MapIcon::CleanWater,
-            Self::MaxHealth | Self::Health => MapIcon::HealthFragment,
-            Self::MaxEnergy | Self::Energy => MapIcon::EnergyFragment,
+            Self::BaseMaxHealth | Self::Health => MapIcon::HealthFragment,
+            Self::BaseMaxEnergy | Self::Energy => MapIcon::EnergyFragment,
             Self::WeaponUpgrade(_) => MapIcon::BonusItem, // TODO is this good?
             Self::Shard(_) => MapIcon::Shard,
             Self::Teleporter(_) => MapIcon::SavePedestalInactive,
@@ -274,8 +274,8 @@ impl CommonUberIdentifier {
             Self::GorlekOre | Self::Keystones => 100,
             Self::ShardSlots => 250,
             Self::CleanWater => 500,
-            Self::MaxHealth | Self::Health => 200,
-            Self::MaxEnergy | Self::Energy => 150,
+            Self::BaseMaxHealth | Self::Health => 200,
+            Self::BaseMaxEnergy | Self::Energy => 150,
             Self::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
                 Skill::GladesAncestralLight | Skill::MarshAncestralLight => 300,
@@ -295,10 +295,10 @@ impl CommonUberIdentifier {
             Self::Keystones => Icon::File(Cow::Borrowed("icons/game/keystone.png")),
             Self::ShardSlots => Icon::File(Cow::Borrowed("icons/game/shardslot.png")),
             Self::CleanWater => Icon::File(Cow::Borrowed("icons/game/water.png")),
-            Self::MaxHealth | Self::Health => {
+            Self::BaseMaxHealth | Self::Health => {
                 Icon::File(Cow::Borrowed("icons/game/healthfragment.png"))
             }
-            Self::MaxEnergy | Self::Energy => {
+            Self::BaseMaxEnergy | Self::Energy => {
                 Icon::File(Cow::Borrowed("icons/game/energyfragment.png"))
             }
             Self::WeaponUpgrade(weapon_upgrade) => match weapon_upgrade {
@@ -342,9 +342,9 @@ impl CommonUberIdentifier {
             Self::Keystones => UberIdentifier::KEYSTONES,
             Self::ShardSlots => UberIdentifier::SHARD_SLOTS,
             Self::CleanWater => UberIdentifier::CLEAN_WATER,
-            Self::MaxHealth => UberIdentifier::MAX_HEALTH,
+            Self::BaseMaxHealth => UberIdentifier::BASE_MAX_HEALTH,
             Self::Health => UberIdentifier::HEALTH,
-            Self::MaxEnergy => UberIdentifier::MAX_ENERGY,
+            Self::BaseMaxEnergy => UberIdentifier::BASE_MAX_ENERGY,
             Self::Energy => UberIdentifier::ENERGY,
             Self::Skill(skill) => skill.uber_identifier(),
             Self::Shard(shard) => shard.uber_identifier(),
@@ -361,9 +361,9 @@ impl CommonUberIdentifier {
             UberIdentifier::KEYSTONES => Some(Self::Keystones),
             UberIdentifier::SHARD_SLOTS => Some(Self::ShardSlots),
             UberIdentifier::CLEAN_WATER => Some(Self::CleanWater),
-            UberIdentifier::MAX_HEALTH => Some(Self::MaxHealth),
+            UberIdentifier::BASE_MAX_HEALTH => Some(Self::BaseMaxHealth),
             UberIdentifier::HEALTH => Some(Self::Health),
-            UberIdentifier::MAX_ENERGY => Some(Self::MaxEnergy),
+            UberIdentifier::BASE_MAX_ENERGY => Some(Self::BaseMaxEnergy),
             UberIdentifier::ENERGY => Some(Self::Energy),
             uber_identifier => {
                 if let Some(skill) = Skill::from_uber_identifier(uber_identifier) {

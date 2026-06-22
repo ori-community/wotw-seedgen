@@ -845,7 +845,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         self.solve_amount(
             solution,
-            UberIdentifier::MAX_HEALTH,
+            UberIdentifier::BASE_MAX_HEALTH,
             amount,
             // health cannot drop to zero
             |amount| amount < 0,
@@ -885,7 +885,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                             // solve its communicated max amount and doing one step of energy here in the energy branch.
                             // This will iteratively create a tree where energy is solved stepwise and health directly jumps to the leaves,
                             // which is ideal. We can use solve_boolean for a single step since the UberState type doesn't actually matter.
-                            this.solve_boolean(solution, UberIdentifier::MAX_ENERGY, simulate)
+                            this.solve_boolean(solution, UberIdentifier::BASE_MAX_ENERGY, simulate)
                         } else if solution.commitments.commit_life_pact() {
                             this.solve_max_energy(solution, amount, simulate)
                         } else {
@@ -910,7 +910,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         amount: OrderedFloat<f32>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
-        self.solve_float(solution, UberIdentifier::MAX_ENERGY, amount, simulate)
+        self.solve_float(solution, UberIdentifier::BASE_MAX_ENERGY, amount, simulate)
     }
 
     fn solve_life_pact(

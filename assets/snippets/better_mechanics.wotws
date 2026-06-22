@@ -22,8 +22,8 @@
 
 !if teleport_refill {
     on player.isTeleporting == false {
-        store(player.health, 999)
-        store(player.energy, 999)
+        store(player.health, player.maxHealth)
+        store(player.energy, player.maxEnergy)
     }
 }
 

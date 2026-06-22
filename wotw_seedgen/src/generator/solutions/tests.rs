@@ -38,8 +38,8 @@ fn mock_world<'graph, 'settings>(
     uber_states: UberStates,
 ) -> World<'graph, 'settings> {
     let mut world = World::new(graph, 0, settings, uber_states, &mut []);
-    world.store_max_health(0, &[]);
-    world.store_max_energy((0.).into(), &[]);
+    world.store_base_max_health(0, &[]);
+    world.store_base_max_energy((0.).into(), &[]);
     world.store_shard_slots(0, &[]);
     world.traverse_spawn(&[]);
     world

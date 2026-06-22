@@ -647,27 +647,41 @@
           "value_type": "Integer"
         },
         "10": {
-          "name": "maxHealth",
+          "name": "baseMaxHealth",
           "readonly": false,
           "type": "VirtualUberState",
           "value": 30.0,
           "value_type": "Integer"
         },
         "11": {
+          "name": "maxHealth",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 30.0,
+          "value_type": "Integer"
+        },
+        "12": {
           "name": "health",
           "readonly": false,
           "type": "VirtualUberState",
           "value": 30.0,
           "value_type": "Float"
         },
-        "12": {
-          "name": "maxEnergy",
+        "20": {
+          "name": "baseMaxEnergy",
           "readonly": false,
           "type": "VirtualUberState",
           "value": 3.0,
           "value_type": "Float"
         },
-        "13": {
+        "21": {
+          "name": "maxEnergy",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 3.0,
+          "value_type": "Float"
+        },
+        "22": {
           "name": "energy",
           "readonly": false,
           "type": "VirtualUberState",

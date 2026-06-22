@@ -103,8 +103,8 @@ fn is_met(c: &mut Criterion) {
     let req_c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let req_d = Requirement::Damage(10.0);
     world.store_skill(Skill::Blaze, true, &[]);
-    world.add_max_health(20, &[]);
-    world.add_max_energy((2.).into(), &[]);
+    world.add_base_max_health(20, &[]);
+    world.add_base_max_energy((2.).into(), &[]);
     let requirement = Requirement::And(vec![
         Requirement::Or(vec![req_a.clone(), req_d.clone()]),
         Requirement::Or(vec![req_b.clone(), req_c.clone()]),
@@ -116,7 +116,7 @@ fn is_met(c: &mut Criterion) {
     });
 
     world.store_skill(Skill::Bow, true, &[]);
-    world.add_max_energy((10.).into(), &[]);
+    world.add_base_max_energy((10.).into(), &[]);
     let requirement = Requirement::Combat(smallvec![(Enemy::Lizard, 3),]);
     group.bench_function("short_combat", |b| {
         b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
@@ -175,8 +175,8 @@ fn reach_check(c: &mut Criterion) {
             world.snapshot();
             world.traverse_spawn(&[]);
             world.store_spirit_light(10000, &[]);
-            world.store_max_health(200, &[]);
-            world.store_max_energy(20.0.into(), &[]);
+            world.store_base_max_health(200, &[]);
+            world.store_base_max_energy(20.0.into(), &[]);
             world.store_keystones(34, &[]);
             world.store_gorlek_ore(40, &[]);
             world.store_shard_slots(8, &[]);

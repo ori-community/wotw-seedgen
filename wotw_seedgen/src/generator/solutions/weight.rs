@@ -162,9 +162,9 @@ impl Cost for CommonUberIdentifier {
         match self {
             CommonUberIdentifier::Health | CommonUberIdentifier::Energy => 0.,
             CommonUberIdentifier::SpiritLight => 1.,
-            CommonUberIdentifier::MaxHealth => 10.,
+            CommonUberIdentifier::BaseMaxHealth => 10.,
             CommonUberIdentifier::GorlekOre => 80.,
-            CommonUberIdentifier::MaxEnergy
+            CommonUberIdentifier::BaseMaxEnergy
             | CommonUberIdentifier::Skill(Skill::Regenerate | Skill::WaterBreath) => 100., // Quality-of-Life Skills
             CommonUberIdentifier::Keystones => 160.,
             CommonUberIdentifier::WeaponUpgrade(_) => 200.,

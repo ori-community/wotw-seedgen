@@ -65,13 +65,13 @@ pub fn health_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(health_fragment_string(false)),
-            add_integer(UberIdentifier::MAX_HEALTH, 5),
+            add_integer(UberIdentifier::BASE_MAX_HEALTH, 5),
             // TODO reimplement fragment overflow bug?
             // TODO but MAX_HEALTH is just the base max health!
             store_integer(
                 UberIdentifier::HEALTH,
                 CommandInteger::FetchInteger {
-                    uber_identifier: UberIdentifier::MAX_HEALTH,
+                    uber_identifier: UberIdentifier::BASE_MAX_HEALTH,
                 },
             ),
         ],
@@ -82,11 +82,11 @@ pub fn energy_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
             item_message(energy_fragment_string(false)),
-            add_float(UberIdentifier::MAX_ENERGY, 0.5),
+            add_float(UberIdentifier::BASE_MAX_ENERGY, 0.5),
             store_float(
                 UberIdentifier::ENERGY,
                 CommandFloat::FetchFloat {
-                    uber_identifier: UberIdentifier::MAX_ENERGY,
+                    uber_identifier: UberIdentifier::BASE_MAX_ENERGY,
                 }, // TODO reimplement fragment overflow bug?
             ),
         ],
@@ -920,14 +920,14 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveHealthFragment => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(health_fragment_string(true)),
-                    add_integer(UberIdentifier::MAX_HEALTH, -5),
+                    add_integer(UberIdentifier::BASE_MAX_HEALTH, -5),
                 ],
             }),
             FunctionIdentifier::EnergyFragment => Command::Void(energy_fragment()),
             FunctionIdentifier::RemoveEnergyFragment => Command::Void(CommandVoid::Multi {
                 commands: vec![
                     item_message(energy_fragment_string(true)),
-                    add_float(UberIdentifier::MAX_ENERGY, -0.5),
+                    add_float(UberIdentifier::BASE_MAX_ENERGY, -0.5),
                 ],
             }),
             FunctionIdentifier::Skill => Command::Void(skill(arg(&mut context)?)),

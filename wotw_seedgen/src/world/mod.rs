@@ -202,8 +202,8 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
-    /// world.add_max_health(110, &events);
-    /// world.add_max_energy((12.).into(), &events);
+    /// world.add_base_max_health(110, &events);
+    /// world.add_base_max_energy((12.).into(), &events);
     /// assert_eq!(world.max_orbs(), Orbs { health: 140.0, energy: 15.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
     /// ```
@@ -239,10 +239,10 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
     /// assert_eq!(world.health_plant_drops(), 1.0);
     ///
-    /// world.add_max_health(40, &events);
+    /// world.add_base_max_health(40, &events);
     /// assert_eq!(world.health_plant_drops(), 2.0);
     ///
-    /// world.add_max_health(90, &events);
+    /// world.add_base_max_health(90, &events);
     /// assert_eq!(world.health_plant_drops(), 5.0);
     /// ```
     pub fn health_plant_drops(&self) -> f32 {

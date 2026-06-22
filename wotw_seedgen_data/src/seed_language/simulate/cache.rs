@@ -106,8 +106,8 @@ impl Cache {
             CommonUberIdentifier::Keystones => self.keystones = value.expect_integer(),
             CommonUberIdentifier::ShardSlots => self.shard_slots = value.expect_integer(),
             CommonUberIdentifier::CleanWater => self.clean_water = value.expect_boolean(),
-            CommonUberIdentifier::MaxHealth => self.base_max_health = value.expect_integer() as f32,
-            CommonUberIdentifier::MaxEnergy => self.base_max_energy = value.expect_float(),
+            CommonUberIdentifier::BaseMaxHealth => self.base_max_health = value.expect_integer() as f32,
+            CommonUberIdentifier::BaseMaxEnergy => self.base_max_energy = value.expect_float(),
             CommonUberIdentifier::Health | CommonUberIdentifier::Energy => {}
             CommonUberIdentifier::Skill(skill) => {
                 update_set(&mut self.skills, skill, value.expect_boolean())
@@ -209,28 +209,28 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
             .add_integer(UberIdentifier::SHARD_SLOTS, add, events);
     }
 
-    fn store_max_health(&mut self, value: i32, events: &[Event]) {
+    fn store_base_max_health(&mut self, value: i32, events: &[Event]) {
         self.cache.base_max_health = value as f32;
         self.simulation
-            .store_integer(UberIdentifier::MAX_HEALTH, value, events);
+            .store_integer(UberIdentifier::BASE_MAX_HEALTH, value, events);
     }
 
-    fn add_max_health(&mut self, add: i32, events: &[Event]) {
+    fn add_base_max_health(&mut self, add: i32, events: &[Event]) {
         self.cache.base_max_health += add as f32;
         self.simulation
-            .add_integer(UberIdentifier::MAX_HEALTH, add, events);
+            .add_integer(UberIdentifier::BASE_MAX_HEALTH, add, events);
     }
 
-    fn store_max_energy(&mut self, value: f32, events: &[Event]) {
+    fn store_base_max_energy(&mut self, value: f32, events: &[Event]) {
         self.cache.base_max_energy = value;
         self.simulation
-            .store_float(UberIdentifier::MAX_ENERGY, value, events);
+            .store_float(UberIdentifier::BASE_MAX_ENERGY, value, events);
     }
 
-    fn add_max_energy(&mut self, add: f32, events: &[Event]) {
+    fn add_base_max_energy(&mut self, add: f32, events: &[Event]) {
         self.cache.base_max_energy += add;
         self.simulation
-            .add_float(UberIdentifier::MAX_ENERGY, add, events);
+            .add_float(UberIdentifier::BASE_MAX_ENERGY, add, events);
     }
 
     fn store_skill(&mut self, skill: Skill, value: bool, events: &[Event]) {
