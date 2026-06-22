@@ -8737,6 +8737,7 @@ anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
 
   pickup WoodsMain.SpiritTrial:
     moki: WoodsMain.TrialActivation, DoubleJump, Dash, Bash, Grapple, Burrow
+    kii: WoodsMain.TrialActivation, Dash, Bash, Grapple, Burrow, Damage=15
 
   conn WoodsMain.BrokenOwl: free
   conn WoodsMain.MidwayTrial:
@@ -8745,13 +8746,18 @@ anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
       Launch, Grapple, Bash, DoubleJump OR Dash OR Glide
     gorlek:
       Launch, DoubleJump OR Dash OR Glide
-      DoubleJump, Bash, Grapple
+      Bash, Grapple, DoubleJump OR Dash
     kii:
       Launch
       DoubleJump, TripleJump, Grapple OR Damage=15
+      Grapple, Dash, Bash
+      # Glitched
+      # AerialHammerJump, TripleJump OR Damage=15
     unsafe:
+      Grapple, Bash, Hammer  # at the plant above the spikes, upslash to reach the wall above it and then hover to the floating platform
       Hammer, DoubleJump, Grapple  # either djump+upslash to get a walljump just under the checkpoint or upslash+one slash to land on the branch
       Sword, DoubleJump, Grapple  # upslash+downslash to pass through the semi solid branch at the checkpoint
+      AerialHammerJump
   conn WoodsMain.AboveHowl:  # make sure it's not redundant with ->BrokenOwl->AboveHowl
     gorlek: Grapple, Glide
     kii: Grapple, Sentry=3 OR Blaze=5
