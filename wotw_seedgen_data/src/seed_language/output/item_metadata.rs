@@ -2,7 +2,7 @@ use crate::{
     seed_language::{
         output::{
             display::strip_invisible_characters, CommandInteger, CommandString, CommandVoid,
-            ContainedWrites, Event, StringOrPlaceholder,
+            CommandsOutput, ContainedWrites, StringOrPlaceholder,
         },
         simulate::{Simulate, Simulation},
     },
@@ -66,8 +66,8 @@ impl ItemMetadataRef<'_, '_> {
     ///
     /// Similar to [`Self::force_name`], but simulates the result to get a `String`
     /// and removes characters that wouldn't be rendered in an in-game message
-    pub fn log_name<S: Simulation>(&self, simulation: &mut S, events: &[Event]) -> String {
-        let name = self.force_name().simulate(simulation, events);
+    pub fn log_name<S: Simulation>(&self, simulation: &mut S, output: &CommandsOutput) -> String {
+        let name = self.force_name().simulate(simulation, output);
 
         strip_invisible_characters(&name)
     }

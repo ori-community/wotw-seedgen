@@ -42,6 +42,7 @@ impl<'source> Compile<'source> for ast::Event<'source> {
                 compiler
                     .global
                     .output
+                    .commands
                     .events
                     .push(Event { trigger, command });
             }
@@ -144,7 +145,7 @@ impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
 
         compiler.scopes.pop();
 
-        compiler.global.output.command_lookup[index] = CommandVoid::Multi { commands };
+        compiler.global.output.commands.lookup[index] = CommandVoid::Multi { commands };
     }
 }
 

@@ -17,7 +17,7 @@ use wotw_seedgen_data::{
     seed_language::{
         ast::Snippet,
         compile::{self, Compiler},
-        output::CommandInteger,
+        output::{CommandInteger, CommandVoid, CommandsOutput},
         simulate::{Simulation, Snapshot, WorldState},
     },
     Difficulty, Skill, Spawn, UberIdentifier, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
@@ -102,9 +102,9 @@ fn is_met(c: &mut Criterion) {
     let req_b = Requirement::Damage(20.0);
     let req_c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let req_d = Requirement::Damage(10.0);
-    world.store_skill(Skill::Blaze, true, &[]);
-    world.add_base_max_health(20, &[]);
-    world.add_base_max_energy((2.).into(), &[]);
+    world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
+    world.add_base_max_health(20, &CommandsOutput::NONE);
+    world.add_base_max_energy((2.).into(), &CommandsOutput::NONE);
     let requirement = Requirement::And(vec![
         Requirement::Or(vec![req_a.clone(), req_d.clone()]),
         Requirement::Or(vec![req_b.clone(), req_c.clone()]),
@@ -115,8 +115,8 @@ fn is_met(c: &mut Criterion) {
         b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
     });
 
-    world.store_skill(Skill::Bow, true, &[]);
-    world.add_base_max_energy((10.).into(), &[]);
+    world.store_skill(Skill::Bow, true, &CommandsOutput::NONE);
+    world.add_base_max_energy((10.).into(), &CommandsOutput::NONE);
     let requirement = Requirement::Combat(smallvec![(Enemy::Lizard, 3),]);
     group.bench_function("short_combat", |b| {
         b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
@@ -154,10 +154,10 @@ fn solutions(c: &mut Criterion) {
 
     for (id, spawn) in SPAWNS {
         let mut world = world(&graph, &world_settings, spawn);
-        world.traverse_spawn(&[]);
+        world.traverse_spawn(&CommandsOutput::NONE);
 
         group.bench_function(id, |b| {
-            b.iter(|| world.find_solutions(&item_pool, &[], 7, 7, None))
+            b.iter(|| world.find_solutions(&item_pool, &CommandsOutput::NONE, 7, 7, None))
         });
     }
 
@@ -173,16 +173,16 @@ fn reach_check(c: &mut Criterion) {
     group.bench_function("short", |b| {
         b.iter(|| {
             world.snapshot();
-            world.traverse_spawn(&[]);
-            world.store_spirit_light(10000, &[]);
-            world.store_base_max_health(200, &[]);
-            world.store_base_max_energy(20.0.into(), &[]);
-            world.store_keystones(34, &[]);
-            world.store_gorlek_ore(40, &[]);
-            world.store_shard_slots(8, &[]);
-            world.store_skill(Skill::Sword, true, &[]);
-            world.store_skill(Skill::DoubleJump, true, &[]);
-            world.store_skill(Skill::Dash, true, &[]);
+            world.traverse_spawn(&CommandsOutput::NONE);
+            world.store_spirit_light(10000, &CommandsOutput::NONE);
+            world.store_base_max_health(200, &CommandsOutput::NONE);
+            world.store_base_max_energy(20.0.into(), &CommandsOutput::NONE);
+            world.store_keystones(34, &CommandsOutput::NONE);
+            world.store_gorlek_ore(40, &CommandsOutput::NONE);
+            world.store_shard_slots(8, &CommandsOutput::NONE);
+            world.store_skill(Skill::Sword, true, &CommandsOutput::NONE);
+            world.store_skill(Skill::DoubleJump, true, &CommandsOutput::NONE);
+            world.store_skill(Skill::Dash, true, &CommandsOutput::NONE);
             world.reached_nodes().for_each(drop);
             world.restore_snapshot();
         })
@@ -193,9 +193,9 @@ fn reach_check(c: &mut Criterion) {
     group.bench_function("long", |b| {
         b.iter(|| {
             world.snapshot();
-            world.traverse_spawn(&[]);
+            world.traverse_spawn(&CommandsOutput::NONE);
             for item in item_pool.clone().take() {
-                world.simulate(&item, &[]);
+                world.simulate(&item, &CommandsOutput::NONE);
             }
             world.reached_nodes().for_each(drop);
             world.restore_snapshot();
@@ -221,42 +221,47 @@ fn simulation(c: &mut Criterion) {
     group.bench_function("fetch ore", |b| b.iter(|| world.fetch(uber_identifier)));
 
     group.bench_function("simulate fetch ore", |b| {
-        b.iter(|| world.simulate(&CommandInteger::FetchInteger { uber_identifier }, &[]))
+        b.iter(|| {
+            world.simulate(
+                &CommandInteger::FetchInteger { uber_identifier },
+                &CommandsOutput::NONE,
+            )
+        })
     });
 
     group.bench_function("add_gorlek_ore", |b| {
-        b.iter(|| world.add_gorlek_ore(1, &[]))
+        b.iter(|| world.add_gorlek_ore(1, &CommandsOutput::NONE))
     });
 
     group.bench_function("add_integer ore", |b| {
-        b.iter(|| world.add_integer(uber_identifier, 1, &[]))
+        b.iter(|| world.add_integer(uber_identifier, 1, &CommandsOutput::NONE))
     });
 
     group.bench_function("simulate ore", |b| {
-        b.iter(|| world.simulate(&compile::gorlek_ore(), &[]))
+        b.iter(|| world.simulate(&compile::gorlek_ore(), &CommandsOutput::NONE))
     });
 
-    // TODO can't bench this because lookup simulation is not implemented
-    // let mut compiler = Compiler::new(
-    //     &mut Pcg64Mcg::new(0),
-    //     &*TEST_ASSETS,
-    //     TEST_ASSETS.values.uber_state_data(),
-    //     FxHashMap::default(),
-    //     false,
-    // );
-    // compiler.compile_snippet("launch_fragments").unwrap();
-    // let output = compiler.finish().output;
-    // let launch_fragment = output
-    //     .item_pool_changes
-    //     .keys()
-    //     .find(|item| matches!(item, CommandVoid::Lookup { .. }))
-    //     .unwrap();
+    let mut compiler = Compiler::new(
+        &mut Pcg64Mcg::new(0),
+        &*TEST_ASSETS,
+        TEST_ASSETS.values.uber_state_data(),
+        FxHashMap::default(),
+        None,
+        false,
+        false,
+    );
+    compiler.compile_snippet("launch_fragments").unwrap();
+    let output = compiler.finish().output;
+    let launch_fragment = output
+        .modifiers
+        .item_pool_changes
+        .keys()
+        .find(|item| matches!(item, CommandVoid::CallFunction { .. }))
+        .unwrap();
 
-    // dbg!(launch_fragment);
-
-    // group.bench_function("simulate launch_fragment", |b| {
-    //     b.iter(|| world.simulate(launch_fragment, &output.events))
-    // });
+    group.bench_function("simulate launch_fragment", |b| {
+        b.iter(|| world.simulate(launch_fragment, &output.commands))
+    });
 
     group.finish();
 }

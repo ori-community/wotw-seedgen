@@ -1,7 +1,18 @@
-#[derive(Debug, Default, Clone)]
+const STACK_LIMIT: usize = 1000;
+
+#[derive(Debug, Clone)]
 pub struct Stack {
     frames: Vec<StackFrame>,
-    depth: usize,
+    current: usize,
+}
+
+impl Default for Stack {
+    fn default() -> Self {
+        Self {
+            frames: Vec::new(),
+            current: usize::MAX,
+        }
+    }
 }
 
 #[derive(Debug, Default, Clone)]
@@ -15,18 +26,20 @@ pub struct StackFrame {
 impl Stack {
     #[inline]
     pub fn push(&mut self) {
-        self.depth += 1;
+        self.current = self.current.wrapping_add(1);
 
-        if self.depth == self.frames.len() {
+        assert!(self.current < STACK_LIMIT, "stack overflow");
+
+        if self.current == self.frames.len() {
             self.frames.push(StackFrame::default());
+        } else {
+            self.current_frame_mut().clear();
         }
     }
 
     #[inline]
     pub fn pop(&mut self) {
-        self.current_frame_mut().clear();
-
-        self.depth -= 1;
+        self.current = self.current.wrapping_sub(1);
     }
 
     #[inline]
@@ -71,12 +84,12 @@ impl Stack {
 
     #[inline]
     fn current_frame(&self) -> &StackFrame {
-        self.frames.last().unwrap()
+        &self.frames[self.current]
     }
 
     #[inline]
     fn current_frame_mut(&mut self) -> &mut StackFrame {
-        self.frames.last_mut().unwrap()
+        &mut self.frames[self.current]
     }
 }
 

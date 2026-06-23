@@ -37,7 +37,7 @@ impl Preprocessor {
         Self {
             output: PreprocessorOutput::default(),
             errors: vec![],
-            next_function_index: output.command_lookup.len()..,
+            next_function_index: output.commands.lookup.len()..,
         }
     }
 

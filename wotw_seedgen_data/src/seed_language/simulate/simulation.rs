@@ -1,7 +1,7 @@
 use crate::{
     assets::UberStateValue,
     seed_language::{
-        output::{Event, Trigger},
+        output::{CommandsOutput, Trigger},
         simulate::{condition_values::ConditionValues, set_uber_state, Heap, Simulate, Stack},
     },
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
@@ -13,8 +13,8 @@ pub trait Simulation: Sized {
 
     fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize];
 
-    fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
-        let _ = (uber_identifier, events);
+    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        let _ = (uber_identifier, output);
     }
 
     fn stack(&self) -> &Stack;
@@ -49,41 +49,56 @@ pub trait Simulation: Sized {
     }
 
     #[inline]
-    fn simulate<T: Simulate<Self>>(&mut self, t: &T, events: &[Event]) -> T::Return {
-        t.simulate(self, events)
+    fn simulate<T: Simulate<Self>>(&mut self, t: &T, output: &CommandsOutput) -> T::Return {
+        t.simulate(self, output)
     }
 
     #[inline]
-    fn store_boolean(&mut self, uber_identifier: UberIdentifier, value: bool, events: &[Event]) {
-        set_uber_state(self, events, uber_identifier, value.into(), true);
+    fn store_boolean(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: bool,
+        output: &CommandsOutput,
+    ) {
+        set_uber_state(self, output, uber_identifier, value.into(), true);
     }
 
     #[inline]
-    fn store_integer(&mut self, uber_identifier: UberIdentifier, value: i32, events: &[Event]) {
-        set_uber_state(self, events, uber_identifier, value.into(), true);
+    fn store_integer(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: i32,
+        output: &CommandsOutput,
+    ) {
+        set_uber_state(self, output, uber_identifier, value.into(), true);
     }
 
     #[inline]
-    fn add_integer(&mut self, uber_identifier: UberIdentifier, add: i32, events: &[Event]) {
+    fn add_integer(&mut self, uber_identifier: UberIdentifier, add: i32, output: &CommandsOutput) {
         self.store_integer(
             uber_identifier,
             self.fetch_integer(uber_identifier) + add,
-            events,
+            output,
         );
     }
 
     #[inline]
-    fn store_float(&mut self, uber_identifier: UberIdentifier, value: f32, events: &[Event]) {
-        set_uber_state(self, events, uber_identifier, value.into(), true);
+    fn store_float(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        value: f32,
+        output: &CommandsOutput,
+    ) {
+        set_uber_state(self, output, uber_identifier, value.into(), true);
     }
 
     #[inline]
-    fn add_float(&mut self, uber_identifier: UberIdentifier, add: f32, events: &[Event]) {
-        // add_float(uber_identifier, add).simulate(self, events);
+    fn add_float(&mut self, uber_identifier: UberIdentifier, add: f32, output: &CommandsOutput) {
+        // add_float(uber_identifier, add).simulate(self, output);
         self.store_float(
             uber_identifier,
             self.fetch_float(uber_identifier) + add,
-            events,
+            output,
         );
     }
 
@@ -102,85 +117,85 @@ pub trait Simulation: Sized {
     }
 
     #[inline]
-    fn store_spirit_light(&mut self, value: i32, events: &[Event]) {
-        self.store_integer(UberIdentifier::SPIRIT_LIGHT, value, events);
+    fn store_spirit_light(&mut self, value: i32, output: &CommandsOutput) {
+        self.store_integer(UberIdentifier::SPIRIT_LIGHT, value, output);
     }
 
     #[inline]
-    fn add_spirit_light(&mut self, add: i32, events: &[Event]) {
-        self.add_integer(UberIdentifier::SPIRIT_LIGHT, add, events);
+    fn add_spirit_light(&mut self, add: i32, output: &CommandsOutput) {
+        self.add_integer(UberIdentifier::SPIRIT_LIGHT, add, output);
     }
 
     #[inline]
-    fn store_gorlek_ore(&mut self, value: i32, events: &[Event]) {
-        self.store_integer(UberIdentifier::GORLEK_ORE, value, events);
+    fn store_gorlek_ore(&mut self, value: i32, output: &CommandsOutput) {
+        self.store_integer(UberIdentifier::GORLEK_ORE, value, output);
     }
 
     #[inline]
-    fn add_gorlek_ore(&mut self, add: i32, events: &[Event]) {
-        self.add_integer(UberIdentifier::GORLEK_ORE, add, events);
+    fn add_gorlek_ore(&mut self, add: i32, output: &CommandsOutput) {
+        self.add_integer(UberIdentifier::GORLEK_ORE, add, output);
     }
 
     #[inline]
-    fn store_keystones(&mut self, value: i32, events: &[Event]) {
-        self.store_integer(UberIdentifier::KEYSTONES, value, events);
+    fn store_keystones(&mut self, value: i32, output: &CommandsOutput) {
+        self.store_integer(UberIdentifier::KEYSTONES, value, output);
     }
 
     #[inline]
-    fn add_keystones(&mut self, add: i32, events: &[Event]) {
-        self.add_integer(UberIdentifier::KEYSTONES, add, events);
+    fn add_keystones(&mut self, add: i32, output: &CommandsOutput) {
+        self.add_integer(UberIdentifier::KEYSTONES, add, output);
     }
 
     #[inline]
-    fn store_shard_slots(&mut self, value: i32, events: &[Event]) {
-        self.store_integer(UberIdentifier::SHARD_SLOTS, value, events);
+    fn store_shard_slots(&mut self, value: i32, output: &CommandsOutput) {
+        self.store_integer(UberIdentifier::SHARD_SLOTS, value, output);
     }
 
     #[inline]
-    fn add_shard_slots(&mut self, add: i32, events: &[Event]) {
-        self.add_integer(UberIdentifier::SHARD_SLOTS, add, events);
+    fn add_shard_slots(&mut self, add: i32, output: &CommandsOutput) {
+        self.add_integer(UberIdentifier::SHARD_SLOTS, add, output);
     }
 
     #[inline]
-    fn store_base_max_health(&mut self, value: i32, events: &[Event]) {
-        self.store_integer(UberIdentifier::BASE_MAX_HEALTH, value, events);
-    }
-
-    // TODO check that uses scaled correctly since they might have used the number of fragments before
-    #[inline]
-    fn add_base_max_health(&mut self, add: i32, events: &[Event]) {
-        self.add_integer(UberIdentifier::BASE_MAX_HEALTH, add, events);
-    }
-
-    #[inline]
-    fn store_base_max_energy(&mut self, value: f32, events: &[Event]) {
-        self.store_float(UberIdentifier::BASE_MAX_ENERGY, value, events);
+    fn store_base_max_health(&mut self, value: i32, output: &CommandsOutput) {
+        self.store_integer(UberIdentifier::BASE_MAX_HEALTH, value, output);
     }
 
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
-    fn add_base_max_energy(&mut self, add: f32, events: &[Event]) {
-        self.add_float(UberIdentifier::BASE_MAX_ENERGY, add, events);
+    fn add_base_max_health(&mut self, add: i32, output: &CommandsOutput) {
+        self.add_integer(UberIdentifier::BASE_MAX_HEALTH, add, output);
     }
 
     #[inline]
-    fn store_skill(&mut self, skill: Skill, value: bool, events: &[Event]) {
-        self.store_boolean(skill.uber_identifier(), value, events);
+    fn store_base_max_energy(&mut self, value: f32, output: &CommandsOutput) {
+        self.store_float(UberIdentifier::BASE_MAX_ENERGY, value, output);
+    }
+
+    // TODO check that uses scaled correctly since they might have used the number of fragments before
+    #[inline]
+    fn add_base_max_energy(&mut self, add: f32, output: &CommandsOutput) {
+        self.add_float(UberIdentifier::BASE_MAX_ENERGY, add, output);
     }
 
     #[inline]
-    fn store_shard(&mut self, shard: Shard, value: bool, events: &[Event]) {
-        self.store_boolean(shard.uber_identifier(), value, events);
+    fn store_skill(&mut self, skill: Skill, value: bool, output: &CommandsOutput) {
+        self.store_boolean(skill.uber_identifier(), value, output);
     }
 
     #[inline]
-    fn store_teleporter(&mut self, teleporter: Teleporter, value: bool, events: &[Event]) {
-        self.store_boolean(teleporter.uber_identifier(), value, events);
+    fn store_shard(&mut self, shard: Shard, value: bool, output: &CommandsOutput) {
+        self.store_boolean(shard.uber_identifier(), value, output);
     }
 
     #[inline]
-    fn store_clean_water(&mut self, value: bool, events: &[Event]) {
-        self.store_boolean(UberIdentifier::CLEAN_WATER, value, events);
+    fn store_teleporter(&mut self, teleporter: Teleporter, value: bool, output: &CommandsOutput) {
+        self.store_boolean(teleporter.uber_identifier(), value, output);
+    }
+
+    #[inline]
+    fn store_clean_water(&mut self, value: bool, output: &CommandsOutput) {
+        self.store_boolean(UberIdentifier::CLEAN_WATER, value, output);
     }
 
     #[inline]
@@ -188,9 +203,9 @@ pub trait Simulation: Sized {
         &mut self,
         weapon_upgrade: WeaponUpgrade,
         value: bool,
-        events: &[Event],
+        output: &CommandsOutput,
     ) {
-        self.store_integer(weapon_upgrade.uber_identifier(), i32::from(value), events);
+        self.store_integer(weapon_upgrade.uber_identifier(), i32::from(value), output);
     }
 
     #[inline]

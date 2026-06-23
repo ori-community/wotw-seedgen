@@ -201,6 +201,7 @@ impl<'source> Compile<'source> for ast::IncludeIconArgs<'source> {
             compiler
                 .global
                 .output
+                .assets
                 .icons
                 .push((path.data.to_string(), data));
 
@@ -316,7 +317,7 @@ impl<'source> Compile<'source> for ast::AugmentFunArgs<'source> {
 
         let Some(action) = action else { return };
 
-        let function = &mut compiler.global.output.command_lookup[function.index];
+        let function = &mut compiler.global.output.commands.lookup[function.index];
 
         match (function, action) {
             (CommandVoid::Multi { commands }, CommandVoid::Multi { commands: mut more }) => {
@@ -389,7 +390,7 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
-        if compiler.global.output.spawn.is_some() {
+        if compiler.global.output.preload.spawn.is_some() {
             compiler.errors.push(Error::error(
                 "Multiple spawn commands".to_string(),
                 self.span(),
@@ -401,7 +402,7 @@ impl<'source> Compile<'source> for ast::SpawnArgs<'source> {
 
         let (Some(x), Some(y)) = (x, y) else { return };
 
-        compiler.global.output.spawn = Some(Position {
+        compiler.global.output.preload.spawn = Some(Position {
             x: x.into(),
             y: y.into(),
         });
@@ -413,7 +414,7 @@ impl<'source> Compile<'source> for ast::TagsArg<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         if let Some(tag) = self.0.evaluate(compiler) {
-            compiler.global.output.tags.push(tag);
+            compiler.global.output.preload.tags.push(tag);
         }
     }
 }
@@ -523,6 +524,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
             compiler
                 .global
                 .output
+                .commands
                 .events
                 .push(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
 
@@ -671,6 +673,7 @@ fn compile_item_pool_change<'source, const FACTOR: i32>(
         *compiler
             .global
             .output
+            .modifiers
             .item_pool_changes
             .entry(item)
             .or_default() += amount * FACTOR;
@@ -682,7 +685,7 @@ impl<'source> Compile<'source> for ast::AddSpiritLightArgs<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         if let Some(amount) = self.0.evaluate::<i32>(compiler) {
-            compiler.global.output.spirit_light_change += amount;
+            compiler.global.output.modifiers.spirit_light_change += amount;
         }
     }
 }
@@ -692,7 +695,7 @@ impl<'source> Compile<'source> for ast::RemoveSpiritLightArgs<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         if let Some(amount) = self.0.evaluate::<i32>(compiler) {
-            compiler.global.output.spirit_light_change -= amount;
+            compiler.global.output.modifiers.spirit_light_change -= amount;
         }
     }
 }
@@ -721,6 +724,7 @@ impl<'source> Compile<'source> for ast::ItemDataArgs<'source> {
             if compiler
                 .global
                 .output
+                .modifiers
                 .item_metadata
                 .0
                 .insert(
@@ -854,6 +858,7 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
     if f(compiler
         .global
         .output
+        .modifiers
         .item_metadata
         .0
         .entry(item)
@@ -873,7 +878,12 @@ impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
         if let Some(condition) = self.condition.compile_into(compiler) {
-            compiler.global.output.removed_locations.insert(condition);
+            compiler
+                .global
+                .output
+                .modifiers
+                .removed_locations
+                .insert(condition);
         }
     }
 }
@@ -890,6 +900,7 @@ impl<'source> Compile<'source> for ast::LocationSlotsArgs<'source> {
             compiler
                 .global
                 .output
+                .modifiers
                 .location_slots
                 .insert(location, slots.try_into().unwrap_or_default());
         }
@@ -903,6 +914,7 @@ impl<'source> Compile<'source> for ast::SetLogicStateArgs<'source> {
         compiler
             .global
             .output
+            .modifiers
             .logical_state_sets
             .insert(self.0.data.to_string());
     }
@@ -921,7 +933,12 @@ impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
         let zone = get_command_arg(self.zone).and_then(|zone| zone.evaluate(compiler));
 
         if let (Some(item), Some(zone)) = (item, zone) {
-            compiler.global.output.preplacements.push((item, zone));
+            compiler
+                .global
+                .output
+                .modifiers
+                .preplacements
+                .push((item, zone));
         }
     }
 }

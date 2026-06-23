@@ -73,15 +73,21 @@ pub fn generate_seed<F: SnippetAccess>(
         let worlds = snippet_outputs
             .iter()
             .map(|(world_settings, output)| {
-                if output.spawn.is_some() {
+                if output.preload.spawn.is_some() {
                     warn!("A Snippet attempted to set spawn");
                 }
 
                 let mut output = output.clone();
-                let uber_states = UberStates::new(uber_state_data, &output.events);
+                let uber_states = UberStates::new(uber_state_data, &output.commands.events);
 
                 // TODO technically we shouldn't have to change our spawn choice between attempts anymore?
-                let world = World::new(graph, 0, world_settings, uber_states, &mut output.events);
+                let world = World::new(
+                    graph,
+                    0,
+                    world_settings,
+                    uber_states,
+                    &mut output.commands.events,
+                );
 
                 Ok((world, output))
             })

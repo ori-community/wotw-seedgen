@@ -13,7 +13,7 @@ use wotw_seedgen_data::{
     seed_language::{
         ast::ClientEvent,
         compile::store_boolean,
-        output::{CommandVoid, Event, IntermediateOutput, Trigger},
+        output::{CommandVoid, CommandsOutput, Event, Trigger},
         simulate::{Simulate, Simulation, Snapshot},
     },
     Difficulty, Spawn, UberIdentifier, DEFAULT_SPAWN,
@@ -30,7 +30,7 @@ pub fn choose_spawn<'graph>(
     world: &mut World<'graph, '_>,
     log_index: &str,
     item_pool: &ItemPool,
-    output: &mut IntermediateOutput,
+    output: &mut CommandsOutput,
 ) -> Result<Vec<&'graph LocDataEntry>, String> {
     let mut context = SpawnContext::new(rng, world, log_index, item_pool, output);
     context.choose_spawn()?;
@@ -42,7 +42,7 @@ struct SpawnContext<'world, 'graph, 'settings, 'log, 'pool, 'output> {
     world: &'world mut World<'graph, 'settings>,
     log_index: &'log str,
     item_pool: &'pool ItemPool,
-    output: &'output mut IntermediateOutput,
+    output: &'output mut CommandsOutput,
     default_spawn: usize,
     total_reach: Vec<&'graph LocDataEntry>,
 }
@@ -55,7 +55,7 @@ impl<'world, 'graph, 'settings, 'log, 'pool, 'output>
         world: &'world mut World<'graph, 'settings>,
         log_index: &'log str,
         item_pool: &'pool ItemPool,
-        output: &'output mut IntermediateOutput,
+        output: &'output mut CommandsOutput,
     ) -> Self {
         let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
 
@@ -172,12 +172,12 @@ impl<'world, 'graph, 'settings, 'log, 'pool, 'output>
     fn total_reach_check<'s>(&'s mut self) {
         // TODO could avoid redoing this with a snapshot stack
         for command in &**self.item_pool {
-            command.simulate(self.world, &self.output.events);
+            command.simulate(self.world, &self.output);
         }
         self.world
-            .add_spirit_light(TOTAL_SPIRIT_LIGHT, &self.output.events);
+            .add_spirit_light(TOTAL_SPIRIT_LIGHT, &self.output);
 
-        self.world.traverse_spawn(&self.output.events);
+        self.world.traverse_spawn(&self.output);
     }
 
     fn finish(self) -> Vec<&'graph LocDataEntry> {

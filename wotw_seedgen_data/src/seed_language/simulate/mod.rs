@@ -24,7 +24,7 @@ use crate::{
         ast::ClientEvent,
         output::{
             Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid,
-            CommandZone, Event, ExecuteOperator, Operation, StringOrPlaceholder, Trigger,
+            CommandZone, CommandsOutput, ExecuteOperator, Operation, StringOrPlaceholder, Trigger,
             TriggerCondition,
         },
     },
@@ -34,15 +34,15 @@ use crate::{
 pub trait Simulate<S: Simulation> {
     type Return;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return;
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return;
 }
 
 impl<S: Simulation, T: Simulate<S>> Simulate<S> for Vec<T> {
     type Return = ();
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         for t in self {
-            t.simulate(simulation, events);
+            t.simulate(simulation, output);
         }
     }
 }
@@ -50,12 +50,13 @@ impl<S: Simulation, T: Simulate<S>> Simulate<S> for Vec<T> {
 impl<S: Simulation> Simulate<S> for ClientEvent {
     type Return = ();
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
-        events
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
+        output
+            .events
             .iter()
             .filter(|event| event.trigger == Trigger::ClientEvent(*self))
             .for_each(|event| {
-                event.command.simulate(simulation, events);
+                event.command.simulate(simulation, output);
             })
     }
 }
@@ -63,8 +64,8 @@ impl<S: Simulation> Simulate<S> for ClientEvent {
 impl<S: Simulation> Simulate<S> for TriggerCondition {
     type Return = bool;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
-        let value = self.condition.simulate(simulation, events);
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
+        let value = self.condition.simulate(simulation, output);
         let previous_value =
             mem::replace(simulation.condition_values().get(self.id.unwrap()), value);
         value && previous_value == false
@@ -74,25 +75,25 @@ impl<S: Simulation> Simulate<S> for TriggerCondition {
 impl<S: Simulation> Simulate<S> for Command {
     type Return = ();
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
             Command::Boolean(command) => {
-                command.simulate(simulation, events);
+                command.simulate(simulation, output);
             }
             Command::Integer(command) => {
-                command.simulate(simulation, events);
+                command.simulate(simulation, output);
             }
             Command::Float(command) => {
-                command.simulate(simulation, events);
+                command.simulate(simulation, output);
             }
             Command::String(command) => {
-                command.simulate(simulation, events);
+                command.simulate(simulation, output);
             }
             Command::Zone(command) => {
-                command.simulate(simulation, events);
+                command.simulate(simulation, output);
             }
             Command::Void(command) => {
-                command.simulate(simulation, events);
+                command.simulate(simulation, output);
             }
         }
     }
@@ -106,9 +107,9 @@ where
 {
     type Return = Operator::Output;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
-        let left = self.left.simulate(simulation, events);
-        let right = self.right.simulate(simulation, events);
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
+        let left = self.left.simulate(simulation, output);
+        let right = self.right.simulate(simulation, output);
 
         self.operator.execute(left, right)
     }
@@ -117,20 +118,20 @@ where
 impl<S: Simulation> Simulate<S> for CommandBoolean {
     type Return = bool;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
             CommandBoolean::Constant { value } => *value,
             CommandBoolean::FunctionArgument { index } => simulation.stack().get_boolean(*index),
             CommandBoolean::Multi { commands, last } => {
-                commands.simulate(simulation, events);
-                last.simulate(simulation, events)
+                commands.simulate(simulation, output);
+                last.simulate(simulation, output)
             }
-            CommandBoolean::CompareBoolean { operation } => operation.simulate(simulation, events),
-            CommandBoolean::CompareInteger { operation } => operation.simulate(simulation, events),
-            CommandBoolean::CompareFloat { operation } => operation.simulate(simulation, events),
-            CommandBoolean::CompareString { operation } => operation.simulate(simulation, events),
-            CommandBoolean::CompareZone { operation } => operation.simulate(simulation, events),
-            CommandBoolean::LogicOperation { operation } => operation.simulate(simulation, events),
+            CommandBoolean::CompareBoolean { operation } => operation.simulate(simulation, output),
+            CommandBoolean::CompareInteger { operation } => operation.simulate(simulation, output),
+            CommandBoolean::CompareFloat { operation } => operation.simulate(simulation, output),
+            CommandBoolean::CompareString { operation } => operation.simulate(simulation, output),
+            CommandBoolean::CompareZone { operation } => operation.simulate(simulation, output),
+            CommandBoolean::LogicOperation { operation } => operation.simulate(simulation, output),
             CommandBoolean::FetchBoolean { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_boolean()
             }
@@ -143,24 +144,24 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
 impl<S: Simulation> Simulate<S> for CommandInteger {
     type Return = i32;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
             CommandInteger::Constant { value } => *value,
             CommandInteger::FunctionArgument { index } => simulation.stack().get_integer(*index),
             CommandInteger::Multi { commands, last } => {
-                commands.simulate(simulation, events);
-                last.simulate(simulation, events)
+                commands.simulate(simulation, output);
+                last.simulate(simulation, output)
             }
-            CommandInteger::Arithmetic { operation } => operation.simulate(simulation, events),
+            CommandInteger::Arithmetic { operation } => operation.simulate(simulation, output),
             CommandInteger::FetchInteger { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_integer()
             }
             CommandInteger::GetInteger { id } => simulation.heap().get_integer(*id),
             CommandInteger::FromFloat { float } => {
-                float.simulate(simulation, events).round() as i32
+                float.simulate(simulation, output).round() as i32
             }
             CommandInteger::StringLength { string } => {
-                string.simulate(simulation, events).len() as i32
+                string.simulate(simulation, output).len() as i32
             }
         }
     }
@@ -169,20 +170,20 @@ impl<S: Simulation> Simulate<S> for CommandInteger {
 impl<S: Simulation> Simulate<S> for CommandFloat {
     type Return = f32;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
             CommandFloat::Constant { value } => **value,
             CommandFloat::FunctionArgument { index } => simulation.stack().get_float(*index),
             CommandFloat::Multi { commands, last } => {
-                commands.simulate(simulation, events);
-                last.simulate(simulation, events)
+                commands.simulate(simulation, output);
+                last.simulate(simulation, output)
             }
-            CommandFloat::Arithmetic { operation } => operation.simulate(simulation, events),
+            CommandFloat::Arithmetic { operation } => operation.simulate(simulation, output),
             CommandFloat::FetchFloat { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_float()
             }
             CommandFloat::GetFloat { id } => simulation.heap().get_float(*id),
-            CommandFloat::FromInteger { integer } => integer.simulate(simulation, events) as f32,
+            CommandFloat::FromInteger { integer } => integer.simulate(simulation, output) as f32,
         }
     }
 }
@@ -190,7 +191,7 @@ impl<S: Simulation> Simulate<S> for CommandFloat {
 impl<S: Simulation> Simulate<S> for CommandString {
     type Return = String;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
             CommandString::Constant { value } => match value {
                 StringOrPlaceholder::Value(value) => value.clone(),
@@ -198,19 +199,19 @@ impl<S: Simulation> Simulate<S> for CommandString {
             },
             CommandString::FunctionArgument { index } => simulation.stack().get_string(*index),
             CommandString::Multi { commands, last } => {
-                commands.simulate(simulation, events);
-                last.simulate(simulation, events)
+                commands.simulate(simulation, output);
+                last.simulate(simulation, output)
             }
-            CommandString::Concatenate { operation } => operation.simulate(simulation, events),
+            CommandString::Concatenate { operation } => operation.simulate(simulation, output),
             CommandString::GetString { id } => simulation.heap().get_string(*id),
             CommandString::WorldName { .. } => Default::default(),
             CommandString::FromBoolean { boolean } => {
-                boolean.simulate(simulation, events).to_string()
+                boolean.simulate(simulation, output).to_string()
             }
             CommandString::FromInteger { integer } => {
-                integer.simulate(simulation, events).to_string()
+                integer.simulate(simulation, output).to_string()
             }
-            CommandString::FromFloat { float } => float.simulate(simulation, events).to_string(),
+            CommandString::FromFloat { float } => float.simulate(simulation, output).to_string(),
         }
     }
 }
@@ -218,12 +219,12 @@ impl<S: Simulation> Simulate<S> for CommandString {
 impl<S: Simulation> Simulate<S> for CommandZone {
     type Return = Zone;
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
             CommandZone::Constant { value } => *value,
             CommandZone::Multi { commands, last } => {
-                commands.simulate(simulation, events);
-                last.simulate(simulation, events)
+                commands.simulate(simulation, output);
+                last.simulate(simulation, output)
             }
             CommandZone::CurrentZone {} | CommandZone::CurrentMapZone {} => Zone::Void,
         }
@@ -233,9 +234,9 @@ impl<S: Simulation> Simulate<S> for CommandZone {
 impl<S: Simulation> Simulate<S> for CommandVoid {
     type Return = ();
 
-    fn simulate(&self, simulation: &mut S, events: &[Event]) -> Self::Return {
+    fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
-            CommandVoid::Multi { commands } => commands.simulate(simulation, events),
+            CommandVoid::Multi { commands } => commands.simulate(simulation, output),
             CommandVoid::CallFunction {
                 booleans,
                 integers,
@@ -243,28 +244,46 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
                 strings,
                 index,
             } => {
+                let booleans = booleans
+                    .iter()
+                    .map(|boolean| boolean.simulate(simulation, output))
+                    .collect::<Vec<_>>();
+                let integers = integers
+                    .iter()
+                    .map(|integer| integer.simulate(simulation, output))
+                    .collect::<Vec<_>>();
+                let floats = floats
+                    .iter()
+                    .map(|float| float.simulate(simulation, output))
+                    .collect::<Vec<_>>();
+                let strings = strings
+                    .iter()
+                    .map(|string| string.simulate(simulation, output))
+                    .collect::<Vec<_>>();
+
+                let stack = simulation.stack_mut();
+                stack.push();
+
                 for boolean in booleans {
-                    let boolean = boolean.simulate(simulation, events);
-                    simulation.stack_mut().push_boolean(boolean);
+                    stack.push_boolean(boolean);
                 }
                 for integer in integers {
-                    let integer = integer.simulate(simulation, events);
-                    simulation.stack_mut().push_integer(integer);
+                    stack.push_integer(integer);
                 }
                 for float in floats {
-                    let float = float.simulate(simulation, events);
-                    simulation.stack_mut().push_float(float);
+                    stack.push_float(float);
                 }
                 for string in strings {
-                    let string = string.simulate(simulation, events);
-                    simulation.stack_mut().push_string(string);
+                    stack.push_string(string);
                 }
 
-                // TODO we definitely have to simulate the lookup?
+                output.lookup[*index].simulate(simulation, output);
+
+                simulation.stack_mut().pop();
             }
             CommandVoid::If { condition, command } => {
-                if condition.simulate(simulation, events) {
-                    command.simulate(simulation, events)
+                if condition.simulate(simulation, output) {
+                    command.simulate(simulation, output)
                 }
             }
             CommandVoid::StoreBoolean {
@@ -272,43 +291,43 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
                 value,
                 trigger_events,
             } => {
-                let value = value.simulate(simulation, events).into();
-                set_uber_state(simulation, events, *uber_identifier, value, *trigger_events);
+                let value = value.simulate(simulation, output).into();
+                set_uber_state(simulation, output, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::StoreInteger {
                 uber_identifier,
                 value,
                 trigger_events,
             } => {
-                let value = value.simulate(simulation, events).into();
-                set_uber_state(simulation, events, *uber_identifier, value, *trigger_events);
+                let value = value.simulate(simulation, output).into();
+                set_uber_state(simulation, output, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::StoreFloat {
                 uber_identifier,
                 value,
                 trigger_events,
             } => {
-                let value = value.simulate(simulation, events).into();
-                set_uber_state(simulation, events, *uber_identifier, value, *trigger_events);
+                let value = value.simulate(simulation, output).into();
+                set_uber_state(simulation, output, *uber_identifier, value, *trigger_events);
             }
             CommandVoid::SetBoolean { id, value } => {
-                let value = value.simulate(simulation, events);
+                let value = value.simulate(simulation, output);
                 simulation.heap_mut().set_boolean(*id, value);
             }
             CommandVoid::SetInteger { id, value } => {
-                let value = value.simulate(simulation, events);
+                let value = value.simulate(simulation, output);
                 simulation.heap_mut().set_integer(*id, value);
             }
             CommandVoid::SetFloat { id, value } => {
-                let value = value.simulate(simulation, events);
+                let value = value.simulate(simulation, output);
                 simulation.heap_mut().set_float(*id, value);
             }
             CommandVoid::SetString { id, value } => {
-                let value = value.simulate(simulation, events);
+                let value = value.simulate(simulation, output);
                 simulation.heap_mut().set_string(*id, value);
             }
             CommandVoid::TriggerClientEvent { client_event } => {
-                client_event.simulate(simulation, events)
+                client_event.simulate(simulation, output)
             }
             // TODO simulate more maybe?
             CommandVoid::DefineTimer { .. }
@@ -372,7 +391,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
 // TODO is this better than using functions specialized for the UberState types?
 fn set_uber_state<S: Simulation>(
     simulation: &mut S,
-    events: &[Event],
+    output: &CommandsOutput,
     uber_identifier: UberIdentifier,
     value: UberStateValue,
     trigger_events: bool,
@@ -388,36 +407,40 @@ fn set_uber_state<S: Simulation>(
 
     if trigger_events {
         let triggers = simulation.store_impl(uber_identifier, value).to_vec();
-        side_effects(simulation, events, uber_identifier, value);
-        process_triggers(simulation, events, triggers);
+        side_effects(simulation, output, uber_identifier, value);
+        process_triggers(simulation, output, triggers);
     } else {
         let _ = simulation.store_impl(uber_identifier, value);
     }
 
-    simulation.on_change(uber_identifier, events);
+    simulation.on_change(uber_identifier, output);
 }
 
-fn process_triggers<S: Simulation>(simulation: &mut S, events: &[Event], triggers: Vec<usize>) {
+fn process_triggers<S: Simulation>(
+    simulation: &mut S,
+    output: &CommandsOutput,
+    triggers: Vec<usize>,
+) {
     // Trigger conditions have to be evaluated ahead of time in case any
     // triggered commands modify states relevant to the conditions.
     let triggered_events = triggers
         .into_iter()
-        .map(|index| &events[index])
+        .map(|index| &output.events[index])
         .filter(|event| match &event.trigger {
             Trigger::ClientEvent(_) => false,
             Trigger::Binding(_) => true,
-            Trigger::Condition(condition) => condition.simulate(simulation, events),
+            Trigger::Condition(condition) => condition.simulate(simulation, output),
         })
         .collect::<Vec<_>>();
 
     for event in triggered_events {
-        event.command.simulate(simulation, events);
+        event.command.simulate(simulation, output);
     }
 }
 
 fn side_effects<S: Simulation>(
     simulation: &mut S,
-    events: &[Event],
+    output: &CommandsOutput,
     uber_identifier: UberIdentifier,
     value: UberStateValue,
 ) {
@@ -429,7 +452,7 @@ fn side_effects<S: Simulation>(
 
     if matches!(uber_identifier, VOICE | STRENGTH | MEMORY | EYES | HEART) && value == true {
         // TODO not strictly correct but not sure what else to do
-        simulation.add_base_max_health(10, events);
-        simulation.add_base_max_energy(1., events);
+        simulation.add_base_max_health(10, output);
+        simulation.add_base_max_energy(1., output);
     }
 }

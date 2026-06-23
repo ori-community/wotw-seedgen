@@ -243,7 +243,7 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
         global: &'compiler mut GlobalCompilerData<'snippets, 'uberstates>,
         preprocessed: PreprocessorOutput,
     ) -> Self {
-        let debug = global.output.debug.is_some();
+        let debug = global.output.assets.debug.is_some();
 
         let mut compiler = Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
@@ -260,7 +260,7 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
             lint_data.finish_snippet(&compiler.identifier);
         }
 
-        if let Some(debug) = &mut compiler.global.output.debug {
+        if let Some(debug) = &mut compiler.global.output.assets.debug {
             // TODO now it's inefficient that we're returning the whole compiler, could save some clones here
             // ... on the other hand, the things we're cloning are probably supposed to be references anyway
             debug.snippets.insert(
@@ -487,7 +487,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
             let preprocessor = Preprocessor::preprocess(&ast, &self.global.output);
             errors.extend(preprocessor.errors);
 
-            self.global.output.command_lookup.extend(
+            self.global.output.commands.lookup.extend(
                 // Fill with placeholders for all the functions, this also ensures a sane result if some of the functions fail to compile
                 iter::repeat_with(compile::empty).take(preprocessor.output.functions.len()),
             );

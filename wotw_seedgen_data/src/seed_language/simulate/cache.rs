@@ -6,7 +6,7 @@ use strum::VariantArray;
 use crate::{
     assets::UberStateValue,
     seed_language::{
-        output::Event,
+        output::CommandsOutput,
         simulate::{condition_values::ConditionValues, Heap, Simulation, Snapshot, Stack},
     },
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
@@ -106,7 +106,9 @@ impl Cache {
             CommonUberIdentifier::Keystones => self.keystones = value.expect_integer(),
             CommonUberIdentifier::ShardSlots => self.shard_slots = value.expect_integer(),
             CommonUberIdentifier::CleanWater => self.clean_water = value.expect_boolean(),
-            CommonUberIdentifier::BaseMaxHealth => self.base_max_health = value.expect_integer() as f32,
+            CommonUberIdentifier::BaseMaxHealth => {
+                self.base_max_health = value.expect_integer() as f32
+            }
             CommonUberIdentifier::BaseMaxEnergy => self.base_max_energy = value.expect_float(),
             CommonUberIdentifier::Health | CommonUberIdentifier::Energy => {}
             CommonUberIdentifier::Skill(skill) => {
@@ -137,8 +139,8 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
         self.simulation.store_impl(uber_identifier, value)
     }
 
-    fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
-        self.simulation.on_change(uber_identifier, events);
+    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.simulation.on_change(uber_identifier, output);
     }
 
     fn stack(&self) -> &Stack {
@@ -161,111 +163,111 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
         self.simulation.condition_values()
     }
 
-    fn store_spirit_light(&mut self, value: i32, events: &[Event]) {
+    fn store_spirit_light(&mut self, value: i32, output: &CommandsOutput) {
         self.cache.spirit_light = value;
         self.simulation
-            .store_integer(UberIdentifier::SPIRIT_LIGHT, value, events);
+            .store_integer(UberIdentifier::SPIRIT_LIGHT, value, output);
     }
 
-    fn add_spirit_light(&mut self, add: i32, events: &[Event]) {
+    fn add_spirit_light(&mut self, add: i32, output: &CommandsOutput) {
         self.cache.spirit_light += add;
         self.simulation
-            .add_integer(UberIdentifier::SPIRIT_LIGHT, add, events);
+            .add_integer(UberIdentifier::SPIRIT_LIGHT, add, output);
     }
 
-    fn store_gorlek_ore(&mut self, value: i32, events: &[Event]) {
+    fn store_gorlek_ore(&mut self, value: i32, output: &CommandsOutput) {
         self.cache.gorlek_ore = value;
         self.simulation
-            .store_integer(UberIdentifier::GORLEK_ORE, value, events);
+            .store_integer(UberIdentifier::GORLEK_ORE, value, output);
     }
 
-    fn add_gorlek_ore(&mut self, add: i32, events: &[Event]) {
+    fn add_gorlek_ore(&mut self, add: i32, output: &CommandsOutput) {
         self.cache.gorlek_ore += add;
         self.simulation
-            .add_integer(UberIdentifier::GORLEK_ORE, add, events);
+            .add_integer(UberIdentifier::GORLEK_ORE, add, output);
     }
 
-    fn store_keystones(&mut self, value: i32, events: &[Event]) {
+    fn store_keystones(&mut self, value: i32, output: &CommandsOutput) {
         self.cache.keystones = value;
         self.simulation
-            .store_integer(UberIdentifier::KEYSTONES, value, events);
+            .store_integer(UberIdentifier::KEYSTONES, value, output);
     }
 
-    fn add_keystones(&mut self, add: i32, events: &[Event]) {
+    fn add_keystones(&mut self, add: i32, output: &CommandsOutput) {
         self.cache.keystones += add;
         self.simulation
-            .add_integer(UberIdentifier::KEYSTONES, add, events);
+            .add_integer(UberIdentifier::KEYSTONES, add, output);
     }
 
-    fn store_shard_slots(&mut self, value: i32, events: &[Event]) {
+    fn store_shard_slots(&mut self, value: i32, output: &CommandsOutput) {
         self.cache.shard_slots = value;
         self.simulation
-            .store_integer(UberIdentifier::SHARD_SLOTS, value, events);
+            .store_integer(UberIdentifier::SHARD_SLOTS, value, output);
     }
 
-    fn add_shard_slots(&mut self, add: i32, events: &[Event]) {
+    fn add_shard_slots(&mut self, add: i32, output: &CommandsOutput) {
         self.cache.shard_slots += add;
         self.simulation
-            .add_integer(UberIdentifier::SHARD_SLOTS, add, events);
+            .add_integer(UberIdentifier::SHARD_SLOTS, add, output);
     }
 
-    fn store_base_max_health(&mut self, value: i32, events: &[Event]) {
+    fn store_base_max_health(&mut self, value: i32, output: &CommandsOutput) {
         self.cache.base_max_health = value as f32;
         self.simulation
-            .store_integer(UberIdentifier::BASE_MAX_HEALTH, value, events);
+            .store_integer(UberIdentifier::BASE_MAX_HEALTH, value, output);
     }
 
-    fn add_base_max_health(&mut self, add: i32, events: &[Event]) {
+    fn add_base_max_health(&mut self, add: i32, output: &CommandsOutput) {
         self.cache.base_max_health += add as f32;
         self.simulation
-            .add_integer(UberIdentifier::BASE_MAX_HEALTH, add, events);
+            .add_integer(UberIdentifier::BASE_MAX_HEALTH, add, output);
     }
 
-    fn store_base_max_energy(&mut self, value: f32, events: &[Event]) {
+    fn store_base_max_energy(&mut self, value: f32, output: &CommandsOutput) {
         self.cache.base_max_energy = value;
         self.simulation
-            .store_float(UberIdentifier::BASE_MAX_ENERGY, value, events);
+            .store_float(UberIdentifier::BASE_MAX_ENERGY, value, output);
     }
 
-    fn add_base_max_energy(&mut self, add: f32, events: &[Event]) {
+    fn add_base_max_energy(&mut self, add: f32, output: &CommandsOutput) {
         self.cache.base_max_energy += add;
         self.simulation
-            .add_float(UberIdentifier::BASE_MAX_ENERGY, add, events);
+            .add_float(UberIdentifier::BASE_MAX_ENERGY, add, output);
     }
 
-    fn store_skill(&mut self, skill: Skill, value: bool, events: &[Event]) {
+    fn store_skill(&mut self, skill: Skill, value: bool, output: &CommandsOutput) {
         update_set(&mut self.cache.skills, skill, value);
         self.simulation
-            .store_boolean(skill.uber_identifier(), value, events);
+            .store_boolean(skill.uber_identifier(), value, output);
     }
 
-    fn store_shard(&mut self, shard: Shard, value: bool, events: &[Event]) {
+    fn store_shard(&mut self, shard: Shard, value: bool, output: &CommandsOutput) {
         update_set(&mut self.cache.shards, shard, value);
         self.simulation
-            .store_boolean(shard.uber_identifier(), value, events);
+            .store_boolean(shard.uber_identifier(), value, output);
     }
 
-    fn store_teleporter(&mut self, teleporter: Teleporter, value: bool, events: &[Event]) {
+    fn store_teleporter(&mut self, teleporter: Teleporter, value: bool, output: &CommandsOutput) {
         update_set(&mut self.cache.teleporters, teleporter, value);
         self.simulation
-            .store_boolean(teleporter.uber_identifier(), value, events);
+            .store_boolean(teleporter.uber_identifier(), value, output);
     }
 
-    fn store_clean_water(&mut self, value: bool, events: &[Event]) {
+    fn store_clean_water(&mut self, value: bool, output: &CommandsOutput) {
         self.cache.clean_water = value;
         self.simulation
-            .store_boolean(UberIdentifier::CLEAN_WATER, value, events);
+            .store_boolean(UberIdentifier::CLEAN_WATER, value, output);
     }
 
     fn store_weapon_upgrade(
         &mut self,
         weapon_upgrade: WeaponUpgrade,
         value: bool,
-        events: &[Event],
+        output: &CommandsOutput,
     ) {
         update_set(&mut self.cache.weapon_upgrades, weapon_upgrade, value);
         self.simulation
-            .store_integer(weapon_upgrade.uber_identifier(), i32::from(value), events);
+            .store_integer(weapon_upgrade.uber_identifier(), i32::from(value), output);
     }
 
     fn spirit_light(&self) -> i32 {

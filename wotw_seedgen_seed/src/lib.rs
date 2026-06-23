@@ -13,7 +13,9 @@ use indexmap::IndexMap;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
-use wotw_seedgen_data::seed_language::output::{DebugOutput, IntermediateOutput, PlaceholderMap};
+use wotw_seedgen_data::seed_language::output::{
+    DebugOutput, IntermediateOutput, PlaceholderMap, PreloadOutput,
+};
 use wotw_seedgen_data::Position;
 
 use crate::compile::CompileContext;
@@ -41,25 +43,25 @@ impl Seed {
     ) -> Self {
         let mut context = CompileContext::new(placeholder_map);
 
-        context.compile_command_lookup(output.command_lookup);
-        let events = context.compile_events(output.events);
+        context.compile_lookup(output.commands.lookup);
+        let events = context.compile_events(output.commands.events);
 
-        output.tags.sort_unstable();
+        output.preload.tags.sort_unstable();
 
         let mut seed = Self {
             format_version: FORMAT_VERSION,
-            preload: Preload::new(output.tags, output.spawn),
+            preload: Preload::new(output.preload),
             assembly: Assembly {
                 events,
                 command_lookup: context.command_lookup,
             },
             seedgen_info: None,
-            assets: output.icons.into_iter().collect(), // TODO decide on a consistent data structure
+            assets: output.assets.icons.into_iter().collect(), // TODO decide on a consistent data structure
         };
 
         if debug {
             let debug_data = DebugData {
-                compiler_data: output.debug.unwrap_or_default(),
+                compiler_data: output.assets.debug.unwrap_or_default(),
                 indexed_lookup: seed
                     .assembly
                     .command_lookup
@@ -97,10 +99,10 @@ pub struct Preload {
 }
 
 impl Preload {
-    fn new(tags: Vec<String>, spawn: Option<Position>) -> Self {
+    fn new(output: PreloadOutput) -> Self {
         Self {
-            tags,
-            spawn: spawn.unwrap_or(Position::new(-799., -4310.)),
+            tags: output.tags,
+            spawn: output.spawn.unwrap_or(Position::new(-799., -4310.)),
             slug: None,
         }
     }

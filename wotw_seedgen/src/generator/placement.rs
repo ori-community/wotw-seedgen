@@ -36,8 +36,8 @@ use wotw_seedgen_data::{
         compile,
         output::{
             postprocess, AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid,
-            Concatenator, ContainedWrites, Event, IntermediateOutput, IntoConstant, Operation,
-            Trigger,
+            CommandsOutput, Concatenator, ContainedWrites, Event, IntermediateOutput, IntoConstant,
+            Operation, Trigger,
         },
         simulate::{Simulate, Simulation},
     },
@@ -187,7 +187,8 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
 
             debug_assert!(spirit_light_placements <= needs_placement);
 
-            let total_spirit_light = TOTAL_SPIRIT_LIGHT + world.output.spirit_light_change;
+            let total_spirit_light =
+                TOTAL_SPIRIT_LIGHT + world.output.modifiers.spirit_light_change;
             world.spirit_light_placements_remaining = spirit_light_placements as usize;
             // TODO how should !add_item(spirit_light(100)) behave?
             // TODO breaks at very low spirit light totals
@@ -784,15 +785,18 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                     } = world_context;
 
                     assert!(
-                        output.icons.is_empty(),
+                        output.assets.icons.is_empty(),
                         "custom icons in seedgen aren't supported"
                     ); // TODO custom icons in snippets
 
                     let spawn = &world.graph.nodes[world.spawn];
-                    output.spawn = Some(*spawn.position().unwrap());
+                    output.preload.spawn = Some(*spawn.position().unwrap());
 
                     // Debug variant for the uppercase formatting
-                    output.tags.push(format!("{:?}", world.settings.difficulty));
+                    output
+                        .preload
+                        .tags
+                        .push(format!("{:?}", world.settings.difficulty));
 
                     if let Some(loop_size) = world.settings.randomize_entrances {
                         let mut random_entrances = "Random Entrances".to_string();
@@ -801,7 +805,7 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
                             let _ = write!(&mut random_entrances, " (Loop Size {loop_size})");
                         }
 
-                        output.tags.push(random_entrances);
+                        output.preload.tags.push(random_entrances);
                     }
 
                     let seedgen_info = SeedgenInfo {
@@ -836,7 +840,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         let mut item_pool = ItemPoolBuilder::new(&mut rng);
 
-        for (command, amount) in mem::take(&mut output.item_pool_changes) {
+        for (command, amount) in mem::take(&mut output.modifiers.item_pool_changes) {
             if amount >= 0 {
                 item_pool.add_amount(command.clone(), amount as usize);
             } else {
@@ -846,22 +850,27 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         let item_pool = item_pool.finish();
 
-        world.simulate(&ClientEvent::Spawn, &output.events);
-        world.simulate(&ClientEvent::Reload, &output.events);
+        world.simulate(&ClientEvent::Spawn, &output.commands);
+        world.simulate(&ClientEvent::Reload, &output.commands);
 
         let initial_ks_cost = world.reached_ks_cost();
 
         // TODO instead of timing this after the spawn simulation to avoid unsettings the known entrance connections,
         // maybe this could be resolved with whatever mechanism will implement launch fragments behaving differently
         // between client and simulation?
-        generate_entrances(&mut world, &mut output.events, &mut rng)?;
+        generate_entrances(&mut world, &mut output.commands, &mut rng)?;
 
-        let mut needs_placement =
-            spawn::choose_spawn(&mut rng, &mut world, &log_index, &item_pool, &mut output)?;
+        let mut needs_placement = spawn::choose_spawn(
+            &mut rng,
+            &mut world,
+            &log_index,
+            &item_pool,
+            &mut output.commands,
+        )?;
         filter_needs_placement(&world, &log_index, &mut needs_placement, &output);
         let total_pickups = needs_placement.len() as f32;
 
-        world.traverse_spawn(&output.events);
+        world.traverse_spawn(&output.commands);
 
         let spirit_light_provider = SpiritLightProvider::new(&mut rng);
 
@@ -893,7 +902,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         let mut zone_needs_placement = FxHashMap::default();
 
-        for (command, zone) in mem::take(&mut self.output.preplacements) {
+        for (command, zone) in mem::take(&mut self.output.modifiers.preplacements) {
             let pickup_indices = zone_needs_placement.entry(zone).or_insert_with(|| {
                 self.needs_placement
                     .iter()
@@ -1066,7 +1075,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
 
         let progressions = self.world.find_solutions(
             &self.item_pool,
-            &self.output.events,
+            &self.output.commands,
             slots,
             self.spirit_light_progression_slots(),
             None,
@@ -1202,14 +1211,19 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
     }
 
     pub fn name(&self, command: &CommandVoid) -> CommandString {
-        self.output.item_metadata.get(command).force_name()
+        self.output
+            .modifiers
+            .item_metadata
+            .get(command)
+            .force_name()
     }
 
     fn log_name(&mut self, command: &CommandVoid) -> String {
         self.output
+            .modifiers
             .item_metadata
             .get(command)
-            .log_name(&mut self.world, &self.output.events)
+            .log_name(&mut self.world, &self.output.commands)
     }
 
     fn fill_remaining(&mut self, placement_spoiler: &mut Vec<SpoilerPlacement>) {
@@ -1231,7 +1245,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
                     pickup,
                     command,
                     placement_spoiler,
-                    |_, world, events| world.add_gorlek_ore(1, events),
+                    |_, world, output| world.add_gorlek_ore(1, output),
                 );
             } else {
                 let amount = self.spirit_light_provider.take();
@@ -1292,7 +1306,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         placement_spoiler: &mut Vec<SpoilerPlacement>,
         simulate: F,
     ) where
-        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &[Event]),
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &CommandsOutput),
     {
         trace!(
             "{index}Placing {name} at {pickup}",
@@ -1340,11 +1354,11 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         command: CommandVoid,
         simulate: F,
     ) where
-        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &[Event]),
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &CommandsOutput),
     {
-        simulate(&command, &mut self.world, &self.output.events);
+        simulate(&command, &mut self.world, &self.output.commands);
 
-        self.output.events.push(Event { trigger, command });
+        self.output.commands.events.push(Event { trigger, command });
     }
 
     fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {
@@ -1409,7 +1423,7 @@ fn filter_needs_placement(
     needs_placement.retain(|pickup| {
         let condition = CommandBoolean::loc_data_condition(pickup.uber_identifier, pickup.value);
         // TODO remove by identifier instead?
-        if output.removed_locations.contains(&condition) {
+        if output.modifiers.removed_locations.contains(&condition) {
             trace!(
                 "{log_index}Manually removed {pickup} from placement locations",
                 pickup = pickup.identifier
@@ -1427,7 +1441,7 @@ fn filter_needs_placement(
             return false;
         }
 
-        match output.location_slots.get(&condition) {
+        match output.modifiers.location_slots.get(&condition) {
             None | Some(1) => {},
             Some(0) => {
                 trace!(

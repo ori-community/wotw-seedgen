@@ -2,7 +2,11 @@ use ordered_float::OrderedFloat;
 use tokio::sync::RwLockReadGuard;
 use wotw_seedgen::{
     World,
-    data::{UberIdentifier, assets::UberStateValue, seed_language::simulate::Simulation},
+    data::{
+        UberIdentifier,
+        assets::UberStateValue,
+        seed_language::{output::CommandsOutput, simulate::Simulation},
+    },
     seed::SeedgenInfo,
 };
 
@@ -41,15 +45,19 @@ pub fn reachable(
             .ok_or_else(|| Error::Custom(format!("Unknown UberIdentifier {uber_identifier}")))?;
 
         match &data.default_value {
-            UberStateValue::Boolean(_) => world.store_boolean(uber_identifier, *value > 0.5, &[]),
-            UberStateValue::Integer(_) => {
-                world.store_integer(uber_identifier, (*value) as i32, &[])
+            UberStateValue::Boolean(_) => {
+                world.store_boolean(uber_identifier, *value > 0.5, &CommandsOutput::NONE)
             }
-            UberStateValue::Float(_) => world.store_float(uber_identifier, *value, &[]),
+            UberStateValue::Integer(_) => {
+                world.store_integer(uber_identifier, (*value) as i32, &CommandsOutput::NONE)
+            }
+            UberStateValue::Float(_) => {
+                world.store_float(uber_identifier, *value, &CommandsOutput::NONE)
+            }
         }
     }
 
-    world.traverse_spawn(&[]);
+    world.traverse_spawn(&CommandsOutput::NONE);
 
     let mut reached = world
         .reached_indices()

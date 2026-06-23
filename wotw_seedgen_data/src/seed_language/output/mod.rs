@@ -33,11 +33,43 @@ use std::hash::Hash;
 // TODO check all the public derives
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct IntermediateOutput {
+    pub preload: PreloadOutput,
+    pub commands: CommandsOutput,
+    pub modifiers: GenerationModifiers,
+    pub assets: AssetsOutput,
+}
+
+impl IntermediateOutput {
+    pub fn new(debug: bool) -> Self {
+        let mut s = Self::default();
+        if debug {
+            s.assets.debug = Some(DebugOutput::default());
+        }
+        s
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct PreloadOutput {
     pub spawn: Option<Position>,
-    pub events: Vec<Event>,
-    pub command_lookup: Vec<CommandVoid>,
-    pub icons: Vec<(String, Vec<u8>)>, // TODO poor memory
     pub tags: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct CommandsOutput {
+    pub events: Vec<Event>,
+    pub lookup: Vec<CommandVoid>,
+}
+
+impl CommandsOutput {
+    pub const NONE: Self = Self {
+        events: Vec::new(),
+        lookup: Vec::new(),
+    };
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct GenerationModifiers {
     pub item_pool_changes: FxHashMap<CommandVoid, i32>,
     pub spirit_light_change: i32,
     pub item_metadata: ItemMetadata,
@@ -46,17 +78,12 @@ pub struct IntermediateOutput {
     // TODO unused
     pub logical_state_sets: FxHashSet<String>,
     pub preplacements: Vec<(CommandVoid, Zone)>,
-    pub debug: Option<DebugOutput>,
 }
 
-impl IntermediateOutput {
-    pub fn new(debug: bool) -> Self {
-        let mut s = Self::default();
-        if debug {
-            s.debug = Some(Default::default());
-        }
-        s
-    }
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct AssetsOutput {
+    pub icons: Vec<(String, Vec<u8>)>, // TODO poor memory
+    pub debug: Option<DebugOutput>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]

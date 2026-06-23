@@ -12,7 +12,10 @@ use smallvec::smallvec;
 use wotw_seedgen_data::{
     assets::{AssetCacheValues, TEST_ASSETS},
     logic_language::output::{Enemy, Graph, RefillValue, Requirement},
-    seed_language::simulate::{Simulation, Snapshot},
+    seed_language::{
+        output::CommandsOutput,
+        simulate::{Simulation, Snapshot},
+    },
     test_logger, Difficulty, Shard, Skill, WorldSettings, DEFAULT_SPAWN,
 };
 
@@ -23,9 +26,9 @@ pub fn empty_test_world<'graph, 'settings>(
 ) -> World<'graph, 'settings> {
     let mut world = test_world(graph, settings, spawn);
 
-    world.store_base_max_health(0, &[]);
-    world.store_base_max_energy((0.).into(), &[]);
-    world.store_shard_slots(0, &[]);
+    world.store_base_max_health(0, &CommandsOutput::NONE);
+    world.store_base_max_energy((0.).into(), &CommandsOutput::NONE);
+    world.store_shard_slots(0, &CommandsOutput::NONE);
 
     world
 }
@@ -54,11 +57,11 @@ fn full_reach_check() {
 
     let mut pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0)).finish();
     for item in pool.take() {
-        world.simulate(&item, &[]);
+        world.simulate(&item, &CommandsOutput::NONE);
     }
-    world.add_spirit_light(10000, &[]);
+    world.add_spirit_light(10000, &CommandsOutput::NONE);
 
-    world.traverse_spawn(&[]);
+    world.traverse_spawn(&CommandsOutput::NONE);
 
     let reached = world
         .reached_pickups()
@@ -100,11 +103,11 @@ fn small_reach_check() {
         "GladesTown.Teleporter",
     );
 
-    world.store_skill(Skill::DoubleJump, true, &[]);
-    world.store_shard(Shard::TripleJump, true, &[]);
-    world.store_base_max_health(5, &[]);
+    world.store_skill(Skill::DoubleJump, true, &CommandsOutput::NONE);
+    world.store_shard(Shard::TripleJump, true, &CommandsOutput::NONE);
+    world.store_base_max_health(5, &CommandsOutput::NONE);
 
-    world.traverse_spawn(&[]);
+    world.traverse_spawn(&CommandsOutput::NONE);
 
     let reached = world
         .reached_pickups()
@@ -127,8 +130,8 @@ fn max_energy() {
     let mut world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
     assert_eq!(world.max_energy(), 0.0);
 
-    world.add_base_max_energy(5., &[]);
-    world.store_shard(Shard::Energy, true, &[]);
+    world.add_base_max_energy(5., &CommandsOutput::NONE);
+    world.store_shard(Shard::Energy, true, &CommandsOutput::NONE);
     assert_eq!(world.max_energy(), 5.0);
 
     let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
@@ -149,7 +152,7 @@ fn refill_orbs() {
     ];
     for health in expected {
         assert_eq!(world.checkpoint_orbs().health, health);
-        world.add_base_max_health(5, &[]);
+        world.add_base_max_health(5, &CommandsOutput::NONE);
     }
 
     world.restore_snapshot();
@@ -162,19 +165,19 @@ fn refill_orbs() {
     ];
     for drops in expected {
         assert_eq!(world.health_plant_drops(), drops);
-        world.add_base_max_health(5, &[]);
+        world.add_base_max_health(5, &CommandsOutput::NONE);
     }
 
     world.restore_snapshot();
 
-    world.store_shard(Shard::Energy, true, &[]);
-    world.store_shard(Shard::Vitality, true, &[]);
+    world.store_shard(Shard::Energy, true, &CommandsOutput::NONE);
+    world.store_shard(Shard::Vitality, true, &CommandsOutput::NONE);
     assert_eq!(world.checkpoint_orbs(), Orbs::new(0.0, 1.0));
 
-    world.store_base_max_health(35, &[]);
+    world.store_base_max_health(35, &CommandsOutput::NONE);
     assert_eq!(world.checkpoint_orbs(), Orbs::new(35.0, 1.0));
 
-    world.store_base_max_health(140, &[]);
+    world.store_base_max_health(140, &CommandsOutput::NONE);
     assert_eq!(world.checkpoint_orbs(), Orbs::new(45.0, 1.0));
 
     let world = test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
@@ -190,28 +193,28 @@ fn destroy_cost() {
     let mut world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
     assert_eq!(world.destroy_cost::<false>(10.0, false), None);
 
-    world.store_skill(Skill::Spear, true, &[]);
+    world.store_skill(Skill::Spear, true, &CommandsOutput::NONE);
     assert_eq!(world.destroy_cost::<false>(10.0, true), Some(4.0));
     assert_eq!(world.destroy_cost::<false>(0.0, false), Some(0.0));
 
-    world.store_skill(Skill::Bow, true, &[]);
+    world.store_skill(Skill::Bow, true, &CommandsOutput::NONE);
     assert_eq!(world.destroy_cost::<false>(10.0, false), Some(1.5));
 
     let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
     world.settings = &settings;
-    world.store_skill(Skill::GladesAncestralLight, true, &[]);
-    world.store_skill(Skill::MarshAncestralLight, true, &[]);
-    world.store_shard(Shard::Wingclip, true, &[]);
-    world.add_shard_slots(1, &[]);
-    world.store_skill(Skill::Bow, false, &[]);
+    world.store_skill(Skill::GladesAncestralLight, true, &CommandsOutput::NONE);
+    world.store_skill(Skill::MarshAncestralLight, true, &CommandsOutput::NONE);
+    world.store_shard(Shard::Wingclip, true, &CommandsOutput::NONE);
+    world.add_shard_slots(1, &CommandsOutput::NONE);
+    world.store_skill(Skill::Bow, false, &CommandsOutput::NONE);
     assert_eq!(world.destroy_cost::<false>(1.0, false), Some(2.0));
 
-    world.store_skill(Skill::Bow, true, &[]);
+    world.store_skill(Skill::Bow, true, &CommandsOutput::NONE);
     assert_eq!(world.destroy_cost::<false>(10.0, true), Some(0.25));
 
     let mut world = empty_test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
-    world.store_skill(Skill::Grenade, true, &[]);
-    world.store_skill(Skill::Shuriken, true, &[]);
+    world.store_skill(Skill::Grenade, true, &CommandsOutput::NONE);
+    world.store_skill(Skill::Shuriken, true, &CommandsOutput::NONE);
     assert_eq!(world.destroy_cost::<false>(20.0, false), Some(1.5));
     assert_eq!(world.destroy_cost::<false>(24.0, false), Some(1.5));
     assert_eq!(world.destroy_cost::<false>(34.0, false), Some(2.0));
@@ -271,7 +274,7 @@ fn is_met() {
     eprintln!("testing {req}");
 
     test!(&req, "❌");
-    world.store_skill(Skill::Blaze, true, &[]);
+    world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
     test!(&req, "✅");
 
     test!(Requirement::And(vec![req.clone(), Requirement::Free]), "✅");
@@ -281,28 +284,28 @@ fn is_met() {
     eprintln!("testing {req}");
 
     test!(&req, "❌");
-    world.store_base_max_energy(1., &[]);
+    world.store_base_max_energy(1., &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_base_max_energy(2., &[]);
+    world.store_base_max_energy(2., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -2.0)]);
 
     set_difficulty!(Difficulty::Gorlek);
-    world.store_base_max_energy(1., &[]);
+    world.store_base_max_energy(1., &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_shard(Shard::Energy, true, &[]);
+    world.store_shard(Shard::Energy, true, &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -2.0)]);
-    world.store_shard(Shard::Energy, false, &[]);
+    world.store_shard(Shard::Energy, false, &CommandsOutput::NONE);
 
     set_difficulty!(Difficulty::Unsafe);
     test!(&req, [Orbs::new(0., -1.0)]);
 
-    world.store_shard(Shard::Overcharge, true, &[]);
+    world.store_shard(Shard::Overcharge, true, &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -1.0 * 0.5)]);
-    world.store_shard(Shard::Overcharge, false, &[]);
+    world.store_shard(Shard::Overcharge, false, &CommandsOutput::NONE);
 
-    world.store_shard(Shard::LifePact, true, &[]);
-    world.store_base_max_energy(0.5, &[]);
-    world.store_base_max_health(15, &[]);
+    world.store_shard(Shard::LifePact, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(0.5, &CommandsOutput::NONE);
+    world.store_base_max_health(15, &CommandsOutput::NONE);
     test!(
         Requirement::EnergySkill(Skill::Blaze, 1.0),
         [Orbs::new(-5.0, -0.5)]
@@ -323,25 +326,25 @@ fn is_met() {
 
     eprintln!("testing Damage");
 
-    world.store_base_max_health(30, &[]);
+    world.store_base_max_health(30, &CommandsOutput::NONE);
     test!(Requirement::Damage(30.0), "❌");
-    world.store_base_max_health(35, &[]);
+    world.store_base_max_health(35, &CommandsOutput::NONE);
     test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
 
     set_difficulty!(Difficulty::Gorlek);
-    world.store_base_max_health(30, &[]);
-    world.store_shard(Shard::Vitality, true, &[]);
+    world.store_base_max_health(30, &CommandsOutput::NONE);
+    world.store_shard(Shard::Vitality, true, &CommandsOutput::NONE);
     test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
-    world.store_shard(Shard::Vitality, false, &[]);
-    world.store_shard(Shard::Resilience, true, &[]);
+    world.store_shard(Shard::Vitality, false, &CommandsOutput::NONE);
+    world.store_shard(Shard::Resilience, true, &CommandsOutput::NONE);
     test!(Requirement::Damage(30.0), [Orbs::new(-30.0 * 0.9, 0.)]);
-    world.store_shard(Shard::Resilience, false, &[]);
+    world.store_shard(Shard::Resilience, false, &CommandsOutput::NONE);
 
     set_difficulty!(Difficulty::Unsafe);
-    world.store_base_max_energy(3., &[]);
-    world.store_skill(Skill::Regenerate, true, &[]);
+    world.store_base_max_energy(3., &CommandsOutput::NONE);
+    world.store_skill(Skill::Regenerate, true, &CommandsOutput::NONE);
     test!(Requirement::Damage(60.0), "❌");
-    world.store_base_max_health(65, &[]);
+    world.store_base_max_health(65, &CommandsOutput::NONE);
     test!(
         Requirement::Damage(60.0),
         [Orbs::new(30.0, world.max_energy())],
@@ -366,22 +369,22 @@ fn is_met() {
     eprintln!("testing {req}");
 
     test!(&req, "❌");
-    world.store_skill(Skill::Sword, true, &[]);
+    world.store_skill(Skill::Sword, true, &CommandsOutput::NONE);
     test!(&req, [world.max_orbs()]);
 
-    world.store_skill(Skill::Sword, false, &[]);
+    world.store_skill(Skill::Sword, false, &CommandsOutput::NONE);
 
-    world.store_skill(Skill::Grenade, true, &[]);
-    world.store_base_max_energy(1.5, &[]);
+    world.store_skill(Skill::Grenade, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(1.5, &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_base_max_energy(2., &[]);
+    world.store_base_max_energy(2., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -2.0)]);
 
     set_difficulty!(Difficulty::Unsafe);
-    world.store_base_max_energy(1., &[]);
+    world.store_base_max_energy(1., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -1.0)]);
     set_difficulty!(Difficulty::Moki);
-    world.store_base_max_energy(1.5, &[]);
+    world.store_base_max_energy(1.5, &CommandsOutput::NONE);
     test!(&req, "❌");
 
     world.restore_snapshot();
@@ -390,13 +393,13 @@ fn is_met() {
     let req = Requirement::ShurikenBreak(12.0);
     eprintln!("testing {req}");
 
-    world.store_skill(Skill::Shuriken, true, &[]);
-    world.store_base_max_energy(5., &[]);
+    world.store_skill(Skill::Shuriken, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(5., &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_base_max_energy(6., &[]);
+    world.store_base_max_energy(6., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -6.0)]);
     set_difficulty!(Difficulty::Unsafe);
-    world.store_base_max_energy(2., &[]);
+    world.store_base_max_energy(2., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -2.0)]);
 
     world.restore_snapshot();
@@ -407,26 +410,26 @@ fn is_met() {
     eprintln!("testing {req}");
 
     // Bow has 4 damage -> 2 * 4 + 5 = 13 shots * 0.25 energy / shot = 3.25 energy
-    world.store_skill(Skill::Bow, true, &[]);
-    world.store_base_max_energy(3., &[]);
+    world.store_skill(Skill::Bow, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(3., &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_base_max_energy(3.25, &[]);
+    world.store_base_max_energy(3.25, &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -3.25)]);
     // With 5 damage -> 2 * 3 + 4 = 10 shots * 0.25 energy / shot = 2.5 energy
-    world.store_skill(Skill::MarshAncestralLight, true, &[]);
+    world.store_skill(Skill::MarshAncestralLight, true, &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -2.5)]);
-    world.store_shard_slots(3, &[]);
+    world.store_shard_slots(3, &CommandsOutput::NONE);
     // Wingclip stacks additively, increasing the damage to 4 * 2.25 = 9 against Skeeto
-    world.store_shard(Shard::Wingclip, true, &[]);
+    world.store_shard(Shard::Wingclip, true, &CommandsOutput::NONE);
     // Splinter has 3 shots of half strength -> 7.5 damage against Slug and 13.5 against Skeeto
-    world.store_shard(Shard::Splinter, true, &[]);
+    world.store_shard(Shard::Splinter, true, &CommandsOutput::NONE);
     // 2 * 2 + 2 = 6 shots * 0.25 energy / shot = 1.5 energy
     test!(&req, [Orbs::new(0., -1.5)]);
 
     set_difficulty!(Difficulty::Moki);
-    world.store_base_max_energy(6.5, &[]);
+    world.store_base_max_energy(6.5, &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_skill(Skill::DoubleJump, true, &[]);
+    world.store_skill(Skill::DoubleJump, true, &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -6.5)]);
 
     set_difficulty!(Difficulty::Unsafe);
@@ -443,19 +446,19 @@ fn is_met() {
     ]);
     eprintln!("testing {req}");
 
-    world.store_skill(Skill::Shuriken, true, &[]);
-    world.store_skill(Skill::Spear, true, &[]);
-    world.store_base_max_energy(13.5, &[]);
+    world.store_skill(Skill::Shuriken, true, &CommandsOutput::NONE);
+    world.store_skill(Skill::Spear, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(13.5, &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_base_max_energy(14., &[]);
+    world.store_base_max_energy(14., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -14.0)]);
     set_difficulty!(Difficulty::Moki);
-    world.store_base_max_energy(32.5, &[]);
-    world.store_skill(Skill::Bash, true, &[]);
-    world.store_skill(Skill::Launch, true, &[]);
-    world.store_skill(Skill::Burrow, true, &[]);
+    world.store_base_max_energy(32.5, &CommandsOutput::NONE);
+    world.store_skill(Skill::Bash, true, &CommandsOutput::NONE);
+    world.store_skill(Skill::Launch, true, &CommandsOutput::NONE);
+    world.store_skill(Skill::Burrow, true, &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_base_max_energy(33., &[]);
+    world.store_base_max_energy(33., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -33.0)]);
 
     set_difficulty!(Difficulty::Unsafe);
@@ -465,14 +468,14 @@ fn is_met() {
     let req = Requirement::Combat(smallvec![(Enemy::Tentacle, 1)]);
     eprintln!("testing {req}");
 
-    world.store_skill(Skill::Spear, true, &[]);
-    world.store_skill(Skill::DoubleJump, true, &[]);
-    world.store_base_max_energy(2., &[]);
+    world.store_skill(Skill::Spear, true, &CommandsOutput::NONE);
+    world.store_skill(Skill::DoubleJump, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(2., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -2.0)]);
     set_difficulty!(Difficulty::Moki);
-    world.store_base_max_energy(7.5, &[]);
+    world.store_base_max_energy(7.5, &CommandsOutput::NONE);
     test!(&req, "❌");
-    world.store_base_max_energy(8., &[]);
+    world.store_base_max_energy(8., &CommandsOutput::NONE);
     test!(&req, [Orbs::new(0., -8.0)]);
 
     set_difficulty!(Difficulty::Unsafe);
@@ -486,9 +489,9 @@ fn is_met() {
     let c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let d = Requirement::Damage(10.0);
 
-    world.store_skill(Skill::Blaze, true, &[]);
-    world.store_base_max_energy(2., &[]);
-    world.store_base_max_health(25, &[]);
+    world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(2., &CommandsOutput::NONE);
+    world.store_base_max_health(25, &CommandsOutput::NONE);
 
     test!(
         Requirement::And(vec![c.clone(), d.clone()]),
@@ -518,8 +521,8 @@ fn is_met() {
         ]),
         [Orbs::new(-10.0, -1.0)]
     );
-    world.store_base_max_energy(6., &[]);
-    world.store_base_max_health(65, &[]);
+    world.store_base_max_energy(6., &CommandsOutput::NONE);
+    world.store_base_max_health(65, &CommandsOutput::NONE);
     test!(
         Requirement::And(vec![
             Requirement::Or(vec![a.clone(), d.clone()]),
@@ -547,13 +550,13 @@ fn is_met() {
     world.restore_snapshot();
     world.snapshot();
 
-    world.store_base_max_health(35, &[]);
-    world.store_base_max_energy(1., &[]);
+    world.store_base_max_health(35, &CommandsOutput::NONE);
+    world.store_base_max_energy(1., &CommandsOutput::NONE);
     test!(
         Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
         "❌"
     );
-    world.store_skill(Skill::Regenerate, true, &[]);
+    world.store_skill(Skill::Regenerate, true, &CommandsOutput::NONE);
     test!(
         Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
         [Orbs::new(-30.0, -1.0)]
@@ -563,8 +566,8 @@ fn is_met() {
         Requirement::Damage(10.0),
         Requirement::EnergySkill(Skill::Blaze, 1.0),
     ]);
-    world.store_skill(Skill::Blaze, true, &[]);
-    world.store_base_max_energy(2., &[]);
+    world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
+    world.store_base_max_energy(2., &CommandsOutput::NONE);
     test!(
         Requirement::And(vec![req.clone(), req.clone()]),
         [

@@ -1838,7 +1838,7 @@ where
     lookup_or_insert(
         identifier,
         &mut context.compiler.preprocessed.functions,
-        &mut context.compiler.global.output.command_lookup,
+        &mut context.compiler.global.output.commands.lookup,
         || CommandVoid::Multi {
             commands: context
                 .compiler
@@ -1860,7 +1860,7 @@ where
 fn lookup_or_insert<F>(
     identifier: String,
     functions: &mut FxHashMap<String, PreprocessedFunction>,
-    command_lookup: &mut Vec<CommandVoid>,
+    lookup: &mut Vec<CommandVoid>,
     command: F,
 ) -> Command
 where
@@ -1869,8 +1869,8 @@ where
     let index = functions
         .entry(identifier)
         .or_insert_with(|| {
-            let index = command_lookup.len();
-            command_lookup.push(command());
+            let index = lookup.len();
+            lookup.push(command());
 
             PreprocessedFunction {
                 index,

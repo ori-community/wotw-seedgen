@@ -2,7 +2,10 @@ pub use crate::seed_language::ast::ClientEvent;
 
 use super::{CommandBoolean, CommandVoid};
 use crate::{
-    seed_language::simulate::{Simulate, Simulation},
+    seed_language::{
+        output::CommandsOutput,
+        simulate::{Simulate, Simulation},
+    },
     EqIgnore, UberIdentifier,
 };
 use serde::{Deserialize, Serialize};
@@ -86,7 +89,7 @@ impl TriggerCondition {
     }
 
     pub(crate) fn register<S: Simulation>(&mut self, simulation: &mut S) {
-        let initial_value = self.condition.simulate(simulation, &[]);
+        let initial_value = self.condition.simulate(simulation, &CommandsOutput::NONE);
         let id = simulation.condition_values().register(initial_value);
         self.id = EqIgnore(Some(id));
     }

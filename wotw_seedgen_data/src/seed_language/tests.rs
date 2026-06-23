@@ -1,11 +1,17 @@
-use crate::{assets::{AssetFileAccess, SnippetAccess, SnippetFileAccess, TestAccess, UberStateData}, seed_language::{
-    ast::{
-        parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
-        FunctionCall, Literal, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
+use crate::{
+    assets::{AssetFileAccess, SnippetAccess, SnippetFileAccess, TestAccess, UberStateData},
+    seed_language::{
+        ast::{
+            parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
+            FunctionCall, Literal, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
+        },
+        compile::{Compiler, FREE_MEMORY_START},
+        output::{CommandVoid, IntermediateOutput},
     },
-    compile::{Compiler, FREE_MEMORY_START},
-    output::{CommandVoid, IntermediateOutput},
-}, Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon, HorizontalAnchor, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone};
+    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon,
+    HorizontalAnchor, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon,
+    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+};
 use rustc_hash::FxHashMap;
 use std::{
     array,
@@ -325,7 +331,7 @@ fn operator_precedence() {
     fn test_precedence(term: &str, value: i32) {
         let output = test_str(&format!("on spawn set_integer(\"oriLurk\", {term})"));
         assert_eq!(
-            output.events[0].command,
+            output.commands.events[0].command,
             CommandVoid::SetInteger {
                 id: FREE_MEMORY_START,
                 value: value.into()

@@ -19,7 +19,7 @@ use wotw_seedgen_data::{
     assets::{LocDataEntry, StateDataEntry},
     logic_language::output::{Anchor, Connection, Graph, Node, Refill, RefillValue, Requirement},
     seed_language::{
-        output::Event,
+        output::CommandsOutput,
         simulate::{CloneSnapshot, Simulation, Snapshot},
     },
     EqIgnore, Skill, UberIdentifier,
@@ -390,13 +390,13 @@ impl<'graph> World<'graph, '_> {
         self.reach.state.best_orbs.contains_key(&index)
     }
 
-    pub fn traverse_spawn(&mut self, events: &[Event]) {
+    pub fn traverse_spawn(&mut self, output: &CommandsOutput) {
         self.check_all_states();
 
         let orb_variants = smallvec![self.max_orbs()];
-        self.traverse(self.spawn, orb_variants, events);
+        self.traverse(self.spawn, orb_variants, output);
 
-        self.attempt_spawn_teleport(events);
+        self.attempt_spawn_teleport(output);
     }
 
     pub(crate) fn fails(&self) -> &ReachStateFails<'graph> {
@@ -423,7 +423,7 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn attempt_spawn_teleport(&mut self, events: &[Event]) {
+    fn attempt_spawn_teleport(&mut self, output: &CommandsOutput) {
         let reached_anchors = self
             .reach
             .state
@@ -433,11 +433,11 @@ impl<'graph> World<'graph, '_> {
             .collect::<Vec<_>>();
 
         for anchor in reached_anchors {
-            self.attempt_teleport(anchor, events)
+            self.attempt_teleport(anchor, output)
         }
     }
 
-    fn attempt_teleport(&mut self, anchor: &Anchor, events: &[Event]) {
+    fn attempt_teleport(&mut self, anchor: &Anchor, output: &CommandsOutput) {
         if self.reach.state.tp_reached {
             return;
         }
@@ -450,12 +450,16 @@ impl<'graph> World<'graph, '_> {
         {
             if let Ok(tp_index) = self.graph.find_node(TP_ANCHOR) {
                 self.reach.state.tp_reached = true;
-                self.traverse(tp_index, orb_variants, events);
+                self.traverse(tp_index, orb_variants, output);
             }
         }
     }
 
-    pub(super) fn update_reached(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
+    pub(super) fn update_reached(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        output: &CommandsOutput,
+    ) {
         trace!(
             "updating reach for {uber_identifier} with {inventory}",
             inventory = self.inventory_display(),
@@ -468,7 +472,7 @@ impl<'graph> World<'graph, '_> {
         if let Some(fails) = self.reach.state.fails.uber_state.remove(&uber_identifier) {
             trace!("removed {uber_identifier} from UberState fails");
             for fail in fails {
-                self.progress(fail, events);
+                self.progress(fail, output);
             }
         }
 
@@ -478,7 +482,7 @@ impl<'graph> World<'graph, '_> {
             {
                 self.reach.state.clear();
 
-                self.traverse_spawn(events);
+                self.traverse_spawn(output);
             }
 
             self.updating_reach = false;
@@ -538,21 +542,21 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn progress(&mut self, connection_index: ConnectionIndex<'graph>, events: &[Event]) {
+    fn progress(&mut self, connection_index: ConnectionIndex<'graph>, output: &CommandsOutput) {
         let orb_variants = self.get_connection_orbs(&connection_index).clone();
 
         match &connection_index.connection {
             ConnectionOrRefill::Refill(_) => {
                 let node_index = connection_index.node_index(self.graph);
-                self.traverse(node_index, orb_variants, events)
+                self.traverse(node_index, orb_variants, output)
             }
             ConnectionOrRefill::Connection(connection) => {
-                self.traverse_connection(connection.0, orb_variants, connection_index, events)
+                self.traverse_connection(connection.0, orb_variants, connection_index, output)
             }
         }
     }
 
-    fn traverse(&mut self, node_index: usize, orb_variants: OrbVariants, events: &[Event]) {
+    fn traverse(&mut self, node_index: usize, orb_variants: OrbVariants, output: &CommandsOutput) {
         let node = &self.graph.nodes[node_index];
 
         trace!(
@@ -562,7 +566,7 @@ impl<'graph> World<'graph, '_> {
         );
 
         match node {
-            Node::Anchor(anchor) => self.traverse_anchor(anchor, node_index, orb_variants, events),
+            Node::Anchor(anchor) => self.traverse_anchor(anchor, node_index, orb_variants, output),
             Node::Pickup(LocDataEntry {
                 uber_identifier,
                 value,
@@ -572,8 +576,8 @@ impl<'graph> World<'graph, '_> {
                 uber_identifier,
                 value,
                 ..
-            }) => self.traverse_state(node_index, *uber_identifier, *value, events),
-            Node::LogicalState(_) => self.traverse_logical_state(node_index, events),
+            }) => self.traverse_state(node_index, *uber_identifier, *value, output),
+            Node::LogicalState(_) => self.traverse_logical_state(node_index, output),
         }
     }
 
@@ -582,7 +586,7 @@ impl<'graph> World<'graph, '_> {
         anchor: &'graph Anchor,
         node_index: usize,
         mut orb_variants: OrbVariants,
-        events: &[Event],
+        output: &CommandsOutput,
     ) {
         self.use_refills(anchor, &mut orb_variants);
 
@@ -591,14 +595,14 @@ impl<'graph> World<'graph, '_> {
             .best_orbs
             .insert(node_index, orb_variants.clone());
 
-        self.attempt_teleport(anchor, events);
+        self.attempt_teleport(anchor, output);
 
         for connection in &anchor.connections {
             self.traverse_connection(
                 connection,
                 orb_variants.clone(),
                 ConnectionIndex::connection(anchor, connection),
-                events,
+                output,
             )
         }
     }
@@ -608,29 +612,29 @@ impl<'graph> World<'graph, '_> {
         index: usize,
         uber_identifier: UberIdentifier,
         value: Option<i32>,
-        events: &[Event],
+        output: &CommandsOutput,
     ) {
         self.reach.state.best_orbs.insert(index, smallvec![]);
 
         match value {
-            None => self.store_boolean(uber_identifier, true, events),
+            None => self.store_boolean(uber_identifier, true, output),
             Some(value) => {
                 // logical states are incremental
                 if self.fetch_integer(uber_identifier) < value {
-                    self.store_integer(uber_identifier, value, events);
+                    self.store_integer(uber_identifier, value, output);
                 }
             }
         }
     }
 
-    fn traverse_logical_state(&mut self, index: usize, events: &[Event]) {
+    fn traverse_logical_state(&mut self, index: usize, output: &CommandsOutput) {
         debug_assert!(self.graph.nodes[index].is_logical_state());
 
         self.reach.state.best_orbs.insert(index, smallvec![]);
 
         if let Some(fails) = self.reach.state.fails.logical_state.remove(&index) {
             for fail in fails {
-                self.progress(fail, events);
+                self.progress(fail, output);
             }
         }
     }
@@ -664,7 +668,7 @@ impl<'graph> World<'graph, '_> {
         connection: &'graph Connection,
         mut orb_variants: OrbVariants,
         connection_index: ConnectionIndex<'graph>,
-        events: &[Event],
+        output: &CommandsOutput,
     ) {
         let ControlFlow::Continue(revisit) = self.should_visit(connection, &mut orb_variants)
         else {
@@ -681,7 +685,7 @@ impl<'graph> World<'graph, '_> {
                 return;
             }
 
-            self.traverse(connection.to, target_orbs, events)
+            self.traverse(connection.to, target_orbs, output)
         }
     }
 

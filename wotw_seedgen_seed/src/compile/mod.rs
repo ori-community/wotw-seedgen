@@ -27,11 +27,11 @@ impl CompileContext {
         }
     }
 
-    pub fn compile_command_lookup(&mut self, intermediate_command_lookup: Vec<input::CommandVoid>) {
+    pub fn compile_lookup(&mut self, intermediate_lookup: Vec<input::CommandVoid>) {
         self.command_lookup
-            .resize_with(intermediate_command_lookup.len(), Default::default);
+            .resize_with(intermediate_lookup.len(), Default::default);
 
-        for (index, command) in intermediate_command_lookup.into_iter().enumerate() {
+        for (index, command) in intermediate_lookup.into_iter().enumerate() {
             self.command_lookup[index] = command.compile(self).0;
         }
     }

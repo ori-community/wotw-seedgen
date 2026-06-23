@@ -27,7 +27,7 @@ use wotw_seedgen_data::{
     assets::UberStateValue,
     logic_language::output::{Graph, RefillValue},
     seed_language::{
-        output::Event,
+        output::{CommandsOutput, Event},
         simulate::{
             ConditionValues, Heap, Simulation, SimulationCache, Snapshot, Stack, UberStates,
             WorldState,
@@ -151,7 +151,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     ///
     /// ```
     /// # use wotw_seedgen::World;
-    /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
+    /// # use wotw_seedgen_data::seed_language::{output::CommandsOutput, simulate::UberStates};
     /// # use wotw_seedgen_data::logic_language::output::Graph;
     /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, Difficulty, Shard, WorldSettings};
@@ -160,11 +160,11 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// # let mut events = [];
+    /// # let mut output = CommandsOutput::NONE;
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
-    /// world.store_shard(Shard::Vitality, true, &events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
+    /// world.store_shard(Shard::Vitality, true, &output);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
     /// world.cap_orbs::<false>(&mut orbs);
@@ -187,7 +187,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     ///
     /// ```
     /// # use wotw_seedgen::World;
-    /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
+    /// # use wotw_seedgen_data::seed_language::{output::CommandsOutput, simulate::UberStates};
     /// # use wotw_seedgen_data::logic_language::output::Graph;
     /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
@@ -196,14 +196,14 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// # let mut events = [];
+    /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
     /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
-    /// world.add_base_max_health(110, &events);
-    /// world.add_base_max_energy((12.).into(), &events);
+    /// world.add_base_max_health(110, &output);
+    /// world.add_base_max_energy((12.).into(), &output);
     /// assert_eq!(world.max_orbs(), Orbs { health: 140.0, energy: 15.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
     /// ```
@@ -226,7 +226,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     ///
     /// ```
     /// # use wotw_seedgen::World;
-    /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
+    /// # use wotw_seedgen_data::seed_language::{output::CommandsOutput, simulate::UberStates};
     /// # use wotw_seedgen_data::logic_language::output::Graph;
     /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
@@ -234,15 +234,15 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let graph = Graph::empty();
     /// # let spawn = 0;
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
-    /// # let mut events = [];
+    /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
     /// assert_eq!(world.health_plant_drops(), 1.0);
     ///
-    /// world.add_base_max_health(40, &events);
+    /// world.add_base_max_health(40, &output);
     /// assert_eq!(world.health_plant_drops(), 2.0);
     ///
-    /// world.add_base_max_health(90, &events);
+    /// world.add_base_max_health(90, &output);
     /// assert_eq!(world.health_plant_drops(), 5.0);
     /// ```
     pub fn health_plant_drops(&self) -> f32 {
@@ -503,8 +503,8 @@ impl Simulation for World<'_, '_> {
         self.state.store_impl(uber_identifier, value)
     }
 
-    fn on_change(&mut self, uber_identifier: UberIdentifier, events: &[Event]) {
-        self.update_reached(uber_identifier, events);
+    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.update_reached(uber_identifier, output);
     }
 
     #[inline]

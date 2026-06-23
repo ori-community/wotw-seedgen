@@ -10,7 +10,7 @@ use wotw_seedgen_data::{
     seed_language::{
         ast::ClientEvent,
         compile::{store_boolean, store_integer},
-        output::{CommandBoolean, Event, Trigger, TriggerCondition},
+        output::{CommandBoolean, CommandsOutput, Event, Trigger, TriggerCondition},
         simulate::Simulation,
     },
     UberIdentifier,
@@ -66,7 +66,7 @@ struct EntranceRandomizerState {
 
 pub fn generate_entrances(
     world: &mut World,
-    events: &mut Vec<Event>,
+    output: &mut CommandsOutput,
     rng: &mut Pcg64Mcg,
 ) -> Result<(), String> {
     let (connections, loop_size) = match world.settings.randomize_entrances {
@@ -97,12 +97,12 @@ pub fn generate_entrances(
             ];
 
             // enable randoConfig.showSmallEntrances
-            events.push(Event {
+            output.events.push(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                 command: store_boolean(UberIdentifier::rando_config(200), true),
             });
             // mark entrance connections as unknown
-            events.extend((1..=32).map(|entrance_id| Event {
+            output.events.extend((1..=32).map(|entrance_id| Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                 command: store_boolean(
                     UberIdentifier::known_entrance_connections(entrance_id),
@@ -123,18 +123,19 @@ pub fn generate_entrances(
             target_entrance_id
         );
 
-        let set_connection =
-            store_integer(UberIdentifier::entrances(entrance_id), target_entrance_id);
-        world.simulate(&set_connection, &events);
-        events.push(Event {
+        let uber_identifier = UberIdentifier::entrances(entrance_id);
+
+        world.store_integer(uber_identifier, target_entrance_id, output);
+
+        output.events.push(Event {
             trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-            command: set_connection,
+            command: store_integer(uber_identifier, target_entrance_id),
         });
 
         // If the target entrance is known to connect back to this entrance, mark
         // the target entrance as visited too once we went through this entrance
         if loop_size == 2 {
-            events.push(Event {
+            output.events.push(Event {
                 trigger: Trigger::Condition(TriggerCondition::new(CommandBoolean::FetchBoolean {
                     uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
                 })),

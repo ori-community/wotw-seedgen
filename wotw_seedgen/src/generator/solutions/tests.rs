@@ -17,7 +17,7 @@ use wotw_seedgen_data::{
     parse::SpannedOption,
     seed_language::{
         compile::{clean_water, energy_fragment, health_fragment, keystone, shard, skill},
-        output::{CommandVoid, CommonItem, ContainedWrites},
+        output::{CommandVoid, CommandsOutput, CommonItem, ContainedWrites},
         simulate::{Simulate, Simulation, UberStates},
     },
     test_logger, Difficulty,
@@ -38,10 +38,10 @@ fn mock_world<'graph, 'settings>(
     uber_states: UberStates,
 ) -> World<'graph, 'settings> {
     let mut world = World::new(graph, 0, settings, uber_states, &mut []);
-    world.store_base_max_health(0, &[]);
-    world.store_base_max_energy((0.).into(), &[]);
-    world.store_shard_slots(0, &[]);
-    world.traverse_spawn(&[]);
+    world.store_base_max_health(0, &CommandsOutput::NONE);
+    world.store_base_max_energy((0.).into(), &CommandsOutput::NONE);
+    world.store_shard_slots(0, &CommandsOutput::NONE);
+    world.traverse_spawn(&CommandsOutput::NONE);
     world
 }
 
@@ -52,7 +52,7 @@ fn find_test_solutions(
 ) -> Vec<Vec<(CommandVoid, u32)>> {
     sorted_test_solutions(
         world
-            .find_solutions_no_max_items(&item_pool, &[], slots, 0, Some(u8::MAX))
+            .find_solutions_no_max_items(&item_pool, &CommandsOutput::NONE, slots, 0, Some(u8::MAX))
             .into_iter()
             .map(|solution| {
                 amounts_from_item_list(
@@ -197,7 +197,7 @@ fn mock_solutions() {
             let mut world = mock_world(&graph, &settings, TEST_ASSETS.uber_states.clone());
 
             for item in [$($items)*] {
-                item.simulate(&mut world, &[]);
+                item.simulate(&mut world, &CommandsOutput::NONE);
             }
 
             test!(@test_solutions world, $($more)*);
@@ -1181,7 +1181,7 @@ fn spawn_solutions_prelude(spawn: &str) -> World<'static, 'static> {
     test_logger();
 
     let mut world = test_world(graph, &*GORLEK_SETTINGS, spawn);
-    world.traverse_spawn(&[]);
+    world.traverse_spawn(&CommandsOutput::NONE);
 
     world
 }
@@ -1526,7 +1526,7 @@ fn woods_exit_spawn_solutions() {
 #[test]
 fn reach_spawn_solutions() {
     let mut world = spawn_solutions_prelude("LowerReach.Teleporter");
-    world.store_skill(Grenade, true, &[]);
+    world.store_skill(Grenade, true, &CommandsOutput::NONE);
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1613,8 +1613,8 @@ fn depths_spawn_solutions() {
 #[test]
 fn pools_spawn_solutions() {
     let mut world = spawn_solutions_prelude("EastPools.Teleporter");
-    world.store_clean_water(true, &[]);
-    world.store_boolean(Teleporter::CENTRAL_POOLS_ID, true, &[]);
+    world.store_clean_water(true, &CommandsOutput::NONE);
+    world.store_boolean(Teleporter::CENTRAL_POOLS_ID, true, &CommandsOutput::NONE);
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &*ITEM_POOL, 7),
@@ -1748,7 +1748,7 @@ fn outer_ruins_spawn_solutions() {
 
 //     let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
 //     let mut world = test_world(&*REGIONLESS_GRAPH, &settings, "WillowsEnd.InnerTP");
-//     world.traverse_spawn(&[]);
+//     world.traverse_spawn(&CommandsOutput::NONE);
 
 //     assert_eq_solutions!(
 //         find_test_solutions(&mut world, &*ITEM_POOL, 7),

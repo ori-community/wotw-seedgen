@@ -656,8 +656,8 @@ impl CompileInto for usize {
         let span = action.span();
         let command = action.compile(compiler)?.expect_void(compiler, span)?;
 
-        let index = compiler.global.output.command_lookup.len();
-        compiler.global.output.command_lookup.push(command);
+        let index = compiler.global.output.commands.lookup.len();
+        compiler.global.output.commands.lookup.push(command);
 
         Some(index)
     }

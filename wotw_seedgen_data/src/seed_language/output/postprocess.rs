@@ -19,7 +19,8 @@ use crate::{
         display::strip_invisible_characters,
         item_metadata::{random_shop_description, DEFAULT_SHOP_PRICE},
         postprocess::price_noise::PriceNoise,
-        ClientEvent, ContainedWrites, IntoConstant, ItemMetadataRef, TriggerCondition,
+        ClientEvent, CommandsOutput, ContainedWrites, IntoConstant, ItemMetadataRef,
+        TriggerCondition,
     },
     Position, ShopKind, UberIdentifier, Zone,
 };
@@ -42,11 +43,11 @@ pub fn postprocess(
     } = postprocessor;
 
     for (output, extra_events) in worlds.iter_mut().zip(extra_events) {
-        // TODO merge events with identical triggers?
+        // TODO merge events with identical triggers where it doesn't break order?
 
-        loc_data_triggers.generate_message_origins(&mut output.events);
+        loc_data_triggers.generate_message_origins(&mut output.commands.events);
 
-        output.events.splice(0..0, extra_events);
+        output.commands.events.splice(0..0, extra_events);
     }
 
     placeholder_maps
@@ -131,6 +132,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
 
         let mut matches = target_world
             .output
+            .commands
             .events
             .iter()
             .filter(|event| {
@@ -211,7 +213,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             })
             .collect::<Vec<_>>();
 
-        count_in_zone_message(matches, &origin_world.output.item_metadata)
+        count_in_zone_message(matches, &origin_world.output.modifiers.item_metadata)
     }
 
     fn command_writes_any(
@@ -290,7 +292,11 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         let mut matches = vec![];
 
         let names = events.iter().filter_map(|event| {
-            let metadata = origin_world.output.item_metadata.get(&event.command);
+            let metadata = origin_world
+                .output
+                .modifiers
+                .item_metadata
+                .get(&event.command);
 
             let name = metadata.try_force_name()?;
 
@@ -305,6 +311,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                     .map(|multiworld_event| {
                         self.worlds[multiworld_event.target_world_index]
                             .output
+                            .modifiers
                             .item_metadata
                             .get(multiworld_event.target_command)
                     }),
@@ -406,6 +413,7 @@ impl<'output> WorldPostprocessor<'output> {
         let mut loc_data_events = FxHashMap::<_, Vec<_>>::default();
 
         for event in output
+            .commands
             .events
             .iter()
             .filter(|event| loc_data_triggers.contains(&event.trigger))
@@ -425,11 +433,13 @@ impl<'output> WorldPostprocessor<'output> {
     fn resolve_item_on(&self, trigger: &Trigger) -> CommandString {
         let names = self
             .output
+            .commands
             .events
             .iter()
             .filter(|event| &event.trigger == trigger)
             .filter_map(|event| {
                 self.output
+                    .modifiers
                     .item_metadata
                     .get(&event.command)
                     .try_force_name()
@@ -503,7 +513,7 @@ impl<'output> MultiworldLookup<'output> {
         let mut unmatched_commands = FxHashMap::default();
 
         for (world_index, output) in worlds.iter().enumerate() {
-            for event in &output.events {
+            for event in &output.commands.events {
                 if let Some(id) = event.trigger.as_multiworld() {
                     match unmatched_triggers.entry(id) {
                         Entry::Occupied(occupied) => {
@@ -630,8 +640,14 @@ impl<Item: ResolvePlaceholders, Operator> ResolvePlaceholders for Operation<Item
 
 impl ResolvePlaceholders for IntermediateOutput {
     fn resolve(&self, context: &mut ResolveContext) {
+        self.commands.resolve(context);
+    }
+}
+
+impl ResolvePlaceholders for CommandsOutput {
+    fn resolve(&self, context: &mut ResolveContext) {
         self.events.resolve(context);
-        self.command_lookup.resolve(context);
+        self.lookup.resolve(context);
     }
 }
 

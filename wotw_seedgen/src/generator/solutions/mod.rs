@@ -34,7 +34,9 @@ use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
     logic_language::output::{Connection, Graph, Requirement},
     seed_language::{
-        output::{CommandVoid, CommonWriteCommand, ContainedWrites, Event, UberStateWrite},
+        output::{
+            CommandVoid, CommandsOutput, CommonWriteCommand, ContainedWrites, UberStateWrite,
+        },
         simulate::{Simulate, Simulation, Snapshot},
     },
     Difficulty, EqIgnore, Shard, Skill, UberIdentifier,
@@ -265,7 +267,7 @@ impl<'graph> World<'graph, '_> {
     pub fn find_solutions(
         &mut self,
         item_pool: &ItemPool,
-        events: &[Event],
+        output: &CommandsOutput,
         slots: usize,
         spirit_light_slots: usize,
         search_radius: Option<u8>,
@@ -274,7 +276,7 @@ impl<'graph> World<'graph, '_> {
         let capped_slots = usize::min(slots, *SOLUTION_MAX_ITEMS);
         let mut solutions = self.find_solutions_no_max_items(
             item_pool,
-            events,
+            output,
             capped_slots,
             spirit_light_slots,
             search_radius,
@@ -285,7 +287,7 @@ impl<'graph> World<'graph, '_> {
 
             solutions = self.find_solutions_no_max_items(
                 item_pool,
-                events,
+                output,
                 slots,
                 spirit_light_slots,
                 search_radius,
@@ -308,7 +310,7 @@ impl<'graph> World<'graph, '_> {
     pub fn find_solutions_no_max_items(
         &mut self,
         item_pool: &ItemPool,
-        events: &[Event],
+        output: &CommandsOutput,
         slots: usize,
         spirit_light_slots: usize,
         search_radius: Option<u8>,
@@ -325,7 +327,7 @@ impl<'graph> World<'graph, '_> {
             .map(|fail| PartialSolution::new(fail.clone(), item_pool, search_radius))
             .collect::<Vec<_>>();
 
-        let mut context = SolutionContext::new(self, events, item_pool, slots, spirit_light_slots);
+        let mut context = SolutionContext::new(self, output, item_pool, slots, spirit_light_slots);
 
         // First going through all untouched solutions is not always, but generally faster.
         // I think it's because solving untouched solutions is cheaper so it's a big win
@@ -349,15 +351,15 @@ impl<'graph> World<'graph, '_> {
         &mut self,
         solution: &S,
         item_pool: &ItemPool,
-        events: &[Event],
+        output: &CommandsOutput,
     ) {
         for item in solution.items() {
-            item_pool[*item].simulate(self, events);
+            item_pool[*item].simulate(self, output);
         }
 
         let spirit_light = solution.spirit_light();
         if spirit_light > 0 {
-            self.add_spirit_light(spirit_light, events);
+            self.add_spirit_light(spirit_light, output);
         }
     }
 }
@@ -456,9 +458,9 @@ impl Commitments {
     }
 }
 
-struct SolutionContext<'world, 'graph, 'settings, 'events, 'pool> {
+struct SolutionContext<'world, 'graph, 'settings, 'output, 'pool> {
     world: &'world mut World<'graph, 'settings>,
-    events: &'events [Event],
+    output: &'output CommandsOutput,
     item_pool: &'pool ItemPool,
     slots: usize,
     spirit_light_slots: usize,
@@ -470,12 +472,12 @@ struct SolutionContext<'world, 'graph, 'settings, 'events, 'pool> {
     perf_counters: IndexMap<usize, u32, FxBuildHasher>,
 }
 
-impl<'world, 'graph, 'settings, 'events, 'pool>
-    SolutionContext<'world, 'graph, 'settings, 'events, 'pool>
+impl<'world, 'graph, 'settings, 'output, 'pool>
+    SolutionContext<'world, 'graph, 'settings, 'output, 'pool>
 {
     fn new(
         world: &'world mut World<'graph, 'settings>,
-        events: &'events [Event],
+        output: &'output CommandsOutput,
         item_pool: &'pool ItemPool,
         slots: usize,
         spirit_light_slots: usize,
@@ -488,7 +490,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
 
         Self {
             world,
-            events,
+            output,
             item_pool,
             slots,
             spirit_light_slots,
@@ -517,7 +519,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.world.snapshot();
 
         self.world
-            .simulate_solution(&solution, self.item_pool, self.events);
+            .simulate_solution(&solution, self.item_pool, self.output);
 
         trace!(
             "resuming with {} and {}",
@@ -934,7 +936,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         C: FnOnce(&mut Commitments) -> bool,
         D: FnOnce(Difficulty) -> bool,
         F: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -969,12 +971,12 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     ) -> ControlFlow<(), PartialSolution<'graph>>
     where
         L: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
         R: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -1003,12 +1005,12 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     where
         C: FnOnce(&mut Commitments) -> bool,
         L: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
         R: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -1148,7 +1150,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         solution.remaining_items.remove(&index);
 
         if simulate {
-            self.item_pool[index].simulate(self.world, self.events);
+            self.item_pool[index].simulate(self.world, self.output);
         }
 
         ControlFlow::Continue(())
@@ -1293,7 +1295,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         if simulate {
             // TODO maybe queue up changes to have fewer reach refreshes?
             for index in items {
-                self.item_pool[index].simulate(self.world, self.events);
+                self.item_pool[index].simulate(self.world, self.output);
             }
         }
 
@@ -1368,7 +1370,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
     where
         I: IntoIterator<Item = T>,
         F: FnMut(
-            &mut SolutionContext<'world, 'graph, 'settings, 'events, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
             PartialSolution<'graph>,
             T,
             bool,
@@ -1403,7 +1405,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
         self.check_redundancy(solution)?;
 
         if simulate {
-            self.world.add_spirit_light(amount, self.events);
+            self.world.add_spirit_light(amount, self.output);
         }
 
         ControlFlow::Continue(())
@@ -1432,7 +1434,7 @@ impl<'world, 'graph, 'settings, 'events, 'pool>
                 );
 
                 self.world
-                    .simulate_solution(solution, self.item_pool, self.events);
+                    .simulate_solution(solution, self.item_pool, self.output);
 
                 let new_reached = self.world.reached_pickup_count() - self.initial_pickup_count;
 
