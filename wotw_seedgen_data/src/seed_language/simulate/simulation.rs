@@ -321,7 +321,7 @@ pub trait Simulation: Sized {
             .filter(|weapon_upgrade| self.weapon_upgrade(*weapon_upgrade))
     }
 
-    // mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/uber_states/uber_state_intercepts.cpp
+    // mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/src/Randomizer/uber_states/uber_state_intercepts.cpp
     fn should_prevent_store(&self, uber_identifier: UberIdentifier, value: UberStateValue) -> bool {
         const WELLSPRING_QUEST: UberIdentifier = UberIdentifier::new(937, 34641);
         const KU_QUEST: UberIdentifier = UberIdentifier::new(14019, 34504);

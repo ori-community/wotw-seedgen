@@ -171,7 +171,7 @@ pub enum TuleyIcon {
 }
 
 // TODO link moved somewhere
-// should mirror https://github.com/ori-community/wotw-rando-client/blob/dev/projects/Core/enums/map_icon.h
+// should mirror https://github.com/ori-community/wotw-rando-client/blob/main/src/Core/enums/map_icon.h
 /// Icons used in the map
 #[derive(
     Debug,

@@ -30,7 +30,7 @@ pub enum EquipSlot {
 
 // TODO try for better error messages than the strum default
 // TODO test equipments and document variants, some don't actually need to be equipped? how does that work
-// Source: https://github.com/ori-community/wotw-rando-client/blob/main/projects/Modloader/app/structs/EquipmentType__Enum.h
+// Source: https://github.com/ori-community/wotw-rando-client/blob/main/src/Modloader/app/structs/EquipmentType__Enum.h
 /// Abilities which have to be equipped before use
 #[derive(
     Debug,

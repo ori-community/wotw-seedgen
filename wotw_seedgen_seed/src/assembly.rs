@@ -44,7 +44,7 @@ pub enum Trigger {
 
 /// A Command, which may be used to affect the world, player or client state
 ///
-/// Mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/projects/Randomizer/seed/instructions
+/// Mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/src/Randomizer/seed/instructions
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Command {
     /// Push an empty stack frame
