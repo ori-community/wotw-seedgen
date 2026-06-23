@@ -46,7 +46,14 @@ pub struct World<'graph, 'settings> {
     pub(crate) settings: &'settings WorldSettings,
     pub(crate) reach: Reach<'graph>,
     state: SimulationCache<WorldState>,
-    updating_reach: bool,
+    reach_update_state: ReachUpdateState,
+}
+
+#[derive(Debug)]
+enum ReachUpdateState {
+    Idle,
+    Updating,
+    PendingOrbReset,
 }
 
 impl<'graph, 'settings> World<'graph, 'settings> {
@@ -65,7 +72,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             graph,
             spawn,
             settings,
-            updating_reach: false,
+            reach_update_state: ReachUpdateState::Idle,
             reach: Reach::new(graph),
         }
     }

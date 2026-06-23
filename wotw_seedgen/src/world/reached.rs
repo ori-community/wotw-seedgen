@@ -1,7 +1,6 @@
 use std::{
     fmt::{self, Display},
     hash::Hash,
-    mem,
     ops::{ControlFlow, Deref},
 };
 
@@ -9,7 +8,7 @@ use super::World;
 use crate::{
     logical_difficulty::LogicalDifficulty,
     orbs::{self, format_orb_variants, OrbVariants},
-    world::{GraphRef, Missing},
+    world::{GraphRef, Missing, ReachUpdateState},
 };
 use itertools::Itertools;
 use log::trace;
@@ -465,7 +464,10 @@ impl<'graph> World<'graph, '_> {
             inventory = self.inventory_display(),
         );
 
-        let was_updating_reach = mem::replace(&mut self.updating_reach, true);
+        let was_idle = matches!(self.reach_update_state, ReachUpdateState::Idle);
+        if was_idle {
+            self.reach_update_state = ReachUpdateState::Updating;
+        }
 
         self.check_states_for(uber_identifier);
 
@@ -476,16 +478,20 @@ impl<'graph> World<'graph, '_> {
             }
         }
 
-        if !was_updating_reach {
-            if self.settings.difficulty.may_increase_orbs(uber_identifier)
-                && !self.reach.state.fails.is_empty()
-            {
-                self.reach.state.clear();
+        if self.settings.difficulty.may_increase_orbs(uber_identifier)
+            && !self.reach.state.fails.is_empty()
+        {
+            self.reach_update_state = ReachUpdateState::PendingOrbReset;
+        }
 
-                self.traverse_spawn(output);
-            }
+        if was_idle && matches!(self.reach_update_state, ReachUpdateState::PendingOrbReset) {
+            trace!("resetting reach after orb change");
 
-            self.updating_reach = false;
+            self.reach.state.clear();
+
+            self.traverse_spawn(output);
+
+            self.reach_update_state = ReachUpdateState::Idle;
         }
     }
 
