@@ -24,9 +24,10 @@ use crate::{
     },
     Position, ShopKind, UberIdentifier, Zone,
 };
+use indexmap::IndexMap;
 use itertools::Itertools;
 use rand_pcg::Pcg64Mcg;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
 
 pub fn postprocess(
     worlds: &mut [&mut IntermediateOutput],
@@ -67,7 +68,7 @@ pub struct UniversePostprocessor<'output, 'locdata> {
 
 struct WorldPostprocessor<'output> {
     output: &'output IntermediateOutput,
-    loc_data_events: FxHashMap<&'output Trigger, Vec<&'output Event>>,
+    loc_data_events: IndexMap<&'output Trigger, Vec<&'output Event>, FxBuildHasher>,
 }
 
 struct LocDataTriggers<'locdata> {
@@ -410,7 +411,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
 
 impl<'output> WorldPostprocessor<'output> {
     fn new(output: &'output IntermediateOutput, loc_data_triggers: &LocDataTriggers) -> Self {
-        let mut loc_data_events = FxHashMap::<_, Vec<_>>::default();
+        let mut loc_data_events = IndexMap::<_, Vec<_>, FxBuildHasher>::default();
 
         for event in output
             .commands
