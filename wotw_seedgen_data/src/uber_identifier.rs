@@ -126,7 +126,7 @@ impl UberIdentifier {
         }
     }
 
-    /// Returns `true` if this `UberIdentifier` corresponds to a entrance connection state
+    /// Returns `true` if this `UberIdentifier` corresponds to an entrance connection state
     pub const fn is_entrance(self) -> bool {
         self.group == 27
     }
