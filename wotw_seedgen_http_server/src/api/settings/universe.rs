@@ -5,7 +5,7 @@ use axum::{
 };
 use constcat::concat;
 use serde::Deserialize;
-use utoipa::OpenApi;
+use utoipa::{IntoParams, OpenApi};
 use wotw_seedgen::data::UniverseSettings;
 
 use crate::{RouterState, settings::inline_universe_snippets};
@@ -30,13 +30,14 @@ pub struct Docs;
 #[utoipa::path(
     get,
     path = NEW,
+    params(NewQuery),
     responses((status = OK, body = UniverseSettings)),
 )]
 async fn new(Query(query): Query<NewQuery>) -> Json<UniverseSettings> {
     Json(UniverseSettings::new(query.seed))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, IntoParams)]
 pub struct NewQuery {
     pub seed: String,
 }
