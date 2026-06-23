@@ -137,9 +137,11 @@ impl UberIdentifier {
     pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 3); // TODO client needs to add this
     pub const CLEAN_WATER: UberIdentifier = UberIdentifier::new(RANDO_STATE_GROUP, 2000);
     pub const BASE_MAX_HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 10);
-    pub const HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 11);
+    pub const MAX_HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 11);
+    pub const HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 12);
     pub const BASE_MAX_ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 20);
-    pub const ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 21);
+    pub const MAX_ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 21);
+    pub const ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 22);
     pub const RANDOM_SPIRIT_LIGHT: UberIdentifier = UberIdentifier::new(SETTINGS_GROUP, 0);
 }
 

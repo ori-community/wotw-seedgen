@@ -67,11 +67,10 @@ pub fn health_fragment() -> CommandVoid {
             item_message(health_fragment_string(false)),
             add_integer(UberIdentifier::BASE_MAX_HEALTH, 5),
             // TODO reimplement fragment overflow bug?
-            // TODO but MAX_HEALTH is just the base max health!
             store_integer(
                 UberIdentifier::HEALTH,
                 CommandInteger::FetchInteger {
-                    uber_identifier: UberIdentifier::BASE_MAX_HEALTH,
+                    uber_identifier: UberIdentifier::MAX_HEALTH,
                 },
             ),
         ],
