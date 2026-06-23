@@ -484,12 +484,14 @@ impl<'graph> World<'graph, '_> {
             self.reach_update_state = ReachUpdateState::PendingOrbReset;
         }
 
-        if was_idle && matches!(self.reach_update_state, ReachUpdateState::PendingOrbReset) {
-            trace!("resetting reach after orb change");
+        if was_idle {
+            if matches!(self.reach_update_state, ReachUpdateState::PendingOrbReset) {
+                trace!("resetting reach after orb change");
 
-            self.reach.state.clear();
+                self.reach.state.clear();
 
-            self.traverse_spawn(output);
+                self.traverse_spawn(output);
+            }
 
             self.reach_update_state = ReachUpdateState::Idle;
         }
