@@ -643,6 +643,14 @@ impl<'world, 'graph, 'settings, 'output, 'pool>
             aborted = self.display_solution(&aborted),
         );
 
+        if self
+            .aborted
+            .iter()
+            .any(|other| trace_is_redundant_with(&aborted, other, self.world.graph, self.item_pool))
+        {
+            return;
+        }
+
         self.aborted.retain(|other| {
             !trace_is_redundant_with(other, &aborted, self.world.graph, self.item_pool)
         });
