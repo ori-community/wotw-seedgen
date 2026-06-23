@@ -390,46 +390,31 @@ pub struct FunctionArg {
 }
 
 macro_rules! function_signatures {
-    (@acc $self:ident [$identifier:ident($($arg_identifier:ident: $ty:tt),*) -> $return_ty:tt, $($more:tt)*] -> [$($acc:tt)*]) => {
-        function_signatures!(@acc $self [$($more)*] -> [$($acc)*
-            FunctionIdentifier::$identifier => FunctionSignature {
-                args: function_signatures!(@args $($arg_identifier: $ty),*),
-                return_ty: Some($return_ty),
-            },
-        ])
+    (@return_ty) => {
+        None
     };
 
-    (@acc $self:ident [$identifier:ident($($arg_identifier:ident: $ty:tt),*), $($more:tt)*] -> [$($acc:tt)*]) => {
-        function_signatures!(@acc $self [$($more)*] -> [$($acc)*
-            FunctionIdentifier::$identifier => FunctionSignature {
-                args: function_signatures!(@args $($arg_identifier: $ty),*),
-                return_ty: None,
-            },
-        ])
+    (@return_ty $return_ty:ident) => {
+        Some($return_ty)
     };
 
-    (@acc $self:ident [] -> [$($acc:tt)*]) => {
-        {
-            use Type::*;
+    ($self:ident, $($identifier:ident($($arg_identifier:ident: $arg_ty:ident),*) $(-> $return_ty:ident)?),* $(,)?) => {{
+        use Type::*;
 
-            match $self {
-                $($acc)*
-            }
+        match $self {
+            $(
+                Self::$identifier => FunctionSignature {
+                    args: smallvec![
+                        $(FunctionArg {
+                            identifier: Cow::Borrowed(stringify!($arg_identifier)),
+                            ty: $arg_ty,
+                        }),*
+                    ],
+                    return_ty: function_signatures!(@return_ty $($return_ty)?),
+                },
+            )*
         }
-    };
-
-    (@args $($arg_identifier:ident: $ty:tt),*) => {
-        smallvec![
-            $(FunctionArg {
-                identifier: Cow::Borrowed(stringify!($arg_identifier)),
-                ty: $ty,
-            }),*
-        ]
-    };
-
-    ($self:ident, $($items:tt)*) => {
-        function_signatures!(@acc $self [$($items)*] -> [])
-    };
+    }};
 }
 
 impl FunctionIdentifier {
