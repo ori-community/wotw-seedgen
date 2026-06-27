@@ -619,6 +619,10 @@ pub enum CommandVoid {
         y: CommandFloat,
         label: CommandString,
     },
+    /// Marks spoiler map icon with id `id` as collected
+    MarkSpoilerMapIconCollected {
+        id: usize,
+    },
     /// Create a spirit well icon that you can warp to on the map at (`x`, `y`)
     CreateWarpIcon {
         id: usize,

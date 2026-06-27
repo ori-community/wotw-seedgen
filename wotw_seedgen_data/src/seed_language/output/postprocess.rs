@@ -280,7 +280,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             }
 
             if let Some(map_position) = map_position {
-                self.generate_spoiler_defaults(next_spoiler_icon_id, map_position, name, &matches, &mut extra_events);
+                self.generate_spoiler_defaults(next_spoiler_icon_id, trigger, map_position, name, &matches, &mut extra_events);
                 next_spoiler_icon_id += 1;
             }
         }
@@ -389,6 +389,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
     fn generate_spoiler_defaults(
         &self,
         spoiler_icon_id: usize,
+        trigger: &Trigger,
         map_position: Position,
         name: CommandString,
         matches: &[ItemMetadataRef<'output, 'output>],
@@ -411,6 +412,13 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             y: map_position.y.into(),
             label,
         }));
+
+        extra_events.push(Event {
+            trigger: trigger.clone(),
+            command: CommandVoid::MarkSpoilerMapIconCollected {
+                id: spoiler_icon_id,
+            },
+        })
     }
 }
 
@@ -927,8 +935,9 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::DestroyWheelItem { .. }
             | Self::SwitchWheel { .. }
             | Self::ResetAllWheels {}
-            | Self::CloseMenu {} => {}
-            Self::CloseWeaponWheel {} => {}
+            | Self::CloseMenu {}
+            | Self::CloseWeaponWheel {}
+            | Self::MarkSpoilerMapIconCollected { .. } => {}
         }
     }
 }

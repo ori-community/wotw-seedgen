@@ -345,6 +345,9 @@ impl Display for CommandVoid {
             CommandVoid::CreateSpoilerMapIcon { id, icon, x, y, label } => {
                 write!(f, "create_spoiler_map_icon({id}, {icon}, {x}, {y}, {label})")
             }
+            CommandVoid::MarkSpoilerMapIconCollected { id } => {
+                write!(f, "mark_spoiler_map_icon_collected({id})")
+            }
             CommandVoid::CreateWarpIcon { id, x, y } => {
                 write!(f, "create_warp_icon({id}, {x}, {y})")
             }

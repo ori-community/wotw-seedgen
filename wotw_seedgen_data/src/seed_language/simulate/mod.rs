@@ -363,6 +363,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::EnableServerSync { .. }
             | CommandVoid::DisableServerSync { .. }
             | CommandVoid::CreateSpoilerMapIcon { .. }
+            | CommandVoid::MarkSpoilerMapIconCollected { .. }
             | CommandVoid::SetWarpIconLabel { .. }
             | CommandVoid::SetShopItemPrice { .. }
             | CommandVoid::SetShopItemName { .. }

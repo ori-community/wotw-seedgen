@@ -559,6 +559,8 @@ impl Compile for input::CommandVoid {
                 .float(1, y)
                 .string(0, label)
                 .call(Command::CreateSpoilerMapIcon(id, icon), MemoryUsed::ZERO),
+            Self::MarkSpoilerMapIconCollected { id } => Args::new(context)
+                .call(Command::MarkSpoilerMapIconCollected(id), MemoryUsed::ZERO),
             Self::CreateWarpIcon { id, x, y } => Args::new(context)
                 .float(0, x)
                 .float(1, y)
