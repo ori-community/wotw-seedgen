@@ -216,7 +216,7 @@ pub enum Command {
     /// Stop syncing `uber_identifier` in co-op
     DisableServerSync(/*uber_identifier*/ UberIdentifier),
     /// Create `icon` at (Float Memory 0, Float Memory 1) with the label set to String Memory 0
-    CreateSpoilerMapIcon(/*icon*/ MapIcon),
+    CreateSpoilerMapIcon(/*id*/ usize, /*icon*/ MapIcon),
     /// Create a spirit well map icon with `id` that you can warp to at (Float Memory 0, Float Memory 1)
     CreateWarpIcon(/*id*/ usize),
     /// If `id` refers to an existing spirit well icon, set its label to String Memory 0

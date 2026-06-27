@@ -64,6 +64,7 @@ pub struct UniversePostprocessor<'output, 'locdata> {
     worlds: Vec<WorldPostprocessor<'output>>,
     loc_data_triggers: LocDataTriggers<'locdata>,
     multiworld_lookup: MultiworldLookup<'output>,
+
 }
 
 struct WorldPostprocessor<'output> {
@@ -242,6 +243,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         rng: &mut Pcg64Mcg,
     ) -> Vec<Event> {
         let mut extra_events = vec![];
+        let mut next_spoiler_icon_id = 0usize;
 
         for (trigger, events) in &world.loc_data_events {
             let shop_identifier = trigger
@@ -278,7 +280,8 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             }
 
             if let Some(map_position) = map_position {
-                self.generate_spoiler_defaults(map_position, name, &matches, &mut extra_events);
+                self.generate_spoiler_defaults(next_spoiler_icon_id, map_position, name, &matches, &mut extra_events);
+                next_spoiler_icon_id += 1;
             }
         }
 
@@ -385,6 +388,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
 
     fn generate_spoiler_defaults(
         &self,
+        spoiler_icon_id: usize,
         map_position: Position,
         name: CommandString,
         matches: &[ItemMetadataRef<'output, 'output>],
@@ -401,6 +405,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         };
 
         extra_events.push(Event::on_reload(CommandVoid::CreateSpoilerMapIcon {
+            id: spoiler_icon_id,
             icon,
             x: map_position.x.into(),
             y: map_position.y.into(),

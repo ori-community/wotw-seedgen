@@ -613,6 +613,7 @@ pub enum CommandVoid {
     },
     /// Create `icon` at (`x`, `y`) with the label set to `label`
     CreateSpoilerMapIcon {
+        id: usize,
         icon: MapIcon,
         x: CommandFloat,
         y: CommandFloat,

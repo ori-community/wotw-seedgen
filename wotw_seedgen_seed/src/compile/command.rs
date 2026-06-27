@@ -554,11 +554,11 @@ impl Compile for input::CommandVoid {
                 vec![Command::DisableServerSync(uber_identifier)],
                 MemoryUsed::ZERO,
             ),
-            Self::CreateSpoilerMapIcon { icon, x, y, label } => Args::new(context)
+            Self::CreateSpoilerMapIcon { id, icon, x, y, label } => Args::new(context)
                 .float(0, x)
                 .float(1, y)
                 .string(0, label)
-                .call(Command::CreateSpoilerMapIcon(icon), MemoryUsed::ZERO),
+                .call(Command::CreateSpoilerMapIcon(id, icon), MemoryUsed::ZERO),
             Self::CreateWarpIcon { id, x, y } => Args::new(context)
                 .float(0, x)
                 .float(1, y)
