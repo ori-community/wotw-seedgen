@@ -8920,7 +8920,7 @@ anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (whe
       Launch
       DoubleJump, Bash, Grenade=1
       DoubleJump, SentryJump=2  # one extra to let the player figure out where to sjump
-    # kii:
+    kii: Bash, Grenade=2
       # Glitched
       # SentryJump=1
       # AerialHammerJump, TripleJump OR GlideJump
@@ -8950,23 +8950,34 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
       Launch
       DoubleJump, TripleJump, Damage=60
       DoubleJump, TripleJump, Bash, Damage=30
+      # Glitched
+      # AerialHammerJump, TripleJump OR Damage=15
+      # Damage=15, GrenadeJump=1, Damage=15, GrenadeJump=1, Bash  # not bashing the last plant because you could throw your grenade at it
+      # Damage=15, GrenadeJump=1, Damage=15, GrenadeJump=1, DoubleJump, Dash
+      # Damage=15, GrenadeJump=1, Damage=15, DoubleJump, TripleJump 
+      # Damage=15, SwordSJump=1, Damage=15, SwordSJump=1
+      # Damage=15, SwordSJump=1, Damage=15, DoubleJump, TripleJump
+      # Damage=15, SwordSJump=1, Bash
     unsafe:
-      DoubleJump, TripleJump, Damage=45
-      DoubleJump, TripleJump, Bash, Damage=15
+      AerialHammerJump
       DoubleJump, Damage=45, Dash OR Shuriken=2
-      DoubleJump, Damage=15, TripleJump OR Bash
+      DoubleJump, Damage=15, TripleJump OR Bash OR GrenadeJump
+      SwordSJump=1, Damage=15
+      GrenadeJump, Damage=30
   conn WoodsMain.BeforeLog:  # moki paths are solved with the Teleporter->AbovePit->OrangeTree connection. Make sure this isn't redundant with Teleporter->OrangeTree->BeforeLog
     gorlek, WoodsMain.LogBlobDestroyed:
-      DoubleJump, Combat=2xBalloon, Hammer OR Sword OR TripleJump
+      DoubleJump, Combat=2xBalloon, TripleJump OR Hammer OR Sword
       SentryJump=1, Combat=2xBalloon OR Dash
       Bash, Grenade=1, Combat=2xBalloon OR Dash
-      Launch
     kii, WoodsMain.LogBlobDestroyed:
-      Combat=Balloon, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # only need to kill the first balloon
-      Damage=20, DoubleJump, Sword OR Hammer OR TripleJump OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # dboost on the first balloon to kill it
-      DoubleJump, Dash
+      DoubleJump, TripleJump OR Hammer OR Sword 
+      Bash, Grenade=1
+      # Glitched
+      # GlideJump OR SentryJump
     unsafe, WoodsMain.LogBlobDestroyed:
-      DoubleJump
+      DoubleJump OR GlideJump OR SentryJump=1 OR SpearJump=1 OR AbilitySwap=1
+      Dash, Hammer  # dash ramp
+      Bash, Grenade=1
 
 anchor WoodsMain.OrangeTree at 1030, -4010:  # At the right of the tree above the teleporter
   conn WoodsMain.AbovePit:
