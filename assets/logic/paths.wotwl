@@ -8966,6 +8966,7 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
       SwordSJump=1, Damage=15
       GrenadeJump, Damage=30
   conn WoodsMain.BeforeLog:  # moki paths are solved with the Teleporter->AbovePit->OrangeTree connection. Make sure this isn't redundant with Teleporter->OrangeTree->BeforeLog
+    # TODO: add moki paths. It's only relevant for custom headers which solves WoodsMain.LogBlobDestroyed and I feel too lazy to care about it right now
     gorlek, WoodsMain.LogBlobDestroyed:
       DoubleJump, Combat=2xBalloon, TripleJump OR Hammer OR Sword
       SentryJump=1, Combat=2xBalloon OR Dash
@@ -9026,11 +9027,14 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
   refill Energy=3:  # the crystal in the pit
     unsafe: BreakCrystal, Bash, DoubleJump OR Dash OR Glide OR Launch  # technically just Bash
 
-  conn WoodsMain.Teleporter:  # a dead end in moki
+  conn WoodsMain.Teleporter:
+    # TODO: add moki paths when WoodsMain.Teleporter->WoodsMain.BeforeLog gets some as well. Right now, it's a dead end s not worth pathfinding it.
     gorlek: DoubleJump OR Dash OR Glide OR Launch OR Sword OR Damage=15
     kii:
       Hammer OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2 OR Damage=15
       Bash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    unsafe:
+      PauseFloat OR AbilitySwap=1 
   conn WoodsMain.OrangeTree:
     moki: Bash OR Glide OR Launch
     gorlek:
@@ -9042,7 +9046,7 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
       Damage=30, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Hammer, DoubleJump OR Dash
     unsafe:
-      Damage=30
+      AbilitySwap=1 OR Damage=15
   conn WoodsMain.FeedingGrounds:
     moki:
       DoubleJump, Dash OR Bash
@@ -9055,6 +9059,9 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
     kii:
       Dash OR DoubleJump OR Hammer OR Blaze=4 OR Sentry=2
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Shuriken=2 OR AbilitySwap=1
+      GrenadeCancel, Bash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn WoodsShrine:  # Make sure this isn't redundant with AbovePit->FeedingGrounds->WoodsShrine
     gorlek: Damage=15, DoubleJump OR Dash
     kii:
