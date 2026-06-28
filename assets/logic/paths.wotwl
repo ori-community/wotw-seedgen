@@ -5793,7 +5793,9 @@ anchor GladesShrine at -635, -4020:
       Damage=65  # the crabs are terrifying!
       Damage=55, DoubleJump OR Dash  # these can help
       Damage=30, Launch  # if you're op, nothing's terrifying
-    unsafe: Combat=2xCrab+Bee+3xEnergyRefill+Hornbug+2xTentacle+3xEnergyRefill+2xSpinCrab+2xBee+3xEnergyRefill+2xMantis+Tentacle+SpinCrab
+    unsafe:
+      Combat=2xCrab+Bee+3xEnergyRefill+Hornbug+2xTentacle+3xEnergyRefill+2xSpinCrab+2xBee+3xEnergyRefill+2xMantis+Tentacle+SpinCrab
+      Bash
 
   pickup WestGlades.CombatShrine:
     moki: WestGlades.CombatShrineCompleted
@@ -11728,7 +11730,9 @@ anchor DepthsShrine at 213, -4515:
       Damage=65
       Damage=60, DoubleJump OR Dash
       Damage=50, Launch
-    unsafe: Combat=3xBat+4xEnergyRefill+2xSneezeSlug+2xTentacle+4xEnergyRefill+2xBat+2xTentacle+4xEnergyRefill+Bat+SneezeSlug
+    unsafe:
+      Combat=3xBat+4xEnergyRefill+2xSneezeSlug+2xTentacle+4xEnergyRefill+2xBat+2xTentacle+4xEnergyRefill+Bat+SneezeSlug
+      Bash
 
   pickup LowerDepths.CombatShrine:
     moki: LowerDepths.CombatShrineCompleted
