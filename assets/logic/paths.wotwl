@@ -8936,6 +8936,7 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
   state WoodsMain.LogBlobDestroyed:  # these can break the corruption from behind
     gorlek: Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1
+    #kii: ShurikenBreak=3
     unsafe:
       ShurikenBreak=3
       DoubleJump, Glide, Damage=20  # use the balloon
@@ -8980,21 +8981,41 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
       Bash, Grenade=1
 
 anchor WoodsMain.OrangeTree at 1030, -4010:  # At the right of the tree above the teleporter
+  refill Health=1
+
   conn WoodsMain.AbovePit:
     moki: Bash OR Glide OR Launch
     gorlek:
       DoubleJump
       Dash
-    kii: Sword  # Pogo the plant
-    unsafe: Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
-  conn WoodsMain.BeforeLog:
+    kii:
+      Sword  # Pogo the plant
+      # Glitched
+      # Damage=15, GrenadeJump=1
+    unsafe:
+      PauseFloat OR AbilitySwap=1
+      Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
+      Damage=15, Flash=1 OR Sentry=1  # https://youtu.be/ushsm4euT48
+      Damage=15, GrenadeJump
+  conn WoodsMain.BeforeLog:  # Make sure it's not redundant with paths going through the teleporter
     moki:
       Launch
     gorlek:
       SentryJump=1, DoubleJump
       DoubleJump, Bash, Grenade=1
-    kii: Bash
+    kii:
+      Bash
+      # Glitched
+      # HammerSJump=1  # Sword is redundant with going through the teleporter
+      # DoubleJump, TripleJump, GlideJump
+    unsafe:
+      HammerSJump=1  # Sword is redundant with going through the teleporter
+      DoubleJump, TripleJump
+      GlideJump, DoubleJump, Spear=1 OR Flash=1
+      GlideJump, DoubleJump, Shuriken=2  # throw a shuriken at the tre to make it wobble so a glidejump+djump+shuriken is enough to make it on top of the tree. Only relevant because you need ShurikenBreak to go through the teleporter
+      DoubleJump, SpearJump=1, Spear=1 OR Shuriken=1 OR Flash=1
   conn WoodsMain.Teleporter:  # make sure it's not redundant with ->AbovePit->Teleporter and also make sure that it is necessary, since you can only get to BeforeLog or AbovePit with this, which both already have their respective connections from this anchor
+    gorlek: Damage=15, Sword OR Hammer
     kii:
       Sentry=3
       Damage=15, Sentry=1 OR Shuriken=1
