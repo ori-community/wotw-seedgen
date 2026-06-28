@@ -8829,35 +8829,49 @@ anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
 
   state WoodsMain.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: DoubleJump, Dash
-    kii: DoubleJump, Glide
+    kii:
+      DoubleJump, Glide
+      # Glitched
+      # GlideJump, DoubleJump OR Dash
+    unsafe: GlideJump
 
   pickup WoodsMain.OverflowShard:
     moki:
       DoubleJump, Dash OR Glide
       Launch
     gorlek: DoubleJump OR Dash OR Glide
-    kii:
+    kii:  # no GrenadeJump paths because throwing a grenade at the bubble breaks it
       Sentry=2
       Sword, Sentry=1 OR Shuriken=1 OR Flash=1
       Hammer, Sentry=1 OR Shuriken=1 OR Flash=1
+    unsafe:
+      PauseFloat OR AbilitySwap=1
+      GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Bow=1
 
-  conn WoodsMain.MidwayTrial:
-    gorlek: Glide
-  conn WoodsMain.AboveHowl:
-    gorlek: DoubleJump OR Bash OR Sword OR Hammer
-  conn WoodsMain.BeforeLog:  # check for redundancies with AboveHowl and MidwayTrial
-    moki: DoubleJump, Dash OR Bash OR Glide
-    gorlek: Dash
-    kii: Sentry=2 OR Shuriken=1
+  # From here, you can also access WoodsMain.MidwayTrial. So far, going to WoodsMain.MidwayTrial from here doesn't do anything beneficial.
+  # (no pickups, OrangeTree already reachable from here, no point in going to the start of the trial if you can't beat it and having skills to beat it means you can access it from AboveHowl first)
+  # WoodsMain.AboveHowl also accessible but paths can access WoodsMain.BeforeLog directly and then go to AboveHowl for free
+
+  conn WoodsMain.BeforeLog:
+    moki: DoubleJump, Dash OR Bash OR Glide OR Launch
+    gorlek: DoubleJump OR Dash OR Bash OR Glide OR Launch OR Sword OR Hammer
+    kii: Shuriken=1 OR Sentry=2 OR Damage=15
+    unsafe:
+      Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap OR PauseFloat
+      GrenadeJump, Bow=1, GrenadeCancel  # can't use an implicite GrenadeCancel because you need enough energy to use grenade after you used bow
   conn WoodsMain.OrangeTree:  # make sure it's not redundant with ->BeforeLog->OrangeTree
     gorlek:
       Glide
       Burrow, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
     kii:
-      Burrow, DoubleJump OR Dash OR Sentry=5
+      Burrow, DoubleJump OR Dash OR Sword OR Sentry=5
+      DoubleJump, TripleJump OR Dash OR Sword OR Hammer
+      DoubleJump, Bash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Dash, Bash OR Sword OR Hammer OR Sentry=2 OR Damage=15
     unsafe:
       Burrow, Shuriken=4  # not in kii cause you use 2 shurikens in a row
-      Burrow, Sword
+      Dash  # Land in friendly spikes right of the bashable plant
+      PauseFloat
 
 anchor WoodsMain.AboveHowl at 907, -4044:  # At the semisolid above silenced Howl
   pickup WoodsMain.CollapsingOwlSL: free
