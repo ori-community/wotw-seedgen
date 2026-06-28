@@ -9143,7 +9143,11 @@ anchor WoodsShrine at 1361, -4068:
       Damage=80
       Damage=65, DoubleJump OR Dash
       Damage=50, Launch
-    unsafe: Combat=Hornbug+Lizard+3xSkeeto+4xEnergyRefill+2xCrystalMiner+Bat+4xEnergyRefill+9xBalloon+4xEnergyRefill+4xMantis+Bat
+    unsafe:
+      Combat=Hornbug+Lizard+3xSkeeto+4xEnergyRefill+2xCrystalMiner+Bat+4xEnergyRefill+1xBalloon+4xEnergyRefill+4xMantis+Bat
+      Combat=Hornbug+Lizard+3xSkeeto+4xEnergyRefill+2xCrystalMiner+Bat+4xEnergyRefill, Damage=15 OR Flap:
+        Combat=4xEnergyRefill+4xMantis+Bat
+      Bash, Combat=Balloon OR Flap OR Damage=15  # bash everything in the spikes to the left / use spider projectile. Dboost in the spikes then trigger one balloon explosion
 
   pickup WoodsMain.ShrineSL: free
   pickup WoodsMain.CombatShrine:
