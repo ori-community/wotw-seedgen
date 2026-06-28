@@ -8888,12 +8888,15 @@ anchor WoodsMain.AboveHowl at 907, -4044:  # At the semisolid above silenced How
       Bash, Grenade=1, Dash OR Damage=20
       SentryJump=1, Combat=Balloon OR Dash OR Damage=20
     kii:
-      DoubleJump OR Launch
-      Bash
+      DoubleJump OR Launch OR Bash
       Hammer, Glide OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # GlideJump OR SentryJump=1 OR GrenadeJump=1
     unsafe:
       Sword  # pogo the skeeto twice (enemy behaviour not easily readable, therefore not kii)
       Hammer  # Precise walljump
+      GrenadeJump OR GlideJump OR AbilitySwap=2
+      SpearJump=1, Spear=1 OR Flash=1 OR Sentry=1
 
 anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (where shriek chases you and ku)
   refill Checkpoint:  # at 980, -4015
@@ -8917,9 +8920,15 @@ anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (whe
       Launch
       DoubleJump, Bash, Grenade=1
       DoubleJump, SentryJump=2  # one extra to let the player figure out where to sjump
+    # kii:
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump OR GlideJump
+      # GrenadeJump=1, DoubleJump, TripleJump
     unsafe:
       Bash, Grenade=1  # too precise
-      SentryJump=1
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR AbilitySwap=2
+      GrenadeJump, DoubleJump OR GlideJump
 
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   refill Full
