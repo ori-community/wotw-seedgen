@@ -5559,7 +5559,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
 
   state LowerReach.BearSneezed:
     moki:
-      Flap
+      Flap OR LowerReach.ForestsMemory  # Completing the escape wake up Baur
       BaurWithBlaze, Blaze
       BaurWithFlash, Flash
 
@@ -9196,7 +9196,7 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap
+    moki: Flap OR LowerReach.ForestsMemory  # Completing the escape wake up Baur
   state LowerReach.ThawBaurFurnace:
     moki, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       Bash, Flap
@@ -10371,30 +10371,6 @@ anchor LowerReach.SnowEscape at 79, -3733:
   refill Full
 
   quest LowerReach.ForestsMemory:  # currently based on the requirements of getting here to simplify
-    moki:
-      Dash, Bash, Grapple, Glide, Water OR DoubleJump
-      Bash, Glide, Launch
-    gorlek:
-      Launch, Water OR Glide OR Damage=20
-      Dash, Glide, DoubleJump, TripleJump OR Damage=20
-      Dash, Glide, Grapple
-    kii:
-      Launch
-      Dash, DoubleJump, TripleJump OR Glide
-      DoubleJump, Glide, Bash
-      Glide, Grapple, Bash, Water, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Glide, Grapple, Bash, Damage=20, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Glide, Sentry=2
-      DoubleJump, Glide
-      Dash, Glide, Damage=20
-      SentryJump=1, DoubleJump, Dash, TripleJump  # Same path than above but the sjump ease it
-      SentryJump=2, DoubleJump, Dash  # 1st sjump on a friendly spike and 2nd one on the branch to pass the 1st wind column
-      SentryJump=3, Dash, Grapple OR Damage=20
-      Dash, SentryJump=4
-      FlashSwap  # Dodging the water is scary but totally doable.
-
-  state LowerReach.BearSneezed:  # Same paths as LowerReach.ForestsMemory (when finishing the escape, Baur isn't blocking the Reach entrance anymore)
     moki:
       Dash, Bash, Grapple, Glide, Water OR DoubleJump
       Bash, Glide, Launch
