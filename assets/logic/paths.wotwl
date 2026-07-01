@@ -7954,7 +7954,7 @@ anchor WoodsEntry.BellowHut at 478, -4205:  # Bellow the hut, at the checkpoint 
       # Glitched
       # SentryJump=1 OR LaunchSwap
       # AerialHammerJump, TripleJump, Dash OR Glide OR Sword  # works by either going to WoodsEntry.LedgeOre and then going to the hut without using hjumps or by going to WoodsEntry.HutRightSL and use hjump once you're under the hut
-      # AerialHAmmerJump, TripleJump, Bash  # bash a mortar projectile first
+      # AerialHammerJump, TripleJump, Bash  # bash a mortar projectile first
     unsafe: Bash  # Use the mortar
 
 # checkpoint at 525, -4205
@@ -9097,7 +9097,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       Burrow  # If doing cat and mouse, burrow below first to reset shriek aggression then burrow to the TP
       Glide, DoubleJump, TripleJump
       Glide, Grapple, DoubleJump OR Dash
-      Grapple, SentryJump=1, DoubleJump
+      Grapple, SentryJump=1, DoubleJump OR Dash
       WindtornRuins.Seir:  # these wouldn't solve without Seir
         SentryJump=1, DoubleJump, TripleJump  # tjump+up slash to reach the grappable surface
         Bash, Grenade=1, Grapple
@@ -9111,14 +9111,33 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       Bash, Grenade=1, DoubleJump, Hammer, Flash=1 OR Sentry=1
       Bash, Grenade=1, DoubleJump, TripleJump  # if you are doing the escape, use the hiding spot. if you have seir, use a bashnade
       WindtornRuins.Seir:  # these wouldn't solve without Seir
+        Glide, Grapple  # don't actually need seir but avoiding the need to figure out getting a grounded jump from the last hidding spot while in the chase
         Glide, Bash, Grenade=1, DoubleJump OR Dash
         Bash, Grenade=2, DoubleJump
+      # Glitched
+      # AerialHammerJump, TripleJump OR Dash OR Glide OR SentryJump=1  # Condition is for passing the wind updraft 
+      # GlideJump, DoubleJump
+      # GlideJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=2, Glide, DoubleJump OR Dash
+      # SentryJump=1 OR Glide:  # For the wind updraft:
+      #   SwordSJump=2, Dash
+      #   SwordSJump=1, DoubleJump  # djump+upslash to the 2nd hidding spot to save one sjump over dash 
+      #   HammerSJump=1, DoubleJump, Dash OR Sword
+      # WindtornRuins.Seir:
+      #   AerialHammerJump
     unsafe:
-      DoubleJump, TripleJump, Damage=30  # damage for when you get seir
+      Glide, Grapple
+      DoubleJump, TripleJump, Damage=15  # damage for when you get seir
       DoubleJump, Bash, Grenade=1
       Glide, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
       Bash, Grenade=1, DoubleJump, Hammer, Shuriken=1  # not in kii because it is very easy to knock away your safe spot with the shuriken
-      DoubleJump, GrenadeJump
+      AerialHammerJump
+      GlideJump, DoubleJump OR Dash
+      GrenadeJump, DoubleJump OR Glide
+      SentryJump=1 OR Glide:  # For the wind updraft:
+        SwordSJump=2, Dash
+        SwordSJump=1, DoubleJump  # djump+upslash to the 2nd hidding spot to save one sjump over dash 
+        HammerSJump=1, DoubleJump, Dash OR Sword
   conn WoodsMain.AbovePit:
     moki:
       DoubleJump, Bash
@@ -9129,11 +9148,20 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
     kii:
       Bash, Grenade=1
       Dash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
+      # Glitched
+      # AerialHammerJump  # intended for the bottom route but also work with upslash+slash then hjump for the top route
+      # GlideJump, DoubleJump, TripleJump
+      # SentryJump=1  # hammer can go through the bottom route as well
+      # GrenadeJump=1, DoubleJump OR Hammer OR GrenadeJump=1  # bottom route
+      # GrenadeJump=1, Dash, Glide OR Sword OR Shuriken=1 OR Sentry=2
     unsafe:
-      Dash, DoubleJump, TripleJump, Shuriken=1  # too precise for kii
-      DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # too precise for kii
-      DoubleJump  # fall then good old glide skip
-
+      SentryJump=1 OR GrenadeJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump OR AbilitySwap=2
+      DoubleJump  # fall then good old glide skip (include a ceiling jump)
+      Bash, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Grenade=1 OR Bow=1 OR GrenadeCancel OR BowCancel OR PauseFloat OR Damage=15  # https://youtu.be/asnGDXzhDpU
+      GlideJump, Sword, Shuriken=1 OR Grenade=1  # pogo
+      # Dash, DoubleJump, TripleJump, Shuriken=1  # too precise for kii
+      # DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # too precise for kii
+      
 anchor WoodsShrine at 1361, -4068:
   nospawn
   refill Full
@@ -9141,7 +9169,7 @@ anchor WoodsShrine at 1361, -4068:
   state WoodsMain.CombatShrineCompleted:
     moki, Regenerate, Combat=Hornbug+Lizard+3xSkeeto+4xEnergyRefill+2xCrystalMiner+Bat+4xEnergyRefill+9xBalloon+4xEnergyRefill+4xMantis+Bat:  # this one has it all -_-
       Damage=80
-      Damage=65, DoubleJump OR Dash
+      Damage=65, DoubleJump OR Dash OR Bash
       Damage=50, Launch
     unsafe:
       Combat=Hornbug+Lizard+3xSkeeto+4xEnergyRefill+2xCrystalMiner+Bat+4xEnergyRefill+1xBalloon+4xEnergyRefill+4xMantis+Bat
