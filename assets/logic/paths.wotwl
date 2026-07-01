@@ -9215,12 +9215,15 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
     kii, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       Bash
       DoubleJump, TripleJump, Hammer OR Shuriken=1
-      DoubleJump, TripleJump, Glide, Sword OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
+      DoubleJump, TripleJump, Glide, Sword OR Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       DoubleJump, Dash, Hammer
+      # Glitched
+      # AerialHammerJump OR GrenadeJump=1
     unsafe, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       DoubleJump, TripleJump, Sword OR Sentry=1 OR Flash=1 OR Spear=1
       DoubleJump, Dash, Sword OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
-      GrenadeJump
+      GrenadeJump OR AerialHammerJump
+      GlideJump, Sword OR Hammer
 
   conn LowerReach.AboveEntry:
     moki:
@@ -9233,17 +9236,18 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
       SentryJump=1, DoubleJump OR Bash
     kii:
       Bash, Damage=20, Hammer OR Sentry=3
+      # Glitched
+      # SentryJump=1
+      # AerialHammerJump, TripleJump
     unsafe:
-      SentryJump=1
-      #Bash, Damage=20, Sword OR Shuriken=2 OR Sentry=2 OR Flash=2
+      SentryJump=1 OR AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
+      # Bash, Damage=20, Sword OR Shuriken=2 OR Sentry=2 OR Flash=2
       Bash  # can be done damageless, but damage is likely. Keep jumping at the right wall until you go over it and bash the first latern at just the right angle to reach the second
-      DoubleJump, TripleJump, Sentry=3, Damage=20  # https://youtu.be/EhC4SRe4UA0
-      DoubleJump, TripleJump, Sword
-      AerialHammerJump, TripleJump OR Damage=20 OR CoyoteHammerJump OR WallHammerJump
-      GlideHammerJump
       GrenadeJump, DoubleJump
-  conn LowerReach.Icefall:
-    unsafe: DoubleJump, TripleJump, Hammer  # climb the left wall. Yes this is horrible after doing the escape
+      DoubleJump, TripleJump, Sentry=3, Damage=20  # https://youtu.be/EhC4SRe4UA0
+      DoubleJump, TripleJump, Hammer  # climb the left wall. Yes this is horrible after doing the escape
+      SwordJump, TripleJump
+      # DoubleJump, TripleJump, Sword  # Keeping this commentated just in case but it seems to use SwordJump without the tag
   conn WestGlades.Upper:
     moki: LowerReach.BearSneezed
 
