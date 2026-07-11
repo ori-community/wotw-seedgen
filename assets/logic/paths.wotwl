@@ -8562,11 +8562,10 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
       Combat=Balloon, Glide OR Launch
       Damage=20, Glide OR Launch
       DoubleJump, TripleJump, Flap OR Damage=20 OR Combat=Balloon
-    unsafe, WoodsMain.BalloonLureBlobDestroyed:
-      Launch  # Use launch invulnerability to protect you from balloon's explosions
-      Combat=Balloon OR Damage=10:  # dboost on the skeeto instead
-        GrenadeJump OR WallHammerJump OR CoyoteHammerJump
-        DoubleJump, Bash, Grenade=1
+    unsafe, WoodsMain.BalloonLureBlobDestroyed:  # Start teleporting so the balloon explodes while you're invincible
+      Glide OR Launch OR GrenadeJump OR WallHammerJump OR CoyoteHammerJump
+      DoubleJump, Bash, Grenade=1
+      DoubleJump, TripleJump OR Hammer
 
   conn WoodsMain.BelowHiddenOre:
     moki: WoodsMain.BalloonLureBlobDestroyed, Glide
@@ -13357,8 +13356,10 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
   state EastPools.ArenaWall:
     moki, EastPools.LowerWaterDrained: Water, Bash
     unsafe, EastPools.LowerWaterDrained:
-      Water, Launch OR Dash OR Damage=14  # bait the torpedo to the surface. Either avoid the explosion with launch/dash or take the dboost
-      Bash, Damage=180  # TP after bashing the torpedo
+      # Water, Launch OR Dash OR Damage=14  # bait the torpedo to the surface. Either avoid the explosion with launch/dash or take the dboost
+      # Bash, Damage=180  # TP after bashing the torpedo
+      Water OR Damage=100  # https://youtu.be/eo1rYTcAy2g
+      WaterDash, Damage=40
       DashBashChain  # https://youtu.be/NNNyAATvOkQ
   state EastPools.UltraBashWall:
     moki, EastPools.LowerWaterDrained: Water, WaterBreath, Bash
