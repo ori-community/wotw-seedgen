@@ -26259,14 +26259,14 @@
           "value_type": "Integer"
         },
         "31": {
-          "name": "willowTopOutside",
+          "name": "willowTopInside",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 32.0,
           "value_type": "Integer"
         },
         "32": {
-          "name": "willowTopInside",
+          "name": "willowTopOutside",
           "readonly": false,
           "type": "SerializedIntUberState",
           "value": 31.0,
