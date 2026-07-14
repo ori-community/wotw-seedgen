@@ -70,4 +70,5 @@ on reload {
         set_boolean("in_shriek_room", false)
         destroy_message("goals_incomplete")
     })
+    update_goals_completed()
 }
