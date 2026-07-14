@@ -259,7 +259,7 @@ impl Requirement {
 impl Display for Requirement {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Free => write!(f, "Free"),
+            Self::Free => write!(f, "free"),
             Self::Impossible => write!(f, "Impossible"),
             Self::Difficulty(difficulty) => difficulty.fmt(f),
             Self::NormalGameDifficulty => write!(f, "NormalGameDifficulty"),
