@@ -3,6 +3,7 @@ mod http_server_args;
 mod interactive;
 mod plando_args;
 mod preset_args;
+mod print_optimized_graph_args;
 mod regenerate_args;
 mod seed_args;
 mod seed_settings;
@@ -15,6 +16,7 @@ pub use display::{
 pub use http_server_args::HttpServerArgs;
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
+pub use print_optimized_graph_args::PrintOptimizedGraphArgs;
 pub use regenerate_args::RegenerateArgs;
 pub use seed_args::{
     GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs, VerboseArgs, VerboseTarget,
@@ -74,6 +76,11 @@ pub enum Cli {
     Paths,
     /// Import an UberState dump
     ImportUberStates,
+    /// Compiles and decompiles the logic graph
+    PrintOptimizedGraph {
+        #[command(flatten)]
+        args: PrintOptimizedGraphArgs,
+    },
     /// Start the http server
     HttpServer {
         #[command(flatten)]

@@ -5,6 +5,7 @@ mod log_config;
 mod paths;
 mod plando;
 mod preset;
+mod print_optimized_graph;
 mod regenerate;
 mod seed;
 mod stats;
@@ -16,6 +17,7 @@ use import_uber_states::import_uber_states;
 use paths::paths;
 use plando::plando;
 use preset::{universe_preset, world_preset};
+use print_optimized_graph::print_optimized_graph;
 use regenerate::regenerate;
 use seed::seed;
 use stats::stats;
@@ -43,6 +45,7 @@ fn main() -> Result<(), Error> {
         Cli::Regenerate { args } => regenerate(args),
         Cli::Paths => paths(),
         Cli::ImportUberStates => import_uber_states(),
+        Cli::PrintOptimizedGraph { args } => print_optimized_graph(args),
         Cli::HttpServer { args } => http_server(args),
         Cli::SeedLsp => {
             wotw_seedgen_lsp::start_seed();
