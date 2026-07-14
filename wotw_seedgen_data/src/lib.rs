@@ -12,6 +12,7 @@ mod equipment;
 mod icon;
 pub mod logic_language;
 mod message;
+mod partial_then;
 mod position;
 pub mod seed_language;
 mod settings;
@@ -29,6 +30,7 @@ pub use eq_ignore::EqIgnore;
 pub use equipment::{EquipSlot, Equipment};
 pub use icon::{GenericIcon, GromIcon, Icon, LupoIcon, MapIcon, OpherIcon, TuleyIcon};
 pub use message::{Alignment, CoordinateSystem, Corner, HorizontalAnchor, VerticalAnchor};
+pub use partial_then::PartialThen;
 pub use position::Position;
 pub use settings::{
     Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings, WorldSettingsHelpers,

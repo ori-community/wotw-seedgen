@@ -6,6 +6,7 @@ use std::{
 
 use itertools::Itertools;
 use smallvec::{smallvec, SmallVec, ToSmallVec};
+use wotw_seedgen_data::PartialThen;
 
 pub type OrbVariants = SmallVec<[Orbs; 3]>;
 
@@ -58,19 +59,9 @@ impl SubAssign for Orbs {
 
 impl PartialOrd for Orbs {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (
-            self.health.total_cmp(&other.health),
-            self.energy.total_cmp(&other.energy),
-        ) {
-            (Ordering::Equal, Ordering::Equal) => Some(Ordering::Equal),
-            (Ordering::Less | Ordering::Equal, Ordering::Less | Ordering::Equal) => {
-                Some(Ordering::Less)
-            }
-            (Ordering::Greater | Ordering::Equal, Ordering::Greater | Ordering::Equal) => {
-                Some(Ordering::Greater)
-            }
-            (Ordering::Less, Ordering::Greater) | (Ordering::Greater, Ordering::Less) => None,
-        }
+        self.health
+            .total_cmp(&other.health)
+            .partial_then(self.energy.total_cmp(&other.energy))
     }
 }
 
