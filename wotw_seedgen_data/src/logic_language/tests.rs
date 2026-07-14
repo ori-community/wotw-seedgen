@@ -1,16 +1,15 @@
+use std::cmp::Ordering;
+
 use crate::{
     assets::{AssetFileAccess, TestAccess},
     logic_language::{
-        ast::{
-            Amount, And, Content, Dedent, GroupContent, Indent, LogicIdentifier, Or, Paths,
-            PlainRequirement, Region, RegionKeyword, Requirement, RequirementGroup,
-            RequirementLine,
-        },
+        ast::Paths,
         output::{Graph, Node},
         token::{Token, Tokenizer},
     },
     DEFAULT_SPAWN,
 };
+use smallvec::smallvec;
 use wotw_seedgen_parse::{
     Ast, Identifier, Parser, Recoverable, SeparatedNonEmpty, Source, Spanned, Symbol, Tokenize,
 };
@@ -66,6 +65,8 @@ anchor My.Anchor at -420, 69:
 
 #[test]
 fn ast() {
+    use crate::logic_language::ast::*;
+
     let source = "region GorlekMines:\n    moki: GorlekMines.ElevatorFixed OR Shuriken=1\n";
     let mut parser = Parser::new(source, Tokenizer);
     assert_eq!(
@@ -177,4 +178,114 @@ fn compile() {
         }
         _ => panic!(),
     }
+}
+
+#[test]
+fn logical_cmp() {
+    use crate::{
+        logic_language::output::{Enemy::*, Requirement::*},
+        Difficulty::*,
+        Skill::*,
+    };
+    use Ordering::*;
+
+    fn partial_ord_str(ord: Option<Ordering>) -> &'static str {
+        match ord {
+            None => "≠",
+            Some(Less) => "<",
+            Some(Equal) => "=",
+            Some(Greater) => ">",
+        }
+    }
+
+    macro_rules! test {
+        (@ord "<") => { Some(Less) };
+        (@ord "=") => { Some(Equal) };
+        (@ord ">") => { Some(Greater) };
+        (@ord "≠") => { None };
+
+        ($left_req:expr, $ord:tt, $right_req:expr $(,)?) => {
+            let actual = $left_req.logical_cmp(&$right_req);
+
+            assert_eq!(
+                actual,
+                test!(@ord $ord),
+                "expected {left_req} {expected} {right_req}, but got {left_req} {actual} {right_req}",
+                left_req = $left_req,
+                right_req = $right_req,
+                expected = $ord,
+                actual = partial_ord_str(actual),
+            );
+        };
+    }
+
+    test!(Free, "<", Impossible);
+
+    test!(Difficulty(Kii), ">", Difficulty(Gorlek));
+
+    test!(BreakWall(20.), ">", BreakWall(16.));
+
+    test!(
+        And(vec![EnergySkill(Bow, 1.), EnergySkill(Shuriken, 1.)]),
+        "≠",
+        And(vec![EnergySkill(Shuriken, 1.), EnergySkill(Bow, 1.)]),
+    );
+
+    test!(
+        Combat(smallvec![(Bat, 1), (Lizard, 1)]),
+        "=",
+        Combat(smallvec![(Bat, 1), (Lizard, 1)]),
+    );
+
+    test!(
+        Combat(smallvec![(Lizard, 1), (Bat, 1)]),
+        "≠",
+        Combat(smallvec![(Bat, 1), (Lizard, 1)]),
+    );
+
+    test!(
+        Combat(smallvec![(Bat, 1), (Lizard, 1)]),
+        "<",
+        Combat(smallvec![(Bat, 1), (Lizard, 1), (Mantis, 1)]),
+    );
+
+    test!(
+        And(vec![Skill(DoubleJump), Skill(Dash)]),
+        "=",
+        And(vec![Skill(Dash), Skill(DoubleJump)]),
+    );
+
+    test!(
+        And(vec![Skill(DoubleJump), Skill(Launch)]),
+        "≠",
+        And(vec![Skill(Dash), Skill(DoubleJump)]),
+    );
+
+    test!(
+        And(vec![Skill(DoubleJump), Skill(Launch), Skill(Dash)]),
+        ">",
+        And(vec![Skill(Dash), Skill(DoubleJump)]),
+    );
+
+    test!(And(vec![Skill(DoubleJump), Skill(Dash)]), ">", Skill(Dash));
+
+    test!(
+        Or(vec![Skill(DoubleJump), Skill(Dash)]),
+        "=",
+        Or(vec![Skill(Dash), Skill(DoubleJump)]),
+    );
+
+    test!(
+        Or(vec![EnergySkill(Bow, 1.), EnergySkill(Shuriken, 1.)]),
+        "=",
+        Or(vec![EnergySkill(Shuriken, 1.), EnergySkill(Bow, 1.)]),
+    );
+
+    test!(
+        Or(vec![Skill(DoubleJump), Skill(Launch), Skill(Dash)]),
+        "<",
+        Or(vec![Skill(Dash), Skill(DoubleJump)]),
+    );
+
+    test!(Or(vec![Skill(DoubleJump), Skill(Dash)]), "<", Skill(Dash));
 }

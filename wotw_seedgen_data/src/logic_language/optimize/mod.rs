@@ -233,36 +233,6 @@ impl Requirement {
             factor.apply(self, or);
         }
     }
-
-    fn changes_orbs(&self) -> bool {
-        match self {
-            Self::Free
-            | Self::Impossible
-            | Self::Difficulty(_)
-            | Self::NormalGameDifficulty
-            | Self::Trick(_)
-            | Self::Skill(_)
-            | Self::SpiritLight(_)
-            | Self::GorlekOre(_)
-            | Self::Keystone(_)
-            | Self::Shard(_)
-            | Self::Teleporter(_)
-            | Self::Water
-            | Self::State(_) => false,
-            Self::EnergySkill(_, _)
-            | Self::NonConsumingEnergySkill(_)
-            | Self::Damage(_)
-            | Self::Danger(_)
-            | Self::Combat(_)
-            | Self::Boss(_)
-            | Self::BreakWall(_)
-            | Self::ShurikenBreak(_)
-            | Self::SentryBreak(_) => true,
-            Self::And(requirements) | Self::Or(requirements) => {
-                requirements.iter().any(Requirement::changes_orbs)
-            }
-        }
-    }
 }
 
 #[derive(PartialEq)]

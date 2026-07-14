@@ -10,10 +10,19 @@ use crate::{
 
 macro_rules! test {
     ($before:expr, $after:expr) => {
-        let mut graph = TEST_ASSETS.test_graph($before);
-        graph.optimize();
+        let before = $before;
+        let after = $after;
 
-        assert_eq!(graph.get_requirement(), &$after);
+        let mut graph = TEST_ASSETS.test_graph(before.clone());
+        graph.optimize();
+        let optimized = graph.get_requirement();
+
+        if !optimized.logical_eq(&after) {
+            panic!(
+                "{before} should've optimized to {after}, but optimized to {optimized} instead",
+            );
+        }
+
     };
 }
 

@@ -1,8 +1,12 @@
-use std::fmt::{self, Display};
+use std::{
+    cmp::Ordering,
+    fmt::{self, Display},
+    iter,
+};
 
 use crate::{
     assets::{LocDataEntry, StateDataEntry},
-    Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, Zone,
+    Difficulty, PartialThen, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, Zone,
 };
 use itertools::Itertools;
 use rustc_hash::FxHashMap;
@@ -254,6 +258,218 @@ impl Requirement {
             _ => Self::Or(filtered),
         }
     }
+
+    pub fn logical_eq(&self, other: &Self) -> bool {
+        // TODO could prob optimize this significantly
+        matches!(self.logical_cmp(other), Some(Ordering::Equal))
+    }
+
+    pub fn logical_ne(&self, other: &Self) -> bool {
+        !self.logical_eq(other)
+    }
+
+    pub fn logical_lt(&self, other: &Self) -> bool {
+        matches!(self.logical_cmp(other), Some(Ordering::Less))
+    }
+
+    pub fn logical_le(&self, other: &Self) -> bool {
+        matches!(
+            self.logical_cmp(other),
+            Some(Ordering::Less | Ordering::Equal)
+        )
+    }
+
+    pub fn logical_gt(&self, other: &Self) -> bool {
+        matches!(self.logical_cmp(other), Some(Ordering::Greater))
+    }
+
+    pub fn logical_ge(&self, other: &Self) -> bool {
+        matches!(
+            self.logical_cmp(other),
+            Some(Ordering::Greater | Ordering::Equal)
+        )
+    }
+
+    // TODO could use this for redundancy filtering in the optimizer?
+    /// Compares two `Requirements` by their logical meaning
+    ///
+    /// - `None` means the requirements are unrelated
+    /// - `Some(Ordering::Less)` means `self` is strictly more easily met than `other`
+    /// - `Some(Ordering::Equal)` means `self` and `other` are always met together
+    /// - `Some(Ordering::Greater)` means `other` is strictly more easily met than `self`
+    ///
+    /// Note that some amount of normalization is expected. For example
+    /// `(DoubleJump & (Dash & Launch))` will not be equal to `(DoubleJump & Dash & Launch)`.
+    /// And and Or requirements should be flattened for proper results.
+    /// This function also won't venture into the depths of OR redundancy checking.
+    pub fn logical_cmp(&self, other: &Self) -> Option<Ordering> {
+        fn cmp_ordered<A, B, F>(a: A, b: B, mut f: F) -> Option<Ordering>
+        where
+            A: IntoIterator,
+            B: IntoIterator,
+            F: FnMut(A::Item, B::Item) -> Option<Ordering>,
+        {
+            let mut a_iter = a.into_iter();
+            let mut b_iter = b.into_iter();
+
+            let mut ordering = Ordering::Equal;
+
+            for (a_item, b_item) in iter::zip(&mut a_iter, &mut b_iter) {
+                ordering = ordering.partial_then(f(a_item, b_item)?)?;
+            }
+
+            ordering.partial_then(a_iter.count().cmp(&b_iter.count()))
+        }
+
+        /// Compare a chain of requirements where order doesn't matter.
+        ///
+        /// Specifically that's non-orb and requirements and or requirements.
+        ///
+        /// We allow ourselves to ignore some edge cases here, for example
+        /// Ore=4, Ore=2 can't be compared correctly to Ore=3 with this.
+        /// As mentioned, we also don't check for redundancies across ORs.
+        ///
+        /// In effect, we only accept `None` or `Some(Equal)` orderings across the elements.
+        fn cmp_unordered<'r, const IS_AND: bool>(
+            a: impl IntoIterator<Item = &'r Requirement>,
+            mut b: Vec<&Requirement>,
+        ) -> Option<Ordering> {
+            let mut ordering = Ordering::Equal;
+
+            'outer: for a_item in a {
+                let mut index = 0;
+                while index < b.len() {
+                    let b_item = b[index];
+
+                    match a_item.logical_cmp(&b_item) {
+                        Some(item_ordering) => {
+                            if matches!(item_ordering, Ordering::Less | Ordering::Greater) {
+                                ordering = ordering.partial_then(item_ordering)?;
+                            }
+
+                            b.swap_remove(index);
+                            // exists in b, continue onwards, no duplicates are assumed
+                            continue 'outer;
+                        }
+                        None => index += 1,
+                    }
+                }
+
+                // did not exist in b
+                ordering = ordering.partial_then(if IS_AND {
+                    Ordering::Greater
+                } else {
+                    Ordering::Less
+                })?;
+            }
+
+            if b.is_empty() {
+                // everything matched
+                Some(ordering)
+            } else {
+                // something did not exist in a
+                ordering.partial_then(if IS_AND {
+                    Ordering::Less
+                } else {
+                    Ordering::Greater
+                })
+            }
+        }
+
+        fn cmp_many_to_one(
+            many: &[Requirement],
+            one: &Requirement,
+            cmp: fn(&Requirement, &Requirement) -> bool,
+            ord: Ordering,
+        ) -> Option<Ordering> {
+            many.iter()
+                .any(|many_item| cmp(many_item, one))
+                .then_some(ord)
+        }
+
+        match (self, other) {
+            (Self::Free, Self::Free) | (Self::Impossible, Self::Impossible) => {
+                Some(Ordering::Equal)
+            }
+            (Self::Free, _) | (_, Self::Impossible) => Some(Ordering::Less),
+            (_, Self::Free) | (Self::Impossible, _) => Some(Ordering::Greater),
+            (Self::Difficulty(a), Self::Difficulty(b)) => Some(a.cmp(b)),
+            (Self::EnergySkill(a, a_amount), Self::EnergySkill(b, b_amount)) if a == b => {
+                Some(a_amount.total_cmp(b_amount))
+            }
+            (Self::SpiritLight(a), Self::SpiritLight(b))
+            | (Self::GorlekOre(a), Self::GorlekOre(b))
+            | (Self::Keystone(a), Self::Keystone(b)) => Some(a.cmp(b)),
+            (Self::Damage(a), Self::Damage(b))
+            | (Self::Danger(a), Self::Danger(b))
+            | (Self::Boss(a), Self::Boss(b))
+            | (Self::BreakWall(a), Self::BreakWall(b))
+            | (Self::ShurikenBreak(a), Self::ShurikenBreak(b))
+            | (Self::SentryBreak(a), Self::SentryBreak(b)) => Some(a.total_cmp(b)),
+            (Self::Combat(a), Self::Combat(b)) => {
+                cmp_ordered(a, b, |(a_enemy, a_amount), (b_enemy, b_amount)| {
+                    (a_enemy == b_enemy).then(|| a_amount.cmp(b_amount))
+                })
+            }
+            (Self::And(a), Self::And(b)) => {
+                fn partition_orbs<'r, 'v>(
+                    ands: &'r [Requirement],
+                    non_orb_ands: &'v mut Vec<&'r Requirement>,
+                ) -> impl Iterator<Item = &'r Requirement> + use<'r, 'v> {
+                    ands.iter().filter(|&and| {
+                        let changes_orbs = and.changes_orbs();
+
+                        if !changes_orbs {
+                            non_orb_ands.push(and);
+                        }
+
+                        changes_orbs
+                    })
+                }
+
+                let mut a_non_orb_ands = Vec::new();
+                let a_orb_ands = partition_orbs(a, &mut a_non_orb_ands);
+                let mut b_non_orb_ands = Vec::new();
+                let b_orb_ands = partition_orbs(b, &mut b_non_orb_ands);
+
+                cmp_ordered(a_orb_ands, b_orb_ands, Requirement::logical_cmp)?
+                    .partial_then(cmp_unordered::<true>(a_non_orb_ands, b_non_orb_ands)?)
+            }
+            (Self::Or(a), Self::Or(b)) => cmp_unordered::<false>(a, b.iter().collect()),
+            // absurd edge cases like comparing Ore=4, Ore=2 with Ore=3 are ignored here as well
+            (Self::And(many), one) | (one, Self::Or(many)) => {
+                cmp_many_to_one(many, one, Requirement::logical_le, Ordering::Greater)
+            }
+            (one, Self::And(many)) | (Self::Or(many), one) => {
+                cmp_many_to_one(many, one, Requirement::logical_ge, Ordering::Less)
+            }
+            // TODO eq basically redoes the whole matching, maybe we should manually add all the other branches here?
+            _ if self == other => Some(Ordering::Equal),
+            _ => None,
+        }
+    }
+
+    pub(super) fn changes_orbs(&self) -> bool {
+        self.orb_change_kind().is_some()
+    }
+
+    pub(super) fn orb_change_kind(&self) -> Option<OrbChangeKind> {
+        match self {
+            Self::Damage(_) | Self::Danger(_) => Some(OrbChangeKind::Health),
+            Self::EnergySkill(_, _) | Self::NonConsumingEnergySkill(_) => {
+                Some(OrbChangeKind::Energy)
+            }
+            Self::Combat(_)
+            | Self::Boss(_)
+            | Self::BreakWall(_)
+            | Self::ShurikenBreak(_)
+            | Self::SentryBreak(_) => Some(OrbChangeKind::Destroy),
+            Self::And(requirements) | Self::Or(requirements) => {
+                requirements.iter().filter_map(Self::orb_change_kind).max()
+            }
+            _ => None,
+        }
+    }
 }
 
 impl Display for Requirement {
@@ -295,6 +511,13 @@ impl Display for Requirement {
             Self::Or(ors) => write!(f, "({})", ors.iter().format(" | ")),
         }
     }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum OrbChangeKind {
+    Health,
+    Energy,
+    Destroy,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize, ToSchema, EnumString, Display)]
