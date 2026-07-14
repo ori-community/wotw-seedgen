@@ -55,10 +55,30 @@ impl Snapshot for Reach<'_> {
 #[derive(Debug, Clone, Default)]
 struct ReachState<'graph> {
     /// All reached nodes and if they are anchors, the best orbs they have been reached with
-    best_orbs: FxHashMap<usize, OrbVariants>,
+    best_orbs: FxHashMap<usize, BestOrbs>,
     /// [`TP_ANCHOR`] has been reached
     tp_reached: bool,
     fails: ReachStateFails<'graph>,
+}
+
+// TODO are we hurting ourselves by increasing this type size?
+#[derive(Debug, Clone)]
+struct BestOrbs {
+    pre_refills: OrbVariants,
+    post_refills: OrbVariants,
+}
+
+impl BestOrbs {
+    fn new(pre_refills: OrbVariants) -> Self {
+        Self {
+            pre_refills,
+            post_refills: smallvec![],
+        }
+    }
+
+    fn placeholder() -> Self {
+        Self::new(smallvec![])
+    }
 }
 
 #[derive(Debug, Clone, Default)]
@@ -418,7 +438,15 @@ impl<'graph> World<'graph, '_> {
                     .format(", "),
                 connection_index.display(self.graph)
             ),
-            Some(orb_variants) => orb_variants,
+            Some(best_orbs) => {
+                debug_assert!(
+                    !best_orbs.post_refills.is_empty(),
+                    "encountered empty post-refill orbs in connection {}",
+                    connection_index.display(self.graph)
+                );
+
+                &best_orbs.post_refills
+            }
         }
     }
 
@@ -545,7 +573,10 @@ impl<'graph> World<'graph, '_> {
             };
 
             if met {
-                self.reach.state.best_orbs.insert(index, smallvec![]);
+                self.reach
+                    .state
+                    .best_orbs
+                    .insert(index, BestOrbs::placeholder());
             }
         }
     }
@@ -596,12 +627,12 @@ impl<'graph> World<'graph, '_> {
         mut orb_variants: OrbVariants,
         output: &CommandsOutput,
     ) {
+        let mut best_orbs = BestOrbs::new(orb_variants.clone());
+
         self.use_refills(anchor, &mut orb_variants);
 
-        self.reach
-            .state
-            .best_orbs
-            .insert(node_index, orb_variants.clone());
+        best_orbs.post_refills = orb_variants.clone();
+        self.reach.state.best_orbs.insert(node_index, best_orbs);
 
         self.attempt_teleport(anchor, output);
 
@@ -622,7 +653,10 @@ impl<'graph> World<'graph, '_> {
         value: Option<i32>,
         output: &CommandsOutput,
     ) {
-        self.reach.state.best_orbs.insert(index, smallvec![]);
+        self.reach
+            .state
+            .best_orbs
+            .insert(index, BestOrbs::placeholder());
 
         match value {
             None => self.store_boolean(uber_identifier, true, output),
@@ -638,7 +672,10 @@ impl<'graph> World<'graph, '_> {
     fn traverse_logical_state(&mut self, index: usize, output: &CommandsOutput) {
         debug_assert!(self.graph.nodes[index].is_logical_state());
 
-        self.reach.state.best_orbs.insert(index, smallvec![]);
+        self.reach
+            .state
+            .best_orbs
+            .insert(index, BestOrbs::placeholder());
 
         if let Some(fails) = self.reach.state.fails.logical_state.remove(&index) {
             for fail in fails {
@@ -690,6 +727,11 @@ impl<'graph> World<'graph, '_> {
 
         if let Some(mut target_orbs) = self.attempt_requirement(orb_variants, connection_index) {
             if revisit && !self.should_still_visit(connection, &mut target_orbs) {
+                trace!(
+                    "cannot improve target orbs with {}",
+                    format_orb_variants(&target_orbs)
+                );
+
                 return;
             }
 
@@ -697,7 +739,6 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    // TODO slightly incorrect I think, best_orbs is post-refill so it's not a fair comparison with the pre-refill orbs
     fn should_visit(
         &self,
         connection: &Connection,
@@ -710,8 +751,9 @@ impl<'graph> World<'graph, '_> {
                     return ControlFlow::Break(());
                 }
 
+                let pre_refills = &previous.pre_refills;
                 orb_variants
-                    .retain(|orbs| previous.iter().any(|previous_orbs| previous_orbs < orbs));
+                    .retain(|orbs| pre_refills.iter().any(|previous_orbs| previous_orbs < orbs));
 
                 if orb_variants.is_empty() {
                     return ControlFlow::Break(());
@@ -725,7 +767,8 @@ impl<'graph> World<'graph, '_> {
     fn should_still_visit(&self, connection: &Connection, orb_variants: &mut OrbVariants) -> bool {
         let previous = &self.reach.state.best_orbs[&connection.to];
 
-        orb_variants.retain(|orbs| previous.iter().any(|previous_orbs| previous_orbs < orbs));
+        let pre_refills = &previous.pre_refills;
+        orb_variants.retain(|orbs| pre_refills.iter().any(|previous_orbs| previous_orbs < orbs));
 
         if orb_variants.is_empty() {
             return false;
@@ -734,7 +777,7 @@ impl<'graph> World<'graph, '_> {
         trace!(
             "revisiting {to_identifier} to improve previous orbs {previous_orbs} with {orbs}",
             to_identifier = self.graph.nodes[connection.to].identifier(),
-            previous_orbs = format_orb_variants(previous),
+            previous_orbs = format_orb_variants(pre_refills),
             orbs = format_orb_variants(orb_variants),
         );
 
