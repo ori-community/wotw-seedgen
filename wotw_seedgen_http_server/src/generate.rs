@@ -29,6 +29,7 @@ pub fn generate(
         &*cache,
         settings,
         false,
+        None,
     )
     .map_err(Error::Generate)?;
 

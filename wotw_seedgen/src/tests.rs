@@ -22,6 +22,7 @@ fn some_seeds() {
             &*TEST_ASSETS,
             universe_settings,
             false,
+            None,
         )
         .unwrap();
     }

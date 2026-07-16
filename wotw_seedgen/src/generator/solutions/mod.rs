@@ -263,7 +263,7 @@ impl Display for DisplaySolution<'_, '_, '_> {
     }
 }
 
-impl<'graph> World<'graph, '_> {
+impl<'graph> World<'graph, '_, '_> {
     pub fn find_solutions(
         &mut self,
         item_pool: &ItemPool,
@@ -458,8 +458,8 @@ impl Commitments {
     }
 }
 
-struct SolutionContext<'world, 'graph, 'settings, 'output, 'pool> {
-    world: &'world mut World<'graph, 'settings>,
+struct SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool> {
+    world: &'world mut World<'graph, 'settings, 'perf>,
     output: &'output CommandsOutput,
     item_pool: &'pool ItemPool,
     slots: usize,
@@ -472,11 +472,11 @@ struct SolutionContext<'world, 'graph, 'settings, 'output, 'pool> {
     perf_counters: IndexMap<usize, u32, FxBuildHasher>,
 }
 
-impl<'world, 'graph, 'settings, 'output, 'pool>
-    SolutionContext<'world, 'graph, 'settings, 'output, 'pool>
+impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
+    SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>
 {
     fn new(
-        world: &'world mut World<'graph, 'settings>,
+        world: &'world mut World<'graph, 'settings, 'perf>,
         output: &'output CommandsOutput,
         item_pool: &'pool ItemPool,
         slots: usize,
@@ -944,7 +944,7 @@ impl<'world, 'graph, 'settings, 'output, 'pool>
         C: FnOnce(&mut Commitments) -> bool,
         D: FnOnce(Difficulty) -> bool,
         F: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -979,12 +979,12 @@ impl<'world, 'graph, 'settings, 'output, 'pool>
     ) -> ControlFlow<(), PartialSolution<'graph>>
     where
         L: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
         R: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -1013,12 +1013,12 @@ impl<'world, 'graph, 'settings, 'output, 'pool>
     where
         C: FnOnce(&mut Commitments) -> bool,
         L: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
         R: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -1345,7 +1345,7 @@ impl<'world, 'graph, 'settings, 'output, 'pool>
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         fn solve_branch<'graph>(
-            context: &mut SolutionContext<'_, 'graph, '_, '_, '_>,
+            context: &mut SolutionContext<'_, 'graph, '_, '_, '_, '_>,
             mut solution: PartialSolution<'graph>,
             (missing, requirement): (Missing<'graph>, GraphRef<'graph, Requirement>),
             simulate: bool,
@@ -1378,7 +1378,7 @@ impl<'world, 'graph, 'settings, 'output, 'pool>
     where
         I: IntoIterator<Item = T>,
         F: FnMut(
-            &mut SolutionContext<'world, 'graph, 'settings, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
             PartialSolution<'graph>,
             T,
             bool,

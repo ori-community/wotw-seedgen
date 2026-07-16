@@ -27,7 +27,7 @@ use crate::{
 
 pub fn choose_spawn<'graph>(
     rng: &mut Pcg64Mcg,
-    world: &mut World<'graph, '_>,
+    world: &mut World<'graph, '_, '_>,
     log_index: &str,
     item_pool: &ItemPool,
     output: &mut CommandsOutput,
@@ -37,9 +37,9 @@ pub fn choose_spawn<'graph>(
     Ok(context.finish())
 }
 
-struct SpawnContext<'world, 'graph, 'settings, 'log, 'pool, 'output> {
+struct SpawnContext<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output> {
     rng: Pcg64Mcg,
-    world: &'world mut World<'graph, 'settings>,
+    world: &'world mut World<'graph, 'settings, 'perf>,
     log_index: &'log str,
     item_pool: &'pool ItemPool,
     output: &'output mut CommandsOutput,
@@ -47,12 +47,12 @@ struct SpawnContext<'world, 'graph, 'settings, 'log, 'pool, 'output> {
     total_reach: Vec<&'graph LocDataEntry>,
 }
 
-impl<'world, 'graph, 'settings, 'log, 'pool, 'output>
-    SpawnContext<'world, 'graph, 'settings, 'log, 'pool, 'output>
+impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
+    SpawnContext<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
 {
     fn new(
         rng: &mut Pcg64Mcg,
-        world: &'world mut World<'graph, 'settings>,
+        world: &'world mut World<'graph, 'settings, 'perf>,
         log_index: &'log str,
         item_pool: &'pool ItemPool,
         output: &'output mut CommandsOutput,

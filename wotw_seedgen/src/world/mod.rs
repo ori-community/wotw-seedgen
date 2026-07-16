@@ -20,6 +20,7 @@ use std::{
 use crate::{
     logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS},
     orbs::{OrbVariants, Orbs},
+    perf_data::PerfData,
 };
 use reached::Reach;
 use smallvec::smallvec;
@@ -40,13 +41,14 @@ use wotw_seedgen_data::{
 
 // TODO design interfaces instead of spamming pub(crate)?
 #[derive(Debug)]
-pub struct World<'graph, 'settings> {
+pub struct World<'graph, 'settings, 'perf> {
     pub(crate) graph: &'graph Graph,
     pub(crate) spawn: usize,
     pub(crate) settings: &'settings WorldSettings,
     pub(crate) reach: Reach<'graph>,
     state: SimulationCache<WorldState>,
     reach_update_state: ReachUpdateState,
+    perf_data: Option<&'perf PerfData<'graph>>,
 }
 
 #[derive(Debug)]
@@ -56,7 +58,7 @@ enum ReachUpdateState {
     PendingOrbReset,
 }
 
-impl<'graph, 'settings> World<'graph, 'settings> {
+impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
     /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
     ///
     /// It will not start tracking reached locations until you [`World::traverse_spawn`]
@@ -66,6 +68,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         settings: &'settings WorldSettings,
         uber_states: UberStates,
         events: &mut [Event],
+        perf_data: Option<&'perf PerfData<'graph>>,
     ) -> Self {
         Self {
             state: SimulationCache::new(WorldState::new(uber_states, events)),
@@ -74,6 +77,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
             settings,
             reach_update_state: ReachUpdateState::Idle,
             reach: Reach::new(graph),
+            perf_data,
         }
     }
 
@@ -147,7 +151,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut events = [];
     /// let world_settings = WorldSettings::default();
-    /// let world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
+    /// let world = World::new(&graph, spawn, &world_settings, uber_states, &mut events, None);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 5.0 };
     /// world.cap_orbs::<false>(&mut orbs);
@@ -170,7 +174,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let mut output = CommandsOutput::NONE;
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events, None);
     /// world.store_shard(Shard::Vitality, true, &output);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
@@ -205,7 +209,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events, None);
     /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
@@ -243,7 +247,7 @@ impl<'graph, 'settings> World<'graph, 'settings> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events, None);
     /// assert_eq!(world.health_plant_drops(), 1.0);
     ///
     /// world.add_base_max_health(40, &output);
@@ -476,32 +480,37 @@ impl<'graph, 'settings> World<'graph, 'settings> {
         (damage, cost)
     }
 
-    pub fn owned_weapons<const TARGET_IS_WALL: bool>(&self) -> impl Iterator<Item = Skill> + '_ {
+    pub fn owned_weapons<const TARGET_IS_WALL: bool>(
+        &self,
+    ) -> impl Iterator<Item = Skill> + use<'_, 'graph, TARGET_IS_WALL> {
         self.owned_weapons_from(Difficulty::weapons_iter::<TARGET_IS_WALL>)
     }
 
-    pub fn owned_ranged_weapons(&self) -> impl Iterator<Item = Skill> + '_ {
+    pub fn owned_ranged_weapons(&self) -> impl Iterator<Item = Skill> + use<'_, 'graph> {
         self.owned_weapons_from(Difficulty::ranged_weapons_iter)
     }
 
-    pub fn owned_shield_weapons(&self) -> impl Iterator<Item = Skill> + '_ {
+    pub fn owned_shield_weapons(&self) -> impl Iterator<Item = Skill> + use<'_, 'graph> {
         self.owned_weapons_from(|_| SHIELD_WEAPONS.into_iter())
     }
 
-    fn owned_weapons_from<'a, F, I>(&'a self, f: F) -> impl Iterator<Item = Skill> + 'a
+    fn owned_weapons_from<'s, F, I>(
+        &'s self,
+        f: F,
+    ) -> impl Iterator<Item = Skill> + use<'s, 'graph, F, I>
     where
         F: FnOnce(Difficulty) -> I,
-        I: Iterator<Item = Skill> + 'a,
+        I: Iterator<Item = Skill> + 's,
     {
         f(self.settings.difficulty).filter(|weapon| self.skill(*weapon))
     }
 
-    pub fn inventory_display(&self) -> InventoryDisplay<'_, '_, '_> {
+    pub fn inventory_display(&self) -> InventoryDisplay<'_, 'graph, 'settings, 'perf> {
         InventoryDisplay { world: self }
     }
 }
 
-impl Simulation for World<'_, '_> {
+impl Simulation for World<'_, '_, '_> {
     fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
         self.state.fetch(uber_identifier)
     }
@@ -620,7 +629,7 @@ impl Simulation for World<'_, '_> {
     }
 }
 
-impl Snapshot for World<'_, '_> {
+impl Snapshot for World<'_, '_, '_> {
     fn snapshot(&mut self) {
         self.state.snapshot();
         self.reach.snapshot();
@@ -632,11 +641,11 @@ impl Snapshot for World<'_, '_> {
     }
 }
 
-pub struct InventoryDisplay<'world, 'graph, 'settings> {
-    world: &'world World<'graph, 'settings>,
+pub struct InventoryDisplay<'world, 'graph, 'settings, 'perf> {
+    world: &'world World<'graph, 'settings, 'perf>,
 }
 
-impl Display for InventoryDisplay<'_, '_, '_> {
+impl Display for InventoryDisplay<'_, '_, '_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fn comma(f: &mut fmt::Formatter<'_>, first: &mut bool) -> fmt::Result {
             if mem::take(first) {

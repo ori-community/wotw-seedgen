@@ -1,6 +1,7 @@
 mod display;
 mod http_server_args;
 mod interactive;
+mod perf_args;
 mod plando_args;
 mod preset_args;
 mod print_optimized_graph_args;
@@ -14,6 +15,7 @@ pub use display::{
     AVAILABLE_WORLD_PRESETS,
 };
 pub use http_server_args::HttpServerArgs;
+pub use perf_args::{PerfArgs, PerfTarget};
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
 pub use print_optimized_graph_args::PrintOptimizedGraphArgs;
@@ -80,6 +82,11 @@ pub enum Cli {
     PrintOptimizedGraph {
         #[command(flatten)]
         args: PrintOptimizedGraphArgs,
+    },
+    /// Performance measurement tools
+    Perf {
+        #[command(flatten)]
+        args: PerfArgs,
     },
     /// Start the http server
     HttpServer {

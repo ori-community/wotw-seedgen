@@ -140,12 +140,12 @@ impl Display for Missing<'_> {
     }
 }
 
-impl<'graph> World<'graph, '_> {
-    pub fn is_met(
+impl World<'_, '_, '_> {
+    pub fn is_met<'req>(
         &self,
-        requirement: &'graph Requirement,
+        requirement: &'req Requirement,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'req>> {
         // TODO orbvariants newtype could be cool?
         trace!(
             "checking is_met for {requirement} with {orb_variants}",
@@ -166,11 +166,11 @@ impl<'graph> World<'graph, '_> {
         flow
     }
 
-    fn is_met_impl(
+    fn is_met_impl<'req>(
         &self,
-        requirement: &'graph Requirement,
+        requirement: &'req Requirement,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'req>> {
         match requirement {
             Requirement::Free => ControlFlow::Continue(()),
             Requirement::Impossible => ControlFlow::Break(Missing::Impossible),
@@ -374,7 +374,7 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn setting_met(&self, condition: bool) -> ControlFlow<Missing<'graph>> {
+    fn setting_met(&self, condition: bool) -> ControlFlow<Missing<'static>> {
         if condition {
             ControlFlow::Continue(())
         } else {
@@ -382,11 +382,11 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn skill_met(&self, skill: Skill) -> ControlFlow<Missing<'graph>> {
+    fn skill_met(&self, skill: Skill) -> ControlFlow<Missing<'static>> {
         self.boolean_met(self.skill(skill), skill.uber_identifier())
     }
 
-    fn any_skill_met<T>(&self, skills: T) -> ControlFlow<Missing<'graph>>
+    fn any_skill_met<T>(&self, skills: T) -> ControlFlow<Missing<'static>>
     where
         T: IntoIterator<Item = Skill> + Copy,
     {
@@ -397,11 +397,11 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn shard_met(&self, shard: Shard) -> ControlFlow<Missing<'graph>> {
+    fn shard_met(&self, shard: Shard) -> ControlFlow<Missing<'static>> {
         self.boolean_met(self.shard(shard), shard.uber_identifier())
     }
 
-    fn teleporter_met(&self, teleporter: Teleporter) -> ControlFlow<Missing<'graph>> {
+    fn teleporter_met(&self, teleporter: Teleporter) -> ControlFlow<Missing<'static>> {
         self.boolean_met(self.teleporter(teleporter), teleporter.uber_identifier())
     }
 
@@ -409,7 +409,7 @@ impl<'graph> World<'graph, '_> {
         &self,
         condition: bool,
         uber_identifier: UberIdentifier,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'static>> {
         if condition {
             ControlFlow::Continue(())
         } else {
@@ -422,7 +422,7 @@ impl<'graph> World<'graph, '_> {
         current: i32,
         expected: i32,
         uber_identifier: UberIdentifier,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'static>> {
         let missing = expected - current;
 
         if missing <= 0 {
@@ -436,7 +436,7 @@ impl<'graph> World<'graph, '_> {
     fn enemy_movement_met(
         &self,
         enemies: &SmallVec<[(Enemy, u8); 12]>,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'static>> {
         if self.settings.difficulty < Difficulty::Unsafe {
             let mut aerial = false;
             let mut dangerous = false;
@@ -464,7 +464,7 @@ impl<'graph> World<'graph, '_> {
     }
 
     // TODO these seem similar in nature to the different weapon arrays which come out of LogicalDifficulty, maybe they should be there?
-    fn aerial_met(&self) -> ControlFlow<Missing<'graph>> {
+    fn aerial_met(&self) -> ControlFlow<Missing<'static>> {
         if self.settings.difficulty < Difficulty::Gorlek {
             self.any_skill_met([Skill::DoubleJump, Skill::Launch])
         } else {
@@ -472,7 +472,7 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn dangerous_met(&self) -> ControlFlow<Missing<'graph>> {
+    fn dangerous_met(&self) -> ControlFlow<Missing<'static>> {
         self.any_skill_met([Skill::DoubleJump, Skill::Dash, Skill::Bash, Skill::Launch])
     }
 
@@ -481,7 +481,7 @@ impl<'graph> World<'graph, '_> {
         target_health: f32,
         flying_target: bool,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'static>> {
         let Some(cost) = self.destroy_cost::<TARGET_IS_WALL>(target_health, flying_target) else {
             return ControlFlow::Break(Missing::weapon::<TARGET_IS_WALL>());
         };
@@ -493,7 +493,7 @@ impl<'graph> World<'graph, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'static>> {
         self.cost_met_or::<true>(
             cost,
             orb_variants,
@@ -505,7 +505,7 @@ impl<'graph> World<'graph, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'static>> {
         self.cost_met_or::<CONSUMING>(cost, orb_variants, Missing::Energy)
     }
 
@@ -513,8 +513,8 @@ impl<'graph> World<'graph, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-        energy: fn(OrderedFloat<f32>) -> Missing<'graph>,
-    ) -> ControlFlow<Missing<'graph>> {
+        energy: fn(OrderedFloat<f32>) -> Missing<'static>,
+    ) -> ControlFlow<Missing<'static>> {
         let mut missing = MissingOrbStats::new();
 
         if CONSUMING
@@ -639,7 +639,7 @@ impl<'graph> World<'graph, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'graph>> {
+    ) -> ControlFlow<Missing<'static>> {
         let mut missing = MissingOrbStats::new();
 
         orb_variants.retain(|orbs| self.orbs_meet_health::<CONSUMING>(cost, orbs, &mut missing));

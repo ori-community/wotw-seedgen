@@ -197,6 +197,7 @@ pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse
         &DefaultFileAccess,
         settings,
         debug,
+        None,
     )?;
 
     Ok(seed_universe)

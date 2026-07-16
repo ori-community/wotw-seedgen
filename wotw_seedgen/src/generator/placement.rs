@@ -93,9 +93,9 @@ pub fn generate_placements(
     Ok(context.finish(loc_data, debug, rng))
 }
 
-pub struct Context<'graph, 'settings> {
+pub struct Context<'graph, 'settings, 'perf> {
     pub rng: Pcg64Mcg,
-    pub worlds: Vec<WorldContext<'graph, 'settings>>,
+    pub worlds: Vec<WorldContext<'graph, 'settings, 'perf>>,
     settings: &'settings UniverseSettings,
     /// Distribution for random orderings
     ordering_distribution: OrderingDistribution,
@@ -107,9 +107,9 @@ pub struct Context<'graph, 'settings> {
     spoiler: SeedSpoiler,
 }
 
-pub struct WorldContext<'graph, 'settings> {
+pub struct WorldContext<'graph, 'settings, 'perf> {
     pub rng: Pcg64Mcg,
-    pub world: World<'graph, 'settings>,
+    pub world: World<'graph, 'settings, 'perf>,
     pub output: IntermediateOutput,
     /// world index of this world
     index: usize,
@@ -142,10 +142,10 @@ pub struct WorldContext<'graph, 'settings> {
     unshared_items: usize,
 }
 
-impl<'graph, 'settings> Context<'graph, 'settings> {
+impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
     fn new(
         rng: &mut Pcg64Mcg,
-        worlds: Vec<(World<'graph, 'settings>, IntermediateOutput)>,
+        worlds: Vec<(World<'graph, 'settings, 'perf>, IntermediateOutput)>,
         settings: &'settings UniverseSettings,
     ) -> Result<Self, String> {
         let multiworld = worlds.len() > 1;
@@ -822,10 +822,10 @@ impl<'graph, 'settings> Context<'graph, 'settings> {
     }
 }
 
-impl<'graph, 'settings> WorldContext<'graph, 'settings> {
+impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
     fn new(
         rng: &mut Pcg64Mcg,
-        mut world: World<'graph, 'settings>,
+        mut world: World<'graph, 'settings, 'perf>,
         mut output: IntermediateOutput,
         index: usize,
         multiworld: bool,
@@ -1306,7 +1306,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         placement_spoiler: &mut Vec<SpoilerPlacement>,
         simulate: F,
     ) where
-        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &CommandsOutput),
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings, 'perf>, &CommandsOutput),
     {
         trace!(
             "{index}Placing {name} at {pickup}",
@@ -1354,7 +1354,7 @@ impl<'graph, 'settings> WorldContext<'graph, 'settings> {
         command: CommandVoid,
         simulate: F,
     ) where
-        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings>, &CommandsOutput),
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings, 'perf>, &CommandsOutput),
     {
         simulate(&command, &mut self.world, &self.output.commands);
 

@@ -8,6 +8,7 @@ use super::World;
 use crate::{
     logical_difficulty::LogicalDifficulty,
     orbs::{self, format_orb_variants, OrbVariants},
+    perf_data::PerfData,
     world::{GraphRef, Missing, ReachUpdateState},
 };
 use itertools::Itertools;
@@ -280,7 +281,7 @@ impl<'graph> ConnectionIndex<'graph> {
 
     pub(crate) fn is_met(
         &mut self,
-        world: &World<'graph, '_>,
+        world: &World<'graph, '_, '_>,
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'graph>> {
         if let ConnectionRequirement::Partial(partial) = &self.requirement {
@@ -356,7 +357,7 @@ impl<'graph> ConnectionOrRefill<'graph> {
     }
 }
 
-impl<'graph> World<'graph, '_> {
+impl<'graph> World<'graph, '_, '_> {
     #[inline]
     pub fn reached_indices(&self) -> impl Iterator<Item = usize> + use<'_> {
         self.reach.state.best_orbs.keys().copied()
@@ -464,7 +465,7 @@ impl<'graph> World<'graph, '_> {
         }
     }
 
-    fn attempt_teleport(&mut self, anchor: &Anchor, output: &CommandsOutput) {
+    fn attempt_teleport(&mut self, anchor: &'graph Anchor, output: &CommandsOutput) {
         if self.reach.state.tp_reached {
             return;
         }
@@ -725,7 +726,17 @@ impl<'graph> World<'graph, '_> {
             connection_index.display(self.graph)
         );
 
-        if let Some(mut target_orbs) = self.attempt_requirement(orb_variants, connection_index) {
+        let record = self.perf_data.and_then(PerfData::reached_start);
+
+        let target_orbs = self.attempt_requirement(orb_variants, connection_index.clone());
+
+        if let Some(record) = record {
+            self.perf_data
+                .unwrap()
+                .reached_finish(record, connection_index);
+        }
+
+        if let Some(mut target_orbs) = target_orbs {
             if revisit && !self.should_still_visit(connection, &mut target_orbs) {
                 trace!(
                     "cannot improve target orbs with {}",
@@ -883,7 +894,7 @@ impl<'graph> World<'graph, '_> {
 
     pub(crate) fn better_weapons<const TARGET_IS_WALL: bool>(
         &self,
-    ) -> impl Iterator<Item = Skill> + '_ {
+    ) -> impl Iterator<Item = Skill> + use<'_, 'graph, TARGET_IS_WALL> {
         let mut lowest_cost = Skill::Spear.energy_cost();
         let mut highest_dpe = Skill::Sentry.damage_per_energy(false);
 

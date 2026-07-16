@@ -287,6 +287,7 @@ fn generation(c: &mut Criterion) {
                 test_assets,
                 &universe_settings,
                 false,
+                None,
             )
             .unwrap()
         })
@@ -320,6 +321,7 @@ fn generation(c: &mut Criterion) {
                     test_assets,
                     &universe_settings,
                     false,
+                    None,
                 )
                 .unwrap()
             })
@@ -353,6 +355,7 @@ fn generation(c: &mut Criterion) {
                 test_assets,
                 &universe_settings,
                 false,
+                None,
             )
             .unwrap()
         })
@@ -391,6 +394,7 @@ fn multiworld(c: &mut Criterion) {
                     test_assets,
                     &universe_settings,
                     false,
+                    None,
                 )
                 .unwrap()
             });
@@ -404,7 +408,7 @@ fn world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
     spawn: &str,
-) -> World<'graph, 'settings> {
+) -> World<'graph, 'settings, 'graph> {
     let spawn = graph.find_node(spawn).unwrap();
     World::new(
         &*graph,
@@ -412,19 +416,21 @@ fn world<'graph, 'settings>(
         settings,
         TEST_ASSETS.uber_states.clone(),
         &mut [],
+        None,
     )
 }
 
 fn spawnless_world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
-) -> World<'graph, 'settings> {
+) -> World<'graph, 'settings, 'graph> {
     World::new(
         &*graph,
         0,
         settings,
         TEST_ASSETS.uber_states.clone(),
         &mut [],
+        None,
     )
 }
 

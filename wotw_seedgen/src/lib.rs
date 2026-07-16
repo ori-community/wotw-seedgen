@@ -29,7 +29,7 @@ mod logical_difficulty;
 mod tests;
 mod world;
 
-pub use generator::{generate_seed, item_pool, spoiler, SeedUniverse};
+pub use generator::{generate_seed, item_pool, perf_data, spoiler, SeedUniverse};
 pub use logical_difficulty::LogicalDifficulty;
 pub use world::World;
 

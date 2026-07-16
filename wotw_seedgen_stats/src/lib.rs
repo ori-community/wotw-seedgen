@@ -169,6 +169,7 @@ impl<
                     self.snippet_access,
                     settings,
                     false,
+                    None,
                 )
                 .ok()
                 .map(|seed| seed.spoiler)
@@ -289,6 +290,7 @@ impl<
                 self.snippet_access,
                 settings,
                 false,
+                None,
             ) {
                 Ok(seed) => break seed.spoiler,
                 Err(err) => {

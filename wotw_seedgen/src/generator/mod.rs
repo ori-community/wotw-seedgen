@@ -1,5 +1,6 @@
 pub mod entrances;
 pub mod item_pool;
+pub mod perf_data;
 pub mod spoiler;
 
 mod placement;
@@ -8,7 +9,7 @@ mod spawn;
 mod spirit_light;
 
 use self::spoiler::SeedSpoiler;
-use crate::{generator::placement::generate_placements, world::World};
+use crate::{generator::placement::generate_placements, perf_data::PerfData, world::World};
 use log::{info, trace, warn};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
@@ -32,13 +33,14 @@ pub struct SeedUniverse {
 const RETRIES: u16 = 10; // How many retries to allow when generating a seed
 
 /// Entry point for seed generation
-pub fn generate_seed<F: SnippetAccess>(
-    graph: &Graph,
+pub fn generate_seed<'graph, F: SnippetAccess>(
+    graph: &'graph Graph,
     loc_data: &LocData,
     uber_state_data: &UberStateData,
     snippet_access: &F,
     settings: &UniverseSettings,
     debug: bool,
+    perf_data: Option<&PerfData<'graph>>,
 ) -> Result<SeedUniverse, String> {
     let mut rng: Pcg64Mcg = Seeder::from(&settings.seed).make_rng();
     trace!("Seeded RNG with \"{}\"", settings.seed);
@@ -87,6 +89,7 @@ pub fn generate_seed<F: SnippetAccess>(
                     world_settings,
                     uber_states,
                     &mut output.commands.events,
+                    perf_data,
                 );
 
                 Ok((world, output))
