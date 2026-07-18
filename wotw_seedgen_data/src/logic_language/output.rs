@@ -185,41 +185,59 @@ pub enum RefillValue {
     Energy(f32),
 }
 
+// While Requirement does not implement any `Ord`, we still want to order the discriminants in accordance to
+// `Requirement::discriminant_value` to transparently match the intrinsic discriminant values.
+// We order roughly from cheap to expensize and specifically order non-orb-changing < orb-changing < nested.
+// When adding requirements, don't forget to add their respective logic to `Requirement::discriminant_value`
+// as well as all the requirement comparison functions.
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub enum Requirement {
     Free,
     Impossible,
-    Difficulty(Difficulty),
     NormalGameDifficulty,
+    Difficulty(Difficulty),
     Trick(Trick),
+    State(usize),
+    Water,
     Skill(Skill),
-    EnergySkill(Skill, f32),
-    NonConsumingEnergySkill(Skill),
+    Shard(Shard),
+    Teleporter(Teleporter),
     // TODO resources as i32?
     SpiritLight(usize),
     GorlekOre(usize),
     Keystone(usize),
-    Shard(Shard),
-    Teleporter(Teleporter),
-    Water,
-    State(usize),
-    Extern(usize),
-    Damage(f32),
     Danger(f32),
+    Damage(f32),
+    NonConsumingEnergySkill(Skill),
+    // TODO wrapper for f32::total_cmp and cut orderedfloat?
+    EnergySkill(Skill, f32),
+    ShurikenBreak(f32),
+    SentryBreak(f32),
+    Extern(usize),
+    BreakWall(f32),
+    Boss(f32),
     // utoipa has a smallvec feature but it doesn't work
     #[schema(value_type = Vec<(Enemy, u8)>)]
     Combat(SmallVec<[(Enemy, u8); 12]>),
-    Boss(f32),
-    BreakWall(f32),
-    ShurikenBreak(f32),
-    SentryBreak(f32),
     #[schema(no_recursion)]
     And(Vec<Requirement>),
     #[schema(no_recursion)]
     Or(Vec<Requirement>),
 }
 
+// This implementation relies on the order of `Requirement` discriminants.
+// For details check the comment above `Requirement`.
+const _: () = {
+    assert!(
+        Requirement::LAST_NON_ORB_CHANGING + 1 == Requirement::FIRST_ORB_CHANGING,
+        "Requirement::FIRST_ORB_CHANGING does not follow Requirement::LAST_NON_ORB_CHANGING"
+    )
+};
+
 impl Requirement {
+    pub(super) const LAST_NON_ORB_CHANGING: isize = Self::Keystone(1).discriminant_value();
+    pub(super) const FIRST_ORB_CHANGING: isize = Self::Damage(1.).discriminant_value();
+
     pub fn and<I: IntoIterator<Item = Self>>(requirements: I) -> Self {
         let mut filtered = vec![];
 
@@ -232,10 +250,14 @@ impl Requirement {
             }
         }
 
-        match filtered.len() {
+        Self::and_from(filtered)
+    }
+
+    pub fn and_from(mut ands: Vec<Requirement>) -> Self {
+        match ands.len() {
             0 => Self::Free,
-            1 => filtered.pop().unwrap(),
-            _ => Self::And(filtered),
+            1 => ands.pop().unwrap(),
+            _ => Self::And(ands),
         }
     }
 
@@ -255,6 +277,54 @@ impl Requirement {
             0 => Self::Impossible,
             1 => filtered.pop().unwrap(),
             _ => Self::Or(filtered),
+        }
+    }
+
+    /// Reproduces [`std::intrinsics::discriminant_value`].
+    pub(super) const fn discriminant_value(&self) -> isize {
+        match self {
+            Self::Free => 0,
+            Self::Impossible => 1,
+            Self::NormalGameDifficulty => 2,
+            Self::Difficulty(_) => 3,
+            Self::Trick(_) => 4,
+            Self::State(_) => 5,
+            Self::Water => 6,
+            Self::Skill(_) => 7,
+            Self::Shard(_) => 8,
+            Self::Teleporter(_) => 9,
+            Self::SpiritLight(_) => 10,
+            Self::GorlekOre(_) => 11,
+            Self::Keystone(_) => 12,
+            Self::Danger(_) => 14,
+            Self::Damage(_) => 13,
+            Self::NonConsumingEnergySkill(_) => 15,
+            Self::EnergySkill(..) => 16,
+            Self::ShurikenBreak(_) => 17,
+            Self::SentryBreak(_) => 18,
+            Self::Extern(_) => 19,
+            Self::BreakWall(_) => 20,
+            Self::Boss(_) => 21,
+            Self::Combat(_) => 22,
+            Self::And(_) => 23,
+            Self::Or(_) => 24,
+        }
+    }
+
+    pub(super) fn changes_orbs(&self) -> bool {
+        match self {
+            Self::Danger(_)
+            | Self::Damage(_)
+            | Self::NonConsumingEnergySkill(_)
+            | Self::EnergySkill(_, _)
+            | Self::ShurikenBreak(_)
+            | Self::SentryBreak(_)
+            | Self::Extern(_)
+            | Self::BreakWall(_)
+            | Self::Boss(_)
+            | Self::Combat(_) => true,
+            Self::And(nested) | Self::Or(nested) => nested.iter().any(Self::changes_orbs),
+            _ => false,
         }
     }
 }

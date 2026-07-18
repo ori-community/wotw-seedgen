@@ -173,24 +173,22 @@ impl<'graph> World<'graph, '_, '_> {
         match requirement {
             Requirement::Free => ControlFlow::Continue(()),
             Requirement::Impossible => ControlFlow::Break(Missing::Impossible),
+            Requirement::NormalGameDifficulty => self.setting_met(!self.settings.hard),
             Requirement::Difficulty(difficulty) => {
                 self.setting_met(self.settings.difficulty >= *difficulty)
             }
-            Requirement::NormalGameDifficulty => self.setting_met(!self.settings.hard),
             Requirement::Trick(trick) => self.setting_met(self.settings.tricks.contains(trick)),
+            Requirement::State(state) => {
+                if self.has_reached(*state) {
+                    ControlFlow::Continue(())
+                } else {
+                    ControlFlow::Break(Missing::state(*state, &self.graph.nodes[*state]))
+                }
+            }
+            Requirement::Water => self.boolean_met(self.clean_water(), UberIdentifier::CLEAN_WATER),
             Requirement::Skill(skill) => self.skill_met(*skill),
-            Requirement::EnergySkill(skill, amount) => {
-                self.skill_met(*skill)?;
-
-                let cost = self.use_cost(*skill) * *amount;
-                self.cost_met::<true>(cost, orb_variants)
-            }
-            Requirement::NonConsumingEnergySkill(skill) => {
-                self.skill_met(*skill)?;
-
-                let cost = self.use_cost(*skill);
-                self.cost_met::<false>(cost, orb_variants)
-            }
+            Requirement::Shard(shard) => self.shard_met(*shard),
+            Requirement::Teleporter(teleporter) => self.teleporter_met(*teleporter),
             Requirement::SpiritLight(amount) => self.integer_met(
                 self.spirit_light(),
                 *amount as i32,
@@ -204,26 +202,48 @@ impl<'graph> World<'graph, '_, '_> {
             Requirement::Keystone(amount) => {
                 self.integer_met(self.keystones(), *amount as i32, UberIdentifier::KEYSTONES)
             }
-            Requirement::Shard(shard) => self.shard_met(*shard),
-            Requirement::Teleporter(teleporter) => self.teleporter_met(*teleporter),
-            Requirement::Water => self.boolean_met(self.clean_water(), UberIdentifier::CLEAN_WATER),
-            Requirement::State(state) => {
-                if self.has_reached(*state) {
-                    ControlFlow::Continue(())
-                } else {
-                    ControlFlow::Break(Missing::state(*state, &self.graph.nodes[*state]))
-                }
-            }
-            Requirement::Extern(index) => {
-                self.is_met(&self.graph.extern_requirements[*index], orb_variants)
+            Requirement::Danger(amount) => {
+                let cost = *amount * self.defense_mod();
+                self.health_met::<false>(cost, orb_variants)
             }
             Requirement::Damage(amount) => {
                 let cost = *amount * self.defense_mod();
                 self.health_met::<true>(cost, orb_variants)
             }
-            Requirement::Danger(amount) => {
-                let cost = *amount * self.defense_mod();
-                self.health_met::<false>(cost, orb_variants)
+            Requirement::NonConsumingEnergySkill(skill) => {
+                self.skill_met(*skill)?;
+
+                let cost = self.use_cost(*skill);
+                self.cost_met::<false>(cost, orb_variants)
+            }
+            Requirement::EnergySkill(skill, amount) => {
+                self.skill_met(*skill)?;
+
+                let cost = self.use_cost(*skill) * *amount;
+                self.cost_met::<true>(cost, orb_variants)
+            }
+            Requirement::ShurikenBreak(health) => {
+                self.skill_met(Skill::Shuriken)?;
+
+                let clip_mod = if self.settings.difficulty >= Difficulty::Unsafe {
+                    2.0
+                } else {
+                    3.0
+                };
+                let cost = self.destroy_cost_with(*health, Skill::Shuriken, false) * clip_mod;
+
+                self.cost_met::<true>(cost, orb_variants)
+            }
+            Requirement::SentryBreak(health) => {
+                self.skill_met(Skill::Sentry)?;
+
+                let clip_mod = 6.25;
+                let cost = self.destroy_cost_with(*health, Skill::Sentry, false) * clip_mod;
+
+                self.cost_met::<true>(cost, orb_variants)
+            }
+            Requirement::Extern(index) => {
+                self.is_met(&self.graph.extern_requirements[*index], orb_variants)
             }
             Requirement::BreakWall(health) => {
                 self.destroy_cost_met::<true>(*health, false, orb_variants)
@@ -312,26 +332,6 @@ impl<'graph> World<'graph, '_, '_> {
                     orb_variants,
                     Missing::energy_or_better_enemy_weapon(burrow_reduces_cost),
                 )
-            }
-            Requirement::ShurikenBreak(health) => {
-                self.skill_met(Skill::Shuriken)?;
-
-                let clip_mod = if self.settings.difficulty >= Difficulty::Unsafe {
-                    2.0
-                } else {
-                    3.0
-                };
-                let cost = self.destroy_cost_with(*health, Skill::Shuriken, false) * clip_mod;
-
-                self.cost_met::<true>(cost, orb_variants)
-            }
-            Requirement::SentryBreak(health) => {
-                self.skill_met(Skill::Sentry)?;
-
-                let clip_mod = 6.25;
-                let cost = self.destroy_cost_with(*health, Skill::Sentry, false) * clip_mod;
-
-                self.cost_met::<true>(cost, orb_variants)
             }
             Requirement::And(requirements) => {
                 for and in requirements {

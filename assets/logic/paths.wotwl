@@ -12796,6 +12796,7 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       Launch, Damage=20, WaterDash OR Bash
     kii:  # OK look I'm sorry, I probably hate this connection as much as you do
       # Validator here : this is miserable, good luck if you have to change something here. You can copy many paths starting from MillPath if you already checked them and change the damage value (except for the Water, WaterDash paths).
+      # Developer here: This is not a requirement. This is an eldritch monstrosity. Laughing with the sound of combinatorial explosions in the face of my heuristics. Any tiny weakness in the logic optimizer and this beast devours all hope of generating a seed in reasonable time, casting the progression solver into an ever-spiraling abyss, threatening to fill your drive with delirious, incomprehensible logs crashing even the most valiant of editors.
       Water, Launch, Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2 OR Damage=20
       Water, WaterDash:
         Grapple, Dash OR Glide OR Sword OR Shuriken=2 OR Flash=2 OR Sentry=2

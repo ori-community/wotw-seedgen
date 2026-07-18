@@ -330,6 +330,8 @@ impl Difficulty {
     PartialEq,
     Eq,
     Hash,
+    PartialOrd,
+    Ord,
     Serialize,
     Deserialize,
     Display,
