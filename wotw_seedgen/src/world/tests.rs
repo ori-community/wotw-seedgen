@@ -281,7 +281,7 @@ fn is_met() {
     test!(Requirement::And(vec![req.clone(), Requirement::Free]), "✅");
     test!(Requirement::Or(vec![Requirement::Impossible, req]), "✅");
 
-    let req = Requirement::EnergySkill(Skill::Blaze, 1.0);
+    let req = Requirement::EnergySkill(Skill::Blaze, (1.0).into());
     eprintln!("testing {req}");
 
     test!(&req, "❌");
@@ -308,7 +308,7 @@ fn is_met() {
     world.store_base_max_energy(0.5, &CommandsOutput::NONE);
     world.store_base_max_health(15, &CommandsOutput::NONE);
     test!(
-        Requirement::EnergySkill(Skill::Blaze, 1.0),
+        Requirement::EnergySkill(Skill::Blaze, (1.0).into()),
         [Orbs::new(-5.0, -0.5)]
     );
     test!(
@@ -328,36 +328,39 @@ fn is_met() {
     eprintln!("testing Damage");
 
     world.store_base_max_health(30, &CommandsOutput::NONE);
-    test!(Requirement::Damage(30.0), "❌");
+    test!(Requirement::Damage((30.0).into()), "❌");
     world.store_base_max_health(35, &CommandsOutput::NONE);
-    test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
+    test!(Requirement::Damage((30.0).into()), [Orbs::new(-30.0, 0.)]);
 
     set_difficulty!(Difficulty::Gorlek);
     world.store_base_max_health(30, &CommandsOutput::NONE);
     world.store_shard(Shard::Vitality, true, &CommandsOutput::NONE);
-    test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
+    test!(Requirement::Damage((30.0).into()), [Orbs::new(-30.0, 0.)]);
     world.store_shard(Shard::Vitality, false, &CommandsOutput::NONE);
     world.store_shard(Shard::Resilience, true, &CommandsOutput::NONE);
-    test!(Requirement::Damage(30.0), [Orbs::new(-30.0 * 0.9, 0.)]);
+    test!(
+        Requirement::Damage((30.0).into()),
+        [Orbs::new(-30.0 * 0.9, 0.)]
+    );
     world.store_shard(Shard::Resilience, false, &CommandsOutput::NONE);
 
     set_difficulty!(Difficulty::Unsafe);
     world.store_base_max_energy(3., &CommandsOutput::NONE);
     world.store_skill(Skill::Regenerate, true, &CommandsOutput::NONE);
-    test!(Requirement::Damage(60.0), "❌");
+    test!(Requirement::Damage((60.0).into()), "❌");
     world.store_base_max_health(65, &CommandsOutput::NONE);
     test!(
-        Requirement::Damage(60.0),
+        Requirement::Damage((60.0).into()),
         [Orbs::new(30.0, world.max_energy())],
         [Orbs::new(-25.0, -2.0)]
     );
     test!(
-        Requirement::Danger(30.0),
+        Requirement::Danger((30.0).into()),
         [Orbs::new(30.0, world.max_energy())],
         [Orbs::new(30.0, -1.0)]
     );
     test!(
-        Requirement::Danger(60.0),
+        Requirement::Danger((60.0).into()),
         [Orbs::new(30.0, world.max_energy())],
         [Orbs::new(35.0, -2.0)]
     );
@@ -366,7 +369,7 @@ fn is_met() {
     world.restore_snapshot();
     world.snapshot();
 
-    let req = Requirement::BreakWall(12.0);
+    let req = Requirement::BreakWall((12.0).into());
     eprintln!("testing {req}");
 
     test!(&req, "❌");
@@ -391,7 +394,7 @@ fn is_met() {
     world.restore_snapshot();
     world.snapshot();
 
-    let req = Requirement::ShurikenBreak(12.0);
+    let req = Requirement::ShurikenBreak((12.0).into());
     eprintln!("testing {req}");
 
     world.store_skill(Skill::Shuriken, true, &CommandsOutput::NONE);
@@ -485,10 +488,10 @@ fn is_met() {
 
     eprintln!("testing requirement chains");
 
-    let a = Requirement::EnergySkill(Skill::Blaze, 2.0);
-    let b = Requirement::Damage(20.0);
-    let c = Requirement::EnergySkill(Skill::Blaze, 1.0);
-    let d = Requirement::Damage(10.0);
+    let a = Requirement::EnergySkill(Skill::Blaze, (2.0).into());
+    let b = Requirement::Damage((20.0).into());
+    let c = Requirement::EnergySkill(Skill::Blaze, (1.0).into());
+    let d = Requirement::Damage((10.0).into());
 
     world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
     world.store_base_max_energy(2., &CommandsOutput::NONE);
@@ -554,18 +557,24 @@ fn is_met() {
     world.store_base_max_health(35, &CommandsOutput::NONE);
     world.store_base_max_energy(1., &CommandsOutput::NONE);
     test!(
-        Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
+        Requirement::And(vec![
+            Requirement::Damage((30.0).into()),
+            Requirement::Damage((30.0).into())
+        ]),
         "❌"
     );
     world.store_skill(Skill::Regenerate, true, &CommandsOutput::NONE);
     test!(
-        Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),
+        Requirement::And(vec![
+            Requirement::Damage((30.0).into()),
+            Requirement::Damage((30.0).into())
+        ]),
         [Orbs::new(-30.0, -1.0)]
     );
 
     let req = Requirement::Or(vec![
-        Requirement::Damage(10.0),
-        Requirement::EnergySkill(Skill::Blaze, 1.0),
+        Requirement::Damage((10.0).into()),
+        Requirement::EnergySkill(Skill::Blaze, (1.0).into()),
     ]);
     world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
     world.store_base_max_energy(2., &CommandsOutput::NONE);

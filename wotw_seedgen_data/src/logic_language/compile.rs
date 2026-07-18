@@ -454,32 +454,32 @@ impl TrickRequirements {
         let requirement = match trick {
             Trick::SwordSentryJump => Requirement::and([
                 self.sword_sentry_jump.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Sentry, (amount.take()? as f32).into()),
                 Requirement::Skill(Skill::Sword),
             ]),
             Trick::HammerSentryJump => Requirement::and([
                 self.hammer_sentry_jump.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Sentry, (amount.take()? as f32).into()),
                 Requirement::Skill(Skill::Hammer),
             ]),
             Trick::ShurikenBreak => Requirement::and([
                 self.shuriken_break.clone(),
-                Requirement::ShurikenBreak(amount.take()? as f32),
+                Requirement::ShurikenBreak((amount.take()? as f32).into()),
             ]),
             Trick::SentryBreak => Requirement::and([
                 self.sentry_break.clone(),
-                Requirement::SentryBreak(amount.take()? as f32),
+                Requirement::SentryBreak((amount.take()? as f32).into()),
             ]),
             Trick::HammerBreak => {
                 Requirement::and([self.hammer_break.clone(), Requirement::Skill(Skill::Hammer)])
             }
             Trick::SpearBreak => Requirement::and([
                 self.spear_break.clone(),
-                Requirement::EnergySkill(Skill::Spear, 1.),
+                Requirement::EnergySkill(Skill::Spear, (1.).into()),
             ]),
             Trick::SentryBurn => Requirement::and([
                 self.sentry_burn.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Sentry, (amount.take()? as f32).into()),
             ]),
             Trick::RemoveKillPlane => self.remove_kill_plane.clone(),
             Trick::LaunchSwap => {
@@ -487,7 +487,7 @@ impl TrickRequirements {
             }
             Trick::SentrySwap => Requirement::and([
                 self.sentry_swap.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Sentry, (amount.take()? as f32).into()),
             ]),
             Trick::FlashSwap => Requirement::and([
                 self.flash_swap.clone(),
@@ -495,7 +495,7 @@ impl TrickRequirements {
             ]),
             Trick::BlazeSwap => Requirement::and([
                 self.blaze_swap.clone(),
-                Requirement::EnergySkill(Skill::Blaze, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Blaze, (amount.take()? as f32).into()),
             ]),
             Trick::WaveDash => Requirement::and([
                 self.wave_dash.clone(),
@@ -542,16 +542,16 @@ impl TrickRequirements {
             ]),
             Trick::GrenadeRedirect => Requirement::and([
                 self.grenade_redirect.clone(),
-                Requirement::EnergySkill(Skill::Grenade, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Grenade, (amount.take()? as f32).into()),
             ]),
             Trick::SentryRedirect => Requirement::and([
                 self.sentry_redirect.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Sentry, (amount.take()? as f32).into()),
             ]),
             Trick::PauseFloat => self.pause_float.clone(),
             Trick::SpearJump => Requirement::and([
                 self.spear_jump.clone(),
-                Requirement::EnergySkill(Skill::Spear, amount.take()? as f32),
+                Requirement::EnergySkill(Skill::Spear, (amount.take()? as f32).into()),
             ]),
             Trick::GlideBashChain => Requirement::and([
                 self.glide_bash_chain.clone(),
@@ -1072,7 +1072,7 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                             amount_span,
                         ))
                     } else {
-                        Ok(Requirement::EnergySkill(skill, amount as f32))
+                        Ok(Requirement::EnergySkill(skill, (amount as f32).into()))
                     }
                 }
             }
@@ -1112,32 +1112,34 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
                 "Ore" | "GorlekOre" => get_amount().map(Requirement::GorlekOre),
                 "Keystone" => get_amount().map(Requirement::Keystone),
                 "Water" => no_amount().map(|()| Requirement::Water),
-                "Damage" => get_amount().map(|amount| Requirement::Damage(amount as f32)),
-                "Danger" => get_amount().map(|amount| Requirement::Danger(amount as f32)),
-                "Boss" => get_amount().map(|amount| Requirement::Boss(amount as f32)),
-                "BreakWall" => get_amount().map(|amount| Requirement::BreakWall(amount as f32)),
+                "Damage" => get_amount().map(|amount| Requirement::Damage((amount as f32).into())),
+                "Danger" => get_amount().map(|amount| Requirement::Danger((amount as f32).into())),
+                "Boss" => get_amount().map(|amount| Requirement::Boss((amount as f32).into())),
+                "BreakWall" => {
+                    get_amount().map(|amount| Requirement::BreakWall((amount as f32).into()))
+                }
                 "BreakCrystal" => no_amount().map(|()| {
                     Requirement::or([
                         Requirement::Skill(Skill::Sword),
                         Requirement::Skill(Skill::Hammer),
-                        Requirement::EnergySkill(Skill::Bow, 1.0),
+                        Requirement::EnergySkill(Skill::Bow, (1.).into()),
                         Requirement::and([
                             compiler.difficulty_requirements.get(Difficulty::Gorlek),
                             Requirement::or([
-                                Requirement::EnergySkill(Skill::Shuriken, 1.0),
-                                Requirement::EnergySkill(Skill::Grenade, 1.0),
+                                Requirement::EnergySkill(Skill::Shuriken, (1.).into()),
+                                Requirement::EnergySkill(Skill::Grenade, (1.).into()),
                             ]),
                         ]),
                         Requirement::and([
                             compiler.difficulty_requirements.get(Difficulty::Unsafe),
-                            Requirement::EnergySkill(Skill::Spear, 1.0),
+                            Requirement::EnergySkill(Skill::Spear, (1.).into()),
                         ]),
                     ])
                 }),
                 // TODO this doubles the energy and skill reqs
                 "SentryJump" => get_amount().map(|amount| {
                     Requirement::and([
-                        Requirement::EnergySkill(Skill::Sentry, amount as f32),
+                        Requirement::EnergySkill(Skill::Sentry, (amount as f32).into()),
                         Requirement::or([
                             Requirement::and([
                                 compiler

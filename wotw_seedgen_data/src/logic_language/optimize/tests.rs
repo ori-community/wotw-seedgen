@@ -33,7 +33,7 @@ fn optimize_graph_region() {
     test!(
         Or(vec![
             Skill(Regenerate),
-            And(vec![Skill(Regenerate), Danger(40.)]),
+            And(vec![Skill(Regenerate), Danger((40.).into())]),
         ]),
         Skill(Regenerate)
     );
@@ -48,17 +48,21 @@ fn optimize_graph_bashnade() {
             And(vec![
                 Skill(Bash),
                 Or(vec![
-                    EnergySkill(Grenade, 2.),
-                    And(vec![EnergySkill(Grenade, 1.), Skill(DoubleJump)])
+                    EnergySkill(Grenade, (2.).into()),
+                    And(vec![EnergySkill(Grenade, (1.).into()), Skill(DoubleJump)])
                 ])
             ]),
-            And(vec![Skill(Bash), EnergySkill(Grenade, 1.), Skill(Dash)])
+            And(vec![
+                Skill(Bash),
+                EnergySkill(Grenade, (1.).into()),
+                Skill(Dash)
+            ])
         ]),
         And(vec![
             Skill(Bash),
-            EnergySkill(Grenade, 1.),
+            EnergySkill(Grenade, (1.).into()),
             Or(vec![
-                EnergySkill(Grenade, 1.),
+                EnergySkill(Grenade, (1.).into()),
                 Skill(DoubleJump),
                 Skill(Dash),
             ])
@@ -89,26 +93,30 @@ fn optimize_graph_above_door_ore() {
         Or(vec![
             And(vec![
                 Skill(Bash),
-                EnergySkill(Grenade, 1.0),
+                EnergySkill(Grenade, (1.).into()),
                 Or(vec![Skill(Dash), Skill(Glide)]),
             ]),
-            And(vec![Skill(Bash), EnergySkill(Grenade, 1.0), Damage(20.0)]),
             And(vec![
                 Skill(Bash),
-                EnergySkill(Grenade, 2.0),
+                EnergySkill(Grenade, (1.).into()),
+                Damage((20.).into())
+            ]),
+            And(vec![
+                Skill(Bash),
+                EnergySkill(Grenade, (2.).into()),
                 Or(vec![Skill(Sword), Skill(Hammer)]),
             ]),
         ]),
         And(vec![
             Skill(Bash),
-            EnergySkill(Grenade, 1.),
+            EnergySkill(Grenade, (1.).into()),
             Or(vec![
                 Skill(Dash),
                 Skill(Glide),
-                Damage(20.),
+                Damage((20.).into()),
                 And(vec![
                     Or(vec![Skill(Sword), Skill(Hammer)]),
-                    EnergySkill(Grenade, 1.),
+                    EnergySkill(Grenade, (1.).into()),
                 ])
             ])
         ])
@@ -129,7 +137,7 @@ fn optimize_graph_fishing_pool() {
             And(vec![
                 Skill(DoubleJump),
                 Skill(Bash),
-                EnergySkill(Grenade, 1.0),
+                EnergySkill(Grenade, (1.).into()),
             ]),
             Skill(Launch),
             And(vec![
@@ -138,11 +146,11 @@ fn optimize_graph_fishing_pool() {
             ]),
             And(vec![
                 Skill(Bash),
-                EnergySkill(Grenade, 1.0),
+                EnergySkill(Grenade, (1.).into()),
                 Or(vec![Skill(Dash), Skill(Sword), Skill(Hammer)]),
             ]),
             And(vec![Skill(DoubleJump), Shard(TripleJump), Skill(Dash)]),
-        ]),]),
+        ]),],),
         Or(vec![
             And(vec![
                 Skill(Grapple),
@@ -156,7 +164,7 @@ fn optimize_graph_fishing_pool() {
             ]),
             And(vec![
                 Skill(Bash),
-                EnergySkill(Grenade, 1.),
+                EnergySkill(Grenade, (1.).into()),
                 Or(vec![
                     Skill(DoubleJump),
                     Skill(Dash),
@@ -186,7 +194,11 @@ fn optimize_graph_burrow_arena() {
 
     test!(
         Or(vec![
-            And(vec![Skill(Regenerate), Damage(40.), combat.clone()]),
+            And(vec![
+                Skill(Regenerate),
+                Damage((40.).into()),
+                combat.clone()
+            ]),
             combat.clone()
         ]),
         combat

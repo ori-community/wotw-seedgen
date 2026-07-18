@@ -189,7 +189,7 @@ impl<'graph> World<'graph, '_, '_> {
             Requirement::EnergySkill(skill, amount) => {
                 self.skill_met(*skill)?;
 
-                let cost = self.use_cost(*skill) * *amount;
+                let cost = self.use_cost(*skill) * **amount;
                 self.cost_met::<true>(cost, orb_variants)
             }
             Requirement::NonConsumingEnergySkill(skill) => {
@@ -225,19 +225,19 @@ impl<'graph> World<'graph, '_, '_> {
                 self.is_met(&self.graph.extern_requirements[*index], orb_variants)
             }
             Requirement::Damage(amount) => {
-                let cost = *amount * self.defense_mod();
+                let cost = **amount * self.defense_mod();
                 self.health_met::<true>(cost, orb_variants)
             }
             Requirement::Danger(amount) => {
-                let cost = *amount * self.defense_mod();
+                let cost = **amount * self.defense_mod();
                 self.health_met::<false>(cost, orb_variants)
             }
             Requirement::BreakWall(health) => {
-                self.destroy_cost_met::<true>(*health, false, orb_variants)
+                self.destroy_cost_met::<true>(**health, false, orb_variants)
             }
             Requirement::Boss(health) => {
                 // TODO rock boss is flying, just placing a todo in case rock boss will be logic relevant someday
-                self.destroy_cost_met::<false>(*health, false, orb_variants)
+                self.destroy_cost_met::<false>(**health, false, orb_variants)
             }
             Requirement::Combat(enemies) => {
                 // TODO handle nests better
@@ -328,7 +328,7 @@ impl<'graph> World<'graph, '_, '_> {
                 } else {
                     3.0
                 };
-                let cost = self.destroy_cost_with(*health, Skill::Shuriken, false) * clip_mod;
+                let cost = self.destroy_cost_with(**health, Skill::Shuriken, false) * clip_mod;
 
                 self.cost_met::<true>(cost, orb_variants)
             }
@@ -336,7 +336,7 @@ impl<'graph> World<'graph, '_, '_> {
                 self.skill_met(Skill::Sentry)?;
 
                 let clip_mod = 6.25;
-                let cost = self.destroy_cost_with(*health, Skill::Sentry, false) * clip_mod;
+                let cost = self.destroy_cost_with(**health, Skill::Sentry, false) * clip_mod;
 
                 self.cost_met::<true>(cost, orb_variants)
             }

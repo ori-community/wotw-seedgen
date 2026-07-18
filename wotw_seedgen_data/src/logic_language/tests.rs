@@ -223,12 +223,18 @@ fn logical_cmp() {
 
     test!(Difficulty(Kii), ">", Difficulty(Gorlek));
 
-    test!(BreakWall(20.), ">", BreakWall(16.));
+    test!(BreakWall((20.).into()), ">", BreakWall((16.).into()));
 
     test!(
-        And(vec![EnergySkill(Bow, 1.), EnergySkill(Shuriken, 1.)]),
+        And(vec![
+            EnergySkill(Bow, (1.).into()),
+            EnergySkill(Shuriken, (1.).into())
+        ]),
         "≠",
-        And(vec![EnergySkill(Shuriken, 1.), EnergySkill(Bow, 1.)]),
+        And(vec![
+            EnergySkill(Shuriken, (1.).into()),
+            EnergySkill(Bow, (1.).into())
+        ]),
     );
 
     test!(
@@ -276,9 +282,15 @@ fn logical_cmp() {
     );
 
     test!(
-        Or(vec![EnergySkill(Bow, 1.), EnergySkill(Shuriken, 1.)]),
+        Or(vec![
+            EnergySkill(Bow, (1.).into()),
+            EnergySkill(Shuriken, (1.).into())
+        ]),
         "=",
-        Or(vec![EnergySkill(Shuriken, 1.), EnergySkill(Bow, 1.)]),
+        Or(vec![
+            EnergySkill(Shuriken, (1.).into()),
+            EnergySkill(Bow, (1.).into())
+        ]),
     );
 
     test!(

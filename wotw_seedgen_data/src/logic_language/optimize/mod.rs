@@ -5,6 +5,7 @@ use std::{cmp::Ordering, mem};
 
 use itertools::Itertools;
 use log::trace;
+use ordered_float::OrderedFloat;
 
 use crate::logic_language::output::{
     Anchor, Connection, Entrance, Graph, Node, Refill, Requirement,
@@ -137,11 +138,11 @@ impl Requirement {
         }
 
         fn remove_amount<const FRONT: bool>(
-            a_amount: f32,
-            b_amount: f32,
+            a_amount: OrderedFloat<f32>,
+            b_amount: OrderedFloat<f32>,
             a: &mut Requirement,
             b: &mut Requirement,
-            f: impl FnOnce(f32) -> Requirement,
+            f: impl FnOnce(OrderedFloat<f32>) -> Requirement,
         ) -> CommonFactors {
             match f32::total_cmp(&a_amount, &b_amount) {
                 Ordering::Less => {

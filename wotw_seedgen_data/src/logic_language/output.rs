@@ -9,6 +9,7 @@ use crate::{
     Difficulty, PartialThen, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, Zone,
 };
 use itertools::Itertools;
+use ordered_float::OrderedFloat;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
 use smallvec::SmallVec;
@@ -197,7 +198,8 @@ pub enum Requirement {
     NormalGameDifficulty,
     Trick(Trick),
     Skill(Skill),
-    EnergySkill(Skill, f32),
+    // TODO f32::total_cmp looks better than OrderedFloat::cmp, maybe we should have a wrapper for that instead
+    EnergySkill(Skill, OrderedFloat<f32>),
     NonConsumingEnergySkill(Skill),
     // TODO resources as i32?
     SpiritLight(usize),
@@ -208,15 +210,21 @@ pub enum Requirement {
     Water,
     State(usize),
     Extern(usize),
-    Damage(f32),
-    Danger(f32),
+    #[schema(value_type = f32)]
+    Damage(OrderedFloat<f32>),
+    #[schema(value_type = f32)]
+    Danger(OrderedFloat<f32>),
     // utoipa has a smallvec feature but it doesn't work
     #[schema(value_type = Vec<(Enemy, u8)>)]
     Combat(SmallVec<[(Enemy, u8); 12]>),
-    Boss(f32),
-    BreakWall(f32),
-    ShurikenBreak(f32),
-    SentryBreak(f32),
+    #[schema(value_type = f32)]
+    Boss(OrderedFloat<f32>),
+    #[schema(value_type = f32)]
+    BreakWall(OrderedFloat<f32>),
+    #[schema(value_type = f32)]
+    ShurikenBreak(OrderedFloat<f32>),
+    #[schema(value_type = f32)]
+    SentryBreak(OrderedFloat<f32>),
     #[schema(no_recursion)]
     And(Vec<Requirement>),
     #[schema(no_recursion)]

@@ -98,10 +98,10 @@ fn is_met(c: &mut Criterion) {
     let world_settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
     let mut world = spawnless_world(&TEST_ASSETS.graphs.moki, &world_settings);
 
-    let req_a = Requirement::EnergySkill(Skill::Blaze, 2.0);
-    let req_b = Requirement::Damage(20.0);
-    let req_c = Requirement::EnergySkill(Skill::Blaze, 1.0);
-    let req_d = Requirement::Damage(10.0);
+    let req_a = Requirement::EnergySkill(Skill::Blaze, (2.0).into());
+    let req_b = Requirement::Damage((20.0).into());
+    let req_c = Requirement::EnergySkill(Skill::Blaze, (1.0).into());
+    let req_d = Requirement::Damage((10.0).into());
     world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
     world.add_base_max_health(20, &CommandsOutput::NONE);
     world.add_base_max_energy((2.).into(), &CommandsOutput::NONE);

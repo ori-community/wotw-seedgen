@@ -232,14 +232,20 @@ fn mock_solutions() {
     );
 
     test!(
-        Requirement::EnergySkill(Grenade, 2.),
+        Requirement::EnergySkill(Grenade, (2.).into()),
         [[skill(Grenade), (energy_fragment(), 8)]]
     );
 
-    test!(Requirement::Damage(36.), [[(health_fragment(), 8)]]);
+    test!(
+        Requirement::Damage((36.).into()),
+        [[(health_fragment(), 8)]]
+    );
 
     test!(
-        Requirement::And(vec![Requirement::Damage(18.), Requirement::Damage(18.)]),
+        Requirement::And(vec![
+            Requirement::Damage((18.).into()),
+            Requirement::Damage((18.).into())
+        ]),
         [
             [(health_fragment(), 8)],
             [
@@ -251,12 +257,15 @@ fn mock_solutions() {
     );
 
     test!(
-        Requirement::Or(vec![Requirement::Damage(36.), Requirement::Damage(18.)]),
+        Requirement::Or(vec![
+            Requirement::Damage((36.).into()),
+            Requirement::Damage((18.).into())
+        ]),
         [[(health_fragment(), 4)]]
     );
 
     test!(
-        Requirement::BreakWall(12.),
+        Requirement::BreakWall((12.).into()),
         [
             [skill(Sword)],
             [skill(Hammer)],
@@ -308,11 +317,7 @@ fn mock_solutions() {
     settings.difficulty = Difficulty::Unsafe;
 
     test!(
-        Requirement::And(vec![
-            Requirement::Damage(18.),
-            Requirement::Damage(18.),
-            Requirement::Damage(18.),
-        ]),
+        Requirement::And(vec![Requirement::Damage((18.).into()); 3]),
         [
             [(health_fragment(), 11)],
             [shard(Resilience), (health_fragment(), 10)],
@@ -343,7 +348,7 @@ fn mock_solutions() {
 
     test!(
         spawn with [skill(Bow)],
-        Requirement::BreakWall(12.),
+        Requirement::BreakWall((12.).into()),
         [
            [skill(Sword)],
            [skill(Hammer)],
@@ -370,7 +375,7 @@ fn mock_solutions() {
     );
 
     test!(
-        Requirement::BreakWall(12.),
+        Requirement::BreakWall((12.).into()),
         [
             [skill(Sword)],
             [skill(Hammer)],
@@ -508,8 +513,8 @@ fn mock_solutions() {
     test!(
         // TODO this should really be equivalent to Requirement::EnergySkill(Grenade, 2.0)
         Requirement::And(vec![
-            Requirement::EnergySkill(Grenade, 1.),
-            Requirement::EnergySkill(Grenade, 1.)
+            Requirement::EnergySkill(Grenade, (1.).into()),
+            Requirement::EnergySkill(Grenade, (1.).into())
         ]),
         [
             [skill(Grenade), (energy_fragment(), 4)],
