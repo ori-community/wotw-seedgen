@@ -1,7 +1,6 @@
 use std::{
     cmp::Ordering,
     fmt::{self, Display},
-    iter,
 };
 
 use crate::{
@@ -190,41 +189,46 @@ pub enum RefillValue {
     Energy(f32),
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
+// While Requirement does not implement any `Ord`, we still want to order
+// the discriminants in accordance to `Requirement::discriminant_value` from `optimize`
+// to transparently match the intrinsic discriminant values.
+// This roughly means ordering from cheap to expensize and specifically
+// ordering all orb-modifying requirements at the end.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, ToSchema)]
 pub enum Requirement {
     Free,
     Impossible,
-    Difficulty(Difficulty),
     NormalGameDifficulty,
+    Difficulty(Difficulty),
     Trick(Trick),
+    State(usize),
+    Water,
     Skill(Skill),
-    // TODO f32::total_cmp looks better than OrderedFloat::cmp, maybe we should have a wrapper for that instead
-    EnergySkill(Skill, OrderedFloat<f32>),
-    NonConsumingEnergySkill(Skill),
+    Shard(Shard),
+    Teleporter(Teleporter),
     // TODO resources as i32?
     SpiritLight(usize),
     GorlekOre(usize),
     Keystone(usize),
-    Shard(Shard),
-    Teleporter(Teleporter),
-    Water,
-    State(usize),
-    Extern(usize),
     #[schema(value_type = f32)]
     Damage(OrderedFloat<f32>),
     #[schema(value_type = f32)]
     Danger(OrderedFloat<f32>),
-    // utoipa has a smallvec feature but it doesn't work
-    #[schema(value_type = Vec<(Enemy, u8)>)]
-    Combat(SmallVec<[(Enemy, u8); 12]>),
-    #[schema(value_type = f32)]
-    Boss(OrderedFloat<f32>),
-    #[schema(value_type = f32)]
-    BreakWall(OrderedFloat<f32>),
+    NonConsumingEnergySkill(Skill),
+    // TODO f32::total_cmp looks better than OrderedFloat::cmp, maybe we should have a wrapper for that instead
+    EnergySkill(Skill, OrderedFloat<f32>),
     #[schema(value_type = f32)]
     ShurikenBreak(OrderedFloat<f32>),
     #[schema(value_type = f32)]
     SentryBreak(OrderedFloat<f32>),
+    Extern(usize),
+    #[schema(value_type = f32)]
+    BreakWall(OrderedFloat<f32>),
+    #[schema(value_type = f32)]
+    Boss(OrderedFloat<f32>),
+    // utoipa has a smallvec feature but it doesn't work
+    #[schema(value_type = Vec<(Enemy, u8)>)]
+    Combat(SmallVec<[(Enemy, u8); 12]>),
     #[schema(no_recursion)]
     And(Vec<Requirement>),
     #[schema(no_recursion)]
@@ -325,11 +329,18 @@ impl Requirement {
 
             let mut ordering = Ordering::Equal;
 
-            for (a_item, b_item) in iter::zip(&mut a_iter, &mut b_iter) {
-                ordering = ordering.partial_then(f(a_item, b_item)?)?;
+            // Cannot use zip because we need to check the remaining state after
+            while let Some(a) = a_iter.next() {
+                match b_iter.next() {
+                    None => return ordering.partial_then(Ordering::Greater),
+                    Some(b) => ordering = ordering.partial_then(f(a, b)?)?,
+                }
             }
 
-            ordering.partial_then(a_iter.count().cmp(&b_iter.count()))
+            match b_iter.next() {
+                None => Some(ordering),
+                Some(_) => ordering.partial_then(Ordering::Less),
+            }
         }
 
         /// Compare a chain of requirements where order doesn't matter.
@@ -460,6 +471,7 @@ impl Requirement {
         }
     }
 
+    // TODO implement based on discriminants as well now? If that improves anything?
     pub(super) fn changes_orbs(&self) -> bool {
         self.orb_change_kind().is_some()
     }
