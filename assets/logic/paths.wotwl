@@ -15376,8 +15376,9 @@ anchor LowerWastes.CentralTP at 1992, -3902:  # Location of the east teleporter
     kii: Burrow
   conn UpperWastes.KeystoneRoom:
     moki: Burrow, DoubleJump OR Dash OR Launch
-    gorlek: Burrow, Glide OR Sword OR Damage=30
-    kii: Burrow
+    gorlek: Burrow, Glide OR Sword
+    kii: Burrow, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=30
+    unsafe: Burrow
 
 region UpperWastes:
   moki: Danger=50, Regenerate  # 30 from spikes + 20 from MaceMiner's hammer attack
@@ -15462,7 +15463,8 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
   conn LowerWastes.CentralTP:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow, Sword OR Hammer OR Damage=30
-    kii: Burrow
+    kii: Burrow, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: Burrow
   conn UpperWastes.MissilePuzzleLeft:
     moki, UpperWastes.KeystoneDoor, Burrow:
       Bash, DoubleJump OR Dash OR Glide
