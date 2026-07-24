@@ -53,7 +53,8 @@ impl Graph {
 
         let Compiler {
             nodes: compiled_nodes,
-            default_entrance_connections,
+            mut extern_requirements,
+            mut default_entrance_connections,
             errors,
             ..
         } = compiler;
@@ -63,8 +64,13 @@ impl Graph {
         nodes.extend(state_data_nodes);
         nodes.extend(compiled_nodes);
 
+        nodes.shrink_to_fit();
+        extern_requirements.shrink_to_fit();
+        default_entrance_connections.shrink_to_fit();
+
         let mut graph = Graph {
             nodes,
+            extern_requirements,
             default_entrance_connections,
         };
 
@@ -79,6 +85,7 @@ impl Graph {
 
 struct Compiler<'source> {
     nodes: Vec<Node>,
+    extern_requirements: Vec<Requirement>,
     index_offset: usize,
     entrance_nodes: Vec<usize>,
     default_entrance_connections: FxHashMap<EntranceId, EntranceId>,
@@ -88,7 +95,7 @@ struct Compiler<'source> {
     state_map: FxHashMap<Cow<'source, str>, usize>,
     pickup_map: FxHashMap<&'source str, usize>,
     anchor_map: FxHashMap<String, usize>,
-    macros: FxHashMap<String, Requirement>,
+    extern_requirement_map: FxHashMap<String, usize>,
     regions: FxHashMap<String, Requirement>,
     errors: Vec<Error>,
 }
@@ -108,14 +115,11 @@ impl<'source> Compiler<'source> {
         );
 
         let mut errors = vec![];
-        let mut nodes = vec![]; // TODO capacity
-        let mut state_map = FxHashMap::default();
-        let mut pickup_map = FxHashMap::default();
-        let mut anchor_map = FxHashMap::default();
-        let mut index_iter = 0..;
+        let mut node_index_iter = 0..;
 
         // index_iter has to be the second iterator so it doesn't get incremented when the first one runs out
-        for (node, index) in iter::zip(loc_data_nodes, &mut index_iter) {
+        let mut pickup_map = FxHashMap::default();
+        for (node, index) in iter::zip(loc_data_nodes, &mut node_index_iter) {
             let identifier = node.identifier();
             if pickup_map.insert(identifier, index).is_some() {
                 errors.push(Error::error(
@@ -124,7 +128,9 @@ impl<'source> Compiler<'source> {
                 ));
             }
         }
-        for (node, index) in iter::zip(state_data_nodes, &mut index_iter) {
+
+        let mut state_map = FxHashMap::default();
+        for (node, index) in iter::zip(state_data_nodes, &mut node_index_iter) {
             let identifier = node.identifier();
             if state_map.insert(Cow::Borrowed(identifier), index).is_some() {
                 errors.push(Error::error(
@@ -155,51 +161,78 @@ impl<'source> Compiler<'source> {
             }
         }
 
+        let mut nodes = vec![]; // TODO capacity
         let mut anchors = Vec::with_capacity(300); // We know more about the needed capacity than collect would
+        let mut anchor_map = FxHashMap::default();
+        let mut extern_requirement_map = FxHashMap::default();
+        let mut extern_requirement_index_iter = 0..;
 
-        for anchor in paths
-            .contents
-            .iter()
-            .filter_map(|content| content.value.as_option())
-            .filter_map(|content| {
-                if let ast::Content::Anchor(_, anchor) = content {
-                    Some(anchor)
-                } else {
-                    None
-                }
-            })
-            .filter_map(|anchor| anchor.value.as_option())
-        {
-            for connection in anchor
-                .content
-                .content
-                .value
-                .as_option()
-                .into_iter()
-                .flat_map(|group| &group.content)
-                .filter_map(|content| match content {
-                    ast::AnchorContent::Connection(
-                        Spanned {
-                            data: ast::ConnectionKeyword::State,
-                            ..
-                        },
-                        connection,
-                    ) => connection.value.as_option(),
-                    _ => None,
-                })
-            {
-                if !state_map.contains_key(connection.identifier.data.0) {
-                    nodes.push(Node::LogicalState(connection.identifier.data.0.to_string()));
-                    state_map.insert(
-                        Cow::Owned(connection.identifier.data.0.to_string()),
-                        index_iter.next().unwrap(),
+        for content in &paths.contents {
+            let SpannedOption::Some(content) = &content.value else {
+                continue;
+            };
+
+            match content {
+                ast::Content::Requirement(_, requirement) => {
+                    let SpannedOption::Some(requirement) = &requirement.value else {
+                        continue;
+                    };
+
+                    let previous = extern_requirement_map.insert(
+                        requirement.identifier.data.0.to_string(),
+                        extern_requirement_index_iter.next().unwrap(),
                     );
+
+                    if previous.is_some() {
+                        errors.push(Error::error(
+                            "duplicate identifier".to_string(),
+                            requirement.identifier.span.clone(),
+                        ));
+                    }
                 }
+                ast::Content::Anchor(_, anchor) => {
+                    let SpannedOption::Some(anchor) = &anchor.value else {
+                        continue;
+                    };
+
+                    anchors.push(anchor);
+
+                    let SpannedOption::Some(group) = &anchor.content.content.value else {
+                        continue;
+                    };
+
+                    for connection in &group.content {
+                        let ast::AnchorContent::Connection(
+                            Spanned {
+                                data: ast::ConnectionKeyword::State,
+                                ..
+                            },
+                            Recoverable {
+                                value: SpannedOption::Some(state_connection),
+                                ..
+                            },
+                        ) = connection
+                        else {
+                            continue;
+                        };
+
+                        if !state_map.contains_key(state_connection.identifier.data.0) {
+                            nodes.push(Node::LogicalState(
+                                state_connection.identifier.data.0.to_string(),
+                            ));
+
+                            state_map.insert(
+                                Cow::Owned(state_connection.identifier.data.0.to_string()),
+                                node_index_iter.next().unwrap(),
+                            );
+                        }
+                    }
+                }
+                _ => {}
             }
-            anchors.push(anchor);
         }
 
-        for (index, anchor) in index_iter.zip(anchors) {
+        for (index, anchor) in node_index_iter.zip(anchors) {
             if anchor_map.contains_key(anchor.identifier.data.0) {
                 errors.push(Error::error(
                     format!("duplicate identifier \"{}\"", anchor.identifier.data.0),
@@ -212,6 +245,7 @@ impl<'source> Compiler<'source> {
 
         Self {
             nodes,
+            extern_requirements: vec![],
             index_offset: loc_data_nodes.len() + state_data_nodes.len(),
             entrance_nodes: vec![],
             default_entrance_connections: FxHashMap::default(),
@@ -221,7 +255,7 @@ impl<'source> Compiler<'source> {
             state_map,
             pickup_map,
             anchor_map,
-            macros: Default::default(),
+            extern_requirement_map,
             regions: Default::default(),
             errors,
         }
@@ -642,18 +676,12 @@ impl<'source> Compile for ast::Macro<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
-        if compiler.macros.contains_key(self.identifier.data.0) {
-            compiler.error("duplicate identifier".to_string(), self.identifier.span);
-        } else {
-            let requirement = self
-                .requirements
-                .compile(compiler)
-                .map_or(Requirement::Impossible, Requirement::or);
+        let requirement = self
+            .requirements
+            .compile(compiler)
+            .map_or(Requirement::Impossible, Requirement::or);
 
-            compiler
-                .macros
-                .insert(self.identifier.data.0.to_string(), requirement);
-        }
+        compiler.extern_requirements.push(requirement);
     }
 }
 
@@ -1032,8 +1060,8 @@ impl<'source> Compile for ast::PlainRequirement<'source> {
             }
         };
 
-        let result = if let Some(requirement) = compiler.macros.get(identifier) {
-            Ok(requirement.clone())
+        let result = if let Some(extern_index) = compiler.extern_requirement_map.get(identifier) {
+            Ok(Requirement::Extern(*extern_index))
         } else if let Ok(skill) = Skill::from_str(identifier) {
             match amount {
                 None => Ok(Requirement::Skill(skill)),

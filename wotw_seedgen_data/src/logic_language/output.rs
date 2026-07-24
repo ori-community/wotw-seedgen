@@ -20,6 +20,7 @@ pub type EntranceId = i32;
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub struct Graph {
     pub nodes: Vec<Node>,
+    pub extern_requirements: Vec<Requirement>,
     pub default_entrance_connections: FxHashMap<EntranceId, EntranceId>,
 }
 
@@ -28,6 +29,7 @@ impl Graph {
     pub fn empty() -> Self {
         Self {
             nodes: Vec::new(),
+            extern_requirements: Vec::new(),
             default_entrance_connections: FxHashMap::default(),
         }
     }
@@ -205,6 +207,7 @@ pub enum Requirement {
     Teleporter(Teleporter),
     Water,
     State(usize),
+    Extern(usize),
     Damage(f32),
     Danger(f32),
     // utoipa has a smallvec feature but it doesn't work
@@ -490,6 +493,7 @@ impl Display for Requirement {
             Self::Teleporter(teleporter) => teleporter.fmt(f),
             Self::Water => write!(f, "Water"),
             Self::State(state) => write!(f, "{{{state}}}"),
+            Self::Extern(index) => write!(f, "{{extern {index}}}"),
             Self::Damage(amount) => write!(f, "Damage={amount}"),
             Self::Danger(amount) => write!(f, "Danger={amount}"),
             Self::Combat(enemies) => write!(
