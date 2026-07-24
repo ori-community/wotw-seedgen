@@ -140,12 +140,15 @@ impl Display for Missing<'_> {
     }
 }
 
-impl World<'_, '_, '_> {
+impl<'graph> World<'graph, '_, '_> {
     pub fn is_met<'req>(
         &self,
         requirement: &'req Requirement,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'req>> {
+    ) -> ControlFlow<Missing<'req>>
+    where
+        'graph: 'req,
+    {
         trace!("checking is_met for {requirement} with {orb_variants}");
 
         // TODO does this optimize cleanly? probably not!
@@ -163,7 +166,10 @@ impl World<'_, '_, '_> {
         &self,
         requirement: &'req Requirement,
         orb_variants: &mut OrbVariants,
-    ) -> ControlFlow<Missing<'req>> {
+    ) -> ControlFlow<Missing<'req>>
+    where
+        'graph: 'req,
+    {
         match requirement {
             Requirement::Free => ControlFlow::Continue(()),
             Requirement::Impossible => ControlFlow::Break(Missing::Impossible),
@@ -207,6 +213,9 @@ impl World<'_, '_, '_> {
                 } else {
                     ControlFlow::Break(Missing::state(*state, &self.graph.nodes[*state]))
                 }
+            }
+            Requirement::Extern(index) => {
+                self.is_met(&self.graph.extern_requirements[*index], orb_variants)
             }
             Requirement::Damage(amount) => {
                 let cost = *amount * self.defense_mod();

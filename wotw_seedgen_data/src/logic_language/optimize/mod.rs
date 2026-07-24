@@ -251,6 +251,7 @@ impl Requirement {
             | Self::State(_) => false,
             Self::EnergySkill(_, _)
             | Self::NonConsumingEnergySkill(_)
+            | Self::Extern(_)
             | Self::Damage(_)
             | Self::Danger(_)
             | Self::Combat(_)
@@ -410,7 +411,8 @@ fn reorder_ands(ands: &mut [Requirement]) {
             | Requirement::Shard(_)
             | Requirement::Teleporter(_)
             | Requirement::Water => ReorderKey::Simple,
-            Requirement::EnergySkill(_, _)
+            Requirement::Extern(_)
+            | Requirement::EnergySkill(_, _)
             | Requirement::NonConsumingEnergySkill(_)
             | Requirement::Damage(_)
             | Requirement::Danger(_) => ReorderKey::ChangesOrbs,
