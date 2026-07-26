@@ -9,7 +9,7 @@ use std::{
 use wotw_seedgen::{data::assets::DefaultFileAccess, generate_seed, perf_data::PerfData};
 
 use crate::{
-    cli::{PerfArgs, PerfTarget},
+    cli::dev::{PerfArgs, PerfTarget},
     seed::logic_assets,
     Error,
 };

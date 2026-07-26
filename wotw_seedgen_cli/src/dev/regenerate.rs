@@ -8,7 +8,7 @@ use wotw_seedgen::{
 use zip::{read::ZipFile, ZipArchive};
 
 use crate::{
-    cli::{GenerationArgs, RegenerateArgs},
+    cli::{dev::RegenerateArgs, GenerationArgs},
     log_config::LogConfig,
     seed::{generate, write_new_game_seed_source, write_seed},
     Error,

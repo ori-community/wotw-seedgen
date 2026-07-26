@@ -1,25 +1,22 @@
+pub mod dev;
+
 mod display;
 mod http_server_args;
 mod interactive;
-mod perf_args;
 mod plando_args;
 mod preset_args;
-mod print_optimized_graph_args;
-mod regenerate_args;
 mod seed_args;
 mod seed_settings;
 mod stats_args;
 
+use dev::Dev;
 pub use display::{
     AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
     AVAILABLE_WORLD_PRESETS,
 };
 pub use http_server_args::HttpServerArgs;
-pub use perf_args::{PerfArgs, PerfTarget};
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
-pub use print_optimized_graph_args::PrintOptimizedGraphArgs;
-pub use regenerate_args::RegenerateArgs;
 pub use seed_args::{
     GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs, VerboseArgs, VerboseTarget,
 };
@@ -69,24 +66,10 @@ pub enum Cli {
         #[command(flatten)]
         args: StatsArgs,
     },
-    /// Regenerate an existing seed for debugging
-    Regenerate {
-        #[command(flatten)]
-        args: RegenerateArgs,
-    },
-    /// Display which local paths seedgen is using
-    Paths,
-    /// Import an UberState dump
-    ImportUberStates,
-    /// Compiles and decompiles the logic graph
-    PrintOptimizedGraph {
-        #[command(flatten)]
-        args: PrintOptimizedGraphArgs,
-    },
-    /// Performance measurement tools
-    Perf {
-        #[command(flatten)]
-        args: PerfArgs,
+    /// Various utilities primarily intended for seedgen development
+    Dev {
+        #[command(subcommand)]
+        command: Dev,
     },
     /// Start the http server
     HttpServer {

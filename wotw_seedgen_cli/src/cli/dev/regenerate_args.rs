@@ -1,7 +1,7 @@
 use clap::Args;
 use std::path::PathBuf;
 
-use super::seed_args::{GenerationArgs, VerboseArgs};
+use crate::cli::{GenerationArgs, VerboseArgs};
 
 #[derive(Args)]
 pub struct RegenerateArgs {

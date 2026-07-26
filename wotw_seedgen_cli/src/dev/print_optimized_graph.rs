@@ -1,6 +1,6 @@
 use std::time::Instant;
 
-use crate::{cli::PrintOptimizedGraphArgs, log_config::LogConfig, seed::logic_assets, Error};
+use crate::{cli::dev::PrintOptimizedGraphArgs, log_config::LogConfig, seed::logic_assets, Error};
 
 pub fn print_optimized_graph(args: PrintOptimizedGraphArgs) -> Result<(), Error> {
     let PrintOptimizedGraphArgs {
