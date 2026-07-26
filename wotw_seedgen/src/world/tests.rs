@@ -1,10 +1,6 @@
 use std::ops::ControlFlow;
 
-use crate::{
-    item_pool::ItemPoolBuilder,
-    orbs::{OrbVariants, Orbs},
-    World,
-};
+use crate::{item_pool::ItemPoolBuilder, orb_variants, orbs::Orbs, World};
 use itertools::Itertools;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
@@ -183,7 +179,7 @@ fn refill_orbs() {
 
     let world = test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
 
-    let mut orb_variants = smallvec![Orbs::default()];
+    let mut orb_variants = orb_variants![Orbs::default()];
     world.refill(RefillValue::Full, &mut orb_variants);
     assert_eq!(&orb_variants[..], &[world.max_orbs()]);
 }
@@ -245,7 +241,7 @@ fn is_met() {
         ($req:expr, [$world_orbs:expr], $f:path) => {
             {
                 let req = $req;
-                let mut orb_variants: OrbVariants = smallvec![$world_orbs];
+                let mut orb_variants = orb_variants![$world_orbs];
                 let control_flow = world.is_met(&req, &mut orb_variants);
                 assert!($f(&control_flow));
             }
@@ -254,10 +250,10 @@ fn is_met() {
         ($req:expr, [$world_orbs:expr], [$($orbs:expr),* $(,)?]) => {
             {
                 let req = $req;
-                let mut left: OrbVariants = smallvec![$world_orbs];
+                let mut left = orb_variants![$world_orbs];
                 let _ = world.is_met(&req, &mut left);
                 left.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));
-                let mut right: OrbVariants = smallvec![$($world_orbs + $orbs),*];
+                let mut right = orb_variants![$($world_orbs + $orbs),*];
                 right.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));
                 assert_eq!(left, right);
             }

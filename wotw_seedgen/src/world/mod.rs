@@ -19,11 +19,11 @@ use std::{
 
 use crate::{
     logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS},
+    orb_variants,
     orbs::{OrbVariants, Orbs},
     perf_data::PerfData,
 };
 use reached::Reach;
-use smallvec::smallvec;
 use wotw_seedgen_data::{
     assets::UberStateValue,
     logic_language::output::{Graph, RefillValue},
@@ -288,7 +288,7 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
         debug_assert!(!orb_variants.is_empty());
 
         match refill {
-            RefillValue::Full => *orb_variants = smallvec![self.max_orbs()],
+            RefillValue::Full => *orb_variants = orb_variants![self.max_orbs()],
             RefillValue::Checkpoint => {
                 let checkpoint_orbs = self.checkpoint_orbs();
 

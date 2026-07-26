@@ -7,14 +7,14 @@ use std::{
 use super::World;
 use crate::{
     logical_difficulty::LogicalDifficulty,
-    orbs::{self, format_orb_variants, OrbVariants},
+    orb_variants,
+    orbs::OrbVariants,
     perf_data::PerfData,
     world::{GraphRef, Missing, ReachUpdateState},
 };
 use itertools::Itertools;
 use log::trace;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
-use smallvec::smallvec;
 use wotw_seedgen_data::{
     assets::{LocDataEntry, StateDataEntry},
     logic_language::output::{Anchor, Connection, Graph, Node, Refill, RefillValue, Requirement},
@@ -74,12 +74,12 @@ impl BestOrbs {
     fn new(pre_refills: OrbVariants) -> Self {
         Self {
             pre_refills,
-            post_refills: smallvec![],
+            post_refills: orb_variants![],
         }
     }
 
     fn placeholder() -> Self {
-        Self::new(smallvec![])
+        Self::new(orb_variants![])
     }
 }
 
@@ -344,7 +344,7 @@ impl Display for ConnectionRequirementPartial<'_> {
             f,
             " -> {requirement} [{orb_variants}]",
             requirement = self.requirement.0,
-            orb_variants = format_orb_variants(&self.orb_variants.0)
+            orb_variants = self.orb_variants,
         )
     }
 }
@@ -414,7 +414,7 @@ impl<'graph> World<'graph, '_, '_> {
     pub fn traverse_spawn(&mut self, output: &CommandsOutput) {
         self.check_all_states();
 
-        let orb_variants = smallvec![self.max_orbs()];
+        let orb_variants = orb_variants![self.max_orbs()];
         self.traverse(self.spawn, orb_variants, output);
 
         self.attempt_spawn_teleport(output);
@@ -471,7 +471,7 @@ impl<'graph> World<'graph, '_, '_> {
             return;
         }
 
-        let mut orb_variants = smallvec![self.max_orbs()];
+        let mut orb_variants = orb_variants![self.max_orbs()];
 
         if self
             .is_met(&anchor.teleport_restriction, &mut orb_variants)
@@ -700,12 +700,12 @@ impl<'graph> World<'graph, '_, '_> {
             {
                 if matches!(refill.value, RefillValue::Full) {
                     // shortcut
-                    *orb_variants = smallvec![max_orbs];
+                    *orb_variants = orb_variants![max_orbs];
                     return;
                 }
 
                 self.refill(refill.value, &mut refill_orbs);
-                *orb_variants = orbs::either(orb_variants, &refill_orbs);
+                orb_variants.insert_alternative(refill_orbs);
             }
         }
     }
@@ -740,15 +740,13 @@ impl<'graph> World<'graph, '_, '_> {
         if let Some(mut target_orbs) = target_orbs {
             if revisit {
                 let previous_orbs = &self.reach.state.best_orbs[&connection.to].pre_refills;
-                let new_orbs = orbs::either(previous_orbs, &target_orbs);
+                let new_orbs = OrbVariants::alternatives(previous_orbs.clone(), target_orbs);
 
                 let display = fmt::from_fn(|f| {
                     write!(
                         f,
                         "previous visit's orbs {previous_orbs} through {connection} with {new_orbs}",
-                        previous_orbs = format_orb_variants(previous_orbs),
                         connection = connection_index.display(self.graph),
-                        new_orbs = format_orb_variants(&new_orbs),
                     )
                 });
 

@@ -3,7 +3,8 @@ use std::ops::ControlFlow;
 
 use super::World;
 use crate::logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS};
-use crate::orbs::{self, format_orb_variants, OrbVariants, Orbs};
+use crate::orb_variants;
+use crate::orbs::{OrbVariants, Orbs};
 use crate::world::GraphRef;
 use itertools::Itertools;
 use log::trace;
@@ -134,7 +135,6 @@ impl Display for Missing<'_> {
                 ors = ors.iter().format_with(" or ", |(missing, requirement), f| {
                     f(&format_args!("{missing} -> {}", requirement.0))
                 }),
-                orbs = format_orb_variants(&orbs.0)
             ),
         }
     }
@@ -247,7 +247,7 @@ impl World<'_, '_, '_> {
                             // However in between energy refills, the cost is always the same
                             self.cost_met_or_better_weapon::<true>(cost, orb_variants)?;
 
-                            for orbs in &mut *orb_variants {
+                            for orbs in orb_variants.iter_mut() {
                                 self.recharge(orbs, amount);
                             }
 
@@ -339,7 +339,7 @@ impl World<'_, '_, '_> {
                 ControlFlow::Continue(())
             }
             Requirement::Or(requirements) => {
-                let mut cheapest = OrbVariants::new();
+                let mut cheapest = orb_variants![];
                 let mut missing = vec![];
 
                 for or in requirements {
@@ -349,7 +349,7 @@ impl World<'_, '_, '_> {
                             if cheapest.is_empty() {
                                 cheapest = orb_variants_after;
                             } else {
-                                cheapest = orbs::either(&cheapest, &orb_variants_after);
+                                cheapest.insert_alternative(orb_variants_after);
                             }
 
                             if cheapest[0] == Orbs::default() {
@@ -522,12 +522,12 @@ impl World<'_, '_, '_> {
             && self.shard(Shard::LifePact)
             && self.skill(Skill::Regenerate)
         {
-            let mut new_orb_variants = OrbVariants::new();
+            let mut new_orb_variants = orb_variants![];
             for orbs in &*orb_variants {
                 self.regenerate_preemptively(*orbs, &mut new_orb_variants, &mut missing);
             }
 
-            *orb_variants = orbs::either(orb_variants, &new_orb_variants);
+            orb_variants.insert_alternative(new_orb_variants);
         }
 
         orb_variants.retain(|orbs| self.orbs_meet_cost::<CONSUMING>(orbs, cost, &mut missing));

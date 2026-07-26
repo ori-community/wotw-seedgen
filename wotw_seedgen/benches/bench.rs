@@ -4,7 +4,7 @@ use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Through
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::smallvec;
-use wotw_seedgen::{item_pool::ItemPoolBuilder, World};
+use wotw_seedgen::{item_pool::ItemPoolBuilder, orb_variants, World};
 use wotw_seedgen_data::{
     assets::{
         AssetCacheValues, AssetFileAccess, PresetAccess, SnippetAccess, WorldPreset,
@@ -112,14 +112,14 @@ fn is_met(c: &mut Criterion) {
         Requirement::Or(vec![req_b.clone(), req_c.clone()]),
     ]);
     group.bench_function("nesting", |b| {
-        b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
+        b.iter(|| world.is_met(&requirement, &mut orb_variants![world.max_orbs()]))
     });
 
     world.store_skill(Skill::Bow, true, &CommandsOutput::NONE);
     world.add_base_max_energy(10., &CommandsOutput::NONE);
     let requirement = Requirement::Combat(smallvec![(Enemy::Lizard, 3),]);
     group.bench_function("short_combat", |b| {
-        b.iter(|| world.is_met(&requirement, &mut smallvec![world.max_orbs()]))
+        b.iter(|| world.is_met(&requirement, &mut orb_variants![world.max_orbs()]))
     });
 
     group.finish();

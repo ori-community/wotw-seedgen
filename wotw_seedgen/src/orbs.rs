@@ -1,13 +1,11 @@
 use std::{
     cmp::Ordering,
     fmt::{self, Display},
-    ops::{Add, AddAssign, Sub, SubAssign},
+    ops::{Add, AddAssign, Deref, DerefMut, Sub, SubAssign},
 };
 
 use itertools::Itertools;
-use smallvec::{smallvec, SmallVec, ToSmallVec};
-
-pub type OrbVariants = SmallVec<[Orbs; 3]>;
+use smallvec::SmallVec;
 
 /// A representation of a player's health and energy
 ///
@@ -19,13 +17,14 @@ pub struct Orbs {
 }
 
 impl Orbs {
-    pub fn new(health: f32, energy: f32) -> Self {
+    pub const fn new(health: f32, energy: f32) -> Self {
         Self { health, energy }
     }
 }
 
 impl Add for Orbs {
     type Output = Orbs;
+
     fn add(self, other: Orbs) -> Orbs {
         Orbs {
             health: self.health + other.health,
@@ -42,6 +41,7 @@ impl AddAssign for Orbs {
 
 impl Sub for Orbs {
     type Output = Orbs;
+
     fn sub(self, other: Orbs) -> Orbs {
         Orbs {
             health: self.health - other.health,
@@ -81,173 +81,132 @@ impl Display for Orbs {
     }
 }
 
-/// For two lists of [`Orbs`] representing alternative possible options, returns a list of [`Orbs`] that contains the options of both, but filtered for any redundancies
-///
-/// # Examples
-///
-/// ```
-/// # use wotw_seedgen::orbs::{either, Orbs, OrbVariants};
-/// # use smallvec::smallvec;
-/// #
-/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
-/// let either_orbs: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }, Orbs { health: 30.0, energy: 0.0 }];
-/// assert_eq!(either(&a, &b), either_orbs);
-///
-/// let a: OrbVariants = smallvec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 20.0, energy: 0.0 }];
-/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
-/// let either_orbs: OrbVariants = smallvec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 30.0, energy: 0.0 }];
-/// assert_eq!(either(&a, &b), either_orbs);
-///
-/// let a: OrbVariants = smallvec![Orbs { health: 30.0, energy: 1.0 }, Orbs { health: 10.0, energy: 3.0 }];
-/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 3.0 }];
-/// let either_orbs: OrbVariants = smallvec![Orbs { health: 30.0, energy: 3.0 }];
-/// assert_eq!(either(&a, &b), either_orbs);
-///
-/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b: OrbVariants = smallvec![];
-/// let either_orbs: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
-/// assert_eq!(either(&a, &b), either_orbs);
-///
-/// let a: OrbVariants = smallvec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }];
-/// let b: OrbVariants = smallvec![Orbs { health: 15.0, energy: 1.0 }];
-/// let either_orbs: OrbVariants = smallvec![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }, Orbs { health: 15.0, energy: 1.0 }];
-/// assert_eq!(either(&a, &b), either_orbs);
-/// ```
-// TODO optimization idea take ownership
-#[must_use]
-pub fn either(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
-    if b.is_empty() {
-        a.to_smallvec()
-    } else if a.is_empty() {
-        b.to_smallvec()
-    } else {
-        let mut sum: OrbVariants = a.to_smallvec();
-        for b in b {
-            if !sum
-                .iter()
-                .any(|a| a.energy >= b.energy && a.health >= b.health)
-            {
-                sum.retain(|a| a.energy > b.energy || a.health > b.health);
-                sum.push(*b);
-            }
-        }
-        sum
-    }
+#[derive(Debug, Default, PartialEq, Clone)]
+pub struct OrbVariants {
+    inner: OrbVariantsInner,
 }
 
-/// For a lists of [`Orbs`] representing alternative possible options and one additional option, returns a list of [`Orbs`] that contains the options of both, filtered for any redundancies
-///
-/// This is an optimization over [`orbs::either`](either) for only one additional option, see [`orbs::either`](either) for further documentation
-#[must_use]
-pub fn either_single(a: &[Orbs], b: Orbs) -> OrbVariants {
-    if a.is_empty() {
-        smallvec![b]
-    } else {
-        let mut sum: OrbVariants = a.to_smallvec();
-        if !sum
-            .iter()
-            .any(|a| a.energy >= b.energy && a.health >= b.health)
-        {
-            sum.retain(|a| a.energy > b.energy || a.health > b.health);
-            sum.push(b);
-        }
-        sum
+type OrbVariantsInner = SmallVec<[Orbs; 3]>;
+
+impl OrbVariants {
+    pub fn new(inner: OrbVariantsInner) -> Self {
+        Self { inner }
     }
-}
 
-/// For two lists of [`Orbs`] representing alternative possible options, returns all possible sums, filtered for any redundancies
-///
-/// # Examples
-///
-/// ```
-/// # use wotw_seedgen::orbs::{both, Orbs, OrbVariants};
-/// # use smallvec::smallvec;
-/// #
-/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
-/// let both_orbs: OrbVariants = smallvec![Orbs { health: 30.0, energy: 2.0 }];
-/// assert_eq!(both(&a, &b), both_orbs);
-///
-/// let a: OrbVariants = smallvec![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 20.0, energy: 0.0 }];
-/// let b: OrbVariants = smallvec![Orbs { health: 30.0, energy: 0.0 }];
-/// let both_orbs: OrbVariants = smallvec![Orbs { health: 40.0, energy: 3.0 }, Orbs { health: 50.0, energy: 0.0 }];
-/// assert_eq!(both(&a, &b), both_orbs);
-///
-/// let a: OrbVariants = smallvec![Orbs { health: 100.0, energy: 30.0 }, Orbs { health: 200.0, energy: 10.0 }];
-/// let b: OrbVariants = smallvec![Orbs { health: 0.0, energy: -10.0 }, Orbs { health: -50.0, energy: -3.0 }];
-/// let both_orbs: OrbVariants = smallvec![
-///     Orbs { health: 100.0, energy: 20.0 },
-///     Orbs { health: 50.0, energy: 27.0 },
-///     Orbs { health: 200.0, energy: 0.0 },
-///     Orbs { health: 150.0, energy: 7.0 },
-/// ];
-/// assert_eq!(both(&a, &b), both_orbs);
-///
-/// let a: OrbVariants = smallvec![Orbs { health: 0.0, energy: 2.0 }];
-/// let b: OrbVariants = smallvec![];
-/// let both_orbs: OrbVariants = smallvec![];
-/// assert_eq!(both(&a, &b), both_orbs);
-/// ```
-#[must_use]
-pub fn both(a: &[Orbs], b: &[Orbs]) -> OrbVariants {
-    if a.is_empty() || b.is_empty() {
-        OrbVariants::default()
-    } else {
-        let mut product = SmallVec::<[Orbs; 3]>::with_capacity(a.len());
+    /// For two `OrbVariants`, returns `OrbVariants` that contain the best options among both, filtered for redundancies.
+    ///
+    /// The existing `OrbVariants` are expected to be internally non-redundant.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use wotw_seedgen::orbs::{orb_variants, Orbs, OrbVariants};
+    /// #
+    /// let a = orb_variants![Orbs { health: 0.0, energy: 2.0 }];
+    /// let b = orb_variants![Orbs { health: 30.0, energy: 0.0 }];
+    /// let combined_orbs = orb_variants![Orbs { health: 0.0, energy: 2.0 }, Orbs { health: 30.0, energy: 0.0 }];
+    /// assert_eq!(OrbVariants::alternatives(a, b), combined_orbs);
+    ///
+    /// let a = orb_variants![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 20.0, energy: 0.0 }];
+    /// let b = orb_variants![Orbs { health: 30.0, energy: 0.0 }];
+    /// let combined_orbs = orb_variants![Orbs { health: 10.0, energy: 3.0 }, Orbs { health: 30.0, energy: 0.0 }];
+    /// assert_eq!(OrbVariants::alternatives(a, b), combined_orbs);
+    ///
+    /// let a = orb_variants![Orbs { health: 30.0, energy: 1.0 }, Orbs { health: 10.0, energy: 3.0 }];
+    /// let b = orb_variants![Orbs { health: 30.0, energy: 3.0 }];
+    /// let combined_orbs = orb_variants![Orbs { health: 30.0, energy: 3.0 }];
+    /// assert_eq!(OrbVariants::alternatives(a, b), combined_orbs);
+    ///
+    /// let a = orb_variants![Orbs { health: 0.0, energy: 2.0 }];
+    /// let b = orb_variants![];
+    /// let combined_orbs = orb_variants![Orbs { health: 0.0, energy: 2.0 }];
+    /// assert_eq!(OrbVariants::alternatives(a, b), combined_orbs);
+    ///
+    /// let a = orb_variants![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }];
+    /// let b = orb_variants![Orbs { health: 15.0, energy: 1.0 }];
+    /// let combined_orbs = orb_variants![Orbs { health: 20.0, energy: 0.0 }, Orbs { health: 10.0, energy: 2.0 }, Orbs { health: 15.0, energy: 1.0 }];
+    /// assert_eq!(OrbVariants::alternatives(a, b), combined_orbs);
+    /// ```
+    pub fn alternatives(mut a: Self, b: Self) -> OrbVariants {
+        a.insert_alternative(b);
+        a
+    }
 
-        for a_ in a {
-            for b_ in b {
-                let orbs = *a_ + *b_;
-                if !product.contains(&orbs) {
-                    product.push(orbs);
+    /// Inserts alternative `OrbVariants` in place. See [`OrbVariants::alternatives`] for more details.
+    pub fn insert_alternative(&mut self, mut b: OrbVariants) {
+        b.retain(|b| {
+            let mut keep = true;
+
+            self.retain(|a| match (*a).partial_cmp(&b) {
+                None => true,
+                Some(Ordering::Less) => false,
+                Some(Ordering::Equal | Ordering::Greater) => {
+                    keep = false;
+                    true
                 }
-            }
-        }
+            });
 
-        product
-            .iter()
-            .filter(|orbs| {
-                !product.iter().any(|other| {
-                    other.energy > orbs.energy && other.health >= orbs.health
-                        || other.energy >= orbs.energy && other.health > orbs.health
-                })
-            })
-            .copied()
-            .collect()
+            keep
+        });
+
+        self.extend(b);
     }
 }
 
-/// For a lists of [`Orbs`] representing alternative possible options and one additional option, returns all possible sums, filtered for any redundancies
-///
-/// This is an optimization over [`orbs::both`](both) with only one additional option, see [`orbs::both`](both) for further documentation
-#[must_use]
-pub fn both_single(a: &[Orbs], b: Orbs) -> OrbVariants {
-    if a.is_empty() {
-        OrbVariants::default()
-    } else {
-        let mut product = SmallVec::<[Orbs; 3]>::with_capacity(a.len());
+impl Deref for OrbVariants {
+    type Target = OrbVariantsInner;
 
-        for a_ in a {
-            let orbs = *a_ + b;
-            if !product.contains(&orbs) {
-                product.push(orbs);
-            }
-        }
-
-        product
-            .iter()
-            .filter(|orbs| {
-                !product.iter().any(|other| {
-                    other.energy > orbs.energy && other.health >= orbs.health
-                        || other.energy >= orbs.energy && other.health > orbs.health
-                })
-            })
-            .copied()
-            .collect()
+    fn deref(&self) -> &Self::Target {
+        &self.inner
     }
 }
 
-pub fn format_orb_variants(orb_variants: &OrbVariants) -> impl Display + use<'_> {
-    orb_variants.iter().format(" / ")
+impl DerefMut for OrbVariants {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.inner
+    }
 }
+
+impl IntoIterator for OrbVariants {
+    type Item = <OrbVariantsInner as IntoIterator>::Item;
+
+    type IntoIter = <OrbVariantsInner as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.inner.into_iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a OrbVariants {
+    type Item = <&'a [Orbs] as IntoIterator>::Item;
+
+    type IntoIter = <&'a [Orbs] as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.inner.iter()
+    }
+}
+
+impl<'a> IntoIterator for &'a mut OrbVariants {
+    type Item = <&'a mut [Orbs] as IntoIterator>::Item;
+
+    type IntoIter = <&'a mut [Orbs] as IntoIterator>::IntoIter;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.inner.iter_mut()
+    }
+}
+
+impl Display for OrbVariants {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.inner.iter().format(" / ").fmt(f)
+    }
+}
+
+#[macro_export]
+macro_rules! orb_variants {
+    ($($t:tt)*) => {
+        $crate::orbs::OrbVariants::new(smallvec::smallvec![$($t)*])
+    };
+}
+pub use orb_variants;

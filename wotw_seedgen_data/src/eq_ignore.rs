@@ -1,4 +1,5 @@
 use std::{
+    fmt::{self, Display},
     hash::{Hash, Hasher},
     ops::{Deref, DerefMut},
 };
@@ -32,5 +33,11 @@ impl<T> Deref for EqIgnore<T> {
 impl<T> DerefMut for EqIgnore<T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.0
+    }
+}
+
+impl<T: Display> Display for EqIgnore<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
     }
 }
