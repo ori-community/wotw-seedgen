@@ -55,6 +55,7 @@ impl Snapshot for Reach<'_> {
 
 #[derive(Debug, Clone, Default)]
 struct ReachState<'graph> {
+    // TODO try Vec? Maybe while also putting anchors to the front?
     /// All reached nodes and if they are anchors, the best orbs they have been reached with
     best_orbs: FxHashMap<usize, BestOrbs>,
     /// [`TP_ANCHOR`] has been reached
@@ -733,20 +734,40 @@ impl<'graph> World<'graph, '_, '_> {
         if let Some(record) = record {
             self.perf_data
                 .unwrap()
-                .reached_finish(record, connection_index);
+                .reached_finish(record, connection_index.clone());
         }
 
         if let Some(mut target_orbs) = target_orbs {
-            if revisit && !self.should_still_visit(connection, &mut target_orbs) {
-                trace!(
-                    "cannot improve target orbs with {}",
-                    format_orb_variants(&target_orbs)
-                );
+            if revisit {
+                let previous_orbs = &self.reach.state.best_orbs[&connection.to].pre_refills;
+                let new_orbs = orbs::either(previous_orbs, &target_orbs);
 
-                return;
+                let display = fmt::from_fn(|f| {
+                    write!(
+                        f,
+                        "previous visit's orbs {previous_orbs} through {connection} with {new_orbs}",
+                        previous_orbs = format_orb_variants(previous_orbs),
+                        connection = connection_index.display(self.graph),
+                        new_orbs = format_orb_variants(&new_orbs),
+                    )
+                });
+
+                if new_orbs.iter().any(|new_orbs| {
+                    !previous_orbs
+                        .iter()
+                        .any(|previous_orbs| previous_orbs >= new_orbs)
+                }) {
+                    trace!("improving {display}");
+
+                    target_orbs = new_orbs;
+                } else {
+                    trace!("cannot improve {display}");
+
+                    return;
+                }
             }
 
-            self.traverse(connection.to, target_orbs, output)
+            self.traverse(connection.to, target_orbs, output);
         }
     }
 
@@ -763,36 +784,19 @@ impl<'graph> World<'graph, '_, '_> {
                 }
 
                 let pre_refills = &previous.pre_refills;
-                orb_variants
-                    .retain(|orbs| pre_refills.iter().any(|previous_orbs| previous_orbs < orbs));
+                orb_variants.retain(|orbs| {
+                    !pre_refills
+                        .iter()
+                        .any(|previous_orbs| previous_orbs >= orbs)
+                });
 
                 if orb_variants.is_empty() {
-                    return ControlFlow::Break(());
+                    ControlFlow::Break(())
+                } else {
+                    ControlFlow::Continue(true)
                 }
-
-                ControlFlow::Continue(true)
             }
         }
-    }
-
-    fn should_still_visit(&self, connection: &Connection, orb_variants: &mut OrbVariants) -> bool {
-        let previous = &self.reach.state.best_orbs[&connection.to];
-
-        let pre_refills = &previous.pre_refills;
-        orb_variants.retain(|orbs| pre_refills.iter().any(|previous_orbs| previous_orbs < orbs));
-
-        if orb_variants.is_empty() {
-            return false;
-        }
-
-        trace!(
-            "revisiting {to_identifier} to improve previous orbs {previous_orbs} with {orbs}",
-            to_identifier = self.graph.nodes[connection.to].identifier(),
-            previous_orbs = format_orb_variants(pre_refills),
-            orbs = format_orb_variants(orb_variants),
-        );
-
-        true
     }
 
     fn attempt_requirement(
