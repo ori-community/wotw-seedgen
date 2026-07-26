@@ -1,9 +1,11 @@
+mod find;
 mod import_uber_states;
 mod paths;
 mod perf;
 mod print_optimized_graph;
 mod regenerate;
 
+use find::find;
 use import_uber_states::import_uber_states;
 use paths::paths;
 use perf::perf;
@@ -18,6 +20,7 @@ pub fn dev(command: Dev) -> Result<(), Error> {
         Dev::Paths => paths(),
         Dev::ImportUberStates => import_uber_states(),
         Dev::PrintOptimizedGraph { args } => print_optimized_graph(args),
+        Dev::Find { command } => find(command),
         Dev::Perf { args } => perf(args),
     }
 }

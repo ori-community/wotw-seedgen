@@ -1,7 +1,10 @@
+pub mod find;
+
 mod perf_args;
 mod print_optimized_graph_args;
 mod regenerate_args;
 
+use find::Find;
 pub use perf_args::{PerfArgs, PerfTarget};
 pub use print_optimized_graph_args::PrintOptimizedGraphArgs;
 pub use regenerate_args::RegenerateArgs;
@@ -23,6 +26,10 @@ pub enum Dev {
     PrintOptimizedGraph {
         #[command(flatten)]
         args: PrintOptimizedGraphArgs,
+    },
+    Find {
+        #[command(subcommand)]
+        command: Find,
     },
     /// Performance measurement tools
     Perf {
