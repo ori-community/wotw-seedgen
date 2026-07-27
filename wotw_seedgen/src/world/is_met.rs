@@ -146,20 +146,13 @@ impl World<'_, '_, '_> {
         requirement: &'req Requirement,
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'req>> {
-        // TODO orbvariants newtype could be cool?
-        trace!(
-            "checking is_met for {requirement} with {orb_variants}",
-            orb_variants = orb_variants.iter().format(" or ")
-        );
+        trace!("checking is_met for {requirement} with {orb_variants}");
 
         // TODO does this optimize cleanly? probably not!
         let flow = self.is_met_impl(requirement, orb_variants);
 
         match &flow {
-            ControlFlow::Continue(()) => trace!(
-                "{requirement} was met with {orb_variants}",
-                orb_variants = orb_variants.iter().format(" or "),
-            ),
+            ControlFlow::Continue(()) => trace!("{requirement} was met with {orb_variants}"),
             ControlFlow::Break(missing) => trace!("{requirement} was missing {missing}"),
         }
 

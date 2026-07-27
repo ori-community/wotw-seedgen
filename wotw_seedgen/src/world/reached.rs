@@ -601,9 +601,8 @@ impl<'graph> World<'graph, '_, '_> {
         let node = &self.graph.nodes[node_index];
 
         trace!(
-            "{identifier} reached with {best_orbs}",
+            "{identifier} reached with {orb_variants}",
             identifier = node.identifier(),
-            best_orbs = orb_variants.iter().format(" or "),
         );
 
         match node {
