@@ -38,4 +38,11 @@ ordered-float = { version = "4.2", features = ["serde"]}
 utoipa = { version = "5.4.0", features = ["repr"] }
 
 [dev-dependencies]
+criterion = "0.5"
 env_logger = { version = "0.11", default-features = false }
+
+[[bench]]
+name = "wotw_seedgen_data_bench"
+path = "benches/bench.rs"
+harness = false
+required-features = ["test_helpers"]
