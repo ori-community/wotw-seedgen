@@ -1,15 +1,15 @@
 mod find;
 mod import_uber_states;
+mod optimize_graph;
 mod paths;
 mod perf;
-mod print_optimized_graph;
 mod regenerate;
 
 use find::find;
 use import_uber_states::import_uber_states;
+use optimize_graph::optimize_graph;
 use paths::paths;
 use perf::perf;
-use print_optimized_graph::print_optimized_graph;
 use regenerate::regenerate;
 
 use crate::{cli::dev::Dev, Error};
@@ -19,7 +19,7 @@ pub fn dev(command: Dev) -> Result<(), Error> {
         Dev::Regenerate { args } => regenerate(args),
         Dev::Paths => paths(),
         Dev::ImportUberStates => import_uber_states(),
-        Dev::PrintOptimizedGraph { args } => print_optimized_graph(args),
+        Dev::OptimizeGraph { args } => optimize_graph(args),
         Dev::Find { command } => find(command),
         Dev::Perf { args } => perf(args),
     }

@@ -1,9 +1,9 @@
 use std::time::Instant;
 
-use crate::{cli::dev::PrintOptimizedGraphArgs, log_config::LogConfig, seed::logic_assets, Error};
+use crate::{cli::dev::OptimizeGraphArgs, log_config::LogConfig, seed::logic_assets, Error};
 
-pub fn print_optimized_graph(args: PrintOptimizedGraphArgs) -> Result<(), Error> {
-    let PrintOptimizedGraphArgs {
+pub fn optimize_graph(args: OptimizeGraphArgs) -> Result<(), Error> {
+    let OptimizeGraphArgs {
         settings_args,
         verbose_args,
     } = args;
@@ -19,7 +19,7 @@ pub fn print_optimized_graph(args: PrintOptimizedGraphArgs) -> Result<(), Error>
 
     println!("{}", graph.decompile());
 
-    eprintln!("Printed graph in {:.1}s", start.elapsed().as_secs_f32());
+    eprintln!("Optimized graph in {:.1}s", start.elapsed().as_secs_f32());
 
     Ok(())
 }

@@ -3,7 +3,7 @@ use clap::Args;
 use crate::cli::{SeedSettingsArgs, VerboseArgs};
 
 #[derive(Args)]
-pub struct PrintOptimizedGraphArgs {
+pub struct OptimizeGraphArgs {
     #[command(flatten)]
     pub settings_args: SeedSettingsArgs,
     #[command(flatten)]
