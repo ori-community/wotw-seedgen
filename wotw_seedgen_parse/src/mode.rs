@@ -24,12 +24,12 @@ pub struct Errors;
 impl ErrorMode for Errors {
     #[inline]
     fn err<E: FnOnce()>(err: E) {
-        err()
+        err();
     }
 
     #[inline]
     fn map_err<E, O: FnOnce(E)>(err: E, op: O) {
-        op(err)
+        op(err);
     }
 }
 

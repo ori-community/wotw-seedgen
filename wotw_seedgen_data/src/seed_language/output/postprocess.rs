@@ -64,7 +64,6 @@ pub struct UniversePostprocessor<'output, 'locdata> {
     worlds: Vec<WorldPostprocessor<'output>>,
     loc_data_triggers: LocDataTriggers<'locdata>,
     multiworld_lookup: MultiworldLookup<'output>,
-
 }
 
 struct WorldPostprocessor<'output> {
@@ -179,7 +178,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                 .get(&id)
                 .and_then(|multiworld_event| {
                     self.zone_of_trigger(
-                        &multiworld_event.origin_trigger,
+                        multiworld_event.origin_trigger,
                         multiworld_event.origin_world_index,
                     )
                 });
@@ -280,7 +279,14 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             }
 
             if let Some(map_position) = map_position {
-                self.generate_spoiler_defaults(next_spoiler_icon_id, trigger, map_position, name, &matches, &mut extra_events);
+                self.generate_spoiler_defaults(
+                    next_spoiler_icon_id,
+                    trigger,
+                    map_position,
+                    name,
+                    &matches,
+                    &mut extra_events,
+                );
                 next_spoiler_icon_id += 1;
             }
         }
@@ -344,7 +350,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         ) {
             let prices = matches
                 .iter()
-                .filter_map(|metadata| metadata.try_force_shop_price());
+                .filter_map(ItemMetadataRef::try_force_shop_price);
 
             let mut price = multi_price(prices);
             price_noise.add_noise(&mut price, rng);
@@ -360,7 +366,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                     name,
                 }));
 
-                let mut descriptions = matches.iter().filter_map(|metadata| metadata.description());
+                let mut descriptions = matches.iter().filter_map(ItemMetadataRef::description);
 
                 let description = match (descriptions.next(), descriptions.next()) {
                     (Some(description), None) => description,
@@ -372,9 +378,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
                     description,
                 }));
 
-                let icon = matches
-                    .iter()
-                    .find_map(|metadata| metadata.try_force_icon());
+                let icon = matches.iter().find_map(ItemMetadataRef::try_force_icon);
 
                 if let Some(icon) = icon {
                     extra_events.push(Event::on_spawn(CommandVoid::SetShopItemIcon {
@@ -397,7 +401,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
     ) {
         let icon = matches
             .iter()
-            .find_map(|metadata| metadata.try_force_map_icon())
+            .find_map(ItemMetadataRef::try_force_map_icon)
             .unwrap_or_default();
 
         let label = match name.into_constant() {
@@ -418,7 +422,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
             command: CommandVoid::MarkSpoilerMapIconCollected {
                 id: spoiler_icon_id,
             },
-        })
+        });
     }
 }
 

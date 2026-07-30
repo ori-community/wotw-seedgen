@@ -58,7 +58,9 @@ impl UberStates {
                 &self.fallback.triggers
             }
             Some(entry) => {
-                if entry.value != value {
+                if entry.value == value {
+                    &self.fallback.triggers
+                } else {
                     if let Some(snapshot) = &mut self.snapshot {
                         snapshot.entry(uber_identifier).or_insert(entry.value);
                     }
@@ -73,8 +75,6 @@ impl UberStates {
                     // TODO type check maybe?
                     entry.value = value;
                     &entry.triggers
-                } else {
-                    &self.fallback.triggers
                 }
             }
         }

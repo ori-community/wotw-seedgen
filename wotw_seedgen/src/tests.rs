@@ -16,7 +16,7 @@ fn some_seeds() {
 
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
         generate_seed(
-            &graph,
+            graph,
             TEST_ASSETS.values.loc_data(),
             TEST_ASSETS.values.uber_state_data(),
             &*TEST_ASSETS,

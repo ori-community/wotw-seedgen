@@ -1,5 +1,5 @@
-use std::net::SocketAddr;
 use clap::Args;
+use std::net::SocketAddr;
 
 #[derive(Args)]
 pub struct HttpServerArgs {

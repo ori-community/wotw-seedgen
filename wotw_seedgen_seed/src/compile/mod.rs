@@ -29,7 +29,7 @@ impl CompileContext {
 
     pub fn compile_lookup(&mut self, intermediate_lookup: Vec<input::CommandVoid>) {
         self.command_lookup
-            .resize_with(intermediate_lookup.len(), Default::default);
+            .resize_with(intermediate_lookup.len(), Vec::new);
 
         for (index, command) in intermediate_lookup.into_iter().enumerate() {
             self.command_lookup[index] = command.compile(self).0;

@@ -128,7 +128,7 @@ impl OrbVariants {
         b.retain(|b| {
             let mut keep = true;
 
-            self.retain(|a| match (*a).partial_cmp(&b) {
+            self.retain(|a| match (*a).partial_cmp(b) {
                 None => true,
                 Some(Ordering::Less) => false,
                 Some(Ordering::Equal | Ordering::Greater) => {

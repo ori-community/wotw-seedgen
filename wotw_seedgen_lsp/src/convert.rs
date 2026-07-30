@@ -77,7 +77,7 @@ pub fn last_line(source: &str) -> (usize, usize) {
     if let Some((index, _)) = line_indices.next() {
         line = 1;
         line_start = index + 1;
-    };
+    }
     line += line_indices.count();
 
     (line, line_start)

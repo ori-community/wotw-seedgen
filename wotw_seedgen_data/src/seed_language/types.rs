@@ -359,7 +359,7 @@ impl output::Literal {
 }
 
 impl Constant {
-    pub(crate) fn ty(&self) -> Type {
+    pub(crate) fn ty(self) -> Type {
         match self {
             Constant::ClientEvent(_) => Type::ClientEvent,
             Constant::Skill(_) => Type::Skill,

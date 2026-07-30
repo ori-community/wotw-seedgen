@@ -379,7 +379,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     /// You can use this to backtrack if you called [`Parser::position`] earlier
     #[inline]
     pub fn jump(&mut self, position: usize) {
-        self.position = position
+        self.position = position;
     }
 
     /// The `position` representing the end of the parser
@@ -477,7 +477,7 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     }
 }
 
-impl<'source, T> Debug for Parser<'source, T>
+impl<T> Debug for Parser<'_, T>
 where
     T: Tokenize,
     T::Token: Debug,
@@ -490,7 +490,7 @@ where
         } else {
             ""
         };
-        let source = format!("{}{}{}", more_before, &self.source[span], more_after,);
+        let source = format!("{}{}{}", more_before, &self.source[span], more_after);
 
         f.debug_struct("Parser")
             .field("source", &source)

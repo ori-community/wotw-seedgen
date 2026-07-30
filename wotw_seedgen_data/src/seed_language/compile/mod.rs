@@ -110,6 +110,14 @@ impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
     }
 }
 
+impl<'source, T: Compile<'source>> Compile<'source> for Box<T> {
+    type Output = T::Output;
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+        (*self).compile(compiler)
+    }
+}
+
 impl<'source, T: Compile<'source>> Compile<'source> for Vec<T> {
     type Output = Vec<T::Output>; // TODO experiment with returning iterators instead of vectors from collection compile implementations
 
@@ -202,10 +210,10 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
             output: IntermediateOutput::new(debug),
             uber_state_data,
             snippet_access,
-            exported_values: Default::default(),
+            exported_values: FxHashMap::default(),
             id_resolver: IdResolver::new(lockfile),
             config,
-            lint_data: lint.then(|| LintData::default()),
+            lint_data: lint.then(LintData::default),
         }
     }
 
@@ -298,7 +306,7 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
             self.errors.push(Error::error(
                 "unknown identifier".to_string(),
                 identifier.span(),
-            ))
+            ));
         }
 
         value
@@ -314,7 +322,7 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
             self.errors.push(Error::error(
                 "unknown function".to_string(),
                 identifier.span(),
-            ))
+            ));
         }
 
         function
@@ -352,7 +360,7 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
 
         if ty.is_none() {
             self.errors
-                .push(Error::error("Unknown UberState".to_string(), span.span()))
+                .push(Error::error("Unknown UberState".to_string(), span.span()));
         }
 
         ty
@@ -456,8 +464,8 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
                 lint,
                 debug,
             ),
-            compiled_snippets: Default::default(),
-            errors: Default::default(),
+            compiled_snippets: FxHashMap::default(),
+            errors: FxHashMap::default(),
         }
     }
 
@@ -512,7 +520,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
 
             self.global
                 .exported_values
-                .insert(identifier.to_string(), Default::default());
+                .insert(identifier.to_string(), FxHashMap::default());
 
             let compiler = SnippetCompiler::compile(
                 ast,

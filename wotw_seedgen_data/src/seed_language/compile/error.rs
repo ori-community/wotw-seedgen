@@ -78,7 +78,7 @@ pub fn uber_state_type_error(found: UberStateType, expected: Type, span: Range<u
         error.help = Some(
             "if you want to trigger on every change of the state, use \"on change <UberIdentifier>\""
                 .to_string(),
-        )
+        );
     }
 
     error

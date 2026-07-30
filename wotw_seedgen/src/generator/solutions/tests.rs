@@ -52,7 +52,7 @@ fn find_test_solutions(
 ) -> Vec<Vec<(CommandVoid, u32)>> {
     sorted_test_solutions(
         world
-            .find_solutions_no_max_items(&item_pool, &CommandsOutput::NONE, slots, 0, Some(u8::MAX))
+            .find_solutions_no_max_items(item_pool, &CommandsOutput::NONE, slots, 0, Some(u8::MAX))
             .into_iter()
             .map(|solution| {
                 amounts_from_item_list(
@@ -1180,7 +1180,7 @@ fn spawn_solutions_prelude(spawn: &str) -> World<'static, 'static, 'static> {
     let graph = &*REGIONLESS_GRAPH;
     test_logger();
 
-    let mut world = test_world(graph, &*GORLEK_SETTINGS, spawn);
+    let mut world = test_world(graph, &GORLEK_SETTINGS, spawn);
     world.traverse_spawn(&CommandsOutput::NONE);
 
     world
@@ -1191,7 +1191,7 @@ fn marsh_spawn_solutions() {
     let mut world = spawn_solutions_prelude("MarshSpawn.Main");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // MarshSpawn.BridgeSL
             [skill(DoubleJump)],
@@ -1222,7 +1222,7 @@ fn den_spawn_solutions() {
     let mut world = spawn_solutions_prelude("HowlsDen.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // HowlsDen.LaserKS
             [skill(DoubleJump)],
@@ -1246,7 +1246,7 @@ fn hollow_spawn_solutions() {
     let mut world = spawn_solutions_prelude("EastHollow.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // EastHollow.BashTree via EastHollow.VoiceDoorPlatform
             [skill(Launch)],
@@ -1290,7 +1290,7 @@ fn glades_spawn_solutions() {
     let mut world = spawn_solutions_prelude("GladesTown.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // GladesTown.LupoPotSL
             [clean_water()],
@@ -1383,7 +1383,7 @@ fn wellspring_spawn_solutions() {
     let mut world = spawn_solutions_prelude("InnerWellspring.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // InnerWellspring.SwimOre
             [clean_water()],
@@ -1405,7 +1405,7 @@ fn woods_entrance_spawn_solutions() {
     let mut world = spawn_solutions_prelude("WoodsEntry.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // WoodsEntry.LeafPileSL
             [skill(Flap)],
@@ -1435,7 +1435,7 @@ fn woods_exit_spawn_solutions() {
     let mut world = spawn_solutions_prelude("WoodsMain.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // WoodsMain.ShrineSL
             [skill(Glide)],
@@ -1529,7 +1529,7 @@ fn reach_spawn_solutions() {
     world.store_skill(Grenade, true, &CommandsOutput::NONE);
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // TODO this is incorrect in paths.wotwl, the ice wall next to the teleporter should be a state
             // if this was correct, LowerReach.MeltIceSL would be reachable on spawn and not considered here
@@ -1561,7 +1561,7 @@ fn depths_spawn_solutions() {
     let mut world = spawn_solutions_prelude("UpperDepths.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // TODO these three are invalid solutions, we don't have `BreakWall with` syntax yet so this cannot be written correctly in paths.wotwl
             [skill(Spear), skill(Hammer)],
@@ -1617,7 +1617,7 @@ fn pools_spawn_solutions() {
     world.store_boolean(Teleporter::CENTRAL_POOLS_ID, true, &CommandsOutput::NONE);
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // EastPools.UltraBashShard
             [skill(Bash)],
@@ -1640,7 +1640,7 @@ fn feeding_grounds_spawn_solutions() {
     let mut world = spawn_solutions_prelude("LowerWastes.FeedingGroundsTP");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // LowerWastes.FeedingGroundsTPOre
             [skill(Burrow)],
@@ -1662,7 +1662,7 @@ fn central_wastes_spawn_solutions() {
     let mut world = spawn_solutions_prelude("LowerWastes.CentralTP");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // LowerWastes.UpperPathHF
             [skill(Burrow)],
@@ -1692,7 +1692,7 @@ fn outer_ruins_spawn_solutions() {
     let mut world = spawn_solutions_prelude("UpperWastes.OuterRuinsTP");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // UpperWastes.SpinLasersRightSL
             [skill(Burrow)],
@@ -1751,7 +1751,7 @@ fn outer_ruins_spawn_solutions() {
 //     world.traverse_spawn(&CommandsOutput::NONE);
 
 //     assert_eq_solutions!(
-//         find_test_solutions(&mut world, &*ITEM_POOL, 7),
+//         find_test_solutions(&mut world, &ITEM_POOL, 7),
 //         make_test_solutions!([
 //             // anchor WillowsEnd.Entry
 //             // [skill(Sword)],
@@ -1858,7 +1858,7 @@ fn burrows_spawn_solutions() {
     let mut world = spawn_solutions_prelude("MidnightBurrows.Teleporter");
 
     assert_eq_solutions!(
-        find_test_solutions(&mut world, &*ITEM_POOL, 7),
+        find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // MidnightBurrows.LeftKS
             [skill(DoubleJump)],

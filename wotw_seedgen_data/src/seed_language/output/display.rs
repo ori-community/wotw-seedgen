@@ -342,8 +342,17 @@ impl Display for CommandVoid {
             CommandVoid::DisableServerSync { uber_identifier } => {
                 write!(f, "disable_server_sync({uber_identifier})")
             }
-            CommandVoid::CreateSpoilerMapIcon { id, icon, x, y, label } => {
-                write!(f, "create_spoiler_map_icon({id}, {icon}, {x}, {y}, {label})")
+            CommandVoid::CreateSpoilerMapIcon {
+                id,
+                icon,
+                x,
+                y,
+                label,
+            } => {
+                write!(
+                    f,
+                    "create_spoiler_map_icon({id}, {icon}, {x}, {y}, {label})"
+                )
             }
             CommandVoid::MarkSpoilerMapIconCollected { id } => {
                 write!(f, "mark_spoiler_map_icon_collected({id})")
@@ -525,24 +534,6 @@ pub fn strip_invisible_characters(s: &str) -> String {
     result
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn strip_invisible_characters() {
-        use super::strip_invisible_characters as strip;
-
-        assert_eq!(strip(""), "");
-        assert_eq!(strip("aaa"), "aaa");
-        assert_eq!(strip("@#$"), "");
-        assert_eq!(strip("@@@a@a@@a@"), "aaa");
-        assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
-        assert_eq!(
-            strip(r"<worldn>1<\><world>1<\><nicon>x<\><icon>x<\>"),
-            r"1<world>1<\>x<icon>x<\>"
-        );
-    }
-}
-
 fn store_suffix(trigger_events: bool) -> &'static str {
     if trigger_events {
         ""
@@ -567,4 +558,22 @@ fn multi<T: Display>(f: &mut fmt::Formatter, commands: &[CommandVoid], last: T) 
     }
 
     write!(f, "{last} }}")
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn strip_invisible_characters() {
+        use super::strip_invisible_characters as strip;
+
+        assert_eq!(strip(""), "");
+        assert_eq!(strip("aaa"), "aaa");
+        assert_eq!(strip("@#$"), "");
+        assert_eq!(strip("@@@a@a@@a@"), "aaa");
+        assert_eq!(strip("a<aaa>a</><aaaaa>a"), "aaa");
+        assert_eq!(
+            strip(r"<worldn>1<\><world>1<\><nicon>x<\><icon>x<\>"),
+            r"1<world>1<\>x<icon>x<\>"
+        );
+    }
 }

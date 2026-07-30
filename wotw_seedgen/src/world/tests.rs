@@ -36,7 +36,7 @@ pub fn test_world<'graph, 'settings>(
 ) -> World<'graph, 'settings, 'graph> {
     let spawn = graph.find_node(spawn).unwrap();
     World::new(
-        &*graph,
+        graph,
         spawn,
         settings,
         TEST_ASSETS.uber_states.clone(),
@@ -297,7 +297,7 @@ fn is_met() {
     test!(&req, [Orbs::new(0., -1.0)]);
 
     world.store_shard(Shard::Overcharge, true, &CommandsOutput::NONE);
-    test!(&req, [Orbs::new(0., -1.0 * 0.5)]);
+    test!(&req, [Orbs::new(0., -0.5)]);
     world.store_shard(Shard::Overcharge, false, &CommandsOutput::NONE);
 
     world.store_shard(Shard::LifePact, true, &CommandsOutput::NONE);

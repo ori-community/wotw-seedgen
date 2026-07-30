@@ -12,13 +12,13 @@ use wotw_seedgen::data::{
 use crate::cli::LITERAL;
 
 pub static AVAILABLE_UNIVERSE_PRESETS: LazyLock<Vec<AvailablePreset>> =
-    LazyLock::new(|| AvailablePreset::all_universe());
+    LazyLock::new(AvailablePreset::all_universe);
 
 pub static AVAILABLE_WORLD_PRESETS: LazyLock<Vec<AvailablePreset>> =
-    LazyLock::new(|| AvailablePreset::all_world());
+    LazyLock::new(AvailablePreset::all_world);
 
 pub static AVAILABLE_SNIPPETS: LazyLock<Vec<AvailableSnippet>> =
-    LazyLock::new(|| AvailableSnippet::all());
+    LazyLock::new(AvailableSnippet::all);
 
 #[derive(Debug, Clone)]
 pub struct AvailablePreset {

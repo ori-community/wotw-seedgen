@@ -251,7 +251,7 @@ pub trait Simulation: Sized {
     /// ```
     #[inline]
     fn max_health(&self) -> f32 {
-        self.base_max_health() + self.shard(Shard::Vitality) as u8 as f32 * 10.
+        self.base_max_health() + f32::from(u8::from(self.shard(Shard::Vitality))) * 10.
     }
 
     #[inline]
@@ -277,7 +277,7 @@ pub trait Simulation: Sized {
     /// ```
     #[inline]
     fn max_energy(&self) -> f32 {
-        self.base_max_energy() + self.shard(Shard::Energy) as u8 as f32
+        self.base_max_energy() + f32::from(u8::from(self.shard(Shard::Energy)))
     }
 
     #[inline]

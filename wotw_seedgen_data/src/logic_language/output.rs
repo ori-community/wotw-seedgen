@@ -231,7 +231,7 @@ const _: () = {
     assert!(
         Requirement::LAST_NON_ORB_CHANGING + 1 == Requirement::FIRST_ORB_CHANGING,
         "Requirement::FIRST_ORB_CHANGING does not follow Requirement::LAST_NON_ORB_CHANGING"
-    )
+    );
 };
 
 impl Requirement {

@@ -134,14 +134,14 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
                 |(default_spawn_reached, reached_count), index| {
                     (
                         default_spawn_reached || index == self.default_spawn,
-                        reached_count + self.world.graph.nodes[index].is_pickup() as usize,
+                        reached_count + usize::from(self.world.graph.nodes[index].is_pickup()),
                     )
                 },
             );
 
             self.world.restore_snapshot();
 
-            if default_spawn_reached == false {
+            if !default_spawn_reached {
                 trace!(
                     "{log_index}Discarding spawn {spawn} since {default_spawn} wasn't reached",
                     log_index = self.log_index,
@@ -169,15 +169,14 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
         Err("All available spawn locations failed to reach all locations".to_string())
     }
 
-    fn total_reach_check<'s>(&'s mut self) {
+    fn total_reach_check(&mut self) {
         // TODO could avoid redoing this with a snapshot stack
         for command in &**self.item_pool {
-            command.simulate(self.world, &self.output);
+            command.simulate(self.world, self.output);
         }
-        self.world
-            .add_spirit_light(TOTAL_SPIRIT_LIGHT, &self.output);
+        self.world.add_spirit_light(TOTAL_SPIRIT_LIGHT, self.output);
 
-        self.world.traverse_spawn(&self.output);
+        self.world.traverse_spawn(self.output);
     }
 
     fn finish(self) -> Vec<&'graph LocDataEntry> {
@@ -190,7 +189,7 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
                 self.output.events.push(Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                     command: store_boolean(UberIdentifier::new(5377, 63173), true),
-                })
+                });
             }
             "MidnightBurrows.Teleporter"
             | "MarshSpawn.Main"
@@ -218,7 +217,7 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
                             x: spawn_position.x.into(),
                             y: spawn_position.y.into(),
                         },
-                    })
+                    });
                 }
             }
         }
@@ -294,7 +293,7 @@ impl<'graph> FullyRandomSpawnGenerator<'graph> {
             .enumerate()
             .filter(|(_, node)| node.can_spawn())
             .choose(&mut rng)
-            .ok_or_else(|| "No valid spawn locations available")?;
+            .ok_or("No valid spawn locations available")?;
 
         Ok(Self {
             rng,

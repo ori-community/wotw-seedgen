@@ -204,7 +204,7 @@ impl Requirement {
 
                     match and {
                         Self::And(ands) => {
-                            for conjunction in disjunction.iter_mut() {
+                            for conjunction in &mut disjunction {
                                 conjunction.append(&mut ands.clone());
                             }
                         }
@@ -223,18 +223,14 @@ impl Requirement {
                                 .collect();
                         }
                         literal => {
-                            for conjunction in disjunction.iter_mut() {
+                            for conjunction in &mut disjunction {
                                 conjunction.push(literal.clone());
                             }
                         }
                     }
                 }
 
-                *self = Self::or(
-                    disjunction
-                        .into_iter()
-                        .map(|conjunction| Self::and_from(conjunction)),
-                );
+                *self = Self::or(disjunction.into_iter().map(Self::and_from));
             }
             Self::Or(ors) => {
                 for index in 0..ors.len() {
@@ -942,11 +938,10 @@ where
     B::IntoIter: ExactSizeIterator,
     F: FnMut(&'a Requirement, &'a Requirement) -> Ordering,
 {
-    let mut a_iter = a.into_iter();
     let mut b_iter = b.into_iter();
 
     // Cannot use zip because we need the remaining state after
-    while let Some(a_item) = a_iter.next() {
+    for a_item in a {
         match b_iter.next() {
             None => return Ordering::Greater,
             Some(b_item) => match f(a_item, b_item) {
@@ -1081,8 +1076,7 @@ where
     );
 
     match slice.binary_search_by(f) {
-        Ok(index) => index,
-        Err(index) => index,
+        Ok(index) | Err(index) => index,
     }
 }
 
@@ -1293,7 +1287,7 @@ impl FactorIndices {
         Self { inner: indices }
     }
 
-    fn remove_from_ors<'r>(self, ors: &'r mut Vec<Requirement>) -> RemoveFactorFromOrs<'r> {
+    fn remove_from_ors(self, ors: &mut Vec<Requirement>) -> RemoveFactorFromOrs<'_> {
         RemoveFactorFromOrs::new(self.inner, ors)
     }
 }
@@ -1432,7 +1426,6 @@ impl<'r> OrbChangingFactorFinderSide<'r> {
         }
     }
 
-    #[must_use]
     fn add(
         &mut self,
         requirement: &'r Requirement,
@@ -1458,9 +1451,8 @@ impl<'r> OrbChangingFactorFinderSide<'r> {
                     self.occurences.inner.push((requirement, indices));
 
                     return Some(requirement_priority);
-                } else {
-                    indices.push(index);
                 }
+                indices.push(index);
             }
         }
 

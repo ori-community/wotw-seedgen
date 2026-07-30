@@ -31,12 +31,11 @@ pub trait SeedStorageAccess {
 
 use crate::handle_errors::HandleErrors;
 
-use super::*;
-
 use std::{
     fs::{self, DirEntry, File, ReadDir},
     hash::{Hash, Hasher},
     io::{self, Write},
+    iter,
     path::{Path, PathBuf},
     sync::LazyLock,
 };
@@ -69,7 +68,7 @@ impl SeedStorageAccess for FileAccess {
 
                 Some((seed, previous))
             })
-            .map_or(true, |(seed, previous)| {
+            .is_none_or(|(seed, previous)| {
                 let settings = UniverseSettings {
                     seed,
                     world_settings: settings.world_settings.clone(),
@@ -175,14 +174,14 @@ impl ReadSeeds {
                                         eprintln!(
                                             "Removed \"{}\" from seed storage",
                                             path.display()
-                                        )
+                                        );
                                     }
                                     Err(err) => {
                                         eprintln!(
                                             "Failed to remove \"{}\" from seed storage: {}",
                                             path.display(),
                                             err
-                                        )
+                                        );
                                     }
                                 }
                                 err
@@ -267,11 +266,11 @@ fn print_feedback_for_existing_seeds(seeds: HandleErrorsReadDir) {
     if let Some((oldest, newest)) = Option::zip(oldest, newest) {
         let fmt = "%c";
         eprintln!(
-                "Reusing {} seed{} with these settings from a previous run, generated between {} and {}",
-                amount,
-                if amount == 1 { "" } else { "s" },
-                oldest.format(fmt),
-                newest.format(fmt)
-            )
+            "Reusing {} seed{} with these settings from a previous run, generated between {} and {}",
+            amount,
+            if amount == 1 { "" } else { "s" },
+            oldest.format(fmt),
+            newest.format(fmt)
+        );
     }
 }

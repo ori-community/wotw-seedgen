@@ -46,13 +46,13 @@ pub fn reachable(
 
         match &data.default_value {
             UberStateValue::Boolean(_) => {
-                world.store_boolean(uber_identifier, *value > 0.5, &CommandsOutput::NONE)
+                world.store_boolean(uber_identifier, *value > 0.5, &CommandsOutput::NONE);
             }
             UberStateValue::Integer(_) => {
-                world.store_integer(uber_identifier, (*value) as i32, &CommandsOutput::NONE)
+                world.store_integer(uber_identifier, (*value) as i32, &CommandsOutput::NONE);
             }
             UberStateValue::Float(_) => {
-                world.store_float(uber_identifier, *value, &CommandsOutput::NONE)
+                world.store_float(uber_identifier, *value, &CommandsOutput::NONE);
             }
         }
     }

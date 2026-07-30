@@ -94,7 +94,7 @@ impl<Item, Punctuation> Punctuated<Item, Punctuation> {
 
     #[inline]
     pub fn len(&self) -> usize {
-        self.items.len() + self.last.is_some() as usize
+        self.items.len() + usize::from(self.last.is_some())
     }
 
     #[inline]
@@ -201,7 +201,7 @@ impl<Item, Punctuation> IndexMut<usize> for Punctuated<Item, Punctuation> {
         let len = self.len();
 
         match self.get_mut(index) {
-            None => panic!("index out of bounds: the len is {len} but the index is {index}",),
+            None => panic!("index out of bounds: the len is {len} but the index is {index}"),
             Some(item) => item,
         }
     }

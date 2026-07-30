@@ -107,18 +107,18 @@ impl Cache {
             CommonUberIdentifier::ShardSlots => self.shard_slots = value.expect_integer(),
             CommonUberIdentifier::CleanWater => self.clean_water = value.expect_boolean(),
             CommonUberIdentifier::BaseMaxHealth => {
-                self.base_max_health = value.expect_integer() as f32
+                self.base_max_health = value.expect_integer() as f32;
             }
             CommonUberIdentifier::BaseMaxEnergy => self.base_max_energy = value.expect_float(),
             CommonUberIdentifier::Health | CommonUberIdentifier::Energy => {}
             CommonUberIdentifier::Skill(skill) => {
-                update_set(&mut self.skills, skill, value.expect_boolean())
+                update_set(&mut self.skills, skill, value.expect_boolean());
             }
             CommonUberIdentifier::Shard(shard) => {
-                update_set(&mut self.shards, shard, value.expect_boolean())
+                update_set(&mut self.shards, shard, value.expect_boolean());
             }
             CommonUberIdentifier::Teleporter(teleporter) => {
-                update_set(&mut self.teleporters, teleporter, value.expect_boolean())
+                update_set(&mut self.teleporters, teleporter, value.expect_boolean());
             }
             CommonUberIdentifier::WeaponUpgrade(weapon_upgrade) => update_set(
                 &mut self.weapon_upgrades,

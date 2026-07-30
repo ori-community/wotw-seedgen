@@ -71,10 +71,11 @@ impl Docs {
                 &mut path.head,
                 &mut path.patch,
                 &mut path.trace,
-            ] {
-                if let Some(operation) = operation {
-                    operation.operation_id = None;
-                }
+            ]
+            .into_iter()
+            .flatten()
+            {
+                operation.operation_id = None;
             }
         }
 

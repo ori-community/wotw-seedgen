@@ -1,6 +1,6 @@
 use crate::{Ast, ErrorMode, Parser, Span, SpanEnd, SpanStart, SpannedOption, Tokenize};
 use derivative::Derivative;
-use std::{fmt::Debug, marker::PhantomData, ops::Range};
+use std::{fmt::Debug, marker::PhantomData, ops::Range, option};
 
 /// Trait responsible for recovering the parser when an [`Ast`] implementation fails
 ///
@@ -118,6 +118,16 @@ impl<T, R> Recoverable<T, R> {
     pub const fn none(span: Range<usize>) -> Self {
         Self::new(SpannedOption::None(span))
     }
+
+    #[inline]
+    pub fn iter(&self) -> option::IntoIter<&T> {
+        self.value.iter()
+    }
+
+    #[inline]
+    pub fn iter_mut(&mut self) -> option::IntoIter<&mut T> {
+        self.value.iter_mut()
+    }
 }
 
 impl<'source, T, V, R> Ast<'source, T> for Recoverable<V, R>
@@ -177,19 +187,19 @@ impl<T, R> IntoIterator for Recoverable<T, R> {
 impl<'a, T, R> IntoIterator for &'a Recoverable<T, R> {
     type Item = &'a T;
 
-    type IntoIter = <SpannedOption<&'a T> as IntoIterator>::IntoIter;
+    type IntoIter = option::IntoIter<&'a T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        (&self.value).into_iter()
+        self.iter()
     }
 }
 
 impl<'a, T, R> IntoIterator for &'a mut Recoverable<T, R> {
     type Item = &'a mut T;
 
-    type IntoIter = <SpannedOption<&'a mut T> as IntoIterator>::IntoIter;
+    type IntoIter = option::IntoIter<&'a mut T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        (&mut self.value).into_iter()
+        self.iter_mut()
     }
 }

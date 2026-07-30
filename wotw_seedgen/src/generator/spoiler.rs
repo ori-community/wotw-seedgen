@@ -176,7 +176,7 @@ impl Display for SeedSpoiler {
                     match position {
                         Some(position) => writeln!(f, "{location:<longest_location$}  {position}")?,
                         None => writeln!(f, "{location}")?,
-                    };
+                    }
                 }
             }
 

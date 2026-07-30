@@ -51,7 +51,7 @@ where
 {
     for res in watcher {
         or_print(
-            (async || {
+            async {
                 let events = res?;
 
                 let mut cache = state.write().await;
@@ -65,7 +65,7 @@ where
                 }
 
                 Ok(())
-            })()
+            }
             .await,
         );
     }

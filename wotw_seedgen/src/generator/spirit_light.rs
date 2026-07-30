@@ -6,7 +6,7 @@ const MIN_SPIRIT_LIGHT: f32 = 50.;
 const NOISE: f32 = 0.25;
 
 /// We want spirit_light(i) = ai² + b (quadratic growth)
-/// And b = MIN_SPIRIT_LIGHT (start above zero) with some random noise
+/// And b = `MIN_SPIRIT_LIGHT` (start above zero) with some random noise
 /// And ₀∫ᵖ spirit_light(i) di = t (place the total amount)
 ///
 /// SPIRIT_LIGHT(i) = ai³/3 + bi

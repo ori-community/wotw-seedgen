@@ -12,7 +12,7 @@ impl Analyzer for ProgressionStats {
         seed.groups
             .iter()
             .flat_map(|group| &group.forced_items)
-            .map(|item| item.name.to_string())
+            .map(|item| item.name.clone())
             .collect()
     }
 }

@@ -14,6 +14,7 @@ use crate::{
     },
 };
 use completion::Completion;
+use rustc_hash::FxHashMap;
 use semantic_tokens::{semantic_tokens, semantic_tokens_legend};
 use serde_json::Value;
 use strum::VariantNames;
@@ -233,7 +234,7 @@ impl Backend<Cache> {
                     &mut rand::thread_rng(),
                     &snippet_access,
                     &cache.uber_state_data,
-                    Default::default(),
+                    FxHashMap::default(),
                     None,
                     true,
                     false,

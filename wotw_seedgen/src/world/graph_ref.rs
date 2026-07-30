@@ -2,6 +2,7 @@ use std::{
     hash::{Hash, Hasher},
     mem,
     ops::Deref,
+    ptr,
 };
 
 #[derive(Debug)]
@@ -17,13 +18,13 @@ impl<T> GraphRef<'_, T> {
     }
 
     fn address(&self) -> isize {
-        self.0 as *const T as isize
+        ptr::from_ref(self.0) as isize
     }
 }
 
 impl<T> Clone for GraphRef<'_, T> {
     fn clone(&self) -> Self {
-        Self(self.0)
+        *self
     }
 }
 

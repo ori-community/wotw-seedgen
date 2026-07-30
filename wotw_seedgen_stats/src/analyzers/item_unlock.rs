@@ -24,7 +24,7 @@ impl Analyzer for ItemUnlockStats {
                     .iter()
                     .any(|placement| placement.item.name == self.item)
             })
-            .flat_map(|group| group.reachable.iter().map(|reachable| reachable.len()))
+            .flat_map(|group| group.reachable.iter().map(Vec::len))
             .sum::<usize>();
 
         vec![super::group_result(

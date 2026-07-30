@@ -1,6 +1,6 @@
 use tower_lsp::lsp_types::{GotoDefinitionResponse, Location, Url};
 use wotw_seedgen_data::{
-    logic_language::ast::{Paths, Handler, LogicIdentifier, PlainRequirement, Traverse},
+    logic_language::ast::{Handler, LogicIdentifier, Paths, PlainRequirement, Traverse},
     parse::{Identifier, Spanned},
 };
 
@@ -93,7 +93,7 @@ impl<'ast, 'source> Handler<'ast, 'source> for DefinitionHandler<'ast, 'source> 
 
     fn anchor_use(&mut self, identifier: &'ast Spanned<LogicIdentifier<'source>>) {
         if identifier.span.contains(&self.index) {
-            self.state.query = Some(DefinitionQuery::Anchor(identifier.data))
+            self.state.query = Some(DefinitionQuery::Anchor(identifier.data));
         }
     }
 
@@ -103,7 +103,7 @@ impl<'ast, 'source> Handler<'ast, 'source> for DefinitionHandler<'ast, 'source> 
 
     fn state_use(&mut self, identifier: &'ast Spanned<LogicIdentifier<'source>>) {
         if identifier.span.contains(&self.index) {
-            self.state.query = Some(DefinitionQuery::State(identifier.data))
+            self.state.query = Some(DefinitionQuery::State(identifier.data));
         }
     }
 
@@ -111,7 +111,7 @@ impl<'ast, 'source> Handler<'ast, 'source> for DefinitionHandler<'ast, 'source> 
         let identifier = &requirement.identifier;
 
         if identifier.span.contains(&self.index) {
-            self.state.query = Some(DefinitionQuery::Requirement(identifier.data))
+            self.state.query = Some(DefinitionQuery::Requirement(identifier.data));
         }
     }
 }

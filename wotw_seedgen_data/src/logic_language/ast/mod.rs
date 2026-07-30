@@ -404,9 +404,8 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                         };
 
                         return Some(RequirementLine { ands, ors, group });
-                    } else {
-                        ands.push((last, And::Colon(symbol.data)));
                     }
+                    ands.push((last, And::Colon(symbol.data)));
                 } else if matches!(parser.current().0, Token::Newline | Token::Dedent) {
                     return Some(RequirementLine {
                         ands,
@@ -420,7 +419,7 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                     return E::none(|| {
                         parser.error(ErrorKind::ExpectedToken(
                             "',' or \"OR\" or ':' or Newline".to_string(),
-                        ))
+                        ));
                     });
                 }
             }

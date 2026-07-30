@@ -49,6 +49,7 @@ impl Error {
 
     /// Returns an [`Error`] with a custom error message.
     /// Convenience wrapper for [`Error::new`] with [`ErrorKind::Error`]
+    #[allow(clippy::self_named_constructors)]
     #[inline]
     pub fn error(message: String, span: Range<usize>) -> Self {
         Self::new(ErrorKind::Error(message), span)
@@ -189,11 +190,11 @@ impl ErrorKind {
     }
 }
 
-impl Into<ReportKind<'static>> for Severity {
-    fn into(self) -> ReportKind<'static> {
-        match self {
-            Self::Warning => ReportKind::Warning,
-            Self::Error => ReportKind::Error,
+impl From<Severity> for ReportKind<'static> {
+    fn from(val: Severity) -> Self {
+        match val {
+            Severity::Warning => Self::Warning,
+            Severity::Error => Self::Error,
         }
     }
 }

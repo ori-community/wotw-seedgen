@@ -121,7 +121,7 @@ pub struct WorldContext<'graph, 'settings, 'perf> {
     spirit_light_provider: SpiritLightProvider,
     /// all remaining pickups which need to be assigned random placements
     needs_placement: Vec<&'graph LocDataEntry>,
-    /// initial length of needs_placement
+    /// initial length of `needs_placement`
     total_pickups: f32,
     /// cost of ks doors already opened on spawn, which will be ignored for forced keystones
     initial_ks_cost: usize,
@@ -308,7 +308,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
             world_context.update_reached();
         }
 
-        self.write_reachable_spoiler()
+        self.write_reachable_spoiler();
     }
 
     fn write_reachable_spoiler(&mut self) {
@@ -504,7 +504,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
     fn progression_slots(&self) -> usize {
         self.worlds
             .iter()
-            .map(|world_context| world_context.progression_slots())
+            .map(WorldContext::progression_slots)
             .sum()
     }
 
@@ -890,10 +890,10 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             total_pickups,
             initial_ks_cost,
             spirit_light_placements_remaining: 0,
-            placeholders: Default::default(),
-            reached_needs_placement: Default::default(),
-            received_placement: Default::default(),
-            reached_item_locations: Default::default(),
+            placeholders: Vec::new(),
+            reached_needs_placement: Vec::new(),
+            received_placement: Vec::new(),
+            reached_item_locations: 0,
             spawn_slots: SPAWN_SLOTS,
             unshared_items: UNSHARED_ITEMS,
         })
@@ -981,7 +981,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             "{log_index}{amount} reached location{location_s} that need{need_s} placements: {reached_needs_placement}",
             log_index = self.log_index,
             amount = self.reached_needs_placement.len(),
-            location_s = if self.reached_needs_placement.len() != 1 { "s" } else { "" },
+            location_s = if self.reached_needs_placement.len() == 1 { "" } else { "s" },
             need_s = if self.reached_needs_placement.len() == 1 { "s" } else { "" },
             reached_needs_placement = self
                 .reached_needs_placement
@@ -1014,7 +1014,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
                 *MAX_PLACEHOLDERS,
                 usize::max(
                     self.placeholders.len(),
-                    (self.reached_needs_placement.len() + self.placeholders.len()) / 2,
+                    usize::midpoint(self.reached_needs_placement.len(), self.placeholders.len()),
                 ),
             ),
         );
@@ -1112,7 +1112,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         // the backup solution comparison has some minor optimizations as well.
         // As a bonus, we already have sorted weights for the trace log, which is why we order bigger first.
         with_weights.sort_unstable_by(|(a, a_weight), (b, b_weight)| {
-            b_weight.total_cmp(a_weight).then_with(|| a.cmp(&b))
+            b_weight.total_cmp(a_weight).then_with(|| a.cmp(b))
         });
 
         if log_enabled!(Trace) {
@@ -1131,18 +1131,16 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             log_index = self.log_index.clone(),
             amount = progressions.len(),
             s = if progressions.len() == 1 { "" } else { "s" },
-            progressions = {
-                progressions
-                    .into_iter()
-                    .format_with("\n", |(solution, weight), f| {
-                        f(&format_args!(
-                            "- {chance:.2}% (reaches {new_reached}): {items}",
-                            chance = (weight / total_weight) * 100.,
-                            new_reached = solution.new_reached,
-                            items = solution.display(&self.item_pool, None), // TODO this was able to use log_name before
-                        ))
-                    })
-            }
+            progressions = progressions
+                .iter()
+                .format_with("\n", |(solution, weight), f| {
+                    f(&format_args!(
+                        "- {chance:.2}% (reaches {new_reached}): {items}",
+                        chance = (weight / total_weight) * 100.,
+                        new_reached = solution.new_reached,
+                        items = solution.display(&self.item_pool, None), // TODO this was able to use log_name before
+                    ))
+                })
         );
     }
 
@@ -1169,11 +1167,11 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         let any_remaining = self.placements_remaining() > self.spirit_light_placements_remaining;
 
         if any_remaining {
-            if !self.reached_needs_placement.is_empty() {
+            if self.reached_needs_placement.is_empty() {
+                self.placeholders.pop()
+            } else {
                 let index = self.rng.gen_range(0..self.reached_needs_placement.len());
                 Some(self.commit_chosen_location(index))
-            } else {
-                self.placeholders.pop()
             }
         } else {
             None
@@ -1339,7 +1337,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             self.spirit_light_placements_remaining.saturating_sub(1);
         let command = compile::spirit_light(amount.into(), &mut self.rng);
         self.place_with_simulation(pickup, command, placement_spoiler, |_, world, events| {
-            world.add_spirit_light(amount, events)
+            world.add_spirit_light(amount, events);
         });
     }
 
@@ -1461,7 +1459,7 @@ fn filter_needs_placement(
                     pickup = pickup.identifier
                 );
 
-                extra_slots.extend(iter::repeat(pickup).take((slots - 1) as usize));
+                extra_slots.extend(iter::repeat_n(pickup, (slots - 1) as usize));
             }
         }
 
@@ -1473,7 +1471,7 @@ fn filter_needs_placement(
     trace!(
         "{log_index}{amount} total locations that need placements: {needs_placement}",
         amount = needs_placement.len(),
-        needs_placement = format_pickups(&needs_placement)
+        needs_placement = format_pickups(needs_placement)
     );
 }
 

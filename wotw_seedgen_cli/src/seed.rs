@@ -125,7 +125,7 @@ fn create_unique_file(dir: PathBuf, name: &str, extension: &str) -> Result<(File
 }
 
 fn create_unique_dir(dir: PathBuf, name: &str) -> Result<PathBuf, Error> {
-    create_unique::<_, ()>(dir, name, "", |path| fs::create_dir(path)).map(|(_, path)| path)
+    create_unique::<_, ()>(dir, name, "", |path| fs::create_dir(path)).map(|((), path)| path)
 }
 
 fn create_unique<F, T>(
@@ -166,7 +166,7 @@ pub fn launch_seed(path: &Path, args: LaunchArgs) -> Result<(), Error> {
     }
 
     if launch {
-        open::that_detached(&path).map_err(|err| file_err("launch", path, err))?;
+        open::that_detached(path).map_err(|err| file_err("launch", path, err))?;
     }
 
     Ok(())
@@ -205,7 +205,7 @@ pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse
 
 pub fn paths(source: &Source) -> Result<Paths<'_>, Error> {
     Paths::parse(&source.content)
-        .eprint_errors(&source)
+        .eprint_errors(source)
         .ok_or_else(|| Error("failed to parse paths".to_string()))
 }
 

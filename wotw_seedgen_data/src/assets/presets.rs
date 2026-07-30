@@ -38,7 +38,7 @@ pub enum PresetGroup {
 
 impl PresetInfo {
     pub fn is_base_preset(&self) -> bool {
-        self.group.as_ref().map_or(false, |group| {
+        self.group.as_ref().is_some_and(|group| {
             let PresetGroup::Base = group;
             true
         })
@@ -107,25 +107,25 @@ impl UniversePreset {
         settings: &mut UniverseSettings,
         file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], file_access)
+        self.apply_impl(settings, &mut vec![], file_access)
     }
 
     pub fn is_base_preset(&self) -> bool {
-        self.info.as_ref().map_or(false, PresetInfo::is_base_preset)
+        self.info.as_ref().is_some_and(PresetInfo::is_base_preset)
     }
 
     pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
         self.settings.difficulty_cmp(&other.settings)
     }
 
-    fn _apply<A: PresetAccess + SnippetAccess>(
+    fn apply_impl<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut UniverseSettings,
         already_applied: &mut Vec<String>,
         file_access: &A,
     ) -> Result<(), String> {
         self.check_compability()?
-            ._apply(settings, already_applied, file_access)
+            .apply_impl(settings, already_applied, file_access)
     }
 
     fn check_compability(mut self) -> Result<UniversePresetSettings, String> {
@@ -170,7 +170,7 @@ impl UniversePresetSettings {
         settings: &mut UniverseSettings,
         file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], file_access)
+        self.apply_impl(settings, &mut vec![], file_access)
     }
 
     pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
@@ -190,7 +190,7 @@ impl UniversePresetSettings {
         }
     }
 
-    fn _apply<A: PresetAccess + SnippetAccess>(
+    fn apply_impl<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut UniverseSettings,
         already_applied: &mut Vec<String>,
@@ -275,7 +275,7 @@ fn include_universe_preset<A: PresetAccess + SnippetAccess>(
     let preset = file_access.universe_preset(&identifier)?;
     already_applied.push(identifier);
 
-    preset._apply(settings, already_applied, file_access)
+    preset.apply_impl(settings, already_applied, file_access)
 }
 
 /// A collection of settings that can be applied to one world of existing settings
@@ -325,25 +325,25 @@ impl WorldPreset {
         settings: &mut WorldSettings,
         file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], file_access)
+        self.apply_impl(settings, &mut vec![], file_access)
     }
 
     pub fn is_base_preset(&self) -> bool {
-        self.info.as_ref().map_or(false, PresetInfo::is_base_preset)
+        self.info.as_ref().is_some_and(PresetInfo::is_base_preset)
     }
 
     pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
         self.settings.difficulty_cmp(&other.settings)
     }
 
-    fn _apply<A: PresetAccess + SnippetAccess>(
+    fn apply_impl<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut WorldSettings,
         already_applied: &mut Vec<String>,
         file_access: &A,
     ) -> Result<(), String> {
         self.check_compability()?
-            ._apply(settings, already_applied, file_access)
+            .apply_impl(settings, already_applied, file_access)
     }
 
     fn check_compability(mut self) -> Result<WorldPresetSettings, String> {
@@ -399,7 +399,7 @@ impl WorldPresetSettings {
         settings: &mut WorldSettings,
         file_access: &A,
     ) -> Result<(), String> {
-        self._apply(settings, &mut vec![], file_access)
+        self.apply_impl(settings, &mut vec![], file_access)
     }
 
     pub fn difficulty_cmp(&self, other: &Self) -> Ordering {
@@ -421,7 +421,7 @@ impl WorldPresetSettings {
             .then_with(|| self.hard.cmp(&other.hard))
     }
 
-    fn _apply<A: PresetAccess + SnippetAccess>(
+    fn apply_impl<A: PresetAccess + SnippetAccess>(
         self,
         settings: &mut WorldSettings,
         already_applied: &mut Vec<String>,
@@ -527,7 +527,7 @@ fn include_world_preset<A: PresetAccess + SnippetAccess>(
     let preset = file_access.world_preset(&identifier)?;
     already_applied.push(identifier);
 
-    preset._apply(settings, already_applied, file_access)
+    preset.apply_impl(settings, already_applied, file_access)
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]

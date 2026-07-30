@@ -84,7 +84,7 @@ impl IdUseMap {
         for status in self.inner.values_mut() {
             match status {
                 IdUseStatus::NeverWritten { read_spans } => {
-                    read_spans.finish_snippet(identifier.to_string())
+                    read_spans.finish_snippet(identifier.to_string());
                 }
                 IdUseStatus::Written => {}
             }

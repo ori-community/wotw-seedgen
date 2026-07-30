@@ -25,11 +25,11 @@ use strum::{Display, EnumDiscriminants, VariantArray, VariantNames};
 use utoipa::ToSchema;
 use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, ErrorMode, ParseResult, SpannedOption};
 
+use crate::icon::GenericIcon;
 pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
     SeparatedNonEmpty, Span, Spanned, Symbol,
 };
-use crate::icon::GenericIcon;
 
 pub type Delimited<const OPEN: char, Content, const CLOSE: char> =
     wotw_seedgen_parse::Delimited<Spanned<Symbol<OPEN>>, Content, Spanned<Symbol<CLOSE>>>;
@@ -62,7 +62,7 @@ impl<'source> Recover<'source, Tokenizer> for RecoverContent {
         // TODO this can skip delimiters
         while !(parser.is_finished() || matches!(parser.current_slice(), "#" | "!" | "on" | "fun"))
         {
-            parser.step()
+            parser.step();
         }
     }
 }
@@ -83,7 +83,7 @@ pub struct RecoverCommandArg;
 impl<'source> Recover<'source, Tokenizer> for RecoverCommandArg {
     fn recover(parser: &mut Parser<'source, Tokenizer>) {
         while !(parser.is_finished() || matches!(parser.current_slice(), "," | ")")) {
-            parser.step()
+            parser.step();
         }
     }
 }
@@ -487,7 +487,7 @@ pub enum Command<'source> {
         Spanned<RemoveSpiritLight>,
         CommandArgs<RemoveSpiritLightArgs<'source>>,
     ),
-    ItemData(Spanned<ItemData>, CommandArgs<ItemDataArgs<'source>>),
+    ItemData(Spanned<ItemData>, CommandArgs<Box<ItemDataArgs<'source>>>),
     ItemDataName(
         Spanned<ItemDataName>,
         CommandArgs<ItemDataNameArgs<'source>>,
@@ -523,7 +523,10 @@ pub enum Command<'source> {
     Preplace(Spanned<Preplace>, CommandArgs<PreplaceArgs<'source>>),
     ZoneOf(Spanned<ZoneOf>, CommandArgs<ZoneOfArgs<'source>>),
     ItemOn(Spanned<ItemOn>, CommandArgs<ItemOnArgs<'source>>),
-    CountInZone(Spanned<CountInZone>, CommandArgs<CountInZoneArgs<'source>>),
+    CountInZone(
+        Spanned<CountInZone>,
+        CommandArgs<Box<CountInZoneArgs<'source>>>,
+    ),
     RandomInteger(
         Spanned<RandomInteger>,
         CommandArgs<RandomIntegerArgs<'source>>,

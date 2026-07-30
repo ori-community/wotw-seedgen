@@ -32,7 +32,7 @@ use std::{
 use itertools::Itertools;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
-    logic_language::output::{Connection, Graph, Requirement},
+    logic_language::output::{Connection, Graph, Node, Requirement},
     seed_language::{
         output::{
             CommandVoid, CommandsOutput, CommonWriteCommand, ContainedWrites, UberStateWrite,
@@ -109,9 +109,9 @@ impl PartialEq for Solution {
         let eq = self.items == other.items;
 
         if cfg!(debug_assertions) {
-            assert!(
-                eq == (eq
-                    && (self.spirit_light == other.spirit_light)
+            assert_eq!(
+                eq,
+                (eq && (self.spirit_light == other.spirit_light)
                     && (self.new_reached == other.new_reached))
             );
         }
@@ -134,11 +134,11 @@ impl Ord for Solution {
         let ord = self.items.cmp(&other.items);
 
         if cfg!(debug_assertions) {
-            assert!(
-                ord == ord
-                    .then(self.spirit_light.cmp(&other.spirit_light))
+            assert_eq!(
+                ord,
+                ord.then(self.spirit_light.cmp(&other.spirit_light))
                     .then(self.new_reached.cmp(&other.new_reached))
-            )
+            );
         }
 
         ord
@@ -526,7 +526,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
             self.world.inventory_display(),
             self.world
                 .reached_nodes()
-                .map(|node| node.identifier())
+                .map(Node::identifier)
                 .format(", "),
         );
 
@@ -1294,7 +1294,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     ) -> ControlFlow<()> {
         solution.used_items.extend(items.iter().copied());
 
-        self.check_redundancy(&solution)?;
+        self.check_redundancy(solution)?;
 
         for index in &items {
             solution.remaining_items.remove(index);

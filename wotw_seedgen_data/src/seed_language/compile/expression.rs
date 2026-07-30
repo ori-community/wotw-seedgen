@@ -87,15 +87,15 @@ impl<'source> Compile<'source> for ast::Operation<'source> {
                     Type::Float => self
                         .compile_operation(operator, compiler)
                         .map(Command::Float),
-                    Type::String => match Concatenator::try_from(operator) {
-                        Ok(operator) => self
-                            .compile_operation(operator, compiler)
-                            .map(Command::String),
-                        Err(()) => {
+                    Type::String => {
+                        if let Ok(operator) = Concatenator::try_from(operator) {
+                            self.compile_operation(operator, compiler)
+                                .map(Command::String)
+                        } else {
                             compiler.errors.push(operation_error(target, self.span()));
                             None
                         }
-                    },
+                    }
                     _ => {
                         compiler.errors.push(operation_error(target, self.span()));
                         None
@@ -113,39 +113,39 @@ impl<'source> Compile<'source> for ast::Operation<'source> {
                 let target = compiler.common_type(&self.left, &self.right)?;
 
                 match target {
-                    Type::Boolean => match EqualityComparator::try_from(operator) {
-                        Ok(operator) => self
-                            .compile_operation::<CommandBoolean, _, _>(operator, compiler)
-                            .map(Command::Boolean),
-                        Err(()) => {
+                    Type::Boolean => {
+                        if let Ok(operator) = EqualityComparator::try_from(operator) {
+                            self.compile_operation::<CommandBoolean, _, _>(operator, compiler)
+                                .map(Command::Boolean)
+                        } else {
                             compiler.errors.push(operation_error(target, self.span()));
                             None
                         }
-                    },
+                    }
                     Type::Integer => self
                         .compile_operation::<CommandInteger, _, _>(operator, compiler)
                         .map(Command::Boolean),
                     Type::Float => self
                         .compile_operation::<CommandFloat, _, _>(operator, compiler)
                         .map(Command::Boolean),
-                    Type::String => match operator.try_into() {
-                        Ok(operator) => self
-                            .compile_operation::<CommandString, _, _>(operator, compiler)
-                            .map(Command::Boolean),
-                        Err(()) => {
+                    Type::String => {
+                        if let Ok(operator) = operator.try_into() {
+                            self.compile_operation::<CommandString, _, _>(operator, compiler)
+                                .map(Command::Boolean)
+                        } else {
                             compiler.errors.push(operation_error(target, self.span()));
                             None
                         }
-                    },
-                    Type::Zone => match operator.try_into() {
-                        Ok(operator) => self
-                            .compile_operation::<CommandZone, _, _>(operator, compiler)
-                            .map(Command::Boolean),
-                        Err(()) => {
+                    }
+                    Type::Zone => {
+                        if let Ok(operator) = operator.try_into() {
+                            self.compile_operation::<CommandZone, _, _>(operator, compiler)
+                                .map(Command::Boolean)
+                        } else {
                             compiler.errors.push(operation_error(target, self.span()));
                             None
                         }
-                    },
+                    }
                     _ => {
                         compiler.errors.push(operation_error(target, self.span()));
                         None

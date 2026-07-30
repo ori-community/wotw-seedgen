@@ -115,7 +115,9 @@ impl LogicalDifficulty for Difficulty {
 
     fn may_increase_orbs(self, uber_identifier: UberIdentifier) -> bool {
         match uber_identifier {
-            UberIdentifier::BASE_MAX_HEALTH | UberIdentifier::BASE_MAX_ENERGY | Skill::REGENERATE_ID => true,
+            UberIdentifier::BASE_MAX_HEALTH
+            | UberIdentifier::BASE_MAX_ENERGY
+            | Skill::REGENERATE_ID => true,
             Shard::RESILIENCE_ID => self.resilience(),
             Shard::VITALITY_ID => self.vitality(),
             Shard::ENERGY_ID => self.energy_shard(),

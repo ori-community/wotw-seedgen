@@ -82,7 +82,7 @@ impl<'pool> WeightContext<'pool> {
                 *write_counts.entry(*writes).or_default() += 1.;
             }
 
-            solution_data.push(SolutionData { item_cost, items })
+            solution_data.push(SolutionData { item_cost, items });
         }
 
         Self {
@@ -181,19 +181,16 @@ impl Cost for CommonUberIdentifier {
             )
             | CommonUberIdentifier::Shard(_) => 500.,
             CommonUberIdentifier::Skill(Skill::Dash | Skill::Flap) => 600., // Counteracting bias because these unlock rather little
-            CommonUberIdentifier::Skill(Skill::Glide)
-            | CommonUberIdentifier::Skill(Skill::Grapple) => 700., // Feel-Good Finds
+            CommonUberIdentifier::Skill(Skill::Glide | Skill::Grapple) => 700., // Feel-Good Finds
             CommonUberIdentifier::Skill(
                 Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken,
             ) => 800., // Basic Weapons
-            CommonUberIdentifier::Skill(Skill::Burrow)
-            | CommonUberIdentifier::Skill(Skill::WaterDash)
-            | CommonUberIdentifier::Skill(Skill::Grenade)
-            | CommonUberIdentifier::Skill(Skill::Flash)
+            CommonUberIdentifier::Skill(
+                Skill::Burrow | Skill::WaterDash | Skill::Grenade | Skill::Flash,
+            )
             | CommonUberIdentifier::CleanWater => 900., // Key Skills
             CommonUberIdentifier::Skill(Skill::DoubleJump) => 1000., // Good to find, but this is already biased for by being powerful
-            CommonUberIdentifier::Skill(Skill::Blaze)
-            | CommonUberIdentifier::Skill(Skill::Sentry) => 1400., // Tedious Weapons
+            CommonUberIdentifier::Skill(Skill::Blaze | Skill::Sentry) => 1400., // Tedious Weapons
             CommonUberIdentifier::Skill(Skill::Bash) => 1500., // Counteracting bias because Bash unlocks a lot
             CommonUberIdentifier::Skill(Skill::Spear) => 2000., // Lowering the frequency of slow Spear starts
             CommonUberIdentifier::Teleporter(

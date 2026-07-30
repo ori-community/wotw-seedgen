@@ -187,13 +187,11 @@ impl FromStr for UberIdentifier {
             part.parse().map_err(|err| error(part.to_string(), err))
         }
 
-        let (group, member) = s
-            .split_once('|')
-            .ok_or(ParseUberIdentifierError::InvalidFormat)?;
+        let (group, member) = s.split_once('|').ok_or(ParseUberIdentifierError::Format)?;
 
         Ok(Self {
-            group: parse_part(group, ParseUberIdentifierError::InvalidGroup)?,
-            member: parse_part(member, ParseUberIdentifierError::InvalidMember)?,
+            group: parse_part(group, ParseUberIdentifierError::Group)?,
+            member: parse_part(member, ParseUberIdentifierError::Member)?,
         })
     }
 }
@@ -201,11 +199,11 @@ impl FromStr for UberIdentifier {
 #[derive(Debug, Error)]
 pub enum ParseUberIdentifierError {
     #[error("invalid format")]
-    InvalidFormat,
+    Format,
     #[error("invalid group {0}: {1}")]
-    InvalidGroup(String, ParseIntError),
+    Group(String, ParseIntError),
     #[error("invalid member {0}: {1}")]
-    InvalidMember(String, ParseIntError),
+    Member(String, ParseIntError),
 }
 
 impl PartialSchema for UberIdentifier {

@@ -162,16 +162,15 @@ fn boxed_arg<T: CompileInto>(context: &mut ArgContext) -> Option<Box<T>> {
 fn spanned_string_literal(context: &mut ArgContext) -> Option<(String, Range<usize>)> {
     let (arg, span) = spanned_arg::<CommandString>(context)?;
 
-    match arg.into_constant() {
-        Ok(value) => Some((value, span)),
-        Err(_) => {
-            context.compiler.errors.push(Error::error(
-                "Only literals are allowed in this position".to_string(),
-                span,
-            ));
+    if let Ok(value) = arg.into_constant() {
+        Some((value, span))
+    } else {
+        context.compiler.errors.push(Error::error(
+            "Only literals are allowed in this position".to_string(),
+            span,
+        ));
 
-            None
-        }
+        None
     }
 }
 
@@ -596,7 +595,7 @@ impl<'source> ast::FunctionCall<'source> {
         let mut floats = vec![];
         let mut strings = vec![];
 
-        for (arg_signature, arg_expression) in function.signature.args.iter().zip(parameters) {
+        for (arg_signature, arg_expression) in function.signature.args.into_iter().zip(parameters) {
             match arg_signature.ty {
                 Type::Boolean => booleans.push(
                     arg_expression
@@ -682,7 +681,7 @@ impl SnippetCompiler<'_, '_, '_, '_> {
                 let end = close.span_end();
 
                 self.errors
-                    .push(Error::error("Too few parameters".to_string(), start..end))
+                    .push(Error::error("Too few parameters".to_string(), start..end));
             }
             Ordering::Equal => {}
             Ordering::Greater => {
@@ -690,7 +689,7 @@ impl SnippetCompiler<'_, '_, '_, '_> {
                 let end = parameters.last().unwrap().span_end();
 
                 self.errors
-                    .push(Error::error("Too many parameters".to_string(), start..end))
+                    .push(Error::error("Too many parameters".to_string(), start..end));
             }
         }
     }

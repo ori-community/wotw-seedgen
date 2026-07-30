@@ -103,7 +103,7 @@ pub(crate) struct ReachStateFails<'graph> {
     pub energy: FxHashSet<ConnectionIndex<'graph>>,
 }
 
-impl<'graph> ReachState<'graph> {
+impl ReachState<'_> {
     fn clear(&mut self) {
         self.best_orbs.retain(|_, best_orbs| best_orbs.do_not_clear);
         self.tp_reached = false;
@@ -327,7 +327,7 @@ impl Display for ConnectionIndexDisplay<'_, '_> {
         match self.connection.connection {
             ConnectionOrRefill::Refill(refill) => write!(f, " -> {}", refill.value)?,
             ConnectionOrRefill::Connection(connection) => {
-                write!(f, " -> {}", self.graph.nodes[connection.to].identifier())?
+                write!(f, " -> {}", self.graph.nodes[connection.to].identifier())?;
             }
         }
 
@@ -483,7 +483,7 @@ impl<'graph> World<'graph, '_, '_> {
             .collect::<Vec<_>>();
 
         for anchor in reached_anchors {
-            self.attempt_teleport(anchor, output)
+            self.attempt_teleport(anchor, output);
         }
     }
 
@@ -610,10 +610,10 @@ impl<'graph> World<'graph, '_, '_> {
         match &connection_index.connection {
             ConnectionOrRefill::Refill(_) => {
                 let node_index = connection_index.node_index(self.graph);
-                self.traverse(node_index, orb_variants, output)
+                self.traverse(node_index, orb_variants, output);
             }
             ConnectionOrRefill::Connection(connection) => {
-                self.traverse_connection(connection.0, orb_variants, connection_index, output)
+                self.traverse_connection(connection.0, orb_variants, connection_index, output);
             }
         }
     }
@@ -664,7 +664,7 @@ impl<'graph> World<'graph, '_, '_> {
                 orb_variants.clone(),
                 ConnectionIndex::connection(anchor, connection),
                 output,
-            )
+            );
         }
     }
 
@@ -855,10 +855,10 @@ impl<'graph> World<'graph, '_, '_> {
             Missing::WallWeapon => self.add_weapon_fail::<true>(connection),
             Missing::EnemyWeapon => self.add_weapon_fail::<false>(connection),
             Missing::EnergyOrBetterWallWeapon(_) => {
-                self.add_energy_or_better_weapon_fail::<true>(connection)
+                self.add_energy_or_better_weapon_fail::<true>(connection);
             }
             Missing::EnergyOrBetterEnemyWeapon(_) => {
-                self.add_energy_or_better_weapon_fail::<false>(connection)
+                self.add_energy_or_better_weapon_fail::<false>(connection);
             }
             Missing::EnergyOrBurrowOrBetterEnemyWeapon(_) => {
                 add_fail_to(
@@ -866,7 +866,7 @@ impl<'graph> World<'graph, '_, '_> {
                     Skill::BURROW_ID,
                     connection.clone(),
                 );
-                self.add_energy_or_better_weapon_fail::<false>(connection)
+                self.add_energy_or_better_weapon_fail::<false>(connection);
             }
             Missing::Any(options) => {
                 for missing in options {

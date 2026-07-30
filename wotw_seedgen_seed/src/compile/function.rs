@@ -66,7 +66,8 @@ impl<'ctx> FunctionCompiler<'ctx> {
 
             commands.extend(pre_push_arg.commands);
 
-            let mut post_push_commands = Vec::with_capacity(1 + needs_intermediate_copy as usize);
+            let mut post_push_commands =
+                Vec::with_capacity(1 + usize::from(needs_intermediate_copy));
 
             if needs_intermediate_copy {
                 let (copy_away, copy_back) =
@@ -80,7 +81,7 @@ impl<'ctx> FunctionCompiler<'ctx> {
             debug_assert!(matches!(post_push, PostPushArg::CopyPlaceholder));
 
             post_push_commands.push(pre_push_arg.destination.stack_push());
-            *post_push = PostPushArg::Finished(post_push_commands)
+            *post_push = PostPushArg::Finished(post_push_commands);
         }
 
         commands.push(Command::StackPush);
@@ -258,8 +259,8 @@ impl Iterator for PrePushArgSelector {
     type Item = PrePushArg;
 
     fn next(&mut self) -> Option<Self::Item> {
-        fn select(remaining_args: &mut Vec<PrePushArg>, arg: PrePushArg) -> PrePushArg {
-            for remaining in remaining_args.iter_mut() {
+        fn select(remaining_args: &mut [PrePushArg], arg: PrePushArg) -> PrePushArg {
+            for remaining in remaining_args {
                 remaining
                     .gets_overwritten_by
                     .retain(|index| *index != arg.index);

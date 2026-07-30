@@ -64,7 +64,7 @@ pub fn perf(args: PerfArgs) -> Result<(), Error> {
         .take(available)
         .collect::<Vec<_>>()
         .into_iter()
-        .for_each(|handle| handle.join().expect("a seedgen thread panicked"))
+        .for_each(|handle| handle.join().expect("a seedgen thread panicked"));
     });
 
     eprintln!("Generated {} seeds", count.into_inner());

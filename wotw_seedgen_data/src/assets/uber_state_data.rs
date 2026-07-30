@@ -58,7 +58,7 @@ impl Display for UberStateAlias {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.uber_identifier)?;
         if let Some(value) = self.value {
-            write!(f, " >= {}", value)?;
+            write!(f, " >= {value}")?;
         }
         Ok(())
     }
@@ -98,12 +98,11 @@ pub enum UberStateValue {
 
 impl UberStateValue {
     pub fn as_boolean(self) -> bool {
-        match self {
-            UberStateValue::Boolean(value) => value,
-            _ => {
-                eprintln!("Attempted to access {self:?} UberState as Boolean");
-                Default::default()
-            }
+        if let UberStateValue::Boolean(value) = self {
+            value
+        } else {
+            eprintln!("Attempted to access {self:?} UberState as Boolean");
+            false
         }
     }
 
@@ -115,12 +114,11 @@ impl UberStateValue {
     }
 
     pub fn as_integer(self) -> i32 {
-        match self {
-            UberStateValue::Integer(value) => value,
-            _ => {
-                eprintln!("Attempted to access {self:?} UberState as Integer");
-                Default::default()
-            }
+        if let UberStateValue::Integer(value) = self {
+            value
+        } else {
+            eprintln!("Attempted to access {self:?} UberState as Integer");
+            0
         }
     }
 
@@ -132,12 +130,11 @@ impl UberStateValue {
     }
 
     pub fn as_float(self) -> f32 {
-        match self {
-            UberStateValue::Float(value) => value,
-            _ => {
-                eprintln!("Attempted to access {self:?} UberState as Float");
-                Default::default()
-            }
+        if let UberStateValue::Float(value) = self {
+            value
+        } else {
+            eprintln!("Attempted to access {self:?} UberState as Float");
+            0.
         }
     }
 
@@ -335,7 +332,7 @@ where
     V: Serialize,
     S: Serializer,
 {
-    let mut map = t.into_iter().collect::<IndexMap<_, _, FxBuildHasher>>();
+    let mut map = t.iter().collect::<IndexMap<_, _, FxBuildHasher>>();
 
     map.sort_unstable_keys();
 

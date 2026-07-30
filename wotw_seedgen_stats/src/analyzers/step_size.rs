@@ -18,11 +18,7 @@ impl Analyzer for StepSizeStats {
             .iter()
             .map(|group| {
                 super::group_result(
-                    group
-                        .reachable
-                        .iter()
-                        .map(|reachable| reachable.len())
-                        .sum(),
+                    group.reachable.iter().map(Vec::len).sum(),
                     self.result_bucket_size,
                 )
             })

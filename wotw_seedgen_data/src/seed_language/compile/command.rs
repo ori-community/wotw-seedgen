@@ -321,7 +321,7 @@ impl<'source> Compile<'source> for ast::AugmentFunArgs<'source> {
 
         match (function, action) {
             (CommandVoid::Multi { commands }, CommandVoid::Multi { commands: mut more }) => {
-                commands.append(&mut more)
+                commands.append(&mut more);
             }
             (CommandVoid::Multi { commands }, action) => commands.push(action),
             (function, CommandVoid::Multi { mut commands }) => {
@@ -645,7 +645,7 @@ impl<'source> Compile<'source> for ast::AddItemArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
-        compile_item_pool_change::<1>(self.0, compiler)
+        compile_item_pool_change::<1>(self.0, compiler);
     }
 }
 
@@ -653,7 +653,7 @@ impl<'source> Compile<'source> for ast::RemoveItemArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
-        compile_item_pool_change::<-1>(self.0, compiler)
+        compile_item_pool_change::<-1>(self.0, compiler);
     }
 }
 
@@ -869,7 +869,7 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
         compiler.errors.push(Error::error(
             format!("Already defined {field} for this item"),
             span,
-        ))
+        ));
     }
 }
 
@@ -1057,7 +1057,7 @@ impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
         let max = get_command_arg(self.0.max).and_then(|max| max.evaluate::<f32>(compiler));
 
         if let (Some(min), Some(max)) = (min, max) {
-            let value: f32 = compiler.rng.gen_range(min.into()..=max.into());
+            let value: f32 = compiler.rng.gen_range(min..=max);
 
             compiler.define_variable(self.0.identifier.data, OrderedFloat(value));
         }

@@ -250,10 +250,10 @@ impl ItemPool {
                 let cost = item.writes.cost();
 
                 cost <= 10000. || {
-                    let choose = self.rng.gen_bool(10000. / cost as f64);
+                    let choose = self.rng.gen_bool(10000. / f64::from(cost));
 
                     if !choose {
-                        trace!("Rerolling random placement {}", item.command.log_display())
+                        trace!("Rerolling random placement {}", item.command.log_display());
                     }
 
                     choose

@@ -17,7 +17,6 @@ use crate::seed_language::ast::{
     ZoneOfArgs,
 };
 
-#[must_use]
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
     match arg {
         Recoverable {
@@ -35,7 +34,6 @@ pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
     }
 }
 
-#[must_use]
 pub fn get_command_arg_ref<T>(arg: &CommandArg<T>) -> Option<&T> {
     match arg {
         Recoverable {
@@ -57,7 +55,6 @@ pub fn inspect_command_arg<T, F: FnOnce(&T)>(arg: &CommandArg<T>, f: F) {
     get_command_arg_ref(arg).inspect(|t| f(*t));
 }
 
-#[must_use]
 pub fn get_command_args_ref<T>(args: &CommandArgs<T>) -> Option<&T> {
     match args {
         Recoverable {
@@ -179,7 +176,7 @@ impl<H: Handler> Traverse<H> for Spanned<Literal<'_>> {
 
 impl<H: Handler> Traverse<H> for UberIdentifier<'_> {
     fn traverse(&self, handler: &mut H) {
-        handler.uber_identifier(self)
+        handler.uber_identifier(self);
     }
 }
 
@@ -515,7 +512,7 @@ impl<H: Handler> Traverse<H> for SetConfigArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.string(&self.snippet_name.span);
         inspect_command_arg(&self.identifier, |identifier| {
-            handler.identifier(identifier)
+            handler.identifier(identifier);
         });
         inspect_command_arg(&self.value, |value| handler.string(&value.span));
     }
@@ -532,7 +529,7 @@ impl<H: Handler> Traverse<H> for TimerArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.identifier_def(&self.toggle_identifier);
         inspect_command_arg(&self.timer_identifier, |timer_identifier| {
-            handler.identifier_def(timer_identifier)
+            handler.identifier_def(timer_identifier);
         });
     }
 }
@@ -595,7 +592,7 @@ impl<H: Handler> Traverse<H> for ItemDataArgs<'_> {
         inspect_command_arg(&self.name, |name| name.traverse(handler));
         inspect_command_arg(&self.price, |price| price.traverse(handler));
         inspect_command_arg(&self.description, |description| {
-            description.traverse(handler)
+            description.traverse(handler);
         });
         inspect_command_arg(&self.icon, |icon| icon.traverse(handler));
         inspect_command_arg(&self.map_icon, |map_icon| map_icon.traverse(handler));
@@ -620,7 +617,7 @@ impl<H: Handler> Traverse<H> for ItemDataDescriptionArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.item.traverse(handler);
         inspect_command_arg(&self.description, |description| {
-            description.traverse(handler)
+            description.traverse(handler);
         });
     }
 }
@@ -725,7 +722,7 @@ impl<H: Handler> Traverse<H> for RandomFromPoolArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.identifier_def(&self.identifier);
         inspect_command_arg(&self.pool_identifier, |pool_identifier| {
-            handler.identifier_use(pool_identifier)
+            handler.identifier_use(pool_identifier);
         });
     }
 }

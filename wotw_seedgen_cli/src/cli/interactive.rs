@@ -9,7 +9,7 @@ use dialoguer::{
     Confirm, Input, MultiSelect, Select,
 };
 use itertools::Itertools;
-use rustc_hash::FxHashSet;
+use rustc_hash::{FxHashMap, FxHashSet};
 use strum::{Display, VariantArray, VariantNames};
 use wotw_seedgen::data::{
     assets::{
@@ -116,7 +116,7 @@ fn select_presets(
                     .iter()
                     .map(|available_preset| includes.contains(&available_preset.identifier))
                     .collect::<Vec<_>>(),
-            )
+            );
         }
 
         let selected = query
@@ -256,7 +256,7 @@ fn select_tricks(
         .available_tricks()
         .filter(|trick| {
             let controlled = include_settings.tricks.contains(trick);
-            include_controlled += controlled as u8;
+            include_controlled += u8::from(controlled);
             !controlled
         })
         .collect::<Vec<_>>();
@@ -278,7 +278,7 @@ fn select_tricks(
                     .iter()
                     .map(|trick| tricks.contains(trick))
                     .collect::<Vec<_>>(),
-            )
+            );
         }
 
         let indices = query.interact_opt()?.unwrap_or_default();
@@ -289,7 +289,7 @@ fn select_tricks(
             } else {
                 settings.tricks = Some(Tricks::Some(
                     indices.into_iter().map(|index| items[index]).collect(),
-                ))
+                ));
             }
         }
     }
@@ -357,7 +357,7 @@ fn select_snippets(
         .iter()
         .filter(|snippet| {
             let controlled = include_settings.snippets.contains(&snippet.identifier);
-            include_controlled += controlled as u32;
+            include_controlled += u32::from(controlled);
             !controlled
         })
         .collect::<Vec<_>>();
@@ -387,7 +387,7 @@ fn select_snippets(
                 .iter()
                 .map(|identifier| snippets.contains(identifier))
                 .collect::<Vec<_>>(),
-        )
+        );
     }
 
     let selected = query
@@ -455,10 +455,10 @@ fn select_snippet_config(
         let index = selected.unwrap_or_default();
         if index == 0 {
             break;
-        } else {
-            let snippet = &configurable_snippets[index - 1];
-            select_snippet_config_value(prefix, settings, snippet, include_settings)?;
         }
+
+        let snippet = &configurable_snippets[index - 1];
+        select_snippet_config_value(prefix, settings, snippet, include_settings)?;
     }
 
     Ok(())
@@ -505,7 +505,7 @@ fn select_snippet_config_value(
                     reset = Reset.render(),
                     name = value.name,
                     description = match &value.description {
-                        None => "".to_string(),
+                        None => String::new(),
                         Some(description) => format!(" ({description})"),
                     },
                 )
@@ -527,16 +527,16 @@ fn select_snippet_config_value(
         let index = selected.unwrap_or_default();
         if index == 0 {
             break;
-        } else {
-            let value = &config[index - 1];
-            choose_snippet_config_value(
-                prefix,
-                settings,
-                &snippet.identifier,
-                value,
-                &mut current_values[index - 1],
-            )?;
         }
+
+        let value = &config[index - 1];
+        choose_snippet_config_value(
+            prefix,
+            settings,
+            &snippet.identifier,
+            value,
+            &mut current_values[index - 1],
+        )?;
     }
 
     Ok(())
@@ -554,7 +554,7 @@ fn choose_snippet_config_value(
         identifier = value.0,
         name = value.1.name,
         description = match &value.1.description {
-            None => "".to_string(),
+            None => String::new(),
             Some(description) => format!("; {description}"),
         }
     );
@@ -563,7 +563,7 @@ fn choose_snippet_config_value(
         ConfigDefault::Boolean(_) => Select::new()
             .with_prompt(prompt)
             .items(&[true, false])
-            .default((current == "false") as usize)
+            .default(usize::from(current == "false"))
             .interact_opt()?
             .map(|choice| (choice == 0).to_string())
             .unwrap_or_default(),
@@ -574,14 +574,14 @@ fn choose_snippet_config_value(
     };
 
     if !choice.is_empty() {
-        *current = choice.clone();
+        current.clone_from(&choice);
 
         settings
             .snippet_config
-            .get_or_insert_with(Default::default)
+            .get_or_insert_with(FxHashMap::default)
             .entry(snippet.to_string())
             .or_default()
-            .insert(value.0.to_string(), choice);
+            .insert(value.0.clone(), choice);
     }
 
     Ok(())

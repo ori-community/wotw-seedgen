@@ -190,6 +190,7 @@ impl<'source> Compiler<'source> {
                         ));
                     }
                 }
+                ast::Content::Region(..) => {}
                 ast::Content::Anchor(_, anchor) => {
                     let SpannedOption::Some(anchor) = &anchor.value else {
                         continue;
@@ -228,7 +229,6 @@ impl<'source> Compiler<'source> {
                         }
                     }
                 }
-                _ => {}
             }
         }
 
@@ -256,7 +256,7 @@ impl<'source> Compiler<'source> {
             pickup_map,
             anchor_map,
             extern_requirement_map,
-            regions: Default::default(),
+            regions: FxHashMap::default(),
             errors,
         }
     }
@@ -292,7 +292,7 @@ impl<'source> Compiler<'source> {
             let visited_state_index = self.nodes.len();
             // TODO during seedgen this should be 1, but start as 0 in the true seed
             self.nodes.push(Node::State(StateDataEntry {
-                identifier: format!("{}Visited", anchor_identifier),
+                identifier: format!("{anchor_identifier}Visited"),
                 uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
                 value: None,
             }));
@@ -660,7 +660,7 @@ impl<T: Compile> Compile for ast::GroupContent<T> {
     }
 }
 
-impl<'source> Compile for ast::Content<'source> {
+impl Compile for ast::Content<'_> {
     type Output = ();
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -672,7 +672,7 @@ impl<'source> Compile for ast::Content<'source> {
     }
 }
 
-impl<'source> Compile for ast::Macro<'source> {
+impl Compile for ast::Macro<'_> {
     type Output = ();
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -685,7 +685,7 @@ impl<'source> Compile for ast::Macro<'source> {
     }
 }
 
-impl<'source> Compile for ast::Region<'source> {
+impl Compile for ast::Region<'_> {
     type Output = ();
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -707,7 +707,7 @@ impl<'source> Compile for ast::Region<'source> {
     }
 }
 
-impl<'source> Compile for ast::Anchor<'source> {
+impl Compile for ast::Anchor<'_> {
     type Output = ();
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -748,7 +748,7 @@ impl<'source> Compile for ast::Anchor<'source> {
                         }
                     }
                     ast::AnchorContent::Refill(_, refill) => {
-                        refills.extend(refill.compile(compiler))
+                        refills.extend(refill.compile(compiler));
                     }
                     ast::AnchorContent::Connection(keyword, connection) => {
                         if let SpannedOption::Some(connection) = connection.value {
@@ -786,14 +786,14 @@ impl<'source> Compile for ast::Anchor<'source> {
                                             // but checking whether it's met and then running into an unmet requirement later is bad.
                                             region_requirement.clone(),
                                             requirement,
-                                        ])
+                                        ]);
                                     }
 
                                     connections.push(Connection {
                                         to,
                                         requirement,
                                         implicitly_generated: false,
-                                    })
+                                    });
                                 }
                             }
                         }
@@ -825,7 +825,7 @@ impl Compile for ast::AnchorPosition {
     }
 }
 
-impl<'source> Compile for ast::Entrance<'source> {
+impl Compile for ast::Entrance<'_> {
     type Output = Option<Entrance>;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -886,7 +886,7 @@ impl<'source> Compile for ast::Entrance<'source> {
     }
 }
 
-impl<'source> Compile for ast::Refill<'source> {
+impl Compile for ast::Refill<'_> {
     type Output = Refill;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -922,7 +922,7 @@ impl Compile for ast::RefillValue {
     }
 }
 
-impl<'source> Compile for ast::RequirementLineOrGroup<'source> {
+impl Compile for ast::RequirementLineOrGroup<'_> {
     type Output = Requirement;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -932,7 +932,7 @@ impl<'source> Compile for ast::RequirementLineOrGroup<'source> {
     }
 }
 
-impl<'source> Compile for ast::InlineRequirementOrGroup<'source> {
+impl Compile for ast::InlineRequirementOrGroup<'_> {
     type Output = Requirement;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -943,7 +943,7 @@ impl<'source> Compile for ast::InlineRequirementOrGroup<'source> {
     }
 }
 
-impl<'source> Compile for ast::RequirementLine<'source> {
+impl Compile for ast::RequirementLine<'_> {
     type Output = Requirement;
 
     fn compile(mut self, compiler: &mut Compiler) -> Self::Output {
@@ -968,7 +968,7 @@ impl<'source> Compile for ast::RequirementLine<'source> {
     }
 }
 
-impl<'source> Compile for ast::Requirement<'source> {
+impl Compile for ast::Requirement<'_> {
     type Output = Requirement;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -989,14 +989,14 @@ fn compile_state(compiler: &mut Compiler, identifier: &str, span: Range<usize>) 
         .or_else(|| compiler.pickup_map.get(identifier))
     {
         None => {
-            compiler.error(format!("Unknown requirement \"{}\"", identifier), span);
+            compiler.error(format!("Unknown requirement \"{identifier}\""), span);
             Requirement::Impossible
         }
         Some(index) => Requirement::State(*index),
     }
 }
 
-impl<'source> Compile for ast::CombatRequirement<'source> {
+impl Compile for ast::CombatRequirement<'_> {
     type Output = Requirement;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -1007,7 +1007,7 @@ impl<'source> Compile for ast::CombatRequirement<'source> {
     }
 }
 
-impl<'source> Compile for ast::Enemy<'source> {
+impl Compile for ast::Enemy<'_> {
     type Output = Option<(Enemy, u8)>;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
@@ -1026,14 +1026,14 @@ impl<'source> Compile for ast::Enemy<'source> {
     }
 }
 
-impl<'source> Compile for ast::PlainRequirement<'source> {
+impl Compile for ast::PlainRequirement<'_> {
     type Output = Requirement;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {
         let identifier = self.identifier.data.0;
         let amount_span = self.amount.as_ref().map_or(
             self.identifier.span.end..self.identifier.span.end,
-            |amount| amount.span(),
+            ast::Amount::span,
         );
 
         let mut amount = self

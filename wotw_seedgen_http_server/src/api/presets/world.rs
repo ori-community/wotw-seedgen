@@ -61,7 +61,7 @@ async fn apply(
     for (index, preset) in body.presets.into_iter().enumerate() {
         preset
             .apply(&mut settings, &cache.base)
-            .map_err(|err| Error::ApplyPreset(format!("at index {index}: {err}")))?
+            .map_err(|err| Error::ApplyPreset(format!("at index {index}: {err}")))?;
     }
 
     Ok(Json(settings))

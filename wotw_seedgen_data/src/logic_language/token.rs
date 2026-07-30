@@ -112,7 +112,7 @@ impl Tokenize for Tokenizer {
                     }
                 }
                 Ok(other) => other,
-                Err(_) => Token::Symbol,
+                Err(()) => Token::Symbol,
             };
             tokens.push((token, span));
         }

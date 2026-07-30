@@ -188,8 +188,8 @@ fn subfolder_changed(
         return;
     }
 
-    let changed = folders
-        .any(|folder| fs::canonicalize(folder).map_or(false, |folder| path.starts_with(folder)));
+    let changed =
+        folders.any(|folder| fs::canonicalize(folder).is_ok_and(|folder| path.starts_with(folder)));
 
     if changed {
         identifiers.push((
@@ -350,15 +350,15 @@ impl AssetCacheValues for DefaultAssetCacheValues {
         }
 
         update_subfolder(snippets, &mut self.snippets, |identifier| {
-            file_access.read_snippet(&identifier)
+            file_access.read_snippet(identifier)
         })?;
 
         update_subfolder(universe_presets, &mut self.universe_presets, |identifier| {
-            file_access.universe_preset(&identifier)
+            file_access.universe_preset(identifier)
         })?;
 
         update_subfolder(world_presets, &mut self.world_presets, |identifier| {
-            file_access.world_preset(&identifier)
+            file_access.world_preset(identifier)
         })?;
 
         Ok(())

@@ -18,7 +18,7 @@ pub struct Scopes<'source> {
 }
 
 impl<'source> Scopes<'source> {
-    pub fn new(debug: bool) -> Self {
+    pub fn new(_debug: bool) -> Self {
         let mut scopes = Self {
             stack: Vec::with_capacity(2),
             // debug: debug.then_some(t),
@@ -88,10 +88,10 @@ impl<'source> Scopes<'source> {
         self.stack.last_mut().unwrap()
     }
 
-    pub fn resolve_variable<Q: ?Sized>(&self, identifier: &Q) -> Option<&VariableValue>
+    pub fn resolve_variable<Q>(&self, identifier: &Q) -> Option<&VariableValue>
     where
         Cow<'source, str>: Borrow<Q>,
-        Q: Hash + Eq,
+        Q: ?Sized + Hash + Eq,
     {
         self.resolve(|scope| scope.variables.get(identifier))
     }

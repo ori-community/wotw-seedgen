@@ -1,7 +1,7 @@
 use axum::{Json, Router, extract::State, routing::get};
 use constcat::concat;
 use rustc_hash::FxHashMap;
-use utoipa::{OpenApi};
+use utoipa::OpenApi;
 use wotw_seedgen::data::seed_language::metadata::Metadata;
 
 use crate::RouterState;

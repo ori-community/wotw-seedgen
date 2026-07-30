@@ -12,7 +12,7 @@ use clap::{
     value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches, Id,
 };
 use itertools::Itertools;
-use rustc_hash::FxHashSet;
+use rustc_hash::{FxHashMap, FxHashSet};
 use std::{
     convert::Infallible,
     ffi::OsStr,
@@ -381,10 +381,7 @@ fn snippets_help(available_snippets: &[AvailableSnippet]) -> String {
                 .chunk_by(|available_snippet| &available_snippet.metadata.category)
                 .into_iter()
                 .format_with("\n", |(category, snippets), f| {
-                    let category = category
-                        .as_ref()
-                        .map(String::as_str)
-                        .unwrap_or("No category");
+                    let category = category.as_ref().map_or("No category", String::as_str);
                     f(&format_args!(
                         "    {category}:\n{}",
                         snippets.format_with("\n", |available_snippet, f| {
@@ -426,7 +423,7 @@ fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
                     reset = Reset.render(),
                     name = config_value.name,
                     description = match &config_value.description {
-                        None => "".to_string(),
+                        None => String::new(),
                         Some(description) => format!("; {description}"),
                     },
                     default = config_value.default,
@@ -633,7 +630,7 @@ impl FromArgMatches for SeedSettings {
                 WorldScopedArg::Arg(t) => match world_scope {
                     None => {
                         for world in &mut *world_settings {
-                            f(world, t)
+                            f(world, t);
                         }
                     }
                     Some(index) => {
@@ -650,7 +647,7 @@ impl FromArgMatches for SeedSettings {
                                     )
                                 })?;
 
-                        f(world, t)
+                        f(world, t);
                     }
                 },
             }
@@ -671,8 +668,8 @@ impl FromArgMatches for SeedSettings {
             |world_preset, preset: &String| {
                 world_preset
                     .includes
-                    .get_or_insert_with(Default::default)
-                    .insert(preset.to_string());
+                    .get_or_insert_with(FxHashSet::default)
+                    .insert(preset.clone());
             },
         )?;
 
@@ -696,7 +693,7 @@ impl FromArgMatches for SeedSettings {
             "tricks",
             |world_preset, trick: &Trick| match &mut world_preset.tricks {
                 none @ None => *none = Some(Tricks::Some(FxHashSet::from_iter([*trick]))),
-                Some(Tricks::All) => return,
+                Some(Tricks::All) => {}
                 Some(Tricks::Some(tricks)) => {
                     tricks.insert(*trick);
                 }
@@ -726,7 +723,7 @@ impl FromArgMatches for SeedSettings {
             &mut world_settings,
             "randomize_entrances",
             |world_preset, randomize_entrances: &GreaterOneU8| {
-                world_preset.randomize_entrances = Some(*randomize_entrances)
+                world_preset.randomize_entrances = Some(*randomize_entrances);
             },
         )?;
 
@@ -737,7 +734,7 @@ impl FromArgMatches for SeedSettings {
             |world_preset, snippet: &String| {
                 world_preset
                     .snippets
-                    .get_or_insert_with(Default::default)
+                    .get_or_insert_with(Vec::new)
                     .push(snippet.clone());
             },
         )?;
@@ -749,7 +746,7 @@ impl FromArgMatches for SeedSettings {
             |world_preset, snippet_config: &SnippetConfigArg| {
                 world_preset
                     .snippet_config
-                    .get_or_insert_with(Default::default)
+                    .get_or_insert_with(FxHashMap::default)
                     .entry(snippet_config.snippet_identifier.clone())
                     .or_default()
                     .insert(
@@ -783,7 +780,7 @@ impl FromArgMatches for SeedWorldSettings {
                 .get_many("world_presets")
                 .map(|world_presets| world_presets.cloned().collect()),
             spawn: matches.get_one("spawn").cloned(),
-            difficulty: matches.get_one("difficulty").cloned(),
+            difficulty: matches.get_one("difficulty").copied(),
             tricks: if matches.get_flag("all_tricks") {
                 Some(Tricks::All)
             } else {
@@ -792,7 +789,7 @@ impl FromArgMatches for SeedWorldSettings {
                     .map(|trick| Tricks::Some(trick.copied().collect()))
             },
             hard: matches.get_flag("hard").then_some(true),
-            randomize_entrances: matches.get_one("randomize_entrances").cloned(),
+            randomize_entrances: matches.get_one("randomize_entrances").copied(),
             snippets: matches
                 .get_many("snippets")
                 .map(|snippets| snippets.cloned().collect()),

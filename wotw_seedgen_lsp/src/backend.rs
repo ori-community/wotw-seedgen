@@ -32,7 +32,7 @@ impl<C> Backend<C> {
         Self {
             client,
             cache,
-            text_documents: Default::default(),
+            text_documents: DashMap::default(),
         }
     }
 
@@ -91,7 +91,7 @@ impl<C> Backend<C> {
                         continue;
                     };
 
-                    text_document.replace_range(range, &content_change.text)
+                    text_document.replace_range(range, &content_change.text);
                 }
             }
         }

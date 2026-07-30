@@ -84,31 +84,30 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
                     }
                 };
 
-                match uber_state.value {
-                    None => Some(Trigger::Binding(uber_state.uber_identifier)),
-                    Some(_) => {
-                        let mut error = Error::error(
-                            "cannot bind to an alias which resolves to an integer comparison"
-                                .to_string(),
-                            span,
-                        );
+                if uber_state.value.is_none() {
+                    Some(Trigger::Binding(uber_state.uber_identifier))
+                } else {
+                    let mut error = Error::error(
+                        "cannot bind to an alias which resolves to an integer comparison"
+                            .to_string(),
+                        span,
+                    );
 
-                        if let Some(entry) = compiler
-                            .global
-                            .uber_state_data
-                            .id_lookup
-                            .get(&uber_state.uber_identifier)
-                        {
-                            error = error.with_help(format!(
-                                "maybe you can use the underlying quest state {}?",
-                                entry.preferred_name()
-                            ))
-                        }
-
-                        compiler.errors.push(error);
-
-                        None
+                    if let Some(entry) = compiler
+                        .global
+                        .uber_state_data
+                        .id_lookup
+                        .get(&uber_state.uber_identifier)
+                    {
+                        error = error.with_help(format!(
+                            "maybe you can use the underlying quest state {}?",
+                            entry.preferred_name()
+                        ));
                     }
+
+                    compiler.errors.push(error);
+
+                    None
                 }
             }
             ast::Trigger::Condition(expression) => expression

@@ -301,12 +301,12 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
                 let amount = amount * self.health_plant_drops();
 
                 for orbs in orb_variants {
-                    self.heal(orbs, amount)
+                    self.heal(orbs, amount);
                 }
             }
             RefillValue::Energy(amount) => {
                 for orbs in orb_variants {
-                    self.recharge(orbs, amount)
+                    self.recharge(orbs, amount);
                 }
             }
         }

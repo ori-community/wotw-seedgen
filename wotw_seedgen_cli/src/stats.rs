@@ -57,7 +57,7 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
     for index in 0.. {
         let mut unique_settings_summary = settings_summary.clone();
         if index > 0 {
-            write!(unique_settings_summary, " ({index})").unwrap()
+            write!(unique_settings_summary, " ({index})").unwrap();
         }
 
         path.push(&unique_settings_summary);
@@ -121,14 +121,14 @@ fn summarize_settings(settings: &UniverseSettings) -> String {
     }
 
     if all!(|world_settings| !world_settings.tricks.is_empty()) {
-        summary.push_str("Glitches ")
+        summary.push_str("Glitches ");
     }
 
     if all!(|world_settings| matches!(world_settings.spawn, Spawn::Random | Spawn::FullyRandom)) {
         if all!(|world_settings| matches!(world_settings.spawn, Spawn::FullyRandom)) {
-            summary.push_str("Fully Random Spawn ")
+            summary.push_str("Fully Random Spawn ");
         } else {
-            summary.push_str("Random Spawn ")
+            summary.push_str("Random Spawn ");
         }
     } else if let Spawn::Set(spawn) = &world_settings[0].spawn {
         if spawn != DEFAULT_SPAWN

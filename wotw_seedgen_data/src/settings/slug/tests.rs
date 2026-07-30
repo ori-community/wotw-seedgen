@@ -32,7 +32,7 @@ fn slugification() {
                     "After {count} settings, two had the same slug: {slug}\nSettings a: {a:?}\nSettings b: {b:?}",
                     slug = occupied.key(),
                     a = occupied.get(),
-                    b = &universe_settings.world_settings[0],
+                    b = universe_settings.world_settings[0],
                 );
             }
             Entry::Vacant(vacant) => {

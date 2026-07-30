@@ -112,10 +112,7 @@ impl<Item, Separator> Separated<Item, Separator> {
 
     #[inline]
     pub fn len(&self) -> usize {
-        match self.first {
-            None => 0,
-            Some(_) => 1 + self.more.len(),
-        }
+        usize::from(self.first.is_some()) + self.more.len()
     }
 
     #[inline]

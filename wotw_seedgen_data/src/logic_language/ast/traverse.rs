@@ -221,7 +221,7 @@ impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H>
                         ConnectionKeyword::Anchor => handler.anchor_use(&connection.identifier),
                     }
 
-                    connection.traverse(handler)
+                    connection.traverse(handler);
                 }
             }
         }

@@ -318,7 +318,7 @@ impl<
 
         if let Err(err) = self.storage_access.write_seed(&seed, settings) {
             eprintln!("{err}");
-        };
+        }
 
         Ok(seed)
     }

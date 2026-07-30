@@ -279,6 +279,16 @@ impl<T> SpannedOption<T> {
             Self::None(_) => None,
         }
     }
+
+    #[inline]
+    pub fn iter(&self) -> option::IntoIter<&T> {
+        self.as_option().into_iter()
+    }
+
+    #[inline]
+    pub fn iter_mut(&mut self) -> option::IntoIter<&mut T> {
+        self.as_option_mut().into_iter()
+    }
 }
 
 impl<T: Span> Span for SpannedOption<T> {
@@ -337,7 +347,7 @@ impl<'a, T> IntoIterator for &'a SpannedOption<T> {
     type IntoIter = option::IntoIter<&'a T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.as_option().into_iter()
+        self.iter()
     }
 }
 
@@ -347,6 +357,6 @@ impl<'a, T> IntoIterator for &'a mut SpannedOption<T> {
     type IntoIter = option::IntoIter<&'a mut T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.as_option_mut().into_iter()
+        self.iter_mut()
     }
 }

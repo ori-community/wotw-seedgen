@@ -1,27 +1,33 @@
 use std::{ops::Range, sync::LazyLock};
 
-use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
-use wotw_seedgen_data::{parse::{
-    Delimited, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart, Spanned,
-    SpannedOption,
-}, seed_language::{
-    ast::{
-        Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
-        ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandRepeat,
-        ConfigArgs, ConfigType, ConstantDiscriminants, Content, CountInZoneArgs,
-        CountInZoneBinding, Event, Expression, ExpressionValue, FunctionCall,
-        FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
-        ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-        LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
-        RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
-        RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
-        StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
-        UberIdentifierNumeric, UberStateType, ZoneOfArgs,
-    },
-    compile::FunctionIdentifier,
-    types::Type,
-}, Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor, LupoIcon, MapIcon, GenericIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VariantArray, VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone};
 use crate::seed::cache::CacheValues;
+use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
+use wotw_seedgen_data::{
+    parse::{
+        Delimited, Identifier, Once, Punctuated, Recoverable, SpanEnd, SpanStart, Spanned,
+        SpannedOption,
+    },
+    seed_language::{
+        ast::{
+            Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
+            ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandRepeat,
+            ConfigArgs, ConfigType, ConstantDiscriminants, Content, CountInZoneArgs,
+            CountInZoneBinding, Event, Expression, ExpressionValue, FunctionCall,
+            FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
+            ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
+            LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
+            RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
+            RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
+            StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+            UberIdentifierNumeric, UberStateType, ZoneOfArgs,
+        },
+        compile::FunctionIdentifier,
+        types::Type,
+    },
+    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon,
+    HorizontalAnchor, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon,
+    VariantArray, VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+};
 
 // TODO add controlflow functionality to handler trait and use it here?
 
@@ -515,7 +521,7 @@ static ACTION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
     completion
 });
 
-static FUNCTION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| function_completion());
+static FUNCTION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(function_completion);
 
 fn literal_completion(cache: &CacheValues) -> Vec<CompletionItem> {
     let mut completion = cache.uber_identifier_numeric_completion.clone();

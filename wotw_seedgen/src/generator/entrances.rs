@@ -117,11 +117,7 @@ pub fn generate_entrances(
     };
 
     for (entrance_id, target_entrance_id) in connections {
-        log::trace!(
-            "Connected entrance {} → {}",
-            entrance_id,
-            target_entrance_id
-        );
+        log::trace!("Connected entrance {entrance_id} → {target_entrance_id}");
 
         let uber_identifier = UberIdentifier::entrances(entrance_id);
 
@@ -169,14 +165,13 @@ fn generate_entrance_connections(
                 .copied()
                 .collect_vec(),
         ),
-        reachable_entrances: IndexSet::from_iter(
-            config.entrance_groups[initial_entrance_group]
-                .iter()
-                .copied(),
-        ),
-        remaining_groups: IndexSet::from_iter(
-            (0..config.entrance_groups.len()).filter(|g| *g != initial_entrance_group),
-        ),
+        reachable_entrances: config.entrance_groups[initial_entrance_group]
+            .iter()
+            .copied()
+            .collect(),
+        remaining_groups: (0..config.entrance_groups.len())
+            .filter(|g| *g != initial_entrance_group)
+            .collect(),
         ..EntranceRandomizerState::default()
     };
 
@@ -235,7 +230,7 @@ fn generate_entrance_connections_recursively(
         "{log_indent}Possible entrances: {}",
         possible_target_entrances
             .iter()
-            .map(|d| d.to_string())
+            .map(i32::to_string)
             .join(", ")
     );
 
@@ -303,7 +298,7 @@ fn generate_entrance_connections_recursively(
                 "{log_indent}Possible next entrances: {}",
                 possible_next_entrances
                     .iter()
-                    .map(|d| d.to_string())
+                    .map(i32::to_string)
                     .join(", ")
             );
 

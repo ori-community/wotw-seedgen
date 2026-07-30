@@ -5,7 +5,6 @@ use crate::{
     UberIdentifier,
 };
 use itertools::Itertools;
-use ordered_float::OrderedFloat;
 use wotw_seedgen_parse::{Error, Span};
 
 impl<'source> Compile<'source> for ast::Literal<'source> {
@@ -149,7 +148,7 @@ where
         if distances.len() == 1 {
             format!("Did you mean \"{}\"?", distances[0].1.as_ref())
         } else {
-            distances.sort_unstable_by(|a, b| OrderedFloat(b.0).cmp(&OrderedFloat(a.0)));
+            distances.sort_unstable_by(|(a, _), (b, _)| b.total_cmp(a));
 
             format!(
                 "Did you mean one of these? {}",

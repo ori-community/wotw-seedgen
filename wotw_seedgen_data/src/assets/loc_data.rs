@@ -113,7 +113,7 @@ impl LocData {
                 value: record.uber_state_value,
                 position,
                 map_position,
-            })
+            });
         }
         Ok(Self { entries })
     }

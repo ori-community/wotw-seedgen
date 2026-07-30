@@ -25,8 +25,8 @@ impl Analyzer for ZoneUnlockStats {
                 .any(|node| node.zone == self.zone)
         });
         let reachable_count = groups_until_unlocked
-            .flat_map(|group| group.reachable.iter().map(|reachable| reachable.len()))
-            .sum::<usize>();
+            .flat_map(|group| group.reachable.iter().map(Vec::len))
+            .sum();
 
         vec![super::group_result(
             reachable_count,

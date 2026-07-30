@@ -63,13 +63,13 @@ impl Handler for Metadata {
         match annotation {
             ast::Annotation::Hidden(_) => self.hidden = true,
             ast::Annotation::Name(_, args) => {
-                inspect_command_args(args, |name| self.name = Some(name.data.to_string()))
+                inspect_command_args(args, |name| self.name = Some(name.data.to_string()));
             }
             ast::Annotation::Category(_, args) => inspect_command_args(args, |category| {
-                self.category = Some(category.data.to_string())
+                self.category = Some(category.data.to_string());
             }),
             ast::Annotation::Description(_, args) => inspect_command_args(args, |description| {
-                self.description = Some(description.data.to_string())
+                self.description = Some(description.data.to_string());
             }),
         }
     }

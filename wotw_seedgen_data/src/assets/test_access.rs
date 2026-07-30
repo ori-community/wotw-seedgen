@@ -35,7 +35,7 @@ impl AssetFileAccess for TestAccess {
     type Path = &'static Path;
 
     fn asset_folders(&self) -> Self::Folders {
-        iter::once(&Path::new(ASSETS))
+        iter::once(Path::new(ASSETS))
     }
 }
 
@@ -44,7 +44,7 @@ impl SnippetFileAccess for TestAccess {
     type Path = &'static Path;
 
     fn snippet_folders(&self) -> Self::Folders {
-        iter::once(&Path::new(concat!(ASSETS, "/snippets")))
+        iter::once(Path::new(concat!(ASSETS, "/snippets")))
     }
 }
 
@@ -53,11 +53,11 @@ impl PresetFileAccess for TestAccess {
     type Path = &'static Path;
 
     fn universe_folders(&self) -> Self::Folders {
-        iter::once(&Path::new(concat!(ASSETS, "/universe_presets")))
+        iter::once(Path::new(concat!(ASSETS, "/universe_presets")))
     }
 
     fn world_folders(&self) -> Self::Folders {
-        iter::once(&Path::new(concat!(ASSETS, "/world_presets")))
+        iter::once(Path::new(concat!(ASSETS, "/world_presets")))
     }
 }
 

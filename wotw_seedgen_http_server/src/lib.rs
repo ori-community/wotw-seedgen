@@ -1,9 +1,9 @@
-use std::{net::Ipv4Addr, sync::Arc, time::Duration};
-use std::net::SocketAddr;
-use std::process::exit;
 use axum::Router;
 use single_instance::SingleInstance;
 use socket2::{Domain, Protocol, Socket, Type};
+use std::net::SocketAddr;
+use std::process::exit;
+use std::{net::Ipv4Addr, sync::Arc, time::Duration};
 use tokio::{
     net::TcpListener,
     sync::{RwLock, mpsc},
@@ -62,12 +62,12 @@ pub fn start(inactivity_timeout: Option<Duration>, address: Option<SocketAddr>) 
 type RouterState = Arc<RwLock<Cache>>;
 
 async fn serve(router: Router, address: Option<SocketAddr>) -> Result<()> {
-    axum::serve(listener(address).await, router)
+    axum::serve(listener(address), router)
         .await
         .map_err(Error::Serve)
 }
 
-async fn listener(address: Option<SocketAddr>) -> TcpListener {
+fn listener(address: Option<SocketAddr>) -> TcpListener {
     let address = address.unwrap_or_else(|| SocketAddr::from((Ipv4Addr::LOCALHOST, 51413)));
 
     let domain = Domain::for_address(address);

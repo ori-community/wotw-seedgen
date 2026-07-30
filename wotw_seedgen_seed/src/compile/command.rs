@@ -374,7 +374,7 @@ impl Compile for input::CommandVoid {
                     ..MemoryUsed::ZERO
                 };
 
-                if message.as_constant().map_or(false, String::is_empty) {
+                if message.as_constant().is_some_and(String::is_empty) {
                     (
                         vec![
                             Command::FreeMessage(id),
@@ -554,13 +554,20 @@ impl Compile for input::CommandVoid {
                 vec![Command::DisableServerSync(uber_identifier)],
                 MemoryUsed::ZERO,
             ),
-            Self::CreateSpoilerMapIcon { id, icon, x, y, label } => Args::new(context)
+            Self::CreateSpoilerMapIcon {
+                id,
+                icon,
+                x,
+                y,
+                label,
+            } => Args::new(context)
                 .float(0, x)
                 .float(1, y)
                 .string(0, label)
                 .call(Command::CreateSpoilerMapIcon(id, icon), MemoryUsed::ZERO),
-            Self::MarkSpoilerMapIconCollected { id } => Args::new(context)
-                .call(Command::MarkSpoilerMapIconCollected(id), MemoryUsed::ZERO),
+            Self::MarkSpoilerMapIconCollected { id } => {
+                Args::new(context).call(Command::MarkSpoilerMapIconCollected(id), MemoryUsed::ZERO)
+            }
             Self::CreateWarpIcon { id, x, y } => Args::new(context)
                 .float(0, x)
                 .float(1, y)
@@ -717,6 +724,6 @@ where
     T: AsConstant + Display,
 {
     if t.as_constant().is_none() {
-        trace!("compiling {t}")
+        trace!("compiling {t}");
     }
 }

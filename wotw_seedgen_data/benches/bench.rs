@@ -1,4 +1,4 @@
-use std::sync::LazyLock;
+use std::{slice, sync::LazyLock};
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand_pcg::Pcg64Mcg;
@@ -38,7 +38,7 @@ fn logic_assets(c: &mut Criterion) {
                 paths.clone(),
                 loc_data.clone(),
                 state_data.clone(),
-                &[settings.clone()],
+                slice::from_ref(&settings),
             )
         })
     });
@@ -82,7 +82,7 @@ fn snippets(c: &mut Criterion) {
             );
 
             for identifier in &available_snippets {
-                compiler.compile_snippet(&identifier).unwrap();
+                compiler.compile_snippet(identifier).unwrap();
             }
 
             compiler.finish()

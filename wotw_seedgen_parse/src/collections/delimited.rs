@@ -30,12 +30,11 @@ where
                     Some(close) => break SpannedOption::Some(close),
                     None => match content.ast_item(parser) {
                         ControlFlow::Continue(()) => {
-                            if parser.is_finished() {
-                                panic!(
-                                    "{}::ast_item entered an infinite loop",
-                                    type_name::<Content>()
-                                );
-                            }
+                            assert!(
+                                !parser.is_finished(),
+                                "{}::ast_item entered an infinite loop",
+                                type_name::<Content>()
+                            );
                         }
                         ControlFlow::Break(Ok(())) => break Close::ast_spanned(parser),
                         ControlFlow::Break(Err(())) => {

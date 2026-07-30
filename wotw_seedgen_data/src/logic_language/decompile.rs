@@ -272,8 +272,7 @@ impl Display for RequirementDecompiler<'_> {
                             write_new_line(f, indent)?;
                             f.write_str(")")?;
                         }
-                        OrKind::Inline => self.fork_indent(and, indent).fmt(f)?,
-                        OrKind::NotAnOr => self.fork_indent(and, indent).fmt(f)?,
+                        OrKind::Inline | OrKind::NotAnOr => self.fork_indent(and, indent).fmt(f)?,
                     }
 
                     match (current_or_kind, next_or_kind) {

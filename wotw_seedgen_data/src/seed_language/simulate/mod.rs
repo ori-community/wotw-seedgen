@@ -57,7 +57,7 @@ impl<S: Simulation> Simulate<S> for ClientEvent {
             .filter(|event| event.trigger == Trigger::ClientEvent(*self))
             .for_each(|event| {
                 event.command.simulate(simulation, output);
-            })
+            });
     }
 }
 
@@ -68,7 +68,7 @@ impl<S: Simulation> Simulate<S> for TriggerCondition {
         let value = self.condition.simulate(simulation, output);
         let previous_value =
             mem::replace(simulation.condition_values().get(self.id.unwrap()), value);
-        value && previous_value == false
+        value && !previous_value
     }
 }
 
@@ -204,7 +204,7 @@ impl<S: Simulation> Simulate<S> for CommandString {
             }
             CommandString::Concatenate { operation } => operation.simulate(simulation, output),
             CommandString::GetString { id } => simulation.heap().get_string(*id),
-            CommandString::WorldName { .. } => Default::default(),
+            CommandString::WorldName { .. } => String::new(),
             CommandString::FromBoolean { boolean } => {
                 boolean.simulate(simulation, output).to_string()
             }
@@ -283,7 +283,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             }
             CommandVoid::If { condition, command } => {
                 if condition.simulate(simulation, output) {
-                    command.simulate(simulation, output)
+                    command.simulate(simulation, output);
                 }
             }
             CommandVoid::StoreBoolean {
@@ -327,7 +327,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
                 simulation.heap_mut().set_string(*id, value);
             }
             CommandVoid::TriggerClientEvent { client_event } => {
-                client_event.simulate(simulation, output)
+                client_event.simulate(simulation, output);
             }
             // TODO simulate more maybe?
             CommandVoid::DefineTimer { .. }

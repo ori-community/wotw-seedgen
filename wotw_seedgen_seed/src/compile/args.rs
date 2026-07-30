@@ -16,8 +16,8 @@ impl<'a> Args<'a> {
     pub fn new(context: &'a mut CompileContext) -> Self {
         Self {
             context,
-            args: Default::default(),
-            args_in_progress: Default::default(),
+            args: ArrayVec::new(),
+            args_in_progress: Vec::new(),
         }
     }
 
@@ -104,7 +104,7 @@ impl<'a> Args<'a> {
                             .gets_overwritten(&other_arg.compile_output.1)
                 })
                 .map(|other_arg| other_arg.destination)
-                .collect()
+                .collect();
         }
     }
 
@@ -148,7 +148,7 @@ impl Arg {
         Self {
             destination,
             compile_output,
-            gets_overwritten_by: Default::default(),
+            gets_overwritten_by: ArrayVec::new(),
         }
     }
 }
@@ -201,16 +201,16 @@ impl ArgDestination {
     fn reserve(&self, memory_used: &mut MemoryUsed) {
         match self {
             ArgDestination::Boolean(index) => {
-                memory_used.boolean = usize::max(memory_used.boolean, *index + 1)
+                memory_used.boolean = usize::max(memory_used.boolean, *index + 1);
             }
             ArgDestination::Integer(index) => {
-                memory_used.integer = usize::max(memory_used.integer, *index + 1)
+                memory_used.integer = usize::max(memory_used.integer, *index + 1);
             }
             ArgDestination::Float(index) => {
-                memory_used.float = usize::max(memory_used.float, *index + 1)
+                memory_used.float = usize::max(memory_used.float, *index + 1);
             }
             ArgDestination::String(index) => {
-                memory_used.string = usize::max(memory_used.string, *index + 1)
+                memory_used.string = usize::max(memory_used.string, *index + 1);
             }
         }
     }

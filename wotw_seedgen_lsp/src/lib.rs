@@ -11,14 +11,17 @@ use wotw_seedgen_data::assets::{
 };
 use wotw_seedgen_server_shared::ServerState;
 
-use crate::{backend::Backend, seed::cache::CacheValues as SeedCacheValues, logic::cache::CacheValues as LogicCacheValues};
+use crate::{
+    backend::Backend, logic::cache::CacheValues as LogicCacheValues,
+    seed::cache::CacheValues as SeedCacheValues,
+};
 
 pub fn start_seed() {
-    start(AssetCache::<_, SeedCacheValues>::new(DefaultFileAccess).unwrap())
+    start(AssetCache::<_, SeedCacheValues>::new(DefaultFileAccess).unwrap());
 }
 
 pub fn start_logic() {
-    start(AssetCache::<_, LogicCacheValues>::new(DefaultFileAccess).unwrap())
+    start(AssetCache::<_, LogicCacheValues>::new(DefaultFileAccess).unwrap());
 }
 
 fn start<F, V>(cache: AssetCache<F, V>)

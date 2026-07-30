@@ -107,7 +107,7 @@ impl LogConfig {
             config.trace_seedgen = true;
 
             if targets.is_empty() {
-                config.trace_placement = LevelFilter::Trace
+                config.trace_placement = LevelFilter::Trace;
             } else {
                 for target in targets {
                     config[target] = LevelFilter::Trace;
@@ -126,7 +126,7 @@ impl LogConfig {
         let mut dispatch = Dispatch::new().chain(
             Dispatch::new()
                 .format(move |out, message, record| {
-                    out.finish(format_args!("{} {}", colors.color(record.level()), message))
+                    out.finish(format_args!("{} {}", colors.color(record.level()), message));
                 })
                 .level(LevelFilter::Info)
                 .chain(io::stderr()),
@@ -151,7 +151,7 @@ impl LogConfig {
 
             let mut file_dispatch = Dispatch::new()
                 .format(|out, message, record| {
-                    out.finish(format_args!("{:<7}{}", record.level(), message))
+                    out.finish(format_args!("{:<7}{}", record.level(), message));
                 })
                 .level_for(PLACEMENT_MOD, trace_placement)
                 .level_for(ITEM_POOL_MOD, trace_placement)
@@ -169,14 +169,14 @@ impl LogConfig {
             match trace_uber_states {
                 None => {
                     file_dispatch =
-                        file_dispatch.filter(|metadata| !uber_states_level_filter(metadata))
+                        file_dispatch.filter(|metadata| !uber_states_level_filter(metadata));
                 }
                 Some(uber_states) if uber_states.is_empty() => {
-                    file_dispatch = file_dispatch.filter(uber_states_level_filter)
+                    file_dispatch = file_dispatch.filter(uber_states_level_filter);
                 }
                 Some(uber_states) => {
                     let filter = FilterUberStates { uber_states };
-                    file_dispatch = file_dispatch.filter(move |metadata| filter.filter(metadata))
+                    file_dispatch = file_dispatch.filter(move |metadata| filter.filter(metadata));
                 }
             }
 

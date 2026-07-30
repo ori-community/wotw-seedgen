@@ -101,7 +101,7 @@ impl Preprocessor {
                             // Reassigning identifiers in let commands should be disallowed to avoid confusion where a later let commands influences an earlier function call.
                             ast::Command::If(_, command) => {
                                 if let Some(contents) = &command.contents.content {
-                                    self.preprocess_contents(contents)
+                                    self.preprocess_contents(contents);
                                 }
                             }
                             _ => {}

@@ -5,6 +5,7 @@ use crate::{
     Error,
 };
 use rand_pcg::Pcg64Mcg;
+use rustc_hash::FxHashMap;
 use std::{
     ffi::OsStr,
     fs,
@@ -134,7 +135,7 @@ fn compile(
         rng,
         cache,
         &cache.uber_state_data,
-        Default::default(),
+        FxHashMap::default(),
         Some(lockfile),
         true,
         debug,

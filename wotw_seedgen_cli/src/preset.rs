@@ -1,6 +1,7 @@
 use serde::Serialize;
 use wotw_seedgen::data::assets::{
-    self, PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION, SEEDGEN_USER_DATA_DIR,
+    self, PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION,
+    SEEDGEN_USER_DATA_DIR,
 };
 
 use crate::{

@@ -184,10 +184,8 @@ impl SnippetFileAccess for TestFileAccess {
     }
 }
 
-fn test_compiler<'snippets, F: SnippetAccess>(
-    snippet_access: &'snippets F,
-) -> Compiler<'snippets, 'static> {
-    test_compiler_with_config(snippet_access, Default::default())
+fn test_compiler<F: SnippetAccess>(snippet_access: &F) -> Compiler<'_, 'static> {
+    test_compiler_with_config(snippet_access, FxHashMap::default())
 }
 
 static UBER_STATE_DATA: LazyLock<UberStateData> = LazyLock::new(|| {
@@ -199,14 +197,14 @@ static UBER_STATE_DATA: LazyLock<UberStateData> = LazyLock::new(|| {
         .unwrap()
 });
 
-fn test_compiler_with_config<'snippets, F: SnippetAccess>(
-    snippet_access: &'snippets F,
+fn test_compiler_with_config<F: SnippetAccess>(
+    snippet_access: &F,
     config: FxHashMap<String, FxHashMap<String, String>>,
-) -> Compiler<'snippets, 'static> {
+) -> Compiler<'_, 'static> {
     Compiler::new(
         &mut rand::thread_rng(),
         snippet_access,
-        &*UBER_STATE_DATA,
+        &UBER_STATE_DATA,
         config,
         None,
         false,
@@ -222,27 +220,25 @@ fn test_str(source: &str) -> IntermediateOutput {
 
     compiler.compile_snippet("").unwrap();
 
-    let output = compiler.finish().eprint_errors().unwrap();
-
-    output
+    compiler.finish().eprint_errors().unwrap()
 }
 
 #[test]
 fn coersions() {
+    fn test_variants_with_prefix<T: VariantArray + Display>(prefix: &str, f: fn(&T) -> String) {
+        let variants = T::VARIANTS.iter().map(f).collect::<String>();
+
+        test_str(&format!("{prefix} {{{variants}}}"));
+    }
+
+    fn test_variants<T: VariantArray + Display>(f: fn(&T) -> String) {
+        test_variants_with_prefix("on spawn", f);
+    }
+
     test_str("on spawn store(player.spiritLight, player.spiritLight + player.spiritLight)");
     test_str("!state(float, Float)  on float > 5 {}");
     test_str("on spawn item_message(player.spiritLight - 1)");
     test_str("on spawn item_message((player.spiritLight - player.gorlekOre) + \"SL/Ore\")");
-
-    fn test_variants_with_prefix<T: VariantArray + Display>(prefix: &str, f: fn(&T) -> String) {
-        let variants = T::VARIANTS.iter().map(f).collect::<String>();
-
-        test_str(&format!("{prefix} {{{}}}", variants));
-    }
-
-    fn test_variants<T: VariantArray + Display>(f: fn(&T) -> String) {
-        test_variants_with_prefix("on spawn", f)
-    }
 
     for kind in ConstantDiscriminants::VARIANTS {
         match kind {

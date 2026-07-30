@@ -304,7 +304,7 @@ where
             }
 
             if id.used {
-                max = usize::max(max, id.value)
+                max = usize::max(max, id.value);
             } else {
                 self.gaps.push(id.value);
             }

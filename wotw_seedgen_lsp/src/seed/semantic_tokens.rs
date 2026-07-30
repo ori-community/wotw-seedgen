@@ -54,9 +54,9 @@ impl<'source> TokenBuilder<'source> {
     fn new(source: &'source str) -> Self {
         Self {
             source,
-            tokens: Default::default(),
-            previous_line: Default::default(),
-            previous_offset: Default::default(),
+            tokens: Vec::new(),
+            previous_line: 0,
+            previous_offset: 0,
         }
     }
 
@@ -84,7 +84,7 @@ impl<'source> TokenBuilder<'source> {
             length,
             token_type: token_type as u32,
             token_modifiers_bitset: 0,
-        })
+        });
     }
 
     fn finish(self) -> Vec<SemanticToken> {

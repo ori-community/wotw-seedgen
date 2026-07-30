@@ -282,9 +282,8 @@ impl<'graph> World<'graph, '_, '_> {
                             // TODO put all such comparisons into logical_difficulty?
                             } else if self.settings.difficulty < Difficulty::Unsafe {
                                 return ControlFlow::Break(Missing::Boolean(Skill::BURROW_ID));
-                            } else {
-                                burrow_reduces_cost = true;
                             }
+                            burrow_reduces_cost = true;
                         }
                         _ => {}
                     }
@@ -301,8 +300,8 @@ impl<'graph> World<'graph, '_, '_> {
                     }
                     // No enemy is shielded and armored
                     else if enemy.armored() && self.settings.difficulty < Difficulty::Unsafe {
-                        health *= 2.0
-                    };
+                        health *= 2.0;
+                    }
 
                     let ranged_weapon =
                         enemy.ranged() && self.settings.difficulty < Difficulty::Unsafe;
@@ -677,7 +676,7 @@ impl<'graph> World<'graph, '_, '_> {
         };
 
         if CONSUMING {
-            orbs.health -= cost
+            orbs.health -= cost;
         }
 
         met
@@ -688,7 +687,7 @@ impl<'graph> World<'graph, '_, '_> {
 
         let mut regens = ((cost - orbs.health) / 30.0).ceil();
         if orbs.health + 30.0 * regens <= cost {
-            regens += 1.0
+            regens += 1.0;
         }
         self.heal(orbs, 30.0 * regens);
         let regen_cost = self.use_cost(Skill::Regenerate);
