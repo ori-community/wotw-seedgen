@@ -13,7 +13,7 @@ use crate::{
     world::{GraphRef, Missing, ReachUpdateState},
 };
 use itertools::Itertools;
-use log::trace;
+use log::{trace, warn};
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
     assets::{LocDataEntry, StateDataEntry},
@@ -68,6 +68,7 @@ struct ReachState<'graph> {
 struct BestOrbs {
     pre_refills: OrbVariants,
     post_refills: OrbVariants,
+    do_not_clear: bool,
 }
 
 impl BestOrbs {
@@ -75,11 +76,16 @@ impl BestOrbs {
         Self {
             pre_refills,
             post_refills: orb_variants![],
+            do_not_clear: false,
         }
     }
 
     fn placeholder() -> Self {
         Self::new(orb_variants![])
+    }
+
+    fn do_not_clear(&mut self) {
+        self.do_not_clear = true;
     }
 }
 
@@ -99,7 +105,7 @@ pub(crate) struct ReachStateFails<'graph> {
 
 impl<'graph> ReachState<'graph> {
     fn clear(&mut self) {
-        self.best_orbs.clear();
+        self.best_orbs.retain(|_, best_orbs| best_orbs.do_not_clear);
         self.tp_reached = false;
         self.fails.clear();
     }
@@ -418,6 +424,21 @@ impl<'graph> World<'graph, '_, '_> {
         self.traverse(self.spawn, orb_variants, output);
 
         self.attempt_spawn_teleport(output);
+    }
+
+    pub(crate) fn set_logical_state(&mut self, identifier: &str) {
+        match self.graph.find_node(identifier) {
+            Ok(index) => {
+                if self.graph.nodes[index].is_anchor() {
+                    warn!("Attempted to set anchor \"{identifier}\" as logical state");
+                } else {
+                    let mut best_orbs = BestOrbs::placeholder();
+                    best_orbs.do_not_clear();
+                    self.reach.state.best_orbs.insert(index, best_orbs);
+                }
+            }
+            Err(err) => warn!("Cannot set logical state: {err}"),
+        }
     }
 
     pub(crate) fn fails(&self) -> &ReachStateFails<'graph> {

@@ -870,6 +870,10 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         filter_needs_placement(&world, &log_index, &mut needs_placement, &output);
         let total_pickups = needs_placement.len() as f32;
 
+        for identifier in &output.modifiers.logical_state_sets {
+            world.set_logical_state(identifier);
+        }
+
         world.traverse_spawn(&output.commands);
 
         let spirit_light_provider = SpiritLightProvider::new(&mut rng);
