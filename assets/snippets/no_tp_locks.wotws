@@ -1,0 +1,8 @@
+#category("Logic Changes")
+#name("No Teleporter Locks")
+#description(
+"Removes the skill requirements logic adds to locked teleporters.
+Logic may force teleporting to Burrows without Bash, Depths without Glide, Reach without Flap and Wastes/Ruins/Willow without Burrow.
+Note that this can sidestep key hints since Flap may be inside Reach etc.")
+
+!set_logic_state("RemoveTPLocks")
