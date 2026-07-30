@@ -4,7 +4,10 @@ mod separated;
 
 pub use delimited::Delimited;
 pub use punctuated::Punctuated;
-pub use separated::{Separated, SeparatedNonEmpty};
+pub use separated::{
+    AsItem, Separated, SeparatedGeneric, SeparatedNonEmpty, SeparatedNonEmptyGeneric,
+    SeparatedNonEmptySmall, SeparatedSmall,
+};
 
 use crate::{
     Ast, ErrorMode, Errors, NoErrors, Parser, Span, SpanEnd, SpanStart, SpannedOption, Tokenize,

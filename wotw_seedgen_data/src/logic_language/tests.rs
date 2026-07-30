@@ -12,7 +12,8 @@ use crate::{
     DEFAULT_SPAWN,
 };
 use wotw_seedgen_parse::{
-    Ast, Identifier, Parser, Recoverable, SeparatedNonEmpty, Source, Spanned, Symbol, Tokenize,
+    Ast, Identifier, Parser, Recoverable, SeparatedNonEmpty, SeparatedNonEmptySmall, Source,
+    Spanned, Symbol, Tokenize,
 };
 
 #[test]
@@ -102,11 +103,11 @@ fn ast() {
                                     }),
                                     And::Colon(Symbol)
                                 )],
-                                ors: SeparatedNonEmpty {
-                                    first: Requirement::State(Spanned {
+                                ors: SeparatedNonEmptySmall {
+                                    first: Box::new(Requirement::State(Spanned {
                                         data: LogicIdentifier("GorlekMines.ElevatorFixed"),
                                         span: 30..55,
-                                    }),
+                                    })),
                                     more: vec![(
                                         Or,
                                         Requirement::Plain(PlainRequirement {

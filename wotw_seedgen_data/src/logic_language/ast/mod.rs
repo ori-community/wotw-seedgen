@@ -7,7 +7,8 @@ use ordered_float::OrderedFloat;
 use std::ops::Range;
 use wotw_seedgen_parse::{
     parse_ast, Ast, ErrorKind, ErrorMode, Identifier, ParseResult, Parser, Recover, Recoverable,
-    Separated, SeparatedNonEmpty, Span, SpanEnd, SpanStart, Spanned, SpannedOption, Symbol,
+    Separated, SeparatedNonEmpty, SeparatedNonEmptySmall, Span, SpanEnd, SpanStart, Spanned,
+    SpannedOption, Symbol,
 };
 
 #[inline]
@@ -334,7 +335,7 @@ pub struct RequirementLineOrGroup<'source> {
 #[derive(Debug, Clone, PartialEq, Ast, Span)]
 pub enum InlineRequirementOrGroup<'source> {
     Inline(Spanned<Free>),
-    Group(GroupContent<SeparatedNonEmpty<RequirementLine<'source>, Newline>>),
+    Group(GroupContent<SeparatedNonEmptySmall<RequirementLine<'source>, Newline>>),
 }
 
 #[derive(Debug, Clone, PartialEq, Ast)]
@@ -345,7 +346,7 @@ pub type RequirementGroup<'source> = Group<SeparatedNonEmpty<RequirementLine<'so
 #[derive(Debug, Clone, PartialEq)]
 pub struct RequirementLine<'source> {
     pub ands: Vec<(Requirement<'source>, And)>,
-    pub ors: SeparatedNonEmpty<Requirement<'source>, Or>,
+    pub ors: SeparatedNonEmptySmall<Requirement<'source>, Or>,
     pub group: Option<Box<RequirementGroup<'source>>>,
 }
 
@@ -376,7 +377,10 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                         more.push((Or, Requirement::ast_impl::<E>(parser)?));
 
                         if parser.current().0 != Token::Or {
-                            let ors = SeparatedNonEmpty { first: last, more };
+                            let ors = SeparatedNonEmptySmall {
+                                first: Box::new(last),
+                                more,
+                            };
 
                             let group = (parser.current_slice() == ":")
                                 .then(|| RequirementGroup::ast_no_errors(parser).unwrap())
@@ -398,10 +402,7 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                             content: Recoverable::ast_impl::<E>(parser)?,
                         }));
 
-                        let ors = SeparatedNonEmpty {
-                            first: last,
-                            more: vec![],
-                        };
+                        let ors = SeparatedNonEmptySmall::new(last);
 
                         return Some(RequirementLine { ands, ors, group });
                     }
@@ -409,10 +410,7 @@ impl<'source> Ast<'source, Tokenizer> for RequirementLine<'source> {
                 } else if matches!(parser.current().0, Token::Newline | Token::Dedent) {
                     return Some(RequirementLine {
                         ands,
-                        ors: SeparatedNonEmpty {
-                            first: last,
-                            more: vec![],
-                        },
+                        ors: SeparatedNonEmptySmall::new(last),
                         group: None,
                     });
                 } else {

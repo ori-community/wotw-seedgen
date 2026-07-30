@@ -16,8 +16,8 @@ use crate::{
 };
 use rustc_hash::FxHashMap;
 use wotw_seedgen_parse::{
-    Error, ErrorKind, ParseResult, Recover, Recoverable, Result, Separated, SeparatedNonEmpty,
-    Span, Spanned, SpannedOption,
+    AsItem, Error, ErrorKind, ParseResult, Recover, Recoverable, Result, Separated,
+    SeparatedNonEmptyGeneric, Span, Spanned, SpannedOption,
 };
 
 // TODO not really part of compilation but some kind of lints would be nice, like:
@@ -636,7 +636,11 @@ impl<T: Compile, Separator> Compile for Separated<T, Separator> {
     }
 }
 
-impl<T: Compile, Separator> Compile for SeparatedNonEmpty<T, Separator> {
+impl<T, First, Separator> Compile for SeparatedNonEmptyGeneric<First, T, Separator>
+where
+    T: Compile,
+    First: AsItem<T>,
+{
     type Output = Vec<T::Output>;
 
     fn compile(self, compiler: &mut Compiler) -> Self::Output {

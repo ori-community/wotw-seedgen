@@ -46,7 +46,9 @@ pub use wotw_seedgen_derive::{Ast, Span, TokenDisplay};
 
 pub use ast::{parse_ast, Ast, ParseResult};
 pub use collections::{
-    AstCollection, AstCollectionInit, Delimited, Once, Punctuated, Separated, SeparatedNonEmpty,
+    AsItem, AstCollection, AstCollectionInit, Delimited, Once, Punctuated, Separated,
+    SeparatedGeneric, SeparatedNonEmpty, SeparatedNonEmptyGeneric, SeparatedNonEmptySmall,
+    SeparatedSmall,
 };
 pub use error::{Error, ErrorKind, ErrorWithSource, Result, Severity};
 pub use helpers::{Identifier, NoTrailingInput, Symbol};

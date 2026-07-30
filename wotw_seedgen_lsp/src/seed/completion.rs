@@ -167,7 +167,7 @@ where
 
 impl<Item, Separator> CompletionInSpan for SeparatedNonEmpty<Item, Separator>
 where
-    Item: Completion + Span,
+    Item: Completion + SpanStart + SpanEnd,
 {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.iter().find_map(|item| item.completion(index, cache))

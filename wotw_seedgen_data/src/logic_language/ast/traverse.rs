@@ -1,10 +1,10 @@
 use wotw_seedgen_parse::{
-    Identifier, Recoverable, Separated, SeparatedNonEmpty, Spanned, SpannedOption,
+    AsItem, Identifier, Recoverable, Separated, SeparatedNonEmptyGeneric, Spanned, SpannedOption,
 };
 
 use crate::logic_language::ast::{
-    Anchor, AnchorContent, And, Paths, Connection, ConnectionKeyword, Content, EntranceContent,
-    EntranceTarget, Group, GroupContent, InlineRequirementOrGroup, LogicIdentifier, Macro,
+    Anchor, AnchorContent, And, Connection, ConnectionKeyword, Content, EntranceContent,
+    EntranceTarget, Group, GroupContent, InlineRequirementOrGroup, LogicIdentifier, Macro, Paths,
     PlainRequirement, Refill, Region, Requirement, RequirementLine, RequirementLineOrGroup,
 };
 
@@ -82,10 +82,12 @@ where
     }
 }
 
-impl<'ast, 'source, H, T, Separator> Traverse<'ast, 'source, H> for SeparatedNonEmpty<T, Separator>
+impl<'ast, 'source, H, First, T, Separator> Traverse<'ast, 'source, H>
+    for SeparatedNonEmptyGeneric<First, T, Separator>
 where
     H: Handler<'ast, 'source>,
     T: Traverse<'ast, 'source, H>,
+    First: AsItem<T>,
 {
     fn traverse(&'ast self, handler: &mut H) {
         for t in self {
