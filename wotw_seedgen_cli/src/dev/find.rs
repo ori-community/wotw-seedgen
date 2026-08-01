@@ -8,12 +8,8 @@ use std::{
 };
 
 use wotw_seedgen::{
-    data::{
-        assets::{DefaultFileAccess, LocData, UberStateData},
-        logic_language::output::Graph,
-        UniverseSettings,
-    },
-    generate_seed, SeedUniverse,
+    data::{assets::DefaultFileAccess, UniverseSettings},
+    Generator,
 };
 
 use crate::{
@@ -66,46 +62,9 @@ fn slow(args: SlowArgs) -> Result<(), Error> {
     Ok(())
 }
 
-struct Generator<'graph, 'locations, 'uberstates, 'settings> {
-    graph: &'graph Graph,
-    loc_data: &'locations LocData,
-    uber_state_data: &'uberstates UberStateData,
-    settings: &'settings UniverseSettings,
-}
-
-impl<'graph, 'locations, 'uberstates, 'settings>
-    Generator<'graph, 'locations, 'uberstates, 'settings>
-{
-    fn new(
-        graph: &'graph Graph,
-        loc_data: &'locations LocData,
-        uber_state_data: &'uberstates UberStateData,
-        settings: &'settings UniverseSettings,
-    ) -> Self {
-        Self {
-            graph,
-            loc_data,
-            uber_state_data,
-            settings,
-        }
-    }
-
-    fn generate(self) -> Result<SeedUniverse, String> {
-        generate_seed(
-            self.graph,
-            self.loc_data,
-            self.uber_state_data,
-            &DefaultFileAccess,
-            self.settings,
-            false,
-            None,
-        )
-    }
-}
-
 fn find_with<F>(settings_args: SeedSettingsArgs, f: F) -> Result<String, Error>
 where
-    F: Fn(Generator) -> bool + Send + Sync,
+    F: Fn(Generator<DefaultFileAccess>) -> bool + Send + Sync,
 {
     let start = Instant::now();
 
@@ -130,7 +89,14 @@ where
 
                     eprint!("Generating seed {}\r", settings.seed);
 
-                    let generator = Generator::new(&graph, &loc_data, &uber_state_data, &settings);
+                    let generator = Generator::new(
+                        &graph,
+                        &loc_data,
+                        &uber_state_data,
+                        &DefaultFileAccess,
+                        &settings,
+                    );
+
                     if f(generator) {
                         finished.store(true, Ordering::Relaxed);
 

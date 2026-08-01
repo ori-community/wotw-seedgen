@@ -2,7 +2,7 @@ use std::io::Cursor;
 
 use serde::Serialize;
 use tokio::sync::RwLockReadGuard;
-use wotw_seedgen::{data::UniverseSettings, generate_seed};
+use wotw_seedgen::data::UniverseSettings;
 
 use crate::{
     api::GenerateQuery,
@@ -22,16 +22,7 @@ pub fn generate(
     settings: &UniverseSettings,
     cache: RwLockReadGuard<Cache>,
 ) -> Result<Vec<u8>> {
-    let universe = generate_seed(
-        &cache.graph,
-        &cache.base.loc_data,
-        &cache.base.uber_state_data,
-        &*cache,
-        settings,
-        false,
-        None,
-    )
-    .map_err(Error::Generate)?;
+    let universe = cache.generate(settings).map_err(Error::Generate)?;
 
     let worlds = universe
         .worlds

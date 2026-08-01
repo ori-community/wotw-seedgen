@@ -1,13 +1,14 @@
-use crate::generate_seed;
+use crate::Generator;
 
 use log::info;
 use wotw_seedgen_data::{
+    Difficulty, UniverseSettings,
     assets::{
-        AssetCacheValues, AssetFileAccess, PresetAccess, UniversePreset, UniversePresetSettings,
-        WorldPresetSettings, TEST_ASSETS,
+        AssetCacheValues, AssetFileAccess, PresetAccess, TEST_ASSETS, UniversePreset,
+        UniversePresetSettings, WorldPresetSettings,
     },
     logic_language::{ast::Paths, output::Graph},
-    test_logger, Difficulty, UniverseSettings,
+    test_logger,
 };
 
 #[test]
@@ -15,15 +16,14 @@ fn some_seeds() {
     test_logger();
 
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
-        generate_seed(
+        Generator::new(
             graph,
             TEST_ASSETS.values.loc_data(),
             TEST_ASSETS.values.uber_state_data(),
             &*TEST_ASSETS,
             universe_settings,
-            false,
-            None,
         )
+        .generate()
         .unwrap();
     }
 

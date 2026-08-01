@@ -6,7 +6,7 @@ use std::{
     time::Instant,
 };
 
-use wotw_seedgen::{data::assets::DefaultFileAccess, generate_seed, perf_data::PerfData};
+use wotw_seedgen::{data::assets::DefaultFileAccess, perf_data::PerfData, Generator};
 
 use crate::{
     cli::dev::{PerfArgs, PerfTarget},
@@ -40,23 +40,26 @@ pub fn perf(args: PerfArgs) -> Result<(), Error> {
         iter::repeat_with(|| {
             thread::Builder::new()
                 .name("seedgen".to_string())
-                .spawn_scoped(scope, || loop {
-                    if let Err(err) = generate_seed(
+                .spawn_scoped(scope, || {
+                    let generator = Generator::new(
                         &graph,
                         &loc_data,
                         &uber_state_data,
                         &DefaultFileAccess,
                         &settings,
-                        false,
-                        Some(&perf_data),
-                    ) {
-                        eprintln!("{err}");
-                    }
+                    )
+                    .with_perf_data(&perf_data);
 
-                    count.fetch_add(1, Ordering::Relaxed);
+                    loop {
+                        if let Err(err) = generator.generate() {
+                            eprintln!("{err}");
+                        }
 
-                    if start.elapsed() >= *duration {
-                        return;
+                        count.fetch_add(1, Ordering::Relaxed);
+
+                        if start.elapsed() >= *duration {
+                            return;
+                        }
                     }
                 })
                 .expect("failed to spawn thread")

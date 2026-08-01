@@ -1,16 +1,19 @@
 use std::{ffi::OsStr, fs, path::Path};
 
 use rustc_hash::{FxHashMap, FxHashSet};
-use wotw_seedgen::data::{
-    MapIcon,
-    assets::{
-        AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-        DefaultFileAccess, LocData, PresetFileAccess, SEEDGEN_USER_DATA_DIR, SnippetFileAccess,
-        StateData, UberStateData,
+use wotw_seedgen::{
+    Generator, SeedUniverse,
+    data::{
+        MapIcon, UniverseSettings,
+        assets::{
+            AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
+            DefaultFileAccess, LocData, PresetFileAccess, SEEDGEN_USER_DATA_DIR, SnippetFileAccess,
+            StateData, UberStateData,
+        },
+        logic_language::{ast::Paths, output::Graph},
+        parse::Source,
+        seed_language::{metadata::Metadata, simulate::UberStates},
     },
-    logic_language::{ast::Paths, output::Graph},
-    parse::Source,
-    seed_language::{metadata::Metadata, simulate::UberStates},
 };
 
 use crate::api::logic::{MapIcons, RelevantUberStates, SpawnAnchors};
@@ -28,6 +31,19 @@ pub struct CacheValues {
     pub spawn_anchors: SpawnAnchors,
     pub snippet_info: FxHashMap<String, Metadata>,
     pub data_dir_snippets: FxHashSet<String>,
+}
+
+impl CacheValues {
+    pub fn generate(&self, settings: &UniverseSettings) -> Result<SeedUniverse, String> {
+        Generator::new(
+            &self.graph,
+            &self.base.loc_data,
+            &self.base.uber_state_data,
+            &self.base,
+            settings,
+        )
+        .generate()
+    }
 }
 
 impl AssetCacheValues for CacheValues {

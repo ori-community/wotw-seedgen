@@ -21,7 +21,7 @@ use wotw_seedgen::{
         parse::Source,
         UniverseSettings, WorldSettings,
     },
-    generate_seed, SeedUniverse,
+    Generator, SeedUniverse,
 };
 
 pub fn seed(args: SeedArgs) -> Result<(), Error> {
@@ -190,15 +190,15 @@ pub fn write_new_game_seed_source(path: &Path) -> Result<(), Error> {
 pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse, Error> {
     let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
 
-    let seed_universe = generate_seed(
+    let seed_universe = Generator::new(
         &graph,
         &loc_data,
         &uber_state_data,
         &DefaultFileAccess,
         settings,
-        debug,
-        None,
-    )?;
+    )
+    .with_debug_symbols(debug)
+    .generate()?;
 
     Ok(seed_universe)
 }

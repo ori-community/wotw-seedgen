@@ -1,18 +1,18 @@
 use std::{slice, time::Duration};
 
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
-use wotw_seedgen::{item_pool::ItemPoolBuilder, orb_variants, World};
+use wotw_seedgen::{Generator, World, item_pool::ItemPoolBuilder, orb_variants};
 use wotw_seedgen_data::{
-    assets::{AssetCacheValues, PresetAccess, WorldPreset, WorldPresetSettings, TEST_ASSETS},
+    DEFAULT_SPAWN, Difficulty, Skill, Spawn, UniverseSettings, WorldSettings,
+    assets::{AssetCacheValues, PresetAccess, TEST_ASSETS, WorldPreset, WorldPresetSettings},
     logic_language::output::{Enemy, Graph, Requirement},
     seed_language::{
         output::CommandsOutput,
         simulate::{Simulation, Snapshot},
     },
-    Difficulty, Skill, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
 
 fn is_met(c: &mut Criterion) {
@@ -142,15 +142,14 @@ fn generation(c: &mut Criterion) {
     group.bench_function("default", |b| {
         b.iter(|| {
             universe_settings.seed = seed.next().unwrap().to_string();
-            wotw_seedgen::generate_seed(
+            Generator::new(
                 graph,
                 loc_data,
                 uber_state_data,
                 test_assets,
                 &universe_settings,
-                false,
-                None,
             )
+            .generate()
             .unwrap()
         })
     });
@@ -176,15 +175,14 @@ fn generation(c: &mut Criterion) {
         group.bench_function(format!("{identifier} rspawn trees"), |b| {
             b.iter(|| {
                 universe_settings.seed = seed.next().unwrap().to_string();
-                wotw_seedgen::generate_seed(
+                Generator::new(
                     &graph,
                     loc_data,
                     uber_state_data,
                     test_assets,
                     &universe_settings,
-                    false,
-                    None,
                 )
+                .generate()
                 .unwrap()
             })
         });
@@ -210,15 +208,14 @@ fn generation(c: &mut Criterion) {
     group.bench_function("unsafe", |b| {
         b.iter(|| {
             universe_settings.seed = seed.next().unwrap().to_string();
-            wotw_seedgen::generate_seed(
+            Generator::new(
                 &graph,
                 loc_data,
                 uber_state_data,
                 test_assets,
                 &universe_settings,
-                false,
-                None,
             )
+            .generate()
             .unwrap()
         })
     });
@@ -249,15 +246,14 @@ fn multiworld(c: &mut Criterion) {
             universe_settings.world_settings = vec![world_settings.clone(); *worlds];
             b.iter(|| {
                 universe_settings.seed = seed.next().unwrap().to_string();
-                wotw_seedgen::generate_seed(
+                Generator::new(
                     &graph,
                     loc_data,
                     uber_state_data,
                     test_assets,
                     &universe_settings,
-                    false,
-                    None,
                 )
+                .generate()
                 .unwrap()
             });
         });

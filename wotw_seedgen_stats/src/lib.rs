@@ -27,6 +27,7 @@ use wotw_seedgen::{
         UniverseSettings,
     },
     spoiler::SeedSpoiler,
+    Generator, SeedUniverse,
 };
 
 // TODO use the assets fs helpers here for better errors
@@ -162,17 +163,9 @@ impl<
             eprintln!("Cleaned seed storage for these settings");
         } else {
             self.storage_access.check_cache(self.settings, |settings| {
-                wotw_seedgen::generate_seed(
-                    self.graph,
-                    self.loc_data,
-                    self.uber_state_data,
-                    self.snippet_access,
-                    settings,
-                    false,
-                    None,
-                )
-                .ok()
-                .map(|seed| seed.spoiler)
+                self.generate_one_seed(settings)
+                    .ok()
+                    .map(|seed| seed.spoiler)
             })?;
         }
 
@@ -283,15 +276,7 @@ impl<
         error_messages: &Mutex<Vec<String>>,
     ) -> Result<SeedSpoiler> {
         let seed = loop {
-            match wotw_seedgen::generate_seed(
-                self.graph,
-                self.loc_data,
-                self.uber_state_data,
-                self.snippet_access,
-                settings,
-                false,
-                None,
-            ) {
+            match self.generate_one_seed(settings) {
                 Ok(seed) => break seed.spoiler,
                 Err(err) => {
                     let mut error_messages_lock =
@@ -321,6 +306,17 @@ impl<
         }
 
         Ok(seed)
+    }
+
+    fn generate_one_seed(&self, settings: &UniverseSettings) -> Result<SeedUniverse> {
+        Generator::new(
+            self.graph,
+            self.loc_data,
+            self.uber_state_data,
+            self.snippet_access,
+            settings,
+        )
+        .generate()
     }
 }
 
