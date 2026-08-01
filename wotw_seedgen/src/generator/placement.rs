@@ -808,11 +808,11 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
                         output.preload.tags.push(random_entrances);
                     }
 
-                    let seedgen_info = SeedgenInfo {
-                        universe_settings: self.settings.clone(),
+                    let seedgen_info = SeedgenInfo::new(
+                        self.settings.clone(),
                         world_index,
-                        spawn_identifier: spawn.identifier().to_string(),
-                    };
+                        spawn.identifier().to_string(),
+                    );
 
                     Seed::new(output, placeholder_map, debug).with_seedgen_info(seedgen_info)
                 })

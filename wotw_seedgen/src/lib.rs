@@ -22,7 +22,3 @@ mod world;
 pub use generator::{generate_seed, item_pool, perf_data, spoiler, SeedUniverse};
 pub use logical_difficulty::LogicalDifficulty;
 pub use world::World;
-
-// TODO use this and also set the other metadata: current world, format version, settings
-// TODO look into having the commit hash again
-pub const VERSION: &str = concat!(env!("CARGO_PKG_VERSION"));

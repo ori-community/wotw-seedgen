@@ -4,6 +4,7 @@ members = [
     "wotw_seedgen_cli",
     "wotw_seedgen_derive",
     "wotw_seedgen_data",
+    "wotw_seedgen_git_info",
     "wotw_seedgen_http_server",
     "wotw_seedgen_lsp",
     "wotw_seedgen_parse",
