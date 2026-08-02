@@ -140,7 +140,7 @@ impl Display for Missing<'_> {
     }
 }
 
-impl<'graph> World<'graph, '_, '_> {
+impl<'graph> World<'graph, '_, '_, '_> {
     pub fn is_met<'req>(
         &self,
         requirement: &'req Requirement,
@@ -149,14 +149,18 @@ impl<'graph> World<'graph, '_, '_> {
     where
         'graph: 'req,
     {
-        trace!("checking is_met for {requirement} with {orb_variants}");
+        trace!(logger: self.log_capture, "checking is_met for {requirement} with {orb_variants}");
 
         // TODO does this optimize cleanly? probably not!
         let flow = self.is_met_impl(requirement, orb_variants);
 
         match &flow {
-            ControlFlow::Continue(()) => trace!("{requirement} was met with {orb_variants}"),
-            ControlFlow::Break(missing) => trace!("{requirement} was missing {missing}"),
+            ControlFlow::Continue(()) => {
+                trace!(logger: self.log_capture, "{requirement} was met with {orb_variants}")
+            }
+            ControlFlow::Break(missing) => {
+                trace!(logger: self.log_capture, "{requirement} was missing {missing}")
+            }
         }
 
         flow
@@ -555,7 +559,7 @@ impl<'graph> World<'graph, '_, '_> {
                 if orbs.energy >= higher_cost {
                     orbs.energy -= regen_cost;
                     self.heal(&mut orbs, 30.0);
-                    trace!("adding regenerate option {orbs} to keep life pact enabled");
+                    trace!(logger: self.log_capture, "adding regenerate option {orbs} to keep life pact enabled");
                     new_orb_variants.push(orbs);
                 } else {
                     missing.energy = f32::max(missing.energy, higher_cost - orbs.energy);
@@ -571,7 +575,7 @@ impl<'graph> World<'graph, '_, '_> {
         cost: f32,
         missing: &mut MissingOrbStats,
     ) -> bool {
-        trace!("checking cost_met for cost {cost} with {orbs}");
+        trace!(logger: self.log_capture, "checking cost_met for cost {cost} with {orbs}");
 
         let met = orbs.energy >= cost || {
             missing.energy = f32::max(missing.energy, cost - orbs.energy);
@@ -654,7 +658,7 @@ impl<'graph> World<'graph, '_, '_> {
         orbs: &mut Orbs,
         missing: &mut MissingOrbStats,
     ) -> bool {
-        trace!("checking health_met for cost {cost} with {orbs}");
+        trace!(logger: self.log_capture, "checking health_met for cost {cost} with {orbs}");
 
         let met = orbs.health > cost || {
             missing.health = f32::max(missing.health, cost - orbs.health);
@@ -683,7 +687,7 @@ impl<'graph> World<'graph, '_, '_> {
     }
 
     fn regenerate_as_needed(&self, cost: f32, orbs: &mut Orbs) -> Result<(), f32> {
-        trace!("attempting to regenerate to meet cost {cost} with {orbs}");
+        trace!(logger: self.log_capture, "attempting to regenerate to meet cost {cost} with {orbs}");
 
         let mut regens = ((cost - orbs.health) / 30.0).ceil();
         if orbs.health + 30.0 * regens <= cost {

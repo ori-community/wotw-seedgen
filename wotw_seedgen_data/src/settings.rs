@@ -159,6 +159,7 @@ impl WorldSettingsHelpers for UniverseSettings {
 /// See the [Multiplayer wiki page](https://wiki.orirando.com/features/multiplayer) for an explanation of worlds
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
+#[schema(default = WorldSettings::default)]
 pub struct WorldSettings {
     /// Spawn destination
     pub spawn: Spawn,

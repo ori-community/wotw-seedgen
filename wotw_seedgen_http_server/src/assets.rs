@@ -14,6 +14,7 @@ use wotw_seedgen::{
         parse::Source,
         seed_language::{metadata::Metadata, simulate::UberStates},
     },
+    log_capture::{LogCapture, Record},
 };
 
 use crate::api::logic::{MapIcons, RelevantUberStates, SpawnAnchors};
@@ -34,15 +35,24 @@ pub struct CacheValues {
 }
 
 impl CacheValues {
-    pub fn generate(&self, settings: &UniverseSettings) -> Result<SeedUniverse, String> {
-        Generator::new(
+    pub fn generate(
+        &self,
+        settings: &UniverseSettings,
+        log_level: log::LevelFilter,
+    ) -> Result<(SeedUniverse, Vec<Record>), String> {
+        let log_capture = LogCapture::new().with_max_level(log_level);
+
+        let seed = Generator::new(
             &self.graph,
             &self.base.loc_data,
             &self.base.uber_state_data,
             &self.base,
             settings,
         )
-        .generate()
+        .with_log_capture(&log_capture)
+        .generate()?;
+
+        Ok((seed, log_capture.finish()))
     }
 }
 
@@ -160,7 +170,8 @@ fn graph(source: &Source, loc_data: &LocData, state_data: &StateData) -> Result<
         .eprint_errors(source)
         .ok_or(String::new())?;
 
-    Graph::compile(paths, loc_data.clone(), state_data.clone(), &[])
+    Graph::compiler()
+        .compile(paths, loc_data.clone(), state_data.clone())
         .eprint_errors(source)
         .ok_or(String::new())
 }

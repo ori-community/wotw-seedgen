@@ -5,7 +5,6 @@ use crate::{
     Error,
 };
 use rand_pcg::Pcg64Mcg;
-use rustc_hash::FxHashMap;
 use std::{
     ffi::OsStr,
     fs,
@@ -17,6 +16,7 @@ use wotw_seedgen::{
         assets::{self, AssetCache, DefaultAssetCacheValues, PlandoFileAccess, Watcher},
         seed_language::{compile::Compiler, output::postprocess},
     },
+    log_capture::NO_LOG_CAPTURE,
     seed::Seed,
 };
 
@@ -131,15 +131,10 @@ fn compile(
 ) -> Result<(), Error> {
     let start = Instant::now();
 
-    let mut compiler = Compiler::new(
-        rng,
-        cache,
-        &cache.uber_state_data,
-        FxHashMap::default(),
-        Some(lockfile),
-        true,
-        debug,
-    );
+    let mut compiler = Compiler::new(rng, cache, &cache.uber_state_data)
+        .with_lockfile(lockfile, &NO_LOG_CAPTURE)
+        .with_lint(true)
+        .with_debug(debug);
 
     compiler.compile_snippet(entry)?;
     let mut output = compiler

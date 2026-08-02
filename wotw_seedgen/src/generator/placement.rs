@@ -10,7 +10,7 @@ use crate::{
     item_pool::ItemPoolBuilder,
     logical_difficulty::LogicalDifficulty,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
-    World,
+    Generator, World,
 };
 use itertools::Itertools;
 use log::{log_enabled, trace, warn, Level::Trace};
@@ -43,6 +43,7 @@ use wotw_seedgen_data::{
     },
     UberIdentifier, UniverseSettings,
 };
+use wotw_seedgen_log_capture::LogCapture;
 use wotw_seedgen_seed::SeedgenInfo;
 
 pub(super) const SPAWN_SLOTS: usize = 7;
@@ -53,49 +54,49 @@ const MIN_PLACEHOLDERS: usize = 3;
 static MAX_PLACEHOLDERS: LazyLock<usize> =
     LazyLock::new(|| 10 + SOLUTION_MAX_ITEMS.saturating_mul(2));
 
-pub fn generate_placements(
-    rng: &mut Pcg64Mcg,
-    worlds: Vec<(World, IntermediateOutput)>,
-    settings: &UniverseSettings,
-    loc_data: &LocData,
-    debug: bool,
-) -> Result<SeedUniverse, String> {
-    assert!(
-        !worlds.is_empty(),
-        "Need at least one world to generate a seed"
-    );
-    let mut context = Context::new(rng, worlds, settings)?;
+impl<A> Generator<'_, '_, '_, '_, '_, '_, '_, A> {
+    pub fn generate_placements(
+        &self,
+        rng: &mut Pcg64Mcg,
+        worlds: Vec<(World, IntermediateOutput)>,
+    ) -> Result<SeedUniverse, String> {
+        assert!(
+            !worlds.is_empty(),
+            "Need at least one world to generate a seed"
+        );
+        let mut context = Context::new(rng, worlds, self.settings, self.log_capture)?;
 
-    context.preplacements();
+        context.preplacements();
 
-    loop {
-        context.next_step();
-        context.update_reached();
+        loop {
+            context.next_step();
+            context.update_reached();
 
-        if context.is_everything_reached() {
-            context.place_remaining();
-            context.sort_spoiler_placements();
+            if context.is_everything_reached() {
+                context.place_remaining();
+                context.sort_spoiler_placements();
 
-            break;
-        }
+                break;
+            }
 
-        if context.force_keystones() {
-            continue;
-        }
+            if context.force_keystones() {
+                continue;
+            }
 
-        if !context.place_random() {
-            if let Some((target_world_index, progression)) = context.choose_progression()? {
-                context.place_forced(target_world_index, progression);
+            if !context.place_random() {
+                if let Some((target_world_index, progression)) = context.choose_progression()? {
+                    context.place_forced(target_world_index, progression);
+                }
             }
         }
-    }
 
-    Ok(context.finish(loc_data, debug, rng))
+        Ok(context.finish(self.loc_data, self.debug, rng))
+    }
 }
 
-pub struct Context<'graph, 'settings, 'perf> {
+pub struct Context<'graph, 'settings, 'perf, 'log> {
     pub rng: Pcg64Mcg,
-    pub worlds: Vec<WorldContext<'graph, 'settings, 'perf>>,
+    pub worlds: Vec<WorldContext<'graph, 'settings, 'perf, 'log>>,
     settings: &'settings UniverseSettings,
     /// Distribution for random orderings
     ordering_distribution: OrderingDistribution,
@@ -105,18 +106,19 @@ pub struct Context<'graph, 'settings, 'perf> {
     step: usize,
     /// spoiler being populated over the course of generation
     spoiler: SeedSpoiler,
+    log_capture: &'log LogCapture,
 }
 
-pub struct WorldContext<'graph, 'settings, 'perf> {
+pub struct WorldContext<'graph, 'settings, 'perf, 'log> {
     pub rng: Pcg64Mcg,
-    pub world: World<'graph, 'settings, 'perf>,
-    pub output: IntermediateOutput,
+    pub world: World<'graph, 'settings, 'perf, 'log>,
+    pub output: IntermediateOutput<'log>,
     /// world index of this world
     index: usize,
     /// ready-made string for referencing this world in the log
     log_index: String,
     /// remaining items to place
-    item_pool: ItemPool,
+    item_pool: ItemPool<'log>,
     /// generates appropriate spirit light amounts
     spirit_light_provider: SpiritLightProvider,
     /// all remaining pickups which need to be assigned random placements
@@ -142,11 +144,15 @@ pub struct WorldContext<'graph, 'settings, 'perf> {
     unshared_items: usize,
 }
 
-impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
+impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     fn new(
         rng: &mut Pcg64Mcg,
-        worlds: Vec<(World<'graph, 'settings, 'perf>, IntermediateOutput)>,
+        worlds: Vec<(
+            World<'graph, 'settings, 'perf, 'log>,
+            IntermediateOutput<'log>,
+        )>,
         settings: &'settings UniverseSettings,
+        log_capture: &'log LogCapture,
     ) -> Result<Self, String> {
         let multiworld = worlds.len() > 1;
 
@@ -181,6 +187,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
             total_needs_placement -= needs_placement;
 
             trace!(
+                logger: log_capture,
                 "{log_index}Assigned {spirit_light_placements}/{needs_placement} placements for spirit light",
                 log_index = world.log_index,
             );
@@ -266,6 +273,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
             multiworld_state_index: 0..,
             step: 0,
             spoiler,
+            log_capture,
         })
     }
 
@@ -279,7 +287,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
         self.sort_spoiler_placements();
 
         self.step += 1;
-        trace!("--- Placement step #{}", self.step);
+        trace!(logger: self.log_capture, "--- Placement step #{}", self.step);
 
         self.spoiler.groups.push(SpoilerGroup::default());
     }
@@ -354,6 +362,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
             new_progressions = owned_keystones < 4;
 
             trace!(
+                logger: self.log_capture,
                 "{}Placing {missing_keystones} keystones to avoid keylocks",
                 world_context.log_index
             );
@@ -364,7 +373,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
                 .item_pool
                 .find_remove_amount(&keystone, missing_keystones)
             {
-                warn!("Not enough keystones in the item pool for forced keystone progression, placing anyway");
+                warn!(logger: self.log_capture, "Not enough keystones in the item pool for forced keystone progression, placing anyway");
             }
 
             for _ in 0..missing_keystones {
@@ -376,7 +385,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
     }
 
     fn place_remaining(&mut self) {
-        trace!("All locations reached. Placing remaining items");
+        trace!(logger: self.log_capture, "All locations reached. Placing remaining items");
 
         for target_world_index in 0..self.worlds.len() {
             for command in self.worlds[target_world_index].item_pool.take() {
@@ -456,6 +465,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
                     world.placements_remaining() as f32 / world.total_pickups;
 
                 trace!(
+                    logger: self.log_capture,
                     "{log_index}{placements_remaining:.2}% placements remaining",
                     log_index = world.log_index,
                     placements_remaining = placements_remaining * 100.,
@@ -484,6 +494,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
         }
 
         trace!(
+            logger: self.log_capture,
             "Unable to find any possible forced progression\n{}",
             self.worlds.iter().format_with("\n", |world_context, f| {
                 f(&format_args!(
@@ -510,7 +521,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
 
     fn flush_item_pool(&mut self) -> Result<(), String> {
         // TODO implement new recovery mechanism
-        // trace!("Placing items which modify uberStates to attempt recovery");
+        // trace!(logger: self.log_capture, "Placing items which modify uberStates to attempt recovery");
 
         Err("Failed to reach all locations".to_string())
     }
@@ -543,6 +554,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
                     origin_world.spawn_slots -= 1;
 
                     trace!(
+                        logger: self.log_capture,
                         "Placing {target_index}{name} at {origin_index}Spawn",
                         name = self.worlds[target_world_index].log_name(&command),
                         target_index = self.worlds[target_world_index].log_index,
@@ -550,6 +562,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
                     );
                 } else {
                     warn!(
+                        logger: self.log_capture,
                         "Not enough space to place {target_index}{name}, placing at Spawn despite already having too many spawn items",
                         name = self.worlds[target_world_index].log_name(&command),
                         target_index = self.worlds[target_world_index].log_index,
@@ -593,6 +606,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
 
         if target_world.unshared_items > 0 {
             trace!(
+                logger: self.log_capture,
                 "{}is not allowed to share items yet, forcing item placement in own world",
                 target_world.log_index
             );
@@ -654,6 +668,7 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
         mark_forced: bool,
     ) {
         trace!(
+            logger: self.log_capture,
             "Placing {target_index}{log_name} at {origin_index}{pickup}",
             log_name = self.worlds[target_world_index].log_name(&command),
             target_index = self.worlds[target_world_index].log_index,
@@ -822,11 +837,11 @@ impl<'graph, 'settings, 'perf> Context<'graph, 'settings, 'perf> {
     }
 }
 
-impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
+impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log> {
     fn new(
         rng: &mut Pcg64Mcg,
-        mut world: World<'graph, 'settings, 'perf>,
-        mut output: IntermediateOutput,
+        mut world: World<'graph, 'settings, 'perf, 'log>,
+        mut output: IntermediateOutput<'log>,
         index: usize,
         multiworld: bool,
     ) -> Result<Self, String> {
@@ -838,7 +853,9 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             String::new()
         };
 
-        let mut item_pool = ItemPoolBuilder::new(&mut rng);
+        let log_capture = world.log_capture;
+
+        let mut item_pool = ItemPoolBuilder::new(&mut rng).with_log_capture(log_capture);
 
         for (command, amount) in mem::take(&mut output.modifiers.item_pool_changes) {
             if amount >= 0 {
@@ -858,7 +875,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         // TODO instead of timing this after the spawn simulation to avoid unsettings the known entrance connections,
         // maybe this could be resolved with whatever mechanism will implement launch fragments behaving differently
         // between client and simulation?
-        generate_entrances(&mut world, &mut output.commands, &mut rng)?;
+        generate_entrances(&mut world, &mut output.commands, &mut rng, log_capture)?;
 
         let mut needs_placement = spawn::choose_spawn(
             &mut rng,
@@ -867,7 +884,13 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             &item_pool,
             &mut output.commands,
         )?;
-        filter_needs_placement(&world, &log_index, &mut needs_placement, &output);
+        filter_needs_placement(
+            &world,
+            &log_index,
+            &mut needs_placement,
+            &output,
+            log_capture,
+        );
         let total_pickups = needs_placement.len() as f32;
 
         for identifier in &output.modifiers.logical_state_sets {
@@ -900,7 +923,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
     }
 
     fn preplacements(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
-        trace!("{}Generating preplacements", self.log_index);
+        trace!(logger: self.item_pool.log_capture, "{}Generating preplacements", self.log_index);
 
         self.hi_torin(preplacement_spoiler);
 
@@ -919,6 +942,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             if pickup_indices.is_empty() {
                 let name = self.log_name(&command);
                 warn!(
+                    logger: self.item_pool.log_capture,
                     "{}Failed to preplace {name} in {zone} since no free placement location was available",
                     self.log_index
                 );
@@ -943,6 +967,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             let name = self.log_name(&command);
 
             warn!(
+                logger: self.item_pool.log_capture,
                 "{}Failed to preplace {name} since no free placement location was available",
                 self.log_index
             );
@@ -950,6 +975,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             let name = self.log_name(&command);
 
             warn!(
+                logger: self.item_pool.log_capture,
                 "{}Failed to preplace {name} since no spirit light placement location was available",
                 self.log_index
             );
@@ -978,6 +1004,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         self.reached_item_locations = self.world.reached_pickup_count();
 
         trace!(
+            logger: self.item_pool.log_capture,
             "{log_index}{amount} reached location{location_s} that need{need_s} placements: {reached_needs_placement}",
             log_index = self.log_index,
             amount = self.reached_needs_placement.len(),
@@ -1041,6 +1068,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             .collect::<Vec<_>>();
 
         trace!(
+            logger: self.item_pool.log_capture,
             "{log_index}Keeping {amount}/{total} placeholders: {placeholders}",
             log_index = self.log_index,
             amount = self.placeholders.len(),
@@ -1075,7 +1103,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
     }
 
     fn choose_progression(&mut self, slots: usize) -> Option<Solution> {
-        trace!("{}Attempting forced progression", self.log_index);
+        trace!(logger: self.item_pool.log_capture, "{}Attempting forced progression", self.log_index);
 
         let progressions = self.world.find_solutions(
             &self.item_pool,
@@ -1086,7 +1114,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         );
 
         if progressions.is_empty() {
-            trace!("{}No forced progression found", self.log_index);
+            trace!(logger: self.item_pool.log_capture, "{}No forced progression found", self.log_index);
 
             return None;
         }
@@ -1115,7 +1143,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             b_weight.total_cmp(a_weight).then_with(|| a.cmp(b))
         });
 
-        if log_enabled!(Trace) {
+        if log_enabled!(logger: self.item_pool.log_capture, Trace) {
             self.log_weights(&with_weights);
         }
 
@@ -1127,6 +1155,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         let total_weight = progressions.iter().map(|(_, weight)| weight).sum::<f32>();
 
         trace!(
+            logger: self.item_pool.log_capture,
             "{log_index}{amount} option{s} for forced progression:\n{progressions}",
             log_index = self.log_index.clone(),
             amount = progressions.len(),
@@ -1155,7 +1184,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
 
             match self.choose_spirit_light_location() {
                 None => {
-                    warn!("Not enough space to place spirit light, aborting progression");
+                    warn!(logger: self.item_pool.log_capture, "Not enough space to place spirit light, aborting progression");
                     break;
                 }
                 Some(pickup) => self.place_spirit_light(pickup, batch, placement_spoiler),
@@ -1230,6 +1259,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
 
     fn fill_remaining(&mut self, placement_spoiler: &mut Vec<SpoilerPlacement>) {
         trace!(
+            logger: self.item_pool.log_capture,
             "{}Filling remaining locations with spirit light",
             self.log_index
         );
@@ -1261,6 +1291,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
             if let Node::Pickup(pickup) = node {
                 if !self.world.has_reached(index) {
                     trace!(
+                        logger: self.item_pool.log_capture,
                         "{}Placing extra spirit light in unreachable location {}",
                         self.log_index,
                         pickup.identifier,
@@ -1277,6 +1308,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
 
         if unreachable_count != self.world.settings.difficulty.expected_unreachable() {
             warn!(
+                logger: self.item_pool.log_capture,
                 "{}{unreachable_count} location{} unreachable on these settings!",
                 self.log_index,
                 if unreachable_count == 1 {
@@ -1292,11 +1324,15 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         // TODO try to avoid
         let command = compile::gorlek_ore();
 
-        warn!(
-            "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
-            name = self.log_name(&command),
-            index = self.log_index,
-        );
+        if log_enabled!(logger: self.item_pool.log_capture, Trace) {
+            let name = self.log_name(&command);
+
+            warn!(
+                logger: self.item_pool.log_capture,
+                "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
+                index = self.log_index,
+            );
+        }
 
         command
     }
@@ -1308,14 +1344,18 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         placement_spoiler: &mut Vec<SpoilerPlacement>,
         simulate: F,
     ) where
-        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings, 'perf>, &CommandsOutput),
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings, 'perf, 'log>, &CommandsOutput),
     {
-        trace!(
-            "{index}Placing {name} at {pickup}",
-            name = self.log_name(&command),
-            index = self.log_index,
-            pickup = pickup.identifier,
-        );
+        if log_enabled!(logger: self.item_pool.log_capture, Trace) {
+            let name = self.log_name(&command);
+
+            trace!(
+                logger: self.item_pool.log_capture,
+                "{index}Placing {name} at {pickup}",
+                index = self.log_index,
+                pickup = pickup.identifier,
+            );
+        }
 
         self.write_placement_spoiler(pickup, &command, placement_spoiler);
 
@@ -1356,7 +1396,7 @@ impl<'graph, 'settings, 'perf> WorldContext<'graph, 'settings, 'perf> {
         command: CommandVoid,
         simulate: F,
     ) where
-        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings, 'perf>, &CommandsOutput),
+        F: FnOnce(&CommandVoid, &mut World<'graph, 'settings, 'perf, 'log>, &CommandsOutput),
     {
         simulate(&command, &mut self.world, &self.output.commands);
 
@@ -1419,6 +1459,7 @@ fn filter_needs_placement(
     log_index: &str,
     needs_placement: &mut Vec<&LocDataEntry>,
     output: &IntermediateOutput,
+    log_capture: &LogCapture,
 ) {
     let mut extra_slots = vec![];
 
@@ -1427,6 +1468,7 @@ fn filter_needs_placement(
         // TODO remove by identifier instead?
         if output.modifiers.removed_locations.contains(&condition) {
             trace!(
+                logger: log_capture,
                 "{log_index}Manually removed {pickup} from placement locations",
                 pickup = pickup.identifier
             );
@@ -1436,6 +1478,7 @@ fn filter_needs_placement(
 
         if world.loc_data_condition_met(pickup.uber_identifier, pickup.value) {
             trace!(
+                logger: log_capture,
                 "{log_index}Removing {pickup} from placement locations since the condition was met on spawn",
                 pickup = pickup.identifier
             );
@@ -1447,6 +1490,7 @@ fn filter_needs_placement(
             None | Some(1) => {},
             Some(0) => {
                 trace!(
+                    logger: log_capture,
                     "{log_index}Removing {pickup} from placement locations since location slots were set to zero",
                     pickup = pickup.identifier
                 );
@@ -1455,6 +1499,7 @@ fn filter_needs_placement(
             }
             Some(slots) => {
                 trace!(
+                    logger: log_capture,
                     "{log_index}Increasing {pickup} slots to {slots}",
                     pickup = pickup.identifier
                 );
@@ -1469,6 +1514,7 @@ fn filter_needs_placement(
     needs_placement.append(&mut extra_slots);
 
     trace!(
+        logger: log_capture,
         "{log_index}{amount} total locations that need placements: {needs_placement}",
         amount = needs_placement.len(),
         needs_placement = format_pickups(needs_placement)

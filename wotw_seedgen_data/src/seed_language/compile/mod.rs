@@ -17,6 +17,7 @@ pub use function::{
     FunctionSignature,
 };
 pub use helpers::{add_float, add_integer, store_boolean, store_float, store_integer};
+use wotw_seedgen_log_capture::LogCapture;
 
 use self::preprocess::{Preprocessor, PreprocessorOutput};
 use crate::{
@@ -49,9 +50,9 @@ use wotw_seedgen_parse::{
 };
 
 #[derive(Debug)]
-pub struct Compiler<'snippets, 'uberstates> {
+pub struct Compiler<'snippets, 'uberstates, 'log> {
     rng: Pcg64Mcg,
-    global: GlobalCompilerData<'snippets, 'uberstates>,
+    global: GlobalCompilerData<'snippets, 'uberstates, 'log>,
     compiled_snippets: FxHashMap<String, CompileState>,
     errors: FxHashMap<String, (Source, Vec<Error>)>,
 }
@@ -73,14 +74,14 @@ pub const FREE_MEMORY_START: usize = PRIVATE_MEMORY + 1;
 pub(crate) trait Compile<'source> {
     type Output;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output;
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output;
 }
 
 impl<'source, T: Compile<'source>> Compile<'source> for Spanned<T> {
     type Output = T::Output;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.data.compile(compiler)
     }
 }
@@ -88,7 +89,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Spanned<T> {
 impl<'source, T: Compile<'source>> Compile<'source> for Option<T> {
     type Output = Option<T::Output>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.map(|t| t.compile(compiler))
     }
 }
@@ -96,7 +97,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Option<T> {
 impl<'source, T: Compile<'source>> Compile<'source> for SpannedOption<T> {
     type Output = Option<T::Output>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.into_option().map(|t| t.compile(compiler))
     }
 }
@@ -105,7 +106,7 @@ impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
     type Output = Option<T::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.value.compile(compiler)
     }
 }
@@ -113,7 +114,7 @@ impl<'source, T: Compile<'source>, R> Compile<'source> for Recoverable<T, R> {
 impl<'source, T: Compile<'source>> Compile<'source> for Box<T> {
     type Output = T::Output;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         (*self).compile(compiler)
     }
 }
@@ -121,7 +122,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Box<T> {
 impl<'source, T: Compile<'source>> Compile<'source> for Vec<T> {
     type Output = Vec<T::Output>; // TODO experiment with returning iterators instead of vectors from collection compile implementations
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
@@ -132,7 +133,7 @@ impl<'source, Open, Content: Compile<'source>, Close> Compile<'source>
     type Output = Option<Content::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.content.compile(compiler)
     }
 }
@@ -141,7 +142,7 @@ impl<'source, T: Compile<'source>> Compile<'source> for Once<T> {
     type Output = T::Output;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.0.compile(compiler)
     }
 }
@@ -152,7 +153,7 @@ impl<'source, Item: Compile<'source>, Punctuation> Compile<'source>
     type Output = Vec<Item::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
@@ -163,7 +164,7 @@ impl<'source, Item: Compile<'source>, Separator> Compile<'source>
     type Output = Vec<Item::Output>;
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.into_iter().map(|t| t.compile(compiler)).collect()
     }
 }
@@ -172,20 +173,20 @@ impl<'source> Compile<'source> for ast::Snippet<'source> {
     type Output = ();
 
     #[inline]
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         self.contents.compile(compiler);
     }
 }
 
 #[derive(Derivative)]
 #[derivative(Debug)]
-pub(crate) struct GlobalCompilerData<'snippets, 'uberstates> {
-    pub output: IntermediateOutput,
+pub(crate) struct GlobalCompilerData<'snippets, 'uberstates, 'log> {
+    pub output: IntermediateOutput<'log>,
     pub uber_state_data: &'uberstates UberStateData,
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
     pub exported_values: FxHashMap<String, FxHashMap<String, ExportedValue>>,
-    pub id_resolver: IdResolver,
+    pub id_resolver: IdResolver<'log>,
     // TODO could be a reference
     pub config: FxHashMap<String, FxHashMap<String, String>>,
     pub lint_data: Option<LintData>,
@@ -197,30 +198,42 @@ pub(crate) enum ExportedValue {
     Literal(Literal),
 }
 
-impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
+impl<'snippets, 'uberstates, 'log> GlobalCompilerData<'snippets, 'uberstates, 'log> {
     pub(crate) fn new(
         uber_state_data: &'uberstates UberStateData,
         snippet_access: &'snippets dyn SnippetAccess,
-        config: FxHashMap<String, FxHashMap<String, String>>,
-        lockfile: Option<PathBuf>,
-        lint: bool,
-        debug: bool,
     ) -> Self {
         Self {
-            output: IntermediateOutput::new(debug),
+            output: IntermediateOutput::new(),
             uber_state_data,
             snippet_access,
             exported_values: FxHashMap::default(),
-            id_resolver: IdResolver::new(lockfile),
-            config,
-            lint_data: lint.then(LintData::default),
+            id_resolver: IdResolver::new(),
+            config: FxHashMap::default(),
+            lint_data: None,
         }
+    }
+
+    pub(crate) fn enable_debug(&mut self) {
+        self.output.enable_debug();
+    }
+
+    pub(crate) fn disable_debug(&mut self) {
+        self.output.disable_debug();
+    }
+
+    pub(crate) fn enable_lint(&mut self) {
+        self.lint_data = Some(LintData::default());
+    }
+
+    pub(crate) fn disable_lint(&mut self) {
+        self.lint_data = None;
     }
 
     pub(crate) fn finish(
         self,
         errors: &mut FxHashMap<String, (Source, Vec<Error>)>,
-    ) -> IntermediateOutput {
+    ) -> IntermediateOutput<'log> {
         if let Some(lint_data) = self.lint_data {
             lint_data.finish(errors);
         }
@@ -230,25 +243,25 @@ impl<'snippets, 'uberstates> GlobalCompilerData<'snippets, 'uberstates> {
 }
 
 // TODO not sure if all these fields are used anymore since pulling some stuff out into global
-pub(crate) struct SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates> {
+pub(crate) struct SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates, 'log> {
     pub rng: Pcg64Mcg,
     pub identifier: String, // TODO could be a reference
-    pub global: &'compiler mut GlobalCompilerData<'snippets, 'uberstates>,
+    pub global: &'compiler mut GlobalCompilerData<'snippets, 'uberstates, 'log>,
     pub preprocessed: PreprocessorOutput,
     pub scopes: Scopes<'source>,
     pub errors: Vec<Error>,
 }
 
 const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
-impl<'source, 'compiler, 'snippets, 'uberstates>
-    SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates>
+impl<'source, 'compiler, 'snippets, 'uberstates, 'log>
+    SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates, 'log>
 {
     // TODO weird api
     pub(crate) fn compile<R: Rng>(
         ast: ast::Snippet<'source>,
         rng: &mut R,
         identifier: String,
-        global: &'compiler mut GlobalCompilerData<'snippets, 'uberstates>,
+        global: &'compiler mut GlobalCompilerData<'snippets, 'uberstates, 'log>,
         preprocessed: PreprocessorOutput,
     ) -> Self {
         let debug = global.output.assets.debug.is_some();
@@ -443,30 +456,54 @@ impl<'source, 'compiler, 'snippets, 'uberstates>
     }
 }
 
-impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
+impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
     pub fn new<R: Rng, F: SnippetAccess>(
         rng: &mut R,
         snippet_access: &'snippets F,
         // TODO use asset access instead?
         uber_state_data: &'uberstates UberStateData,
-        config: FxHashMap<String, FxHashMap<String, String>>,
-        lockfile: Option<PathBuf>,
-        lint: bool,
-        debug: bool,
     ) -> Self {
         Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
-            global: GlobalCompilerData::new(
-                uber_state_data,
-                snippet_access,
-                config,
-                lockfile,
-                lint,
-                debug,
-            ),
+            global: GlobalCompilerData::new(uber_state_data, snippet_access),
             compiled_snippets: FxHashMap::default(),
             errors: FxHashMap::default(),
         }
+    }
+
+    pub fn with_config(mut self, config: FxHashMap<String, FxHashMap<String, String>>) -> Self {
+        self.global.config = config;
+        self
+    }
+
+    pub fn with_lockfile(mut self, path: PathBuf, log_capture: &'log LogCapture) -> Self {
+        self.global.id_resolver = IdResolver::from_lockfile(path, log_capture);
+        self
+    }
+
+    pub fn with_debug(mut self, debug: bool) -> Self {
+        if debug {
+            self.global.enable_debug();
+        } else {
+            self.global.disable_debug();
+        }
+
+        self
+    }
+
+    pub fn with_lint(mut self, lint: bool) -> Self {
+        if lint {
+            self.global.enable_lint();
+        } else {
+            self.global.disable_lint();
+        }
+
+        self
+    }
+
+    pub fn with_log_capture(mut self, log_capture: &'log LogCapture) -> Self {
+        self.global.output.modifiers.item_metadata.log_capture = log_capture;
+        self
     }
 
     pub fn compile_snippet(&mut self, identifier: &str) -> std::result::Result<(), String> {
@@ -540,7 +577,7 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
         Ok(())
     }
 
-    pub fn finish(mut self) -> CompileResult {
+    pub fn finish(mut self) -> CompileResult<'log> {
         let output = self.global.finish(&mut self.errors);
 
         CompileResult {
@@ -551,13 +588,13 @@ impl<'snippets, 'uberstates> Compiler<'snippets, 'uberstates> {
 }
 
 #[derive(Debug, Clone)]
-pub struct CompileResult {
-    pub output: IntermediateOutput,
+pub struct CompileResult<'log> {
+    pub output: IntermediateOutput<'log>,
     pub errors: FxHashMap<String, (Source, Vec<Error>)>,
 }
 
-impl CompileResult {
-    pub fn eprint_errors(self) -> Option<IntermediateOutput> {
+impl<'log> CompileResult<'log> {
+    pub fn eprint_errors(self) -> Option<IntermediateOutput<'log>> {
         let mut stderr = io::stderr().lock();
 
         let mut error_count = 0;

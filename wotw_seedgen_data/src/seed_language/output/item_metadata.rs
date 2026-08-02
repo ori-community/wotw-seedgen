@@ -8,35 +8,58 @@ use crate::{
     },
     CommonUberIdentifier, Icon, MapIcon,
 };
+use derivative::Derivative;
 use log::warn;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
+use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
 
 // TODO fewer string allocations?
 
-#[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct ItemMetadata(pub(crate) FxHashMap<CommandVoid, ItemMetadataEntry>);
-impl ItemMetadata {
+#[derive(Debug, Clone, Derivative)]
+#[derivative(PartialEq, Eq)]
+pub struct ItemMetadata<'log> {
+    pub(crate) inner: FxHashMap<CommandVoid, ItemMetadataEntry>,
+    #[derivative(PartialEq = "ignore")]
+    pub(crate) log_capture: &'log LogCapture,
+}
+
+impl<'log> ItemMetadata<'log> {
+    pub const fn new() -> Self {
+        Self {
+            inner: FxHashMap::with_hasher(FxBuildHasher),
+            log_capture: &NO_LOG_CAPTURE,
+        }
+    }
+
     /// Look up metadata for `command`
     pub fn get<'command, 'entry>(
         &'entry self,
         command: &'command CommandVoid,
-    ) -> ItemMetadataRef<'command, 'entry> {
+    ) -> ItemMetadataRef<'command, 'entry, 'log> {
         ItemMetadataRef {
             command,
-            entry: self.0.get(command),
+            entry: self.inner.get(command),
+            log_capture: self.log_capture,
         }
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct ItemMetadataRef<'command, 'entry> {
-    command: &'command CommandVoid,
-    entry: Option<&'entry ItemMetadataEntry>,
+impl Default for ItemMetadata<'static> {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-impl ItemMetadataRef<'_, '_> {
+#[derive(Debug, Clone)]
+pub struct ItemMetadataRef<'command, 'entry, 'log> {
+    command: &'command CommandVoid,
+    entry: Option<&'entry ItemMetadataEntry>,
+    log_capture: &'log LogCapture,
+}
+
+impl ItemMetadataRef<'_, '_, '_> {
     /// Generic name used when sending the item to another world and in the spoiler.
     pub fn name(&self) -> Option<StringOrPlaceholder> {
         self.entry.and_then(|entry| entry.name.clone())
@@ -57,7 +80,7 @@ impl ItemMetadataRef<'_, '_> {
     pub fn force_name(&self) -> CommandString {
         self.try_force_name().unwrap_or_else(|| {
             let code = self.command.to_string();
-            warn!("unable to find readable name for {code}");
+            warn!(logger: self.log_capture, "unable to find readable name for {code}");
             code.into()
         })
     }

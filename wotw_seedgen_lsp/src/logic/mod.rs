@@ -95,7 +95,11 @@ impl Backend<Cache> {
                 let mut result = {
                     let cache = self.cache.read().await;
 
-                    Graph::compile(paths, cache.loc_data.clone(), cache.state_data.clone(), &[])
+                    Graph::compiler().compile(
+                        paths,
+                        cache.loc_data.clone(),
+                        cache.state_data.clone(),
+                    )
                 };
 
                 errors.append(&mut result.errors);

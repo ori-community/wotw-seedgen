@@ -1,6 +1,7 @@
 use crate::generator::solutions::Cost;
 
 use super::SEED_FAILED_MESSAGE;
+use derivative::Derivative;
 use itertools::Itertools;
 use log::{trace, warn};
 use rand::{seq::SliceRandom, Rng, SeedableRng};
@@ -19,12 +20,13 @@ use wotw_seedgen_data::{
     },
     Shard, Skill, WeaponUpgrade,
 };
+use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
 
-pub struct ItemPoolBuilder {
-    item_pool: ItemPool,
+pub struct ItemPoolBuilder<'log> {
+    item_pool: ItemPool<'log>,
 }
 
-impl ItemPoolBuilder {
+impl ItemPoolBuilder<'static> {
     pub fn new(rng: &mut Pcg64Mcg) -> Self {
         const GORLEK_ORE_AMOUNT: usize = 40;
         const KEYSTONE_AMOUNT: usize = 34;
@@ -101,7 +103,7 @@ impl ItemPoolBuilder {
 
         let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
         let items = Vec::with_capacity(TOTAL_AMOUNT);
-        let item_pool = ItemPool { rng, items };
+        let item_pool = ItemPool::new(rng, items);
         let mut builder = Self { item_pool };
 
         builder.add_amount(compile::gorlek_ore(), GORLEK_ORE_AMOUNT);
@@ -122,6 +124,13 @@ impl ItemPoolBuilder {
 
         builder
     }
+}
+
+impl<'log> ItemPoolBuilder<'log> {
+    pub fn with_log_capture(mut self, log_capture: &'log LogCapture) -> Self {
+        self.item_pool.log_capture = log_capture;
+        self
+    }
 
     pub fn add(&mut self, item: CommandVoid) {
         self.item_pool.items.push(Item::new(item));
@@ -141,16 +150,19 @@ impl ItemPoolBuilder {
         self.item_pool.find_remove_amount(item, amount);
     }
 
-    pub fn finish(mut self) -> ItemPool {
+    pub fn finish(mut self) -> ItemPool<'log> {
         self.item_pool.items.shuffle(&mut self.item_pool.rng);
         self.item_pool
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct ItemPool {
+#[derive(Debug, Clone, Derivative)]
+#[derivative(PartialEq)]
+pub struct ItemPool<'log> {
     rng: Pcg64Mcg,
     items: Vec<Item>,
+    #[derivative(PartialEq = "ignore")]
+    pub(super) log_capture: &'log LogCapture,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -196,7 +208,17 @@ impl Cost for Item {
     }
 }
 
-impl ItemPool {
+impl ItemPool<'static> {
+    pub fn new(rng: Pcg64Mcg, items: Vec<Item>) -> Self {
+        Self {
+            rng,
+            items,
+            log_capture: &NO_LOG_CAPTURE,
+        }
+    }
+}
+
+impl<'log> ItemPool<'log> {
     pub fn find_remove(&mut self, item: &CommandVoid) -> bool {
         match self.items.iter().position(|i| &i.command == item) {
             None => {
@@ -232,10 +254,11 @@ impl ItemPool {
 
     fn log_find_remove_failed(&self, item: &CommandVoid) {
         warn!(
+            logger: self.log_capture,
             "Attempted to remove {item} from the item pool, but it didn't exist",
             item = item.log_display()
         );
-        trace!("Current item pool: {self}");
+        trace!(logger: self.log_capture, "Current item pool: {self}");
     }
 
     pub fn remove(&mut self, index: usize) -> CommandVoid {
@@ -253,7 +276,11 @@ impl ItemPool {
                     let choose = self.rng.gen_bool(10000. / f64::from(cost));
 
                     if !choose {
-                        trace!("Rerolling random placement {}", item.command.log_display());
+                        trace!(
+                            logger: self.log_capture,
+                            "Rerolling random placement {}",
+                            item.command.log_display()
+                        );
                     }
 
                     choose
@@ -269,7 +296,7 @@ impl ItemPool {
     }
 }
 
-impl Deref for ItemPool {
+impl Deref for ItemPool<'_> {
     type Target = Vec<Item>;
 
     fn deref(&self) -> &Self::Target {
@@ -277,7 +304,7 @@ impl Deref for ItemPool {
     }
 }
 
-impl Display for ItemPool {
+impl Display for ItemPool<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut items = FxHashMap::default();
         for item in &self.items {

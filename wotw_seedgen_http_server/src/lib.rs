@@ -1,4 +1,5 @@
 use axum::Router;
+use log::LevelFilter;
 use single_instance::SingleInstance;
 use socket2::{Domain, Protocol, Socket, Type};
 use std::net::SocketAddr;
@@ -38,6 +39,9 @@ pub fn start(inactivity_timeout: Option<Duration>, address: Option<SocketAddr>) 
     let (mut runtime, cache) = wotw_seedgen_server_shared::start(cache)?;
 
     let mut router = api::router(cache);
+
+    // Turn the global filter off because we use local filters instead
+    log::set_max_level(LevelFilter::Trace);
 
     match inactivity_timeout {
         None => runtime.block_on(serve(router, address)),

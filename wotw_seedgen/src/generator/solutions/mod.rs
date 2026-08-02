@@ -180,11 +180,11 @@ pub trait SolutionLike<'graph> {
             && other.spirit_light() <= self.spirit_light()
     }
 
-    fn display<'pool, 'solution>(
+    fn display<'pool, 'solution, 'log>(
         &'solution self,
-        item_pool: &'pool ItemPool,
+        item_pool: &'pool ItemPool<'log>,
         graph: Option<&'graph Graph>,
-    ) -> DisplaySolution<'graph, 'pool, 'solution> {
+    ) -> DisplaySolution<'graph, 'pool, 'solution, 'log> {
         DisplaySolution::new(self, item_pool, graph)
     }
 }
@@ -203,17 +203,17 @@ impl<'graph> SolutionLike<'graph> for Solution {
     }
 }
 
-pub struct DisplaySolution<'graph, 'pool, 'solution> {
+pub struct DisplaySolution<'graph, 'pool, 'solution, 'log> {
     connection: Option<(&'solution ConnectionIndex<'graph>, &'graph Graph)>,
     items: &'solution SolutionItems,
     spirit_light: i32,
-    item_pool: &'pool ItemPool,
+    item_pool: &'pool ItemPool<'log>,
 }
 
-impl<'graph, 'pool, 'solution> DisplaySolution<'graph, 'pool, 'solution> {
+impl<'graph, 'pool, 'solution, 'log> DisplaySolution<'graph, 'pool, 'solution, 'log> {
     fn new<S: SolutionLike<'graph> + ?Sized>(
         solution: &'solution S,
-        item_pool: &'pool ItemPool,
+        item_pool: &'pool ItemPool<'log>,
         graph: Option<&'graph Graph>,
     ) -> Self {
         Self {
@@ -225,7 +225,7 @@ impl<'graph, 'pool, 'solution> DisplaySolution<'graph, 'pool, 'solution> {
     }
 }
 
-impl Display for DisplaySolution<'_, '_, '_> {
+impl Display for DisplaySolution<'_, '_, '_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some((connection, graph)) = &self.connection {
             write!(f, "{} / ", connection.display(graph))?;
@@ -263,10 +263,10 @@ impl Display for DisplaySolution<'_, '_, '_> {
     }
 }
 
-impl<'graph> World<'graph, '_, '_> {
+impl<'graph, 'log> World<'graph, '_, '_, 'log> {
     pub fn find_solutions(
         &mut self,
-        item_pool: &ItemPool,
+        item_pool: &ItemPool<'log>,
         output: &CommandsOutput,
         slots: usize,
         spirit_light_slots: usize,
@@ -283,7 +283,10 @@ impl<'graph> World<'graph, '_, '_> {
         );
 
         if solutions.is_empty() && slots > capped_slots {
-            trace!("no solutions found, retrying with uncapped solution size");
+            trace!(
+                logger: item_pool.log_capture,
+                "no solutions found, retrying with uncapped solution size"
+            );
 
             solutions = self.find_solutions_no_max_items(
                 item_pool,
@@ -296,6 +299,7 @@ impl<'graph> World<'graph, '_, '_> {
             if let Some(min_solution) = solutions.iter().min_by_key(|solution| solution.items.len())
             {
                 warn!(
+                    logger: item_pool.log_capture,
                     "insufficient solution max items {solution_max_items}, needed at least {min_max_items} for {min_solution}",
                     solution_max_items = *SOLUTION_MAX_ITEMS,
                     min_max_items = min_solution.items.len(),
@@ -309,7 +313,7 @@ impl<'graph> World<'graph, '_, '_> {
 
     pub fn find_solutions_no_max_items(
         &mut self,
-        item_pool: &ItemPool,
+        item_pool: &ItemPool<'log>,
         output: &CommandsOutput,
         slots: usize,
         spirit_light_slots: usize,
@@ -458,10 +462,10 @@ impl Commitments {
     }
 }
 
-struct SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool> {
-    world: &'world mut World<'graph, 'settings, 'perf>,
+struct SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log> {
+    world: &'world mut World<'graph, 'settings, 'perf, 'log>,
     output: &'output CommandsOutput,
-    item_pool: &'pool ItemPool,
+    item_pool: &'pool ItemPool<'log>,
     slots: usize,
     spirit_light_slots: usize,
     initial_pickup_count: usize,
@@ -472,13 +476,13 @@ struct SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool> {
     perf_counters: IndexMap<usize, u32, FxBuildHasher>,
 }
 
-impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
-    SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>
+impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
+    SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
 {
     fn new(
-        world: &'world mut World<'graph, 'settings, 'perf>,
+        world: &'world mut World<'graph, 'settings, 'perf, 'log>,
         output: &'output CommandsOutput,
-        item_pool: &'pool ItemPool,
+        item_pool: &'pool ItemPool<'log>,
         slots: usize,
         spirit_light_slots: usize,
     ) -> Self {
@@ -504,7 +508,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     }
 
     fn solve_untouched(&mut self, solution: PartialSolution<'graph>) {
-        trace!("starting solve for {}", self.display_solution(&solution));
+        trace!(
+            logger: self.item_pool.log_capture,
+            "starting solve for {}",
+            self.display_solution(&solution)
+        );
 
         self.world.snapshot();
 
@@ -514,7 +522,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     }
 
     fn solve_touched(&mut self, solution: PartialSolution<'graph>) {
-        trace!("resuming solve for {}", self.display_solution(&solution));
+        trace!(
+            logger: self.item_pool.log_capture,
+            "resuming solve for {}",
+            self.display_solution(&solution)
+        );
 
         self.world.snapshot();
 
@@ -522,6 +534,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
             .simulate_solution(&solution, self.item_pool, self.output);
 
         trace!(
+            logger: self.item_pool.log_capture,
             "resuming with {} and {}",
             self.world.inventory_display(),
             self.world
@@ -557,12 +570,13 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         solution: PartialSolution<'graph>,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
+            logger: self.item_pool.log_capture,
             "solving connection {solution}",
             solution = self.display_solution(&solution)
         );
 
         if self.world.has_reached(connection.to) {
-            trace!("already reached");
+            trace!(logger: self.item_pool.log_capture, "already reached");
 
             self.check_solution(solution)
         } else {
@@ -585,7 +599,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         let mut orb_variants = self.world.get_connection_orbs(&solution.connection).clone();
         match solution.connection.is_met(self.world, &mut orb_variants) {
             ControlFlow::Continue(()) => {
-                trace!("already met");
+                trace!(logger: self.item_pool.log_capture, "already met");
 
                 self.check_solution(solution)
             }
@@ -616,6 +630,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         let finished = Solution::new(solution, new_reached);
 
         trace!(
+            logger: self.item_pool.log_capture,
             "finished solution {finished}, {new_reached} reached",
             finished = self.display_solution(&finished),
         );
@@ -639,6 +654,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         let aborted = Solution::new(solution, 0);
 
         trace!(
+            logger: self.item_pool.log_capture,
             "search limit reached, aborting solution {aborted}",
             aborted = self.display_solution(&aborted),
         );
@@ -669,7 +685,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
 
         solution.search_radius -= 1;
 
-        trace!("continuing solution {}", self.display_solution(&solution));
+        trace!(
+            logger: self.item_pool.log_capture,
+            "continuing solution {}",
+            self.display_solution(&solution)
+        );
 
         let mut new_solutions =
             self.new_fails(&mut solution)
@@ -682,7 +702,10 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         let Some(next_solution) = new_solutions.next() else {
             // TODO this can happen for multiple reasons, for example when solving a state that does not immediately solve another connection, which is not ideal
             // It also happens when solving refills that don't immediately progress anything, which sounds unsolvable but maybe fine
-            trace!("no progress, unable to continue solution");
+            trace!(
+                logger: self.item_pool.log_capture,
+                "no progress, unable to continue solution"
+            );
             return ControlFlow::Break(());
         };
 
@@ -774,7 +797,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     }
 
     fn pause_solution(&mut self, solution: PartialSolution<'graph>) {
-        trace!("pausing solution {}", self.display_solution(&solution));
+        trace!(
+            logger: self.item_pool.log_capture,
+            "pausing solution {}",
+            self.display_solution(&solution)
+        );
 
         self.solutions.push_back(solution);
     }
@@ -786,6 +813,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         trace!(
+            logger: self.item_pool.log_capture,
             "solving {missing} for {solution}",
             solution = self.display_solution(&solution)
         );
@@ -944,7 +972,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         C: FnOnce(&mut Commitments) -> bool,
         D: FnOnce(Difficulty) -> bool,
         F: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -979,12 +1007,12 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     ) -> ControlFlow<(), PartialSolution<'graph>>
     where
         L: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
         R: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -1013,12 +1041,12 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     where
         C: FnOnce(&mut Commitments) -> bool,
         L: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
         R: FnOnce(
-            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
             PartialSolution<'graph>,
             bool,
         ) -> ControlFlow<(), PartialSolution<'graph>>,
@@ -1121,7 +1149,10 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
                 .contains(&uber_identifier)
         }) else {
             // TODO can we remember pointless paths that we know end in this branch?
-            trace!("no items in the pool to solve {uber_identifier}");
+            trace!(
+                logger: self.item_pool.log_capture,
+                "no items in the pool to solve {uber_identifier}"
+            );
 
             return ControlFlow::Break(());
         };
@@ -1138,6 +1169,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         self.add_item(&mut solution, index, simulate)?;
 
         trace!(
+            logger: self.item_pool.log_capture,
             "progressed {uber_identifier} for {solution}",
             solution = self.display_solution(&solution),
         );
@@ -1240,7 +1272,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
 
                 match amount_from_write(&write) {
                     None => {
-                        trace!("unable to read into {}, solving stepwise", write.command);
+                        trace!(
+                            logger: self.item_pool.log_capture,
+                            "unable to read into {}, solving stepwise",
+                            write.command
+                        );
 
                         items.push(index);
                         break 'outer;
@@ -1263,7 +1299,10 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
                 if slots > 1 {
                     slots -= 1;
                 } else {
-                    trace!("not enough slots to solve {uber_identifier}*{amount}");
+                    trace!(
+                        logger: self.item_pool.log_capture,
+                        "not enough slots to solve {uber_identifier}*{amount}"
+                    );
 
                     return ControlFlow::Break(());
                 }
@@ -1271,7 +1310,10 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         }
 
         if items.is_empty() {
-            trace!("no items in the pool to solve {uber_identifier}*{amount}");
+            trace!(
+                logger: self.item_pool.log_capture,
+                "no items in the pool to solve {uber_identifier}*{amount}"
+            );
 
             return ControlFlow::Break(());
         }
@@ -1279,6 +1321,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         self.add_items(&mut solution, items, simulate)?;
 
         trace!(
+            logger: self.item_pool.log_capture,
             "progressed {uber_identifier} for {solution}",
             solution = self.display_solution(&solution),
         );
@@ -1315,7 +1358,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
             ControlFlow::Continue(())
         } else {
             // TODO can we remember pointless paths that we know end in this branch?
-            trace!("not enough slots to solve");
+            trace!(logger: self.item_pool.log_capture, "not enough slots to solve");
             ControlFlow::Break(())
         }
     }
@@ -1331,7 +1374,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         if self.spirit_light_slots >= solution.used_spirit_light_slots() {
             ControlFlow::Continue(solution)
         } else {
-            trace!("not enough spirit light slots to solve");
+            trace!(logger: self.item_pool.log_capture, "not enough spirit light slots to solve");
 
             ControlFlow::Break(())
         }
@@ -1345,7 +1388,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         fn solve_branch<'graph>(
-            context: &mut SolutionContext<'_, 'graph, '_, '_, '_, '_>,
+            context: &mut SolutionContext<'_, 'graph, '_, '_, '_, '_, '_>,
             mut solution: PartialSolution<'graph>,
             (missing, requirement): (Missing<'graph>, GraphRef<'graph, Requirement>),
             simulate: bool,
@@ -1378,7 +1421,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     where
         I: IntoIterator<Item = T>,
         F: FnMut(
-            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool>,
+            &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
             PartialSolution<'graph>,
             T,
             bool,
@@ -1437,6 +1480,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
                 self.world.snapshot();
 
                 trace!(
+                    logger: self.item_pool.log_capture,
                     "verifying solution {solution}",
                     solution = solution.display(self.item_pool, None)
                 );
@@ -1479,7 +1523,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool>
     fn display_solution<'context, 'solution, S: SolutionLike<'graph>>(
         &'context self,
         solution: &'solution S,
-    ) -> DisplaySolution<'graph, 'pool, 'solution> {
+    ) -> DisplaySolution<'graph, 'pool, 'solution, 'log> {
         solution.display(self.item_pool, Some(self.world.graph))
     }
 }
@@ -1501,6 +1545,7 @@ fn trace_is_redundant_with<'graph, S: SolutionLike<'graph>, O: SolutionLike<'gra
 
     if is_redundant {
         trace!(
+            logger: item_pool.log_capture,
             "{solution} is redundant with {other}",
             solution = solution.display(item_pool, Some(graph)),
             other = other.display(item_pool, Some(graph)),

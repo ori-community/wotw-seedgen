@@ -38,8 +38,8 @@ pub fn solution_weights(
 
 /// Generator for solution weights, taking into account how frequently the same items
 /// appear across solutions to counterweight similar but non-redundant variants
-struct WeightContext<'pool> {
-    item_pool: &'pool ItemPool,
+struct WeightContext<'pool, 'log> {
+    item_pool: &'pool ItemPool<'log>,
     solution_data: Vec<SolutionData<'pool>>,
     write_counts: FxHashMap<&'pool Vec<UberStateWriteOwned>, f32>,
     slots: usize,
@@ -51,9 +51,9 @@ struct SolutionData<'pool> {
     items: FxHashSet<&'pool Vec<UberStateWriteOwned>>,
 }
 
-impl<'pool> WeightContext<'pool> {
+impl<'pool, 'log> WeightContext<'pool, 'log> {
     fn new(
-        item_pool: &'pool ItemPool,
+        item_pool: &'pool ItemPool<'log>,
         solutions: &[Solution],
         slots: usize,
         spawn_slots: usize,
@@ -119,6 +119,7 @@ impl<'pool> WeightContext<'pool> {
             / (cost * similarity);
 
         trace!(
+            logger: self.item_pool.log_capture,
             "Weight for {items}: {weight} = (1 + max(non_spawn_slots: {non_spawn_slots} - used_slots: {used_slots}, 0)) * (1 + new_reached: {new_reached}) * (0.3 ^ sad_spawn_slots: {sad_spawn_slots}) / (cost: {cost} * similarity: {similarity})",
             non_spawn_slots = self.slots - self.spawn_slots,
             new_reached = solution.new_reached,

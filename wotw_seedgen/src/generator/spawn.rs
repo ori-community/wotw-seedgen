@@ -18,6 +18,7 @@ use wotw_seedgen_data::{
     },
     Difficulty, Spawn, UberIdentifier, DEFAULT_SPAWN,
 };
+use wotw_seedgen_log_capture::LogCapture;
 
 use crate::{
     generator::{placement::TOTAL_SPIRIT_LIGHT, SEED_FAILED_MESSAGE},
@@ -25,11 +26,11 @@ use crate::{
     LogicalDifficulty, World,
 };
 
-pub fn choose_spawn<'graph>(
+pub fn choose_spawn<'graph, 'log>(
     rng: &mut Pcg64Mcg,
-    world: &mut World<'graph, '_, '_>,
+    world: &mut World<'graph, '_, '_, 'log>,
     log_index: &str,
-    item_pool: &ItemPool,
+    item_pool: &ItemPool<'log>,
     output: &mut CommandsOutput,
 ) -> Result<Vec<&'graph LocDataEntry>, String> {
     let mut context = SpawnContext::new(rng, world, log_index, item_pool, output);
@@ -37,24 +38,24 @@ pub fn choose_spawn<'graph>(
     Ok(context.finish())
 }
 
-struct SpawnContext<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output> {
+struct SpawnContext<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log> {
     rng: Pcg64Mcg,
-    world: &'world mut World<'graph, 'settings, 'perf>,
-    log_index: &'log str,
-    item_pool: &'pool ItemPool,
+    world: &'world mut World<'graph, 'settings, 'perf, 'log>,
+    log_index: &'index str,
+    item_pool: &'pool ItemPool<'log>,
     output: &'output mut CommandsOutput,
     default_spawn: usize,
     total_reach: Vec<&'graph LocDataEntry>,
 }
 
-impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
-    SpawnContext<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
+impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
+    SpawnContext<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
 {
     fn new(
         rng: &mut Pcg64Mcg,
-        world: &'world mut World<'graph, 'settings, 'perf>,
-        log_index: &'log str,
-        item_pool: &'pool ItemPool,
+        world: &'world mut World<'graph, 'settings, 'perf, 'log>,
+        log_index: &'index str,
+        item_pool: &'pool ItemPool<'log>,
         output: &'output mut CommandsOutput,
     ) -> Self {
         let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
@@ -107,6 +108,7 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
                     &mut self.rng,
                     self.world.graph,
                     self.world.settings.difficulty,
+                    self.item_pool.log_capture,
                 );
 
                 self.choose_random_spawn(spawns)
@@ -143,6 +145,7 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
 
             if !default_spawn_reached {
                 trace!(
+                    logger: self.item_pool.log_capture,
                     "{log_index}Discarding spawn {spawn} since {default_spawn} wasn't reached",
                     log_index = self.log_index,
                     spawn = self.world.graph.nodes[spawn].identifier(),
@@ -150,6 +153,7 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
                 );
             } else if reached_count != self.total_reach.len() {
                 trace!(
+                    logger: self.item_pool.log_capture,
                     "{log_index}Discarding spawn {spawn} since only {reached_count}/{total_count} locations were reached",
                     log_index = self.log_index,
                     spawn = self.world.graph.nodes[spawn].identifier(),
@@ -157,6 +161,7 @@ impl<'world, 'graph, 'settings, 'perf, 'log, 'pool, 'output>
                 );
             } else {
                 trace!(
+                    logger: self.item_pool.log_capture,
                     "{log_index}Spawning on {spawn}",
                     log_index = self.log_index,
                     spawn = self.world.graph.nodes[spawn].identifier(),
@@ -231,7 +236,12 @@ pub struct RandomSpawnGenerator {
 }
 
 impl RandomSpawnGenerator {
-    pub fn new(rng: &mut Pcg64Mcg, graph: &Graph, difficulty: Difficulty) -> Self {
+    pub fn new(
+        rng: &mut Pcg64Mcg,
+        graph: &Graph,
+        difficulty: Difficulty,
+        log_capture: &LogCapture,
+    ) -> Self {
         // Precompute spawns because the size is small
         let mut spawn_identifiers = difficulty
             .spawn_locations()
@@ -249,6 +259,7 @@ impl RandomSpawnGenerator {
 
         if !spawn_identifiers.is_empty() {
             warn!(
+                logger: log_capture,
                 "Failed to find spawn location{} {}",
                 if spawn_identifiers.len() == 1 {
                     ""

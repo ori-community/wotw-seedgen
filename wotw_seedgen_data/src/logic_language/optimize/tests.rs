@@ -1,4 +1,5 @@
 use smallvec::smallvec;
+use wotw_seedgen_log_capture::NO_LOG_CAPTURE;
 
 use crate::{
     assets::TEST_ASSETS,
@@ -17,7 +18,7 @@ macro_rules! test {
         after.improve_order();
 
         let mut graph = TEST_ASSETS.test_graph(before.clone());
-        graph.optimize();
+        graph.optimize(&NO_LOG_CAPTURE);
         let optimized = graph.get_requirement();
 
         assert_eq!(

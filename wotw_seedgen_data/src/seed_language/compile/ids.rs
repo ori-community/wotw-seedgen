@@ -9,13 +9,14 @@ use derivative::Derivative;
 use log::warn;
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
+use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
 
 use crate::{
     assets::{file_create, file_err},
     seed_language::compile::{GlobalCompilerData, FREE_MEMORY_START},
 };
 
-impl GlobalCompilerData<'_, '_> {
+impl GlobalCompilerData<'_, '_, '_> {
     pub fn read_boolean_id(&mut self, id: String, span: Range<usize>) -> usize {
         if let Some(lint_data) = &mut self.lint_data {
             lint_data.id_use.boolean.read(id.clone(), span);
@@ -133,44 +134,47 @@ impl GlobalCompilerData<'_, '_> {
 ///
 /// If used, the lockfile will be written on drop.
 #[derive(Debug)]
-pub struct IdResolver {
+pub struct IdResolver<'log> {
     lockfile: Option<PathBuf>,
     ids: Ids,
+    log_capture: &'log LogCapture,
 }
 
-impl IdResolver {
-    /// Reads ids from the lockfile, or uses default fallbacks
-    pub fn new(lockfile: Option<PathBuf>) -> Self {
-        match lockfile {
-            None => Self {
-                lockfile: None,
-                ids: Ids::default(),
-            },
-            Some(lockfile_path) => {
-                let ids = File::open(&lockfile_path)
-                    .ok()
-                    .and_then(|lockfile| match serde_json::from_reader(&lockfile) {
-                        Ok(ids) => Some(ids),
-                        Err(err) => {
-                            warn!(
-                                "regenerating ids after failing to parse lockfile \"{lockfile_path}\": {err}",
-                                lockfile_path = lockfile_path.display()
-                            );
-                            None
-                        }
-                    })
-                    .unwrap_or_default();
+impl<'log> IdResolver<'log> {
+    pub fn new() -> Self {
+        Self {
+            lockfile: None,
+            ids: Ids::default(),
+            log_capture: &NO_LOG_CAPTURE,
+        }
+    }
 
-                Self {
-                    lockfile: Some(lockfile_path),
-                    ids,
+    /// Reads ids from the lockfile, or uses default fallbacks
+    pub fn from_lockfile(path: PathBuf, log_capture: &'log LogCapture) -> Self {
+        let ids = File::open(&path)
+            .ok()
+            .and_then(|lockfile| match serde_json::from_reader(&lockfile) {
+                Ok(ids) => Some(ids),
+                Err(err) => {
+                    warn!(
+                        logger: log_capture,
+                        "regenerating ids after failing to parse lockfile \"{path}\": {err}",
+                        path = path.display(),
+                    );
+                    None
                 }
-            }
+            })
+            .unwrap_or_default();
+
+        Self {
+            lockfile: Some(path),
+            ids,
+            log_capture,
         }
     }
 }
 
-impl Deref for IdResolver {
+impl Deref for IdResolver<'_> {
     type Target = Ids;
 
     fn deref(&self) -> &Self::Target {
@@ -178,13 +182,13 @@ impl Deref for IdResolver {
     }
 }
 
-impl DerefMut for IdResolver {
+impl DerefMut for IdResolver<'_> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.ids
     }
 }
 
-impl Drop for IdResolver {
+impl Drop for IdResolver<'_> {
     fn drop(&mut self) {
         if let Some(lockfile_path) = &self.lockfile {
             match file_create(lockfile_path) {
@@ -192,11 +196,11 @@ impl Drop for IdResolver {
                     self.ids.purge_unused();
 
                     if let Err(err) = serde_json::to_writer(lockfile, &self.ids) {
-                        warn!("{}", file_err("write id lockfile", lockfile_path, err));
+                        warn!(logger: self.log_capture, "{}", file_err("write id lockfile", lockfile_path, err));
                     }
                 }
                 Err(err) => {
-                    warn!("{err}");
+                    warn!(logger: self.log_capture, "{err}");
                 }
             }
         }

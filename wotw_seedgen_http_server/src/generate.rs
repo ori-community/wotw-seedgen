@@ -2,7 +2,7 @@ use std::io::Cursor;
 
 use serde::Serialize;
 use tokio::sync::RwLockReadGuard;
-use wotw_seedgen::data::UniverseSettings;
+use wotw_seedgen::{data::UniverseSettings, log_capture::Record};
 
 use crate::{
     api::GenerateQuery,
@@ -15,6 +15,7 @@ pub struct Universe {
     pub worlds: Vec<ciborium::value::Value>,
     pub json_spoiler: Option<String>,
     pub text_spoiler: Option<String>,
+    pub logs: Vec<Record>,
 }
 
 pub fn generate(
@@ -22,7 +23,11 @@ pub fn generate(
     settings: &UniverseSettings,
     cache: RwLockReadGuard<Cache>,
 ) -> Result<Vec<u8>> {
-    let universe = cache.generate(settings).map_err(Error::Generate)?;
+    let max_log_level = query.max_log_level.unwrap_or_default().into();
+
+    let (universe, logs) = cache
+        .generate(settings, max_log_level)
+        .map_err(Error::Generate)?;
 
     let worlds = universe
         .worlds
@@ -50,6 +55,7 @@ pub fn generate(
         worlds,
         json_spoiler,
         text_spoiler,
+        logs,
     };
 
     let mut bytes = vec![];

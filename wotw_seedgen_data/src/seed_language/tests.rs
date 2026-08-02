@@ -184,7 +184,7 @@ impl SnippetFileAccess for TestFileAccess {
     }
 }
 
-fn test_compiler<F: SnippetAccess>(snippet_access: &F) -> Compiler<'_, 'static> {
+fn test_compiler<F: SnippetAccess>(snippet_access: &F) -> Compiler<'_, 'static, 'static> {
     test_compiler_with_config(snippet_access, FxHashMap::default())
 }
 
@@ -200,19 +200,11 @@ static UBER_STATE_DATA: LazyLock<UberStateData> = LazyLock::new(|| {
 fn test_compiler_with_config<F: SnippetAccess>(
     snippet_access: &F,
     config: FxHashMap<String, FxHashMap<String, String>>,
-) -> Compiler<'_, 'static> {
-    Compiler::new(
-        &mut rand::thread_rng(),
-        snippet_access,
-        &UBER_STATE_DATA,
-        config,
-        None,
-        false,
-        false,
-    )
+) -> Compiler<'_, 'static, 'static> {
+    Compiler::new(&mut rand::thread_rng(), snippet_access, &UBER_STATE_DATA).with_config(config)
 }
 
-fn test_str(source: &str) -> IntermediateOutput {
+fn test_str(source: &str) -> IntermediateOutput<'_> {
     eprintln!("testing snippet:\n{source}");
 
     let snippet_access = ExampleFileAccess(source);
@@ -325,7 +317,8 @@ fn coersions() {
 #[test]
 fn operator_precedence() {
     fn test_precedence(term: &str, value: i32) {
-        let output = test_str(&format!("on spawn set_integer(\"oriLurk\", {term})"));
+        let source = format!("on spawn set_integer(\"oriLurk\", {term})");
+        let output = test_str(&source);
         assert_eq!(
             output.commands.events[0].command,
             CommandVoid::SetInteger {

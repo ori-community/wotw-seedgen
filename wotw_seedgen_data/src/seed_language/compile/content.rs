@@ -10,7 +10,7 @@ use wotw_seedgen_parse::{Error, Span};
 impl<'source> Compile<'source> for ast::Content<'source> {
     type Output = ();
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Content::Event(_, event) => {
                 event.compile(compiler);
@@ -31,7 +31,7 @@ impl<'source> Compile<'source> for ast::Content<'source> {
 impl<'source> Compile<'source> for ast::Event<'source> {
     type Output = ();
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         let trigger = self.trigger.compile(compiler);
         let span = self.action.span();
         let command = self.action.compile(compiler);
@@ -53,7 +53,7 @@ impl<'source> Compile<'source> for ast::Event<'source> {
 impl<'source> Compile<'source> for ast::Trigger<'source> {
     type Output = Option<Trigger>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Trigger::ClientEvent(client) => Some(Trigger::ClientEvent(client.data)),
             ast::Trigger::Binding(_, binding) => {
@@ -121,7 +121,7 @@ impl<'source> Compile<'source> for ast::Trigger<'source> {
 impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
     type Output = ();
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         let function = compiler
             .preprocessed
             .functions
@@ -151,7 +151,7 @@ impl<'source> Compile<'source> for ast::FunctionDefinition<'source> {
 impl<'source> Compile<'source> for ast::Action<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Action::Function(function_call) => function_call.compile(compiler),
             ast::Action::Condition(_, condition) => condition.compile(compiler),
@@ -175,7 +175,7 @@ impl<'source> Compile<'source> for ast::Action<'source> {
 impl<'source> Compile<'source> for ast::ActionCondition<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         let condition = self.condition.compile_into(compiler);
         let span = self.action.span();
         let command = self.action.compile(compiler);
@@ -190,5 +190,5 @@ impl<'source> Compile<'source> for ast::ActionCondition<'source> {
 impl<'source> Compile<'source> for ast::Annotation<'source> {
     type Output = ();
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {}
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {}
 }

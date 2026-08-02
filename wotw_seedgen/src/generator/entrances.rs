@@ -1,6 +1,7 @@
 use arrayvec::ArrayVec;
 use indexmap::IndexSet;
 use itertools::Itertools;
+use log::trace;
 use rand::prelude::IteratorRandom;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
@@ -15,6 +16,7 @@ use wotw_seedgen_data::{
     },
     UberIdentifier,
 };
+use wotw_seedgen_log_capture::LogCapture;
 
 use crate::World;
 
@@ -68,14 +70,15 @@ pub fn generate_entrances(
     world: &mut World,
     output: &mut CommandsOutput,
     rng: &mut Pcg64Mcg,
+    log_capture: &LogCapture,
 ) -> Result<(), String> {
     let (connections, loop_size) = match world.settings.randomize_entrances {
         None => {
-            log::trace!("Using default entrance connections");
+            trace!(logger: log_capture, "Using default entrance connections");
             (world.graph.default_entrance_connections.clone(), 2)
         }
         Some(loop_size) => {
-            log::trace!("Randomizing entrance connections");
+            trace!(logger: log_capture, "Randomizing entrance connections");
 
             let entrance_groups: EntranceGroups = [
                 ArrayVec::from([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]),
@@ -111,13 +114,16 @@ pub fn generate_entrances(
             }));
 
             let config = EntranceRandomizerConfig::new(loop_size.get(), entrance_groups)?;
-            let connections = generate_entrance_connections(&config, rng)?;
+            let connections = generate_entrance_connections(&config, rng, log_capture)?;
             (connections, loop_size.get())
         }
     };
 
     for (entrance_id, target_entrance_id) in connections {
-        log::trace!("Connected entrance {entrance_id} → {target_entrance_id}");
+        trace!(
+            logger: log_capture,
+            "Connected entrance {entrance_id} → {target_entrance_id}"
+        );
 
         let uber_identifier = UberIdentifier::entrances(entrance_id);
 
@@ -143,7 +149,7 @@ pub fn generate_entrances(
         }
     }
 
-    log::trace!("Entrances generated");
+    trace!(logger: log_capture, "Entrances generated");
 
     Ok(())
 }
@@ -151,6 +157,7 @@ pub fn generate_entrances(
 fn generate_entrance_connections(
     config: &EntranceRandomizerConfig,
     rng: &mut Pcg64Mcg,
+    log_capture: &LogCapture,
 ) -> Result<FxHashMap<EntranceId, EntranceId>, String> {
     let initial_entrance = *config.entrance_groups.iter().flatten().choose(rng).unwrap();
     let initial_entrance_group = config.group_index_by_entrance_id[&initial_entrance];
@@ -175,7 +182,8 @@ fn generate_entrance_connections(
         ..EntranceRandomizerState::default()
     };
 
-    let final_state = generate_entrance_connections_recursively(&initial_state, config, rng)?;
+    let final_state =
+        generate_entrance_connections_recursively(&initial_state, config, rng, log_capture)?;
     Ok(final_state.connections)
 }
 
@@ -183,6 +191,7 @@ fn generate_entrance_connections_recursively(
     state: &EntranceRandomizerState,
     config: &EntranceRandomizerConfig,
     rng: &mut Pcg64Mcg,
+    log_capture: &LogCapture,
 ) -> Result<EntranceRandomizerState, String> {
     let log_indent_level = state.recursion_level;
     let log_indent = "  ".repeat(log_indent_level as usize);
@@ -193,13 +202,14 @@ fn generate_entrance_connections_recursively(
     let entrance_id = state.next_entrance_id;
 
     if state.current_loop_start.is_none() {
-        log::trace!("{log_indent}Started new loop");
+        trace!(logger: log_capture, "{log_indent}Started new loop");
         state.current_loop_start = Some(entrance_id);
     }
 
     state.current_loop_size += 1;
 
-    log::trace!(
+    trace!(
+        logger: log_capture,
         "{log_indent}Entrance: {entrance_id}, Loop Size: {}",
         state.current_loop_size
     );
@@ -207,7 +217,10 @@ fn generate_entrance_connections_recursively(
     let mut possible_target_entrances: IndexSet<EntranceId> = IndexSet::new();
 
     if state.current_loop_size >= config.max_loop_size {
-        log::trace!("{log_indent}Reached max loop size, force closing loop");
+        trace!(
+            logger: log_capture,
+            "{log_indent}Reached max loop size, force closing loop"
+        );
         possible_target_entrances.insert(state.current_loop_start.unwrap());
     } else {
         let mut shuffled_remaining_groups = state.remaining_groups.iter().collect_vec();
@@ -226,7 +239,8 @@ fn generate_entrance_connections_recursively(
         possible_target_entrances.append(&mut other_entrances_without_incoming_connections);
     }
 
-    log::trace!(
+    trace!(
+        logger: log_capture,
         "{log_indent}Possible entrances: {}",
         possible_target_entrances
             .iter()
@@ -276,7 +290,7 @@ fn generate_entrance_connections_recursively(
         }
 
         if state.current_loop_start.unwrap() == target_entrance_id {
-            log::trace!("{log_indent}Ended loop");
+            trace!(logger: log_capture, "{log_indent}Ended loop");
             state.current_loop_start = None;
             state.current_loop_size = 0;
 
@@ -288,13 +302,14 @@ fn generate_entrance_connections_recursively(
                 .copied()
                 .collect_vec();
             {
-                log::trace!("{log_indent}Current connections:");
+                trace!(logger: log_capture, "{log_indent}Current connections:");
                 for (from_entrance, to_entrance) in &state.connections {
-                    log::trace!("{log_indent}  {from_entrance} → {to_entrance}");
+                    trace!(logger: log_capture, "{log_indent}  {from_entrance} → {to_entrance}");
                 }
             }
 
-            log::trace!(
+            trace!(
+                logger: log_capture,
                 "{log_indent}Possible next entrances: {}",
                 possible_next_entrances
                     .iter()
@@ -305,26 +320,40 @@ fn generate_entrance_connections_recursively(
             for possible_next_entrance_id in possible_next_entrances {
                 state.next_entrance_id = possible_next_entrance_id;
 
-                log::trace!("{log_indent}Trying {possible_next_entrance_id} as next entrance...");
-                if let Ok(state) = generate_entrance_connections_recursively(&state, config, rng) {
-                    log::trace!("{log_indent}Worked! {entrance_id} → {target_entrance_id}");
+                trace!(
+                    logger: log_capture,
+                    "{log_indent}Trying {possible_next_entrance_id} as next entrance..."
+                );
+                if let Ok(state) =
+                    generate_entrance_connections_recursively(&state, config, rng, log_capture)
+                {
+                    trace!(
+                        logger: log_capture,
+                        "{log_indent}Worked! {entrance_id} → {target_entrance_id}"
+                    );
                     return Ok(state);
                 }
 
-                log::trace!("{log_indent}Failed");
+                trace!(logger: log_capture, "{log_indent}Failed");
             }
         } else {
             state.next_entrance_id = target_entrance_id;
 
-            log::trace!(
+            trace!(
+                logger: log_capture,
                 "{log_indent}Trying target entrance as next entrance: {target_entrance_id}"
             );
-            if let Ok(state) = generate_entrance_connections_recursively(&state, config, rng) {
-                log::trace!("{log_indent}Worked! {entrance_id} → {target_entrance_id}");
+            if let Ok(state) =
+                generate_entrance_connections_recursively(&state, config, rng, log_capture)
+            {
+                trace!(
+                    logger: log_capture,
+                    "{log_indent}Worked! {entrance_id} → {target_entrance_id}"
+                );
                 return Ok(state);
             }
 
-            log::trace!("{log_indent}Failed");
+            trace!(logger: log_capture, "{log_indent}Failed");
         }
     }
 

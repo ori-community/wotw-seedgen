@@ -88,35 +88,35 @@ pub(crate) fn uber_state_type(
 }
 
 pub(crate) trait InferType<'source> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type>;
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type>;
 }
 
 impl<'source, T: InferType<'source>> InferType<'source> for Spanned<T> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         self.data.infer_type(compiler)
     }
 }
 
 impl<'source, T: InferType<'source>> InferType<'source> for Option<T> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         self.as_ref().and_then(|t| t.infer_type(compiler))
     }
 }
 
 impl<'source, T: InferType<'source>> InferType<'source> for Box<T> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         (**self).infer_type(compiler)
     }
 }
 
 impl<'source, T: InferType<'source>> InferType<'source> for Once<T> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         self.0.infer_type(compiler)
     }
 }
 
 impl<'source> InferType<'source> for Expression<'source> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         match self {
             Expression::Value(value) => value.infer_type(compiler),
             Expression::Operation(operation) => operation.infer_type(compiler),
@@ -125,7 +125,7 @@ impl<'source> InferType<'source> for Expression<'source> {
 }
 
 impl<'source> InferType<'source> for ExpressionValue<'source> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         match self {
             ExpressionValue::Group(group) => group.content.infer_type(compiler),
             ExpressionValue::Action(action) => action.infer_type(compiler),
@@ -136,7 +136,7 @@ impl<'source> InferType<'source> for ExpressionValue<'source> {
 }
 
 impl<'source> InferType<'source> for Action<'source> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         match self {
             Action::Function(function) => function.infer_type(compiler),
             _ => Some(Type::Action),
@@ -145,7 +145,7 @@ impl<'source> InferType<'source> for Action<'source> {
 }
 
 impl<'source> InferType<'source> for FunctionCall<'source> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         if let Some(function) = compiler.preprocessed.functions.get(self.identifier.data.0) {
             // TODO should void be used earlier here?
             return Some(function.signature.return_ty.unwrap_or(Type::Void));
@@ -292,7 +292,7 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
 impl<'source> Expression<'source> {
     pub(crate) fn uber_state_type(
         &self,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<UberStateType> {
         match self {
             Expression::Value(ExpressionValue::Literal(Spanned {
@@ -323,7 +323,7 @@ impl<'source> Expression<'source> {
 }
 
 impl<'source> InferType<'source> for Spanned<Identifier<'source>> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         compiler.resolve_variable(self).map(VariableValue::ty)
     }
 }
@@ -411,7 +411,7 @@ impl output::Command {
 }
 
 impl<'source> InferType<'source> for Operation<'source> {
-    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Option<Type> {
+    fn infer_type(&self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Option<Type> {
         match self.operator.data {
             Operator::Arithmetic(_) => compiler.common_type(&self.left, &self.right),
             Operator::Logic(_) | Operator::Comparator(_) => Some(Type::Boolean),

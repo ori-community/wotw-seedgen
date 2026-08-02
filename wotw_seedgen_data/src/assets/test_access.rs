@@ -193,14 +193,11 @@ fn graph(base: &DefaultAssetCacheValues, settings: &[WorldSettings]) -> Graph {
         .eprint_errors(&base.paths)
         .unwrap();
 
-    Graph::compile(
-        paths,
-        base.loc_data.clone(),
-        base.state_data.clone(),
-        settings,
-    )
-    .eprint_errors(&base.paths)
-    .unwrap()
+    Graph::compiler()
+        .with_settings(settings)
+        .compile(paths, base.loc_data.clone(), base.state_data.clone())
+        .eprint_errors(&base.paths)
+        .unwrap()
 }
 
 #[derive(Debug, Clone)]

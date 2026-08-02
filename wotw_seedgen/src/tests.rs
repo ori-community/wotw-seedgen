@@ -2,13 +2,12 @@ use crate::Generator;
 
 use log::info;
 use wotw_seedgen_data::{
-    Difficulty, UniverseSettings,
     assets::{
-        AssetCacheValues, AssetFileAccess, PresetAccess, TEST_ASSETS, UniversePreset,
-        UniversePresetSettings, WorldPresetSettings,
+        AssetCacheValues, AssetFileAccess, PresetAccess, UniversePreset, UniversePresetSettings,
+        WorldPresetSettings, TEST_ASSETS,
     },
     logic_language::{ast::Paths, output::Graph},
-    test_logger,
+    test_logger, Difficulty, UniverseSettings,
 };
 
 #[test]
@@ -31,26 +30,28 @@ fn some_seeds() {
     let paths = Paths::parse(&source.content).eprint_errors(source).unwrap();
 
     let mut universe_settings = UniverseSettings::new("0".to_string());
-    let mut graph = Graph::compile(
-        paths.clone(),
-        TEST_ASSETS.loc_data().unwrap(),
-        TEST_ASSETS.state_data().unwrap(),
-        &universe_settings.world_settings,
-    )
-    .parsed
-    .unwrap();
+    let mut graph = Graph::compiler()
+        .with_settings(&universe_settings.world_settings)
+        .compile(
+            paths.clone(),
+            TEST_ASSETS.loc_data().unwrap(),
+            TEST_ASSETS.state_data().unwrap(),
+        )
+        .parsed
+        .unwrap();
     info!("Testing Default settings");
     generate_test_seed(&graph, &universe_settings);
 
     universe_settings.world_settings[0].difficulty = Difficulty::Unsafe;
-    graph = Graph::compile(
-        paths,
-        TEST_ASSETS.loc_data().unwrap(),
-        TEST_ASSETS.state_data().unwrap(),
-        &universe_settings.world_settings,
-    )
-    .parsed
-    .unwrap();
+    graph = Graph::compiler()
+        .with_settings(&universe_settings.world_settings)
+        .compile(
+            paths,
+            TEST_ASSETS.loc_data().unwrap(),
+            TEST_ASSETS.state_data().unwrap(),
+        )
+        .parsed
+        .unwrap();
     info!("Testing Unsafe");
     generate_test_seed(&graph, &universe_settings);
 

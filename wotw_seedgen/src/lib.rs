@@ -9,6 +9,7 @@
 //! Relevant crates are re-exported here, e.g. you can access the [`wotw_seedgen_settings`] crate as `wotw_seedgen::settings`
 
 pub use wotw_seedgen_data as data;
+pub use wotw_seedgen_log_capture as log_capture;
 pub use wotw_seedgen_seed as seed;
 
 pub mod orbs;
@@ -19,6 +20,6 @@ mod logical_difficulty;
 mod tests;
 mod world;
 
-pub use generator::{Generator, SeedUniverse, item_pool, perf_data, spoiler};
+pub use generator::{item_pool, perf_data, spoiler, Generator, SeedUniverse};
 pub use logical_difficulty::LogicalDifficulty;
 pub use world::World;

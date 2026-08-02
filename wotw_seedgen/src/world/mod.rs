@@ -11,6 +11,7 @@ pub(crate) use reached::{
     ConnectionIndex, ConnectionOrRefill, ConnectionRequirement, ConnectionRequirementPartial,
     ReachStateFails,
 };
+use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
 
 use std::{
     fmt::{self, Display},
@@ -37,11 +38,9 @@ use wotw_seedgen_data::{
     Difficulty, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WorldSettings,
 };
 
-// TODO A stateful reach check would have some advantages, for instance currently seedgen would not correctly account for "Grant Launch on breaking this Wall"
-
 // TODO design interfaces instead of spamming pub(crate)?
 #[derive(Debug)]
-pub struct World<'graph, 'settings, 'perf> {
+pub struct World<'graph, 'settings, 'perf, 'log> {
     pub(crate) graph: &'graph Graph,
     pub(crate) spawn: usize,
     pub(crate) settings: &'settings WorldSettings,
@@ -49,6 +48,7 @@ pub struct World<'graph, 'settings, 'perf> {
     state: SimulationCache<WorldState>,
     reach_update_state: ReachUpdateState,
     perf_data: Option<&'perf PerfData<'graph>>,
+    pub(crate) log_capture: &'log LogCapture,
 }
 
 #[derive(Debug)]
@@ -58,7 +58,7 @@ enum ReachUpdateState {
     PendingOrbReset,
 }
 
-impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
+impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// Creates a new world with the given [`Graph`] and [`WorldSettings`]
     ///
     /// It will not start tracking reached locations until you [`World::traverse_spawn`]
@@ -68,7 +68,6 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
         settings: &'settings WorldSettings,
         uber_states: UberStates,
         events: &mut [Event],
-        perf_data: Option<&'perf PerfData<'graph>>,
     ) -> Self {
         Self {
             state: SimulationCache::new(WorldState::new(uber_states, events)),
@@ -77,8 +76,19 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
             settings,
             reach_update_state: ReachUpdateState::Idle,
             reach: Reach::new(graph),
-            perf_data,
+            perf_data: None,
+            log_capture: &NO_LOG_CAPTURE,
         }
+    }
+
+    pub fn with_perf_data(mut self, perf_data: Option<&'perf PerfData<'graph>>) -> Self {
+        self.perf_data = perf_data;
+        self
+    }
+
+    pub fn with_log_capture(mut self, log_capture: &'log LogCapture) -> Self {
+        self.log_capture = log_capture;
+        self
     }
 
     // TODO there are progressions where the requirements is a pure "Impossible". Are we not optimizing those away?
@@ -151,7 +161,7 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut events = [];
     /// let world_settings = WorldSettings::default();
-    /// let world = World::new(&graph, spawn, &world_settings, uber_states, &mut events, None);
+    /// let world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 5.0 };
     /// world.cap_orbs::<false>(&mut orbs);
@@ -174,7 +184,7 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
     /// # let mut output = CommandsOutput::NONE;
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events, None);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
     /// world.store_shard(Shard::Vitality, true, &output);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
@@ -209,7 +219,7 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events, None);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
     /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
@@ -247,7 +257,7 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events, None);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
     /// assert_eq!(world.health_plant_drops(), 1.0);
     ///
     /// world.add_base_max_health(40, &output);
@@ -505,12 +515,12 @@ impl<'graph, 'settings, 'perf> World<'graph, 'settings, 'perf> {
         f(self.settings.difficulty).filter(|weapon| self.skill(*weapon))
     }
 
-    pub fn inventory_display(&self) -> InventoryDisplay<'_, 'graph, 'settings, 'perf> {
+    pub fn inventory_display(&self) -> InventoryDisplay<'_, 'graph, 'settings, 'perf, 'log> {
         InventoryDisplay { world: self }
     }
 }
 
-impl Simulation for World<'_, '_, '_> {
+impl Simulation for World<'_, '_, '_, '_> {
     fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
         self.state.fetch(uber_identifier)
     }
@@ -629,7 +639,7 @@ impl Simulation for World<'_, '_, '_> {
     }
 }
 
-impl Snapshot for World<'_, '_, '_> {
+impl Snapshot for World<'_, '_, '_, '_> {
     fn snapshot(&mut self) {
         self.state.snapshot();
         self.reach.snapshot();
@@ -641,11 +651,11 @@ impl Snapshot for World<'_, '_, '_> {
     }
 }
 
-pub struct InventoryDisplay<'world, 'graph, 'settings, 'perf> {
-    world: &'world World<'graph, 'settings, 'perf>,
+pub struct InventoryDisplay<'world, 'graph, 'settings, 'perf, 'log> {
+    world: &'world World<'graph, 'settings, 'perf, 'log>,
 }
 
-impl Display for InventoryDisplay<'_, '_, '_, '_> {
+impl Display for InventoryDisplay<'_, '_, '_, '_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fn comma(f: &mut fmt::Formatter<'_>, first: &mut bool) -> fmt::Result {
             if mem::take(first) {

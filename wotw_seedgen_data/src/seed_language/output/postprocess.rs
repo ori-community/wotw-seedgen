@@ -60,14 +60,14 @@ pub struct PlaceholderMap {
     pub strings: FxHashMap<StringOrPlaceholder, CommandString>,
 }
 
-pub struct UniversePostprocessor<'output, 'locdata> {
-    worlds: Vec<WorldPostprocessor<'output>>,
+pub struct UniversePostprocessor<'output, 'locdata, 'log> {
+    worlds: Vec<WorldPostprocessor<'output, 'log>>,
     loc_data_triggers: LocDataTriggers<'locdata>,
     multiworld_lookup: MultiworldLookup<'output>,
 }
 
-struct WorldPostprocessor<'output> {
-    output: &'output IntermediateOutput,
+struct WorldPostprocessor<'output, 'log> {
+    output: &'output IntermediateOutput<'log>,
     loc_data_events: IndexMap<&'output Trigger, Vec<&'output Event>, FxBuildHasher>,
 }
 
@@ -87,8 +87,11 @@ struct MultiworldEvent<'output> {
     target_command: &'output CommandVoid,
 }
 
-impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
-    pub fn new(worlds: &'output [&mut IntermediateOutput], loc_data: &'locdata LocData) -> Self {
+impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
+    pub fn new(
+        worlds: &'output [&mut IntermediateOutput<'log>],
+        loc_data: &'locdata LocData,
+    ) -> Self {
         let loc_data_triggers = LocDataTriggers::new(loc_data);
         let multiworld_lookup = MultiworldLookup::new(worlds);
         let worlds = worlds
@@ -297,8 +300,8 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
     fn find_metadata(
         &self,
         events: &[&'output Event],
-        origin_world: &WorldPostprocessor<'output>,
-    ) -> (CommandString, Vec<ItemMetadataRef<'output, 'output>>) {
+        origin_world: &WorldPostprocessor<'output, 'log>,
+    ) -> (CommandString, Vec<ItemMetadataRef<'output, 'output, 'log>>) {
         let mut matches = vec![];
 
         let names = events.iter().filter_map(|event| {
@@ -339,7 +342,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         &self,
         uber_identifier: UberIdentifier,
         name: CommandString,
-        matches: &[ItemMetadataRef<'output, 'output>],
+        matches: &[ItemMetadataRef<'_, '_, '_>],
         price_noise: &PriceNoise,
         rng: &mut Pcg64Mcg,
         extra_events: &mut Vec<Event>,
@@ -396,7 +399,7 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
         trigger: &Trigger,
         map_position: Position,
         name: CommandString,
-        matches: &[ItemMetadataRef<'output, 'output>],
+        matches: &[ItemMetadataRef<'_, '_, '_>],
         extra_events: &mut Vec<Event>,
     ) {
         let icon = matches
@@ -426,8 +429,8 @@ impl<'output, 'locdata> UniversePostprocessor<'output, 'locdata> {
     }
 }
 
-impl<'output> WorldPostprocessor<'output> {
-    fn new(output: &'output IntermediateOutput, loc_data_triggers: &LocDataTriggers) -> Self {
+impl<'output, 'log> WorldPostprocessor<'output, 'log> {
+    fn new(output: &'output IntermediateOutput<'log>, loc_data_triggers: &LocDataTriggers) -> Self {
         let mut loc_data_events = IndexMap::<_, Vec<_>, FxBuildHasher>::default();
 
         for event in output
@@ -614,15 +617,17 @@ trait ResolvePlaceholders {
     fn resolve(&self, context: &mut ResolveContext);
 }
 
-struct ResolveContext<'postprocessor, 'output, 'locdata> {
-    postprocessor: &'postprocessor UniversePostprocessor<'output, 'locdata>,
+struct ResolveContext<'postprocessor, 'output, 'locdata, 'log> {
+    postprocessor: &'postprocessor UniversePostprocessor<'output, 'locdata, 'log>,
     world_index: usize,
     placeholder_map: PlaceholderMap,
 }
 
-impl<'postprocessor, 'output, 'locdata> ResolveContext<'postprocessor, 'output, 'locdata> {
+impl<'postprocessor, 'output, 'locdata, 'log>
+    ResolveContext<'postprocessor, 'output, 'locdata, 'log>
+{
     fn new(
-        postprocessor: &'postprocessor UniversePostprocessor<'output, 'locdata>,
+        postprocessor: &'postprocessor UniversePostprocessor<'output, 'locdata, 'log>,
         world_index: usize,
     ) -> Self {
         Self {
@@ -656,7 +661,7 @@ impl<Item: ResolvePlaceholders, Operator> ResolvePlaceholders for Operation<Item
     }
 }
 
-impl ResolvePlaceholders for IntermediateOutput {
+impl ResolvePlaceholders for IntermediateOutput<'_> {
     fn resolve(&self, context: &mut ResolveContext) {
         self.commands.resolve(context);
     }

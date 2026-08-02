@@ -154,13 +154,14 @@ fn compile() {
         .eprint_errors(&source)
         .unwrap();
 
-    let Some(graph) = Graph::compile(
-        paths,
-        TestAccess.loc_data().unwrap(),
-        TestAccess.state_data().unwrap(),
-        &[],
-    )
-    .eprint_errors(&source) else {
+    let Some(graph) = Graph::compiler()
+        .compile(
+            paths,
+            TestAccess.loc_data().unwrap(),
+            TestAccess.state_data().unwrap(),
+        )
+        .eprint_errors(&source)
+    else {
         panic!("Failed to parse paths.wotwl");
     };
 

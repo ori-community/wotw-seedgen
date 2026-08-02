@@ -15,6 +15,7 @@ use crate::{
     WorldSettingsHelpers,
 };
 use rustc_hash::FxHashMap;
+use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
 use wotw_seedgen_parse::{
     AsItem, Error, ErrorKind, ParseResult, Recover, Recoverable, Result, Separated,
     SeparatedNonEmptyGeneric, Span, Spanned, SpannedOption,
@@ -27,12 +28,42 @@ use wotw_seedgen_parse::{
 // check for implicit moki
 
 impl Graph {
-    /// `settings` is used for optimization, you may pass an empty slice if you don't know the settings this `Graph` will be used for
+    pub fn compiler() -> CompilerConfig<'static, 'static> {
+        CompilerConfig::new()
+    }
+}
+
+pub struct CompilerConfig<'settings, 'log> {
+    settings: &'settings [WorldSettings],
+    log_capture: &'log LogCapture,
+}
+
+impl CompilerConfig<'static, 'static> {
+    pub const fn new() -> Self {
+        Self {
+            settings: &[],
+            log_capture: &NO_LOG_CAPTURE,
+        }
+    }
+}
+
+impl<'settings, 'log> CompilerConfig<'settings, 'log> {
+    /// `settings` used for optimization
+    pub const fn with_settings(mut self, settings: &'settings [WorldSettings]) -> Self {
+        self.settings = settings;
+        self
+    }
+
+    pub const fn with_log_capture(mut self, log_capture: &'log LogCapture) -> Self {
+        self.log_capture = log_capture;
+        self
+    }
+
     pub fn compile(
+        self,
         mut paths: ast::Paths,
         loc_data: LocData,
         state_data: StateData,
-        settings: &[WorldSettings],
     ) -> ParseResult<Graph> {
         let loc_data_nodes = loc_data
             .entries
@@ -46,7 +77,13 @@ impl Graph {
             .map(Node::State)
             .collect::<Vec<_>>();
 
-        let mut compiler = Compiler::new(&mut paths, &loc_data_nodes, &state_data_nodes, settings);
+        let mut compiler = Compiler::new(
+            &mut paths,
+            &loc_data_nodes,
+            &state_data_nodes,
+            self.settings,
+            self.log_capture,
+        );
 
         paths.contents.compile(&mut compiler);
         compiler.generate_entrance_connections();
@@ -74,7 +111,7 @@ impl Graph {
             default_entrance_connections,
         };
 
-        graph.optimize();
+        graph.optimize(self.log_capture);
 
         ParseResult {
             parsed: Some(graph),
@@ -83,7 +120,7 @@ impl Graph {
     }
 }
 
-struct Compiler<'source> {
+struct Compiler<'source, 'log> {
     nodes: Vec<Node>,
     extern_requirements: Vec<Requirement>,
     index_offset: usize,
@@ -98,14 +135,16 @@ struct Compiler<'source> {
     extern_requirement_map: FxHashMap<String, usize>,
     regions: FxHashMap<String, Requirement>,
     errors: Vec<Error>,
+    log_capture: &'log LogCapture,
 }
 
-impl<'source> Compiler<'source> {
+impl<'source, 'log> Compiler<'source, 'log> {
     fn new(
         paths: &mut ast::Paths,
         loc_data_nodes: &'source [Node],
         state_data_nodes: &'source [Node],
         settings: &[WorldSettings],
+        log_capture: &'log LogCapture,
     ) -> Self {
         let hard_requirement = setting_requirement(
             settings,
@@ -258,6 +297,7 @@ impl<'source> Compiler<'source> {
             extern_requirement_map,
             regions: FxHashMap::default(),
             errors,
+            log_capture,
         }
     }
 
@@ -702,7 +742,7 @@ impl Compile for ast::Region<'_> {
                 .map_or(Requirement::Impossible, Requirement::or);
 
             // Region requirements are instantiated often, we'd rather optimize it once here
-            requirement.optimize();
+            requirement.optimize(compiler.log_capture);
 
             compiler
                 .regions

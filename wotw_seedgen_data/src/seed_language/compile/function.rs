@@ -137,9 +137,9 @@ pub fn weapon_upgrade(weapon_upgrade: WeaponUpgrade) -> CommandVoid {
     }
 }
 
-struct ArgContext<'a, 'source, 'compiler, 'snippets, 'uberstates> {
+struct ArgContext<'a, 'source, 'compiler, 'snippets, 'uberstates, 'log> {
     parameters: <ast::Punctuated<ast::Expression<'source>, ','> as IntoIterator>::IntoIter,
-    compiler: &'a mut SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates>,
+    compiler: &'a mut SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates, 'log>,
 }
 
 fn arg<T: CompileInto>(context: &mut ArgContext) -> Option<T> {
@@ -577,7 +577,7 @@ impl<'source> ast::FunctionCall<'source> {
     fn compile_custom_function(
         self,
         function: PreprocessedFunction,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<Command> {
         let parameters = self.parameters.content?;
 
@@ -630,12 +630,12 @@ impl<'source> ast::FunctionCall<'source> {
         }))
     }
 
-    fn compile_signature<'a, 'compiler, 'snippets, 'uberstates>(
+    fn compile_signature<'a, 'compiler, 'snippets, 'uberstates, 'log>(
         self,
-        compiler: &'a mut SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates>,
+        compiler: &'a mut SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates, 'log>,
     ) -> Option<(
         FunctionIdentifier,
-        ArgContext<'a, 'source, 'compiler, 'snippets, 'uberstates>,
+        ArgContext<'a, 'source, 'compiler, 'snippets, 'uberstates, 'log>,
     )> {
         let identifier = compiler.consume_result(
             self.identifier
@@ -664,7 +664,7 @@ impl<'source> ast::FunctionCall<'source> {
     }
 }
 
-impl SnippetCompiler<'_, '_, '_, '_> {
+impl SnippetCompiler<'_, '_, '_, '_, '_> {
     fn check_arg_count(
         &mut self,
         open: &Spanned<Symbol<'('>>,
@@ -698,7 +698,7 @@ impl SnippetCompiler<'_, '_, '_, '_> {
 impl<'source> Compile<'source> for ast::FunctionCall<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         if let Some(function) = compiler.preprocessed.functions.get(self.identifier.data.0) {
             return self.compile_custom_function(function.clone(), compiler);
         }

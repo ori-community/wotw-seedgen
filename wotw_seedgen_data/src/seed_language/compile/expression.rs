@@ -45,7 +45,7 @@ impl Command {
 impl<'source> ast::Expression<'source> {
     pub(crate) fn compile_into<T: CompileInto>(
         self,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<T> {
         match self {
             ast::Expression::Value(value) => value.compile_into(compiler),
@@ -57,7 +57,7 @@ impl<'source> ast::Expression<'source> {
 impl<'source> ast::ExpressionValue<'source> {
     pub(crate) fn compile_into<T: CompileInto>(
         self,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<T> {
         match self {
             ast::ExpressionValue::Group(group) => group.content?.0.compile_into(compiler),
@@ -74,7 +74,7 @@ impl<'source> ast::ExpressionValue<'source> {
 impl<'source> Compile<'source> for ast::Operation<'source> {
     type Output = Option<Command>;
 
-    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         match self.operator.data {
             ast::Operator::Arithmetic(operator) => {
                 let operator = operator.compile(compiler);
@@ -160,7 +160,7 @@ impl<'source> ast::Operation<'source> {
     fn compile_operation<Item, Operator, Output>(
         self,
         operator: Operator,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<Output>
     where
         Item: CompileInto + IntoConstant,
@@ -196,7 +196,7 @@ impl<'source> ast::Operation<'source> {
 impl<'source> Compile<'source> for ast::ArithmeticOperator {
     type Output = ArithmeticOperator;
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         match self {
             ast::ArithmeticOperator::Add => ArithmeticOperator::Add,
             ast::ArithmeticOperator::Subtract => ArithmeticOperator::Subtract,
@@ -209,7 +209,7 @@ impl<'source> Compile<'source> for ast::ArithmeticOperator {
 impl<'source> Compile<'source> for ast::LogicOperator {
     type Output = LogicOperator;
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         match self {
             ast::LogicOperator::And => LogicOperator::And,
             ast::LogicOperator::Or => LogicOperator::Or,
@@ -220,7 +220,7 @@ impl<'source> Compile<'source> for ast::LogicOperator {
 impl<'source> Compile<'source> for ast::Comparator {
     type Output = Comparator;
 
-    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_>) -> Self::Output {
+    fn compile(self, _compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         match self {
             ast::Comparator::Equal => Comparator::Equal,
             ast::Comparator::NotEqual => Comparator::NotEqual,
@@ -263,14 +263,14 @@ pub(crate) trait CompileInto: Sized {
 
     fn compile_action<'source>(
         action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<Self> {
         Self::compile_command(action, compiler)
     }
 
     fn compile_command<'source, T>(
         ast: T,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<Self>
     where
         T: Compile<'source, Output = Option<Command>> + Span,
@@ -285,7 +285,7 @@ pub(crate) trait CompileInto: Sized {
 
     fn compile_literal<'source>(
         literal: Spanned<ast::Literal<'source>>,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<Self> {
         Self::coerce_literal(literal.data.compile(compiler)?, literal.span, compiler)
     }
@@ -651,7 +651,7 @@ impl CompileInto for usize {
 
     fn compile_action<'source>(
         action: ast::Action<'source>,
-        compiler: &mut SnippetCompiler<'source, '_, '_, '_>,
+        compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
     ) -> Option<Self> {
         let span = action.span();
         let command = action.compile(compiler)?.expect_void(compiler, span)?;

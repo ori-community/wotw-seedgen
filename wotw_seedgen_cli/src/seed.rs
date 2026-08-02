@@ -216,7 +216,9 @@ pub fn graph(
     state_data: StateData,
     settings: &[WorldSettings],
 ) -> Result<Graph, Error> {
-    Graph::compile(paths, loc_data, state_data, settings)
+    Graph::compiler()
+        .with_settings(settings)
+        .compile(paths, loc_data, state_data)
         .eprint_errors(source)
         .ok_or_else(|| Error("failed to compile graph".to_string()))
 }

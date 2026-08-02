@@ -288,7 +288,7 @@ impl<'graph> ConnectionIndex<'graph> {
 
     pub(crate) fn is_met(
         &mut self,
-        world: &World<'graph, '_, '_>,
+        world: &World<'graph, '_, '_, '_>,
         orb_variants: &mut OrbVariants,
     ) -> ControlFlow<Missing<'graph>> {
         if let ConnectionRequirement::Partial(partial) = &self.requirement {
@@ -364,7 +364,7 @@ impl<'graph> ConnectionOrRefill<'graph> {
     }
 }
 
-impl<'graph> World<'graph, '_, '_> {
+impl<'graph> World<'graph, '_, '_, '_> {
     #[inline]
     pub fn reached_indices(&self) -> impl Iterator<Item = usize> + use<'_> {
         self.reach.state.best_orbs.keys().copied()
@@ -430,14 +430,14 @@ impl<'graph> World<'graph, '_, '_> {
         match self.graph.find_node(identifier) {
             Ok(index) => {
                 if self.graph.nodes[index].is_anchor() {
-                    warn!("Attempted to set anchor \"{identifier}\" as logical state");
+                    warn!(logger: self.log_capture, "Attempted to set anchor \"{identifier}\" as logical state");
                 } else {
                     let mut best_orbs = BestOrbs::placeholder();
                     best_orbs.do_not_clear();
                     self.reach.state.best_orbs.insert(index, best_orbs);
                 }
             }
-            Err(err) => warn!("Cannot set logical state: {err}"),
+            Err(err) => warn!(logger: self.log_capture, "Cannot set logical state: {err}"),
         }
     }
 
@@ -511,6 +511,7 @@ impl<'graph> World<'graph, '_, '_> {
         output: &CommandsOutput,
     ) {
         trace!(
+            logger: self.log_capture,
             "updating reach for {uber_identifier} with {inventory}",
             inventory = self.inventory_display(),
         );
@@ -523,7 +524,7 @@ impl<'graph> World<'graph, '_, '_> {
         self.check_states_for(uber_identifier);
 
         if let Some(fails) = self.reach.state.fails.uber_state.remove(&uber_identifier) {
-            trace!("removed {uber_identifier} from UberState fails");
+            trace!(logger: self.log_capture, "removed {uber_identifier} from UberState fails");
             for fail in fails {
                 self.progress(fail, output);
             }
@@ -537,7 +538,7 @@ impl<'graph> World<'graph, '_, '_> {
 
         if was_idle {
             if matches!(self.reach_update_state, ReachUpdateState::PendingOrbReset) {
-                trace!("resetting reach after orb change");
+                trace!(logger: self.log_capture, "resetting reach after orb change");
 
                 self.reach.state.clear();
 
@@ -565,6 +566,7 @@ impl<'graph> World<'graph, '_, '_> {
 
             if !logic_states.is_empty() {
                 trace!(
+                    logger: self.log_capture,
                     "checking states for {uber_identifier}: {}",
                     logic_states
                         .iter()
@@ -622,6 +624,7 @@ impl<'graph> World<'graph, '_, '_> {
         let node = &self.graph.nodes[node_index];
 
         trace!(
+            logger: self.log_capture,
             "{identifier} reached with {orb_variants}",
             identifier = node.identifier(),
         );
@@ -743,6 +746,7 @@ impl<'graph> World<'graph, '_, '_> {
         };
 
         trace!(
+            logger: self.log_capture,
             "attempting connection {}",
             connection_index.display(self.graph)
         );
@@ -775,11 +779,11 @@ impl<'graph> World<'graph, '_, '_> {
                         .iter()
                         .any(|previous_orbs| previous_orbs >= new_orbs)
                 }) {
-                    trace!("improving {display}");
+                    trace!(logger: self.log_capture, "improving {display}");
 
                     target_orbs = new_orbs;
                 } else {
-                    trace!("cannot improve {display}");
+                    trace!(logger: self.log_capture, "cannot improve {display}");
 
                     return;
                 }
@@ -825,7 +829,7 @@ impl<'graph> World<'graph, '_, '_> {
         match connection.is_met(self, &mut orb_variants) {
             ControlFlow::Continue(()) => Some(orb_variants),
             ControlFlow::Break(missing) => {
-                trace!("missing {missing}");
+                trace!(logger: self.log_capture, "missing {missing}");
                 self.add_fail(missing, connection);
                 None
             }

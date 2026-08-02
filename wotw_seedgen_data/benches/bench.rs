@@ -2,7 +2,6 @@ use std::{slice, sync::LazyLock};
 
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand_pcg::Pcg64Mcg;
-use rustc_hash::FxHashMap;
 use wotw_seedgen_data::{
     assets::{AssetCacheValues, AssetFileAccess, SnippetAccess, TEST_ASSETS},
     logic_language::{ast::Paths, output::Graph},
@@ -34,12 +33,9 @@ fn logic_assets(c: &mut Criterion) {
 
     group.bench_function("compile", |b| {
         b.iter(|| {
-            Graph::compile(
-                paths.clone(),
-                loc_data.clone(),
-                state_data.clone(),
-                slice::from_ref(&settings),
-            )
+            Graph::compiler()
+                .with_settings(slice::from_ref(&settings))
+                .compile(paths.clone(), loc_data.clone(), state_data.clone())
         })
     });
 
@@ -75,11 +71,8 @@ fn snippets(c: &mut Criterion) {
                 &mut rng,
                 &*TEST_ASSETS,
                 TEST_ASSETS.values.uber_state_data(),
-                FxHashMap::default(),
-                None,
-                true,
-                false,
-            );
+            )
+            .with_lint(true);
 
             for identifier in &available_snippets {
                 compiler.compile_snippet(identifier).unwrap();
@@ -132,10 +125,6 @@ fn simulation(c: &mut Criterion) {
         &mut Pcg64Mcg::new(0),
         &*TEST_ASSETS,
         TEST_ASSETS.values.uber_state_data(),
-        FxHashMap::default(),
-        None,
-        false,
-        false,
     );
     compiler.compile_snippet("launch_fragments").unwrap();
     let output = compiler.finish().output;

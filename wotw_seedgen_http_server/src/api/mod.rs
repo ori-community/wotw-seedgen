@@ -4,9 +4,9 @@ use axum::{
     extract::{Query, State},
     routing::post,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tower_http::cors::{Any, CorsLayer};
-use utoipa::{IntoParams, OpenApi, openapi};
+use utoipa::{IntoParams, OpenApi, ToSchema, openapi};
 use utoipa_swagger_ui::SwaggerUi;
 use wotw_seedgen::data::UniverseSettings;
 
@@ -47,7 +47,9 @@ pub fn router(cache: RouterState) -> Router {
         (path = settings::SETTINGS, api = settings::Docs, tags = [settings::TAG]),
         (path = presets::PRESETS, api = presets::Docs, tags = [presets::TAG]),
         (path = snippets::SNIPPETS, api = snippets::Docs, tags = [snippets::TAG]),
-    )
+    ),
+    // manually add things here that get missed by automatic collection
+    components(schemas(LogLevelFilter)),
 )]
 struct Docs;
 
@@ -92,7 +94,15 @@ impl Docs {
 ///     worlds: [ +bstr ],
 ///     ? json_spoiler: tstr,
 ///     ? text_spoiler: tstr,
+///     logs: [ *record ],
 /// }
+///
+/// record = {
+///     level: level,
+///     message: tstr
+/// }
+///
+/// level = "ERROR" / "WARN" / "INFO" / "DEBUG" / "TRACE"
 /// ```
 #[utoipa::path(
     post,
@@ -120,4 +130,31 @@ async fn generate(
 pub struct GenerateQuery {
     pub json_spoiler: Option<bool>,
     pub text_spoiler: Option<bool>,
+    pub max_log_level: Option<LogLevelFilter>,
+}
+
+#[derive(Default, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "UPPERCASE")]
+#[schema(default = LogLevelFilter::default)]
+pub enum LogLevelFilter {
+    Off,
+    Error,
+    Warn,
+    #[default]
+    Info,
+    Debug,
+    Trace,
+}
+
+impl From<LogLevelFilter> for log::LevelFilter {
+    fn from(value: LogLevelFilter) -> Self {
+        match value {
+            LogLevelFilter::Off => log::LevelFilter::Off,
+            LogLevelFilter::Error => log::LevelFilter::Error,
+            LogLevelFilter::Warn => log::LevelFilter::Warn,
+            LogLevelFilter::Info => log::LevelFilter::Info,
+            LogLevelFilter::Debug => log::LevelFilter::Debug,
+            LogLevelFilter::Trace => log::LevelFilter::Trace,
+        }
+    }
 }

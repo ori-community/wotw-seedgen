@@ -19,7 +19,7 @@ pub fn empty_test_world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
     spawn: &str,
-) -> World<'graph, 'settings, 'graph> {
+) -> World<'graph, 'settings, 'graph, 'static> {
     let mut world = test_world(graph, settings, spawn);
 
     world.store_base_max_health(0, &CommandsOutput::NONE);
@@ -33,7 +33,7 @@ pub fn test_world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
     spawn: &str,
-) -> World<'graph, 'settings, 'graph> {
+) -> World<'graph, 'settings, 'graph, 'static> {
     let spawn = graph.find_node(spawn).unwrap();
     World::new(
         graph,
@@ -41,7 +41,6 @@ pub fn test_world<'graph, 'settings>(
         settings,
         TEST_ASSETS.uber_states.clone(),
         &mut [],
-        None,
     )
 }
 

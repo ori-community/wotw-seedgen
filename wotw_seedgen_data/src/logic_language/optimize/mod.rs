@@ -12,6 +12,7 @@ use std::{
 
 use itertools::Itertools;
 use log::{debug, log_enabled, trace, Level::Debug};
+use wotw_seedgen_log_capture::LogCapture;
 
 use crate::{
     logic_language::output::{Anchor, Connection, Entrance, Graph, Node, Refill, Requirement},
@@ -20,42 +21,42 @@ use crate::{
 };
 
 impl Graph {
-    pub fn optimize(&mut self) {
-        self.nodes.optimize();
-        self.extern_requirements.optimize();
+    pub fn optimize(&mut self, log_capture: &LogCapture) {
+        self.nodes.optimize(log_capture);
+        self.extern_requirements.optimize(log_capture);
     }
 }
 
 pub trait Optimize {
-    fn optimize(&mut self);
+    fn optimize(&mut self, log_capture: &LogCapture);
 }
 
 impl<T: Optimize> Optimize for Option<T> {
-    fn optimize(&mut self) {
+    fn optimize(&mut self, log_capture: &LogCapture) {
         if let Some(t) = self {
-            t.optimize();
+            t.optimize(log_capture);
         }
     }
 }
 
 impl<T: Optimize> Optimize for Vec<T> {
-    fn optimize(&mut self) {
+    fn optimize(&mut self, log_capture: &LogCapture) {
         for t in self {
-            t.optimize();
+            t.optimize(log_capture);
         }
     }
 }
 
 impl Optimize for Node {
-    fn optimize(&mut self) {
+    fn optimize(&mut self, log_capture: &LogCapture) {
         if let Node::Anchor(anchor) = self {
-            anchor.optimize();
+            anchor.optimize(log_capture);
         }
     }
 }
 
 impl Optimize for Anchor {
-    fn optimize(&mut self) {
+    fn optimize(&mut self, log_capture: &LogCapture) {
         let Self {
             identifier,
             position: _,
@@ -66,49 +67,49 @@ impl Optimize for Anchor {
             connections,
         } = self;
 
-        trace!("optimizing {identifier}");
+        trace!(logger: log_capture, "optimizing {identifier}");
 
-        entrance.optimize();
-        teleport_restriction.optimize();
+        entrance.optimize(log_capture);
+        teleport_restriction.optimize(log_capture);
 
-        refills.optimize();
+        refills.optimize(log_capture);
         refills.retain(|refill| !matches!(refill.requirement, Requirement::Impossible));
         refills.shrink_to_fit();
 
-        connections.optimize();
+        connections.optimize(log_capture);
         connections.retain(|connection| !matches!(connection.requirement, Requirement::Impossible));
         connections.shrink_to_fit();
     }
 }
 
 impl Optimize for Entrance {
-    fn optimize(&mut self) {
-        self.requirement.optimize();
+    fn optimize(&mut self, log_capture: &LogCapture) {
+        self.requirement.optimize(log_capture);
     }
 }
 
 impl Optimize for Refill {
-    fn optimize(&mut self) {
-        self.requirement.optimize();
+    fn optimize(&mut self, log_capture: &LogCapture) {
+        self.requirement.optimize(log_capture);
     }
 }
 
 impl Optimize for Connection {
-    fn optimize(&mut self) {
-        self.requirement.optimize();
+    fn optimize(&mut self, log_capture: &LogCapture) {
+        self.requirement.optimize(log_capture);
     }
 }
 
 impl Optimize for Requirement {
-    fn optimize(&mut self) {
+    fn optimize(&mut self, log_capture: &LogCapture) {
         if !matches!(self, Self::And(_) | Self::Or(_)) {
             return;
         }
 
-        let before = log_enabled!(Debug).then(|| {
+        let before = log_enabled!(logger: log_capture, Debug).then(|| {
             let before = self.to_string();
 
-            trace!("optimizing {before}");
+            trace!(logger: log_capture, "optimizing {before}");
 
             before
         });
@@ -121,7 +122,7 @@ impl Optimize for Requirement {
                 while index < ands.len() {
                     let and = &mut ands[index];
 
-                    and.optimize();
+                    and.optimize(log_capture);
 
                     if let Self::And(nested) = and {
                         let nested = mem::take(nested);
@@ -133,16 +134,16 @@ impl Optimize for Requirement {
                     }
                 }
             }
-            Self::Or(_) => self.optimize_or(),
+            Self::Or(_) => self.optimize_or(log_capture),
             _ => unreachable!(),
         }
 
         self.improve_order();
 
-        trace!("improved order: -> {self}");
+        trace!(logger: log_capture, "improved order: -> {self}");
 
         if let Some(before) = &before {
-            debug!("optimized {before} -> {self}");
+            debug!(logger: log_capture, "optimized {before} -> {self}");
         }
     }
 }
@@ -170,23 +171,23 @@ macro_rules! debug_assert_shape {
 }
 
 impl Requirement {
-    fn optimize_or(&mut self) {
+    fn optimize_or(&mut self, log_capture: &LogCapture) {
         self.disjunctive_normal_form();
 
-        trace!("disjunctive normal form: -> {self}");
+        trace!(logger: log_capture, "disjunctive normal form: -> {self}");
 
         self.normalize_order();
 
-        trace!("normalized order: -> {self}");
+        trace!(logger: log_capture, "normalized order: -> {self}");
 
-        self.dedup_literals();
-        self.filter_redundant_conjunctions();
+        self.dedup_literals(log_capture);
+        self.filter_redundant_conjunctions(log_capture);
 
-        trace!("filtered redundant ors: -> {self}");
+        trace!(logger: log_capture, "filtered redundant ors: -> {self}");
 
-        self.heuristically_apply_associativity();
+        self.heuristically_apply_associativity(log_capture);
 
-        trace!("applied associativity: -> {self}");
+        trace!(logger: log_capture, "applied associativity: -> {self}");
     }
 
     /// Transforms the `Requirement` into [disjunctive normal form](https://en.wikipedia.org/wiki/Disjunctive_normal_form).
@@ -445,11 +446,11 @@ impl Requirement {
     ///
     /// - [`Requirement::disjunctive_normal_form`] (is preserved)
     /// - [`Requirement::normalize_order`] **(not preserved since the length of conjunctions may change)**
-    fn dedup_literals(&mut self) {
+    fn dedup_literals(&mut self, log_capture: &LogCapture) {
         debug_assert_shape!(dedup_literals(self): is_disjunctive_normal_form, is_normalized_order);
 
         #[inline]
-        fn dedup_impl(literals: &mut Vec<Requirement>) {
+        fn dedup_impl(literals: &mut Vec<Requirement>, log_capture: &LogCapture) {
             // Adapted from SmallVec::dedup
 
             let mut write: usize = 1;
@@ -464,6 +465,7 @@ impl Requirement {
 
                 if literal_read == &literals[write - 1] {
                     trace!(
+                        logger: log_capture,
                         "removing duplicate {literal_read} from {}",
                         literals.iter().format(" & ")
                     );
@@ -478,7 +480,7 @@ impl Requirement {
 
         match self {
             Self::And(literals) => {
-                dedup_impl(literals);
+                dedup_impl(literals, log_capture);
 
                 // Yes, this happens sometimes oriLol
                 if literals.len() == 1 {
@@ -487,7 +489,7 @@ impl Requirement {
             }
             Self::Or(conjunctions) => {
                 for conjunction in conjunctions.iter_mut() {
-                    conjunction.dedup_literals();
+                    conjunction.dedup_literals(log_capture);
                 }
 
                 // Redundant conjunctions will be caught by `filter_redundant_conjunctions`
@@ -501,7 +503,7 @@ impl Requirement {
     /// # Prerequisites
     ///
     /// - [`Requirement::disjunctive_normal_form`] (is preserved)
-    fn filter_redundant_conjunctions(&mut self) {
+    fn filter_redundant_conjunctions(&mut self, log_capture: &LogCapture) {
         debug_assert_shape!(filter_redundant_conjunctions(self): is_disjunctive_normal_form);
 
         let Self::Or(conjunctions) = self else {
@@ -521,12 +523,12 @@ impl Requirement {
             {
                 match head.logical_cmp_conjunctions(tail_item) {
                     Some(Ordering::Less) => {
-                        trace!("{tail_item} is redundant with {head}");
+                        trace!(logger: log_capture, "{tail_item} is redundant with {head}");
 
                         *tail_item = Self::Impossible;
                     }
                     Some(Ordering::Equal | Ordering::Greater) => {
-                        trace!("{head} is redundant with {tail_item}");
+                        trace!(logger: log_capture, "{head} is redundant with {tail_item}");
 
                         *head = Self::Impossible;
 
@@ -709,7 +711,7 @@ impl Requirement {
     /// Tries to create nested groups to avoid redundant checks across or branches.
     ///
     /// This basically undoes [`Requirement::disjunctive_normal_form`] but chooses new groups that seem appropriate after optimizations.
-    fn heuristically_apply_associativity(&mut self) {
+    fn heuristically_apply_associativity(&mut self, log_capture: &LogCapture) {
         let Self::Or(ors) = self else { return };
 
         // Ideal use of associativity can be difficult:
@@ -722,14 +724,14 @@ impl Requirement {
         // Once we expand the example to (Dash & Glide) | (Dash & DoubleJump) | (Dash & Damage=10) | (Glide & Damage=10)
         // it starts becoming extremely ambiguous. This is why we follow a path of heuristics.
 
-        factor_out_orb_changes(ors);
+        factor_out_orb_changes(ors, log_capture);
 
         loop {
-            if !factor_out_non_orb_changes(ors) {
+            if !factor_out_non_orb_changes(ors, log_capture) {
                 break;
             }
 
-            if !factor_out_orb_changes(ors) {
+            if !factor_out_orb_changes(ors, log_capture) {
                 break;
             }
         }
@@ -1095,8 +1097,8 @@ fn remove_and(ands: &mut Vec<Requirement>, index: usize) -> ControlFlow<Requirem
     }
 }
 
-fn factor_out_orb_changes(ors: &mut Vec<Requirement>) -> bool {
-    let Some(mut orb_changing_factor) = choose_orb_changing_factor(ors) else {
+fn factor_out_orb_changes(ors: &mut Vec<Requirement>, log_capture: &LogCapture) -> bool {
+    let Some(mut orb_changing_factor) = choose_orb_changing_factor(ors, log_capture) else {
         return false;
     };
 
@@ -1105,6 +1107,7 @@ fn factor_out_orb_changes(ors: &mut Vec<Requirement>) -> bool {
 
         let factor_requirement = factor.requirement.clone();
         trace!(
+            logger: log_capture,
             "factoring out {factor_requirement} from ({ors}) at indices {indices}",
             ors = ors.iter().format(" | "),
             indices = factor.indices
@@ -1115,7 +1118,7 @@ fn factor_out_orb_changes(ors: &mut Vec<Requirement>) -> bool {
             or
         }));
 
-        factored.heuristically_apply_associativity();
+        factored.heuristically_apply_associativity(log_capture);
 
         factored = match side {
             OrbChangingFactorSide::Front => Requirement::and([factor_requirement, factored]),
@@ -1126,7 +1129,7 @@ fn factor_out_orb_changes(ors: &mut Vec<Requirement>) -> bool {
 
         ors.push(factored);
 
-        match choose_orb_changing_factor(ors) {
+        match choose_orb_changing_factor(ors, log_capture) {
             None => return true,
             Some(next) => orb_changing_factor = next,
         }
@@ -1143,7 +1146,7 @@ fn insert_non_orb_changing_and(mut requirement: Requirement, insert: Requirement
     }
 }
 
-fn factor_out_non_orb_changes(ors: &mut Vec<Requirement>) -> bool {
+fn factor_out_non_orb_changes(ors: &mut Vec<Requirement>, log_capture: &LogCapture) -> bool {
     let Some(mut factor) = choose_non_orb_changing_factor(ors) else {
         return false;
     };
@@ -1151,6 +1154,7 @@ fn factor_out_non_orb_changes(ors: &mut Vec<Requirement>) -> bool {
     loop {
         let factor_requirement = factor.requirement.clone();
         trace!(
+            logger: log_capture,
             "factoring out {factor_requirement} from ({})",
             ors.iter().format(" | ")
         );
@@ -1160,7 +1164,7 @@ fn factor_out_non_orb_changes(ors: &mut Vec<Requirement>) -> bool {
             or
         }));
 
-        factored.heuristically_apply_associativity();
+        factored.heuristically_apply_associativity(log_capture);
 
         factored = insert_non_orb_changing_and(factored, factor_requirement);
 
@@ -1173,8 +1177,11 @@ fn factor_out_non_orb_changes(ors: &mut Vec<Requirement>) -> bool {
     }
 }
 
-fn choose_orb_changing_factor(ors: &[Requirement]) -> Option<OrbChangingFactor<'_>> {
-    trace!("searching factor in ({})", ors.iter().format(" | "));
+fn choose_orb_changing_factor<'r>(
+    ors: &'r [Requirement],
+    log_capture: &LogCapture,
+) -> Option<OrbChangingFactor<'r>> {
+    trace!(logger: log_capture, "searching factor in ({})", ors.iter().format(" | "));
 
     let mut finder = OrbChangingFactorFinder::new(ors);
 

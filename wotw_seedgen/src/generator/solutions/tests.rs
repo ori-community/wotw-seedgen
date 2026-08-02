@@ -36,8 +36,8 @@ fn mock_world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
     uber_states: UberStates,
-) -> World<'graph, 'settings, 'graph> {
-    let mut world = World::new(graph, 0, settings, uber_states, &mut [], None);
+) -> World<'graph, 'settings, 'graph, 'static> {
+    let mut world = World::new(graph, 0, settings, uber_states, &mut []);
     world.store_base_max_health(0, &CommandsOutput::NONE);
     world.store_base_max_energy(0., &CommandsOutput::NONE);
     world.store_shard_slots(0, &CommandsOutput::NONE);
@@ -45,9 +45,9 @@ fn mock_world<'graph, 'settings>(
     world
 }
 
-fn find_test_solutions(
-    world: &mut World,
-    item_pool: &ItemPool,
+fn find_test_solutions<'log>(
+    world: &mut World<'_, '_, '_, 'log>,
+    item_pool: &ItemPool<'log>,
     slots: usize,
 ) -> Vec<Vec<(CommandVoid, u32)>> {
     sorted_test_solutions(
@@ -1157,14 +1157,15 @@ static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
         .more
         .retain(|(_, content)| !matches!(content.value, SpannedOption::Some(Content::Region(..))));
 
-    Graph::compile(
-        paths,
-        TEST_ASSETS.base.loc_data.clone(),
-        TEST_ASSETS.base.state_data.clone(),
-        slice::from_ref(&*GORLEK_SETTINGS),
-    )
-    .eprint_errors(&TEST_ASSETS.base.paths)
-    .unwrap()
+    Graph::compiler()
+        .with_settings(slice::from_ref(&*GORLEK_SETTINGS))
+        .compile(
+            paths,
+            TEST_ASSETS.base.loc_data.clone(),
+            TEST_ASSETS.base.state_data.clone(),
+        )
+        .eprint_errors(&TEST_ASSETS.base.paths)
+        .unwrap()
 });
 
 static ITEM_POOL: LazyLock<ItemPool> = LazyLock::new(|| {
@@ -1176,7 +1177,7 @@ static ITEM_POOL: LazyLock<ItemPool> = LazyLock::new(|| {
     builder.finish()
 });
 
-fn spawn_solutions_prelude(spawn: &str) -> World<'static, 'static, 'static> {
+fn spawn_solutions_prelude(spawn: &str) -> World<'static, 'static, 'static, 'static> {
     let graph = &*REGIONLESS_GRAPH;
     test_logger();
 

@@ -32,20 +32,24 @@ use std::hash::Hash;
 
 // TODO check all the public derives
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct IntermediateOutput {
+pub struct IntermediateOutput<'log> {
     pub preload: PreloadOutput,
     pub commands: CommandsOutput,
-    pub modifiers: GenerationModifiers,
+    pub modifiers: GenerationModifiers<'log>,
     pub assets: AssetsOutput,
 }
 
-impl IntermediateOutput {
-    pub fn new(debug: bool) -> Self {
-        let mut s = Self::default();
-        if debug {
-            s.assets.debug = Some(DebugOutput::default());
-        }
-        s
+impl<'log> IntermediateOutput<'log> {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn enable_debug(&mut self) {
+        self.assets.enable_debug();
+    }
+
+    pub fn disable_debug(&mut self) {
+        self.assets.disable_debug();
     }
 }
 
@@ -69,10 +73,10 @@ impl CommandsOutput {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub struct GenerationModifiers {
+pub struct GenerationModifiers<'log> {
     pub item_pool_changes: FxHashMap<CommandVoid, i32>,
     pub spirit_light_change: i32,
-    pub item_metadata: ItemMetadata,
+    pub item_metadata: ItemMetadata<'log>,
     pub removed_locations: FxHashSet<CommandBoolean>,
     pub location_slots: FxHashMap<CommandBoolean, u32>,
     pub logical_state_sets: FxHashSet<String>,
@@ -83,6 +87,16 @@ pub struct GenerationModifiers {
 pub struct AssetsOutput {
     pub icons: Vec<(String, Vec<u8>)>, // TODO poor memory
     pub debug: Option<DebugOutput>,
+}
+
+impl AssetsOutput {
+    fn enable_debug(&mut self) {
+        self.debug = Some(DebugOutput::default());
+    }
+
+    fn disable_debug(&mut self) {
+        self.debug = None;
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]

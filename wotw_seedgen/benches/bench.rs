@@ -1,18 +1,18 @@
 use std::{slice, time::Duration};
 
-use criterion::{BenchmarkId, Criterion, Throughput, criterion_group, criterion_main};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
-use wotw_seedgen::{Generator, World, item_pool::ItemPoolBuilder, orb_variants};
+use wotw_seedgen::{item_pool::ItemPoolBuilder, orb_variants, Generator, World};
 use wotw_seedgen_data::{
-    DEFAULT_SPAWN, Difficulty, Skill, Spawn, UniverseSettings, WorldSettings,
-    assets::{AssetCacheValues, PresetAccess, TEST_ASSETS, WorldPreset, WorldPresetSettings},
+    assets::{AssetCacheValues, PresetAccess, WorldPreset, WorldPresetSettings, TEST_ASSETS},
     logic_language::output::{Enemy, Graph, Requirement},
     seed_language::{
         output::CommandsOutput,
         simulate::{Simulation, Snapshot},
     },
+    Difficulty, Skill, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
 
 fn is_met(c: &mut Criterion) {
@@ -266,7 +266,7 @@ fn world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
     spawn: &str,
-) -> World<'graph, 'settings, 'graph> {
+) -> World<'graph, 'settings, 'graph, 'static> {
     let spawn = graph.find_node(spawn).unwrap();
     World::new(
         graph,
@@ -274,22 +274,14 @@ fn world<'graph, 'settings>(
         settings,
         TEST_ASSETS.uber_states.clone(),
         &mut [],
-        None,
     )
 }
 
 fn spawnless_world<'graph, 'settings>(
     graph: &'graph Graph,
     settings: &'settings WorldSettings,
-) -> World<'graph, 'settings, 'graph> {
-    World::new(
-        graph,
-        0,
-        settings,
-        TEST_ASSETS.uber_states.clone(),
-        &mut [],
-        None,
-    )
+) -> World<'graph, 'settings, 'graph, 'static> {
+    World::new(graph, 0, settings, TEST_ASSETS.uber_states.clone(), &mut [])
 }
 
 criterion_group!(all, is_met, solutions, reach_check, generation, multiworld);
