@@ -5,4 +5,6 @@
 Logic may force teleporting to Burrows without Bash, Depths without Glide, Reach without Flap and Wastes/Ruins/Willow without Burrow.
 Note that this can sidestep key hints since Flap may be inside Reach etc.")
 
+!tags("No Teleporter Locks")
+
 !set_logic_state("RemoveTPLocks")

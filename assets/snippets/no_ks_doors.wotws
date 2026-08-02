@@ -2,6 +2,8 @@
 #name("No KS Doors")
 #description("All keystone doors start open")
 
+!tags("No KS Doors")
+
 on spawn {
     store(UpperWastes.KeystoneDoor, true)
     store(MarshSpawn.KeystoneDoor, true)
