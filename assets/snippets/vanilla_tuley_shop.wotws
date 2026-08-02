@@ -1,0 +1,105 @@
+#hidden
+#name("Vanilla Tuley Shop")
+#description("Places the seed projects in the tuley shop and unlocks them with the vanilla seed locations")
+
+!include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
+
+on change UpperWastes.FlowersSeed store(sela_flowers, UpperWastes.FlowersSeed)
+on change EastPools.GrassSeed store(sticky_grass, EastPools.GrassSeed)
+on change UpperDepths.LightcatcherSeed store(lightcatchers, UpperDepths.LightcatcherSeed)
+on change InnerWellspring.BlueMoonSeed store(blue_moon, InnerWellspring.BlueMoonSeed)
+on change UpperReach.SpringSeed store(spring_plants, UpperReach.SpringSeed)
+on change WoodsEntry.TreeSeed store(last_tree, WoodsEntry.TreeSeed)
+
+on tuleyShop.selaFlowers store(gladesProjects.selaFlowersPlanted, true)
+on tuleyShop.stickyGrass store(gladesProjects.stickyGrassPlanted, true)
+on tuleyShop.lightcatchers store(gladesProjects.lightcatchersPlanted, true)
+on tuleyShop.blueMoon store(gladesProjects.blueMoonPlanted, true)
+on tuleyShop.springPlants store(gladesProjects.springPlantsPlanted, true)
+on tuleyShop.lastTree store(gladesProjects.lastTreePlanted, true)
+
+on spawn {
+    set_shop_item_icon(tuleyShop.selaFlowers, SelaFlowers)
+    hide_sela_flowers()
+
+    set_shop_item_icon(tuleyShop.stickyGrass, StickyGrass)
+    hide_sticky_grass()
+
+    set_shop_item_icon(tuleyShop.lightcatchers, Lightcatchers)
+    hide_lightcatchers()
+
+    set_shop_item_icon(tuleyShop.blueMoon, BlueMoon)
+    hide_blue_moon()
+
+    set_shop_item_icon(tuleyShop.springPlants, SpringPlants)
+    hide_spring_plants()
+
+    set_shop_item_icon(tuleyShop.lastTree, TheLastSeed)
+    hide_last_tree()
+}
+
+on sela_flowers {
+    set_shop_item_name(tuleyShop.selaFlowers, "Wellspring Wildflowers")
+    set_shop_item_description(tuleyShop.selaFlowers, "I could never quite get #Sela flowers# to prosper in my old garden. Perhaps they'll do better here?")
+}
+
+on sela_flowers == false hide_sela_flowers()
+fun hide_sela_flowers() {
+    set_shop_item_name(tuleyShop.selaFlowers, "Undiscovered")
+    set_shop_item_description(tuleyShop.selaFlowers, "These seeds have not been discovered yet.")
+}
+
+on sticky_grass {
+    set_shop_item_name(tuleyShop.stickyGrass, "Sticky Situation")
+    set_shop_item_description(tuleyShop.stickyGrass, "I'm not surprised you found this seed so far away. Feel how sticky it is! Grass seeds hitch rides on passers-by to find fresh soil.")
+}
+
+on sticky_grass == false hide_sticky_grass()
+fun hide_sticky_grass() {
+    set_shop_item_name(tuleyShop.stickyGrass, "Undiscovered")
+    set_shop_item_description(tuleyShop.stickyGrass, "These seeds have not been discovered yet.")
+}
+
+on lightcatchers {
+    set_shop_item_name(tuleyShop.lightcatchers, "Firemoth's Delight")
+    set_shop_item_description(tuleyShop.lightcatchers, "With the days growing darker since the #Decay#, Lightcatchers are finding it harder to collect the light they need for their hanging bulbs.")
+}
+
+on lightcatchers == false hide_lightcatchers()
+fun hide_lightcatchers() {
+    set_shop_item_name(tuleyShop.lightcatchers, "Undiscovered")
+    set_shop_item_description(tuleyShop.lightcatchers, "These seeds have not been discovered yet.")
+}
+
+on blue_moon {
+    set_shop_item_name(tuleyShop.blueMoon, "Blue Moon")
+    set_shop_item_description(tuleyShop.blueMoon, "Unlike their cousins, the #Lightcatchers#, these hanging flowers draw energy from the light of the #moon#, not the sun.")
+}
+
+on blue_moon == false hide_blue_moon()
+fun hide_blue_moon() {
+    set_shop_item_name(tuleyShop.blueMoon, "Undiscovered")
+    set_shop_item_description(tuleyShop.blueMoon, "These seeds have not been discovered yet.")
+}
+
+on spring_plants {
+    set_shop_item_name(tuleyShop.springPlants, "Left Behind")
+    set_shop_item_description(tuleyShop.springPlants, "I thought I saved every seed, but it seems one was left behind in the cold, and survived against all odds.")
+}
+
+on spring_plants == false hide_spring_plants()
+fun hide_spring_plants() {
+    set_shop_item_name(tuleyShop.springPlants, "Undiscovered")
+    set_shop_item_description(tuleyShop.springPlants, "These seeds have not been discovered yet.")
+}
+
+on last_tree {
+    set_shop_item_name(tuleyShop.lastTree, "The Last Seed")
+    set_shop_item_description(tuleyShop.lastTree, "I recognize this seed. It seems the tree I couldn't save is not completely gone.")
+}
+
+on last_tree == false hide_last_tree()
+fun hide_last_tree() {
+    set_shop_item_name(tuleyShop.lastTree, "Undiscovered")
+    set_shop_item_description(tuleyShop.lastTree, "These seeds have not been discovered yet.")
+}

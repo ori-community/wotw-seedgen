@@ -55,7 +55,7 @@ on spawn {
     store(npcsStateGroup.gromTalkedAboutMouldwoodGate, true)
     store(npcsStateGroup.gromTalkedAboutBaur, true)
     store(npcsStateGroup.gromTalkedAboutLagoon, true)
-    store(hubUberStateGroup.builderProjectHouses, 1) // TODO check if this is fixed on the dev branch
+    store(hubUberStateGroup.builderProjectHouses, 1)
     store(questUberStateGroup.luposMapQuest, 4)
     store(npcsStateGroup.talkedInHub, 2)
     store(npcsStateGroup.willowsEndSeirExitCutscene, true)
@@ -77,6 +77,7 @@ on spawn {
 
 on EastHollow.ForestsVoice store(EastHollow.VoiceDoorOpen, true)
 on skills.glide store(EastHollow.DepthsOpen, true)
+on gladesProjects.removeThornsBuilt if hubUberStateGroup.builderProjectOpenCave == 0 store(hubUberStateGroup.builderProjectOpenCave, 1)
 // TODO why is this not the wisp pickup?
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3)
 on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)

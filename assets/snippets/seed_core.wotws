@@ -2,7 +2,9 @@
 #name("Seed Core")
 #description("Essentials for the randomizer to function")
 
-!include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
+// TODO fully support random grom and tuley shop and remove this
+!include("vanilla_grom_shop")
+!include("vanilla_tuley_shop")
 
 on spawn {
     // For generated seeds, logic filter should always be available
@@ -69,182 +71,22 @@ on EastPools.TeleporterActive {
   store(lumaPoolsStateGroup.waterLowered, true)
 }
 
-// TODO fully support random grom and tuley shop and remove this
-on spawn {
-    set_shop_item_data(
-        gromShop.repairTheSpiritWell,
-        1,
-        "Repair the Spirit Well",
-        "They say the spirits of old could #warp# from one well to another. Perhaps if we #repaired this well with Gorlek Ore#, returning to the #Wellspring Glades# would be even easier.",
-        RepairTheSpiritWell,
-    )
-    set_shop_item_data(
-        gromShop.dwellingRepairs,
-        4,
-        "Dwelling Repairs",
-        "It's a shame how those old Moki dwellings are in shambles. Maybe if we #fixed them up# the Moki could #move back to the Glades#?",
-        DwellingRepairs,
-    )
-    set_shop_item_data(
-        gromShop.roofsOverHeads,
-        6,
-        "Roofs Over Heads",
-        "Time to #build some more housing#! Now on the big tree, by the fire.",
-        RoofsOverHeads,
-    )
-    set_shop_item_data(
-        gromShop.onwardsAndUpwards,
-        8,
-        "Onwards and Upwards",
-        "Treehouses seem to be popular with the Moki. How about we add a couple more?",
-        OnwardsAndUpwards,
-    )
-    set_shop_item_data(
-        gromShop.thornySituation,
-        5,
-        "Thorny Situation",
-        "Those spikey vines all over the place are quite the nuisance, let me tell you. With some help, I could #clear them out# and #make the Glades safer# for everyone!",
-        ThornySituation,
-    )
-    set_shop_item_data(
-        gromShop.clearTheCaveEntrance,
-        6,
-        "Clear the Cave Entrance",
-        "That old cave entrance looks like it's #about to collapse#...but we Gorlek learned a thing or two about tunnelling after fleeing to the mines. With some Ore, I can #repair# it.",
-        ClearTheCaveEntrance,
-    )
-    set_shop_item_data(
-        gromShop.theGorlekTouch,
-        10,
-        "The Gorlek Touch",
-        "The Moki are right...building is only half the work. Nothing's quite complete without some #finishing touches# of decoration.",
-        TheGorlekTouch,
-    )
+on gladesProjects.spiritWellBuilt
+&& gladesProjects.housesABuilt
+&& gladesProjects.housesBBuilt
+&& gladesProjects.housesCBuilt
+&& gladesProjects.removeThornsBuilt
+&& gladesProjects.openCaveBuilt
+&& gladesProjects.beautifyBuilt
+    store(questUberStateGroup.rebuildGladesQuest, 2)
 
-    set_shop_item_data(
-        tuleyShop.selaFlowers,
-        0,
-        "Wellspring Wildflowers",
-        "I could never quite get #Sela flowers# to prosper in my old garden. Perhaps they'll do better here?",
-        SelaFlowers,
-    )
-    set_shop_item_data(
-        tuleyShop.stickyGrass,
-        0,
-        "Sticky Situation",
-        "I'm not surprised you found this seed so far away. Feel how sticky it is! Grass seeds hitch rides on passers-by to find fresh soil.",
-        StickyGrass,
-    )
-    set_shop_item_data(
-        tuleyShop.lightcatchers,
-        0,
-        "Firemoth's Delight",
-        "With the days growing darker since the #Decay#, Lightcatchers are finding it harder to collect the light they need for their hanging bulbs.",
-        Lightcatchers,
-    )
-    set_shop_item_data(
-        tuleyShop.blueMoon,
-        0,
-        "Blue Moon",
-        "Unlike their cousins, the #Lightcatchers#, these hanging flowers draw energy from the light of the #moon#, not the sun.",
-        BlueMoon,
-    )
-    set_shop_item_data(
-        tuleyShop.springPlants,
-        0,
-        "Left Behind",
-        "I thought I saved every seed, but it seems one was left behind in the cold, and survived against all odds.",
-        SpringPlants,
-    )
-    set_shop_item_data(
-        tuleyShop.lastTree,
-        0,
-        "The Last Seed",
-        "I recognize this seed. It seems the tree I couldn't save is not completely gone.",
-        TheLastSeed,
-    )
-}
-
-on gameStateGroup.gameFinished store(randoState.enableSpoilerFilter, true)
-
-// TODO names are inconsistent with icon names
-// TODO try out storing the shop data in the save file
-on spawn update_houses_b_unlocked()
-on change gromShop.dwellingRepairs update_houses_b_unlocked()
-fun update_houses_b_unlocked() {
-    set_shop_item_hidden(gromShop.roofsOverHeads, gromShop.dwellingRepairs == false)
-}
-on spawn update_houses_c_unlocked()
-on change gromShop.roofsOverHeads update_houses_c_unlocked()
-fun update_houses_c_unlocked() {
-    set_shop_item_hidden(gromShop.onwardsAndUpwards, gromShop.roofsOverHeads == false)
-}
-on spawn update_cave_unlocked()
-on change gromShop.thornySituation update_cave_unlocked()
-fun update_cave_unlocked() {
-    set_shop_item_hidden(gromShop.clearTheCaveEntrance, gromShop.thornySituation == false)
-}
-
-fun check_rebuild_glades_completion() {
-  if gladesProjects.spiritWellBuilt &&
-     gladesProjects.housesABuilt &&
-     gladesProjects.housesBBuilt &&
-     gladesProjects.housesCBuilt &&
-     gladesProjects.removeThornsBuilt &&
-     gladesProjects.openCaveBuilt &&
-     gladesProjects.beautifyBuilt {
-     store(questUberStateGroup.rebuildGladesQuest, 2)
-   }
-}
-
-on gromShop.repairTheSpiritWell store(gladesProjects.spiritWellBuilt, true)
-on gromShop.dwellingRepairs store(gladesProjects.housesABuilt, true)
-on gromShop.roofsOverHeads store(gladesProjects.housesBBuilt, true)
-on gromShop.onwardsAndUpwards store(gladesProjects.housesCBuilt, true)
-on gromShop.thornySituation store(gladesProjects.removeThornsBuilt, true)
-on gromShop.clearTheCaveEntrance store(gladesProjects.openCaveBuilt, true)
-on gromShop.theGorlekTouch store(gladesProjects.beautifyBuilt, true)
-
-on gladesProjects.spiritWellBuilt check_rebuild_glades_completion()
-on gladesProjects.housesABuilt check_rebuild_glades_completion()
-on gladesProjects.housesBBuilt check_rebuild_glades_completion()
-on gladesProjects.housesCBuilt check_rebuild_glades_completion()
-on gladesProjects.removeThornsBuilt check_rebuild_glades_completion()
-on gladesProjects.openCaveBuilt check_rebuild_glades_completion()
-on gladesProjects.beautifyBuilt check_rebuild_glades_completion()
-
-fun check_regrow_glades_completion() {
-  if gladesProjects.lightcatchersPlanted &&
-     gladesProjects.selaFlowersPlanted &&
-     gladesProjects.blueMoonPlanted &&
-     gladesProjects.stickyGrassPlanted &&
-     gladesProjects.springPlantsPlanted &&
-     gladesProjects.lastTreePlanted {
-     store(questUberStateGroup.regrowGladesQuest, 2)
-   }
-}
-
-on tuleyShop.lightcatchers store(gladesProjects.lightcatchersPlanted, true)
-on tuleyShop.selaFlowers store(gladesProjects.selaFlowersPlanted, true)
-on tuleyShop.blueMoon store(gladesProjects.blueMoonPlanted, true)
-on tuleyShop.stickyGrass store(gladesProjects.stickyGrassPlanted, true)
-on tuleyShop.springPlants store(gladesProjects.springPlantsPlanted, true)
-on tuleyShop.lastTree store(gladesProjects.lastTreePlanted, true)
-
-on gladesProjects.lightcatchersPlanted check_regrow_glades_completion()
-on gladesProjects.selaFlowersPlanted check_regrow_glades_completion()
-on gladesProjects.blueMoonPlanted check_regrow_glades_completion()
-on gladesProjects.stickyGrassPlanted check_regrow_glades_completion()
-on gladesProjects.springPlantsPlanted check_regrow_glades_completion()
-on gladesProjects.lastTreePlanted check_regrow_glades_completion()
-
-// TODO inconsistent naming
-on UpperDepths.LightcatcherSeed store(lightcatchers, true)
-on UpperWastes.FlowersSeed store(sela_flowers, true)
-on InnerWellspring.BlueMoonSeed store(blue_moon, true)
-on EastPools.GrassSeed store(sticky_grass, true)
-on UpperReach.SpringSeed store(spring_plants, true)
-on WoodsEntry.TreeSeed store(last_tree, true)
+on gladesProjects.lightcatchersPlanted
+&& gladesProjects.selaFlowersPlanted
+&& gladesProjects.blueMoonPlanted
+&& gladesProjects.stickyGrassPlanted
+&& gladesProjects.springPlantsPlanted
+&& gladesProjects.lastTreePlanted
+    store(questUberStateGroup.regrowGladesQuest, 2)
 
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.

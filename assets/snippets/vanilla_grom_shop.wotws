@@ -1,0 +1,127 @@
+#hidden
+#name("Vanilla Grom Shop")
+#description("Places the building projects in the Grom shop and unlocks them by the vanilla logic")
+
+on hubUberStateGroup.builderProjectHouses > 0 || gromShop.dwellingRepairs show_dwelling_repairs()
+on hubUberStateGroup.builderProjectHouses == 0 && gromShop.dwellingRepairs == false hide_dwelling_repairs()
+
+on gladesProjects.housesABuilt store(hubUberStateGroup.builderProjectHousesB, 1)
+on hubUberStateGroup.builderProjectHousesB > 0 || gromShop.roofsOverHeads show_roofs_over_heads()
+on hubUberStateGroup.builderProjectHousesB == 0 && gromShop.roofsOverHeads == false hide_roofs_over_heads()
+
+on gladesProjects.housesBBuilt store(hubUberStateGroup.builderProjectHousesC, 1)
+on hubUberStateGroup.builderProjectHousesC > 0 || gromShop.onwardsAndUpwards show_onwards_and_upwards()
+on hubUberStateGroup.builderProjectHousesC == 0 && gromShop.onwardsAndUpwards == false hide_onwards_and_upwards()
+
+on hubUberStateGroup.builderProjectOpenCave > 0 || gromShop.clearTheCaveEntrance show_clear_the_cave_entrance()
+on hubUberStateGroup.builderProjectOpenCave == 0 && gromShop.clearTheCaveEntrance == false hide_clear_the_cave_entrance()
+
+on hubUberStateGroup.builderProjectBeautify > 0 || gromShop.theGorlekTouch show_the_gorlek_touch()
+on hubUberStateGroup.builderProjectBeautify == 0 && gromShop.theGorlekTouch == false hide_the_gorlek_touch()
+
+// TODO inconsistent glades project names
+on gromShop.repairTheSpiritWell store(gladesProjects.spiritWellBuilt, true)
+on gromShop.dwellingRepairs store(gladesProjects.housesABuilt, true)
+on gromShop.roofsOverHeads store(gladesProjects.housesBBuilt, true)
+on gromShop.onwardsAndUpwards store(gladesProjects.housesCBuilt, true)
+on gromShop.thornySituation store(gladesProjects.removeThornsBuilt, true)
+on gromShop.clearTheCaveEntrance store(gladesProjects.openCaveBuilt, true)
+on gromShop.theGorlekTouch store(gladesProjects.beautifyBuilt, true)
+
+on spawn {
+    set_shop_item_data(
+        gromShop.repairTheSpiritWell,
+        1,
+        "Repair the Spirit Well",
+        "They say the spirits of old could #warp# from one well to another. Perhaps if we #repaired this well with Gorlek Ore#, returning to the #Wellspring Glades# would be even easier.",
+        RepairTheSpiritWell,
+    )
+
+    set_shop_item_price(gromShop.dwellingRepairs, 4)
+    set_shop_item_icon(gromShop.dwellingRepairs, DwellingRepairs)
+    hide_dwelling_repairs()
+
+    set_shop_item_price(gromShop.roofsOverHeads, 6)
+    set_shop_item_icon(gromShop.roofsOverHeads, RoofsOverHeads)
+    hide_roofs_over_heads()
+
+    set_shop_item_price(gromShop.onwardsAndUpwards, 8)
+    set_shop_item_icon(gromShop.onwardsAndUpwards, OnwardsAndUpwards)
+    hide_onwards_and_upwards()
+
+    set_shop_item_data(
+        gromShop.thornySituation,
+        5,
+        "Thorny Situation",
+        "Those spikey vines all over the place are quite the nuisance, let me tell you. With some help, I could #clear them out# and #make the Glades safer# for everyone!",
+        ThornySituation,
+    )
+
+    set_shop_item_price(gromShop.clearTheCaveEntrance, 6)
+    set_shop_item_icon(gromShop.clearTheCaveEntrance, ClearTheCaveEntrance)
+    hide_clear_the_cave_entrance()
+
+    set_shop_item_price(gromShop.theGorlekTouch, 10)
+    set_shop_item_icon(gromShop.theGorlekTouch, TheGorlekTouch)
+    hide_the_gorlek_touch()
+}
+
+fun show_dwelling_repairs() {
+    set_shop_item_hidden(gromShop.dwellingRepairs, false)
+    set_shop_item_name(gromShop.dwellingRepairs, "Dwelling Repairs")
+    set_shop_item_description(gromShop.dwellingRepairs, "It's a shame how those old Moki dwellings are in shambles. Maybe if we #fixed them up# the Moki could #move back to the Glades#?")
+}
+
+fun hide_dwelling_repairs() {
+    set_shop_item_hidden(gromShop.dwellingRepairs, true)
+    set_shop_item_name(gromShop.dwellingRepairs, "Unrevealed")
+    set_shop_item_description(gromShop.dwellingRepairs, "This project has not been revealed yet.")
+}
+
+fun show_roofs_over_heads() {
+    set_shop_item_hidden(gromShop.roofsOverHeads, false)
+    set_shop_item_name(gromShop.roofsOverHeads, "Roofs Over Heads")
+    set_shop_item_description(gromShop.roofsOverHeads, "Time to #build some more housing#! Now on the big tree, by the fire.")
+}
+
+fun hide_roofs_over_heads() {
+    set_shop_item_hidden(gromShop.roofsOverHeads, true)
+    set_shop_item_name(gromShop.roofsOverHeads, "Unrevealed")
+    set_shop_item_description(gromShop.roofsOverHeads, "This project has not been revealed yet.")
+}
+
+fun show_onwards_and_upwards() {
+    set_shop_item_hidden(gromShop.onwardsAndUpwards, false)
+    set_shop_item_name(gromShop.onwardsAndUpwards, "Onwards and Upwards")
+    set_shop_item_description(gromShop.onwardsAndUpwards, "Treehouses seem to be popular with the Moki. How about we add a couple more?")
+}
+
+fun hide_onwards_and_upwards() {
+    set_shop_item_hidden(gromShop.onwardsAndUpwards, true)
+    set_shop_item_name(gromShop.onwardsAndUpwards, "Unrevealed")
+    set_shop_item_description(gromShop.onwardsAndUpwards, "This project has not been revealed yet.")
+}
+
+fun show_clear_the_cave_entrance() {
+    set_shop_item_hidden(gromShop.clearTheCaveEntrance, false)
+    set_shop_item_name(gromShop.clearTheCaveEntrance, "Clear the Cave Entrance")
+    set_shop_item_description(gromShop.clearTheCaveEntrance, "That old cave entrance looks like it's #about to collapse#...but we Gorlek learned a thing or two about tunnelling after fleeing to the mines. With some Ore, I can #repair# it.")
+}
+
+fun hide_clear_the_cave_entrance() {
+    set_shop_item_hidden(gromShop.clearTheCaveEntrance, true)
+    set_shop_item_name(gromShop.clearTheCaveEntrance, "Unrevealed")
+    set_shop_item_description(gromShop.clearTheCaveEntrance, "This project has not been revealed yet.")
+}
+
+fun show_the_gorlek_touch() {
+    set_shop_item_hidden(gromShop.theGorlekTouch, false)
+    set_shop_item_name(gromShop.theGorlekTouch, "The Gorlek Touch")
+    set_shop_item_description(gromShop.theGorlekTouch, "The Moki are right...building is only half the work. Nothing's quite complete without some #finishing touches# of decoration.")
+}
+
+fun hide_the_gorlek_touch() {
+    set_shop_item_hidden(gromShop.theGorlekTouch, true)
+    set_shop_item_name(gromShop.theGorlekTouch, "Unrevealed")
+    set_shop_item_description(gromShop.theGorlekTouch, "This project has not been revealed yet.")
+}
