@@ -8,8 +8,8 @@
 !item_on(woods_shrine_item, WoodsMain.CombatShrine)
 !item_on(depths_shrine_item, LowerDepths.CombatShrine)
 
-on shrines.marshWave == 1 item_message("Complete the Marsh Combat Shrine to gain\n" + marsh_shrine_item)
-on shrines.howlsDenWave == 1 item_message("Complete the Howl's Den Combat Shrine to gain\n" + den_shrine_item)
-on shrines.gladesWave == 1 item_message("Complete the Glades Combat Shrine to gain\n" + glades_shrine_item)
-on shrines.woodsWave == 1 item_message("Complete the Woods Combat Shrine to gain\n" + woods_shrine_item)
-on shrines.depthsWave == 1 item_message("Complete the Depths Combat Shrine to gain\n" + depths_shrine_item)
+on shrines.marshWave == 1 if MarshPastOpher.CombatShrine == false item_message("Complete the Marsh Combat Shrine to gain\n" + marsh_shrine_item)
+on shrines.howlsDenWave == 1 if HowlsDen.CombatShrine == false item_message("Complete the Howl's Den Combat Shrine to gain\n" + den_shrine_item)
+on shrines.gladesWave == 1 if WestGlades.CombatShrine == false item_message("Complete the Glades Combat Shrine to gain\n" + glades_shrine_item)
+on shrines.woodsWave == 1 if WoodsMain.CombatShrine == false item_message("Complete the Woods Combat Shrine to gain\n" + woods_shrine_item)
+on shrines.depthsWave == 1 if LowerDepths.CombatShrine == false item_message("Complete the Depths Combat Shrine to gain\n" + depths_shrine_item)
