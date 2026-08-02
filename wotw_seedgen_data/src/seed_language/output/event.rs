@@ -72,6 +72,16 @@ impl Trigger {
             _ => None,
         }
     }
+
+    pub(crate) fn register<S: Simulation>(&mut self, event_index: usize, simulation: &mut S) {
+        simulation
+            .uber_states_mut()
+            .register_trigger(self, event_index);
+
+        if let Self::Condition(condition) = self {
+            condition.register(simulation);
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]

@@ -1,10 +1,6 @@
-use crate::{
-    assets::UberStateValue,
-    seed_language::{
-        output::Event,
-        simulate::{CloneSnapshot, ConditionValues, Heap, Simulation, Snapshot, Stack, UberStates},
-    },
-    UberIdentifier,
+use crate::seed_language::{
+    output::Event,
+    simulate::{CloneSnapshot, ConditionValues, Heap, Simulation, Snapshot, Stack, UberStates},
 };
 
 #[derive(Debug, Clone)]
@@ -25,8 +21,8 @@ impl WorldState {
             condition_values: CloneSnapshot::new(ConditionValues::default()),
         };
 
-        for event in events {
-            world_state.register_trigger(&mut event.trigger);
+        for (index, event) in events.iter_mut().enumerate() {
+            world_state.register_trigger(&mut event.trigger, index);
         }
 
         world_state
@@ -34,14 +30,6 @@ impl WorldState {
 }
 
 impl Simulation for WorldState {
-    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
-        self.uber_states.fetch(uber_identifier)
-    }
-
-    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
-        self.uber_states.store(uber_identifier, value)
-    }
-
     fn stack(&self) -> &Stack {
         &self.stack
     }
@@ -58,6 +46,16 @@ impl Simulation for WorldState {
     #[inline]
     fn heap_mut(&mut self) -> &mut Heap {
         &mut self.heap
+    }
+
+    #[inline]
+    fn uber_states(&self) -> &UberStates {
+        &self.uber_states
+    }
+
+    #[inline]
+    fn uber_states_mut(&mut self) -> &mut UberStates {
+        &mut self.uber_states
     }
 
     #[inline]

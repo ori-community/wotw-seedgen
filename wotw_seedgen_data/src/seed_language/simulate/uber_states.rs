@@ -1,7 +1,7 @@
 use crate::{
     assets::{UberStateData, UberStateValue},
     seed_language::{
-        output::{ContainedReads, Event},
+        output::{ContainedReads, Trigger},
         simulate::Snapshot,
     },
     UberIdentifier,
@@ -19,30 +19,29 @@ pub struct UberStates {
 }
 
 impl UberStates {
-    pub fn new(uber_state_data: &UberStateData, events: &[Event]) -> Self {
-        let mut states = uber_state_data
-            .id_lookup
-            .iter()
-            .map(|(uber_identifier, data)| {
-                (*uber_identifier, UberStateEntry::new(data.default_value))
-            })
-            .collect::<FxHashMap<_, _>>();
-
-        for (index, event) in events.iter().enumerate() {
-            for uber_identifier in event.trigger.contained_reads() {
-                match states.get_mut(&uber_identifier) {
-                    None => warn!("Trigger contained unknown UberState {uber_identifier}"),
-                    Some(entry) => {
-                        entry.triggers.push(index);
-                    }
-                }
-            }
-        }
-
+    pub fn new(uber_state_data: &UberStateData) -> Self {
         Self {
-            states,
+            states: uber_state_data
+                .id_lookup
+                .iter()
+                .map(|(uber_identifier, data)| {
+                    (*uber_identifier, UberStateEntry::new(data.default_value))
+                })
+                .collect(),
             fallback: UberStateEntry::new(UberStateValue::Boolean(false)),
             snapshot: None,
+        }
+    }
+
+    /// Register `trigger` to be checked in simulation.
+    pub fn register_trigger(&mut self, trigger: &Trigger, event_index: usize) {
+        for uber_identifier in trigger.contained_reads() {
+            match self.states.get_mut(&uber_identifier) {
+                None => warn!("Trigger contained unknown UberState {uber_identifier}"),
+                Some(entry) => {
+                    entry.triggers.push(event_index);
+                }
+            }
         }
     }
 

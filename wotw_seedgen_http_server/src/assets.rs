@@ -66,7 +66,7 @@ impl AssetCacheValues for CacheValues {
 
         let map_icons = MapIcons::new(&base.loc_data);
         let grom_shop_map_icon_index = grom_shop_map_icon_index(&map_icons);
-        let uber_states = UberStates::new(&base.uber_state_data, &[]);
+        let uber_states = UberStates::new(&base.uber_state_data);
         let relevant_uber_states = RelevantUberStates::new(&base.loc_data, &base.state_data);
 
         let graph = graph(&base.paths, &base.loc_data, &base.state_data)?;
@@ -131,7 +131,7 @@ impl AssetCacheValues for CacheValues {
         }
 
         if changed.uber_state_dump {
-            self.uber_states = UberStates::new(&self.base.uber_state_data, &[]);
+            self.uber_states = UberStates::new(&self.base.uber_state_data);
         }
 
         if changed.loc_data || changed.state_data {

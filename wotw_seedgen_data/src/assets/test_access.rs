@@ -81,7 +81,7 @@ impl AssetCacheValues for TestCacheValues {
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
         let base = DefaultAssetCacheValues::new(file_access)?;
-        let uber_states = UberStates::new(&base.uber_state_data, &[]);
+        let uber_states = UberStates::new(&base.uber_state_data);
         let graphs = TestCacheGraphs::new(&base);
         let test_graph = TestGraph::new();
 

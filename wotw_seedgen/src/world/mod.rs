@@ -521,18 +521,6 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
 }
 
 impl Simulation for World<'_, '_, '_, '_> {
-    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
-        self.state.fetch(uber_identifier)
-    }
-
-    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
-        self.state.store_impl(uber_identifier, value)
-    }
-
-    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
-        self.update_reached(uber_identifier, output);
-    }
-
     #[inline]
     fn stack(&self) -> &Stack {
         self.state.stack()
@@ -553,8 +541,26 @@ impl Simulation for World<'_, '_, '_, '_> {
         self.state.heap_mut()
     }
 
+    #[inline]
+    fn uber_states(&self) -> &UberStates {
+        self.state.uber_states()
+    }
+
+    #[inline]
+    fn uber_states_mut(&mut self) -> &mut UberStates {
+        self.state.uber_states_mut()
+    }
+
     fn condition_values(&mut self) -> &mut ConditionValues {
         self.state.condition_values()
+    }
+
+    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
+        self.state.store_impl(uber_identifier, value)
+    }
+
+    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.update_reached(uber_identifier, output);
     }
 
     // Not sure how we could use the cache-efficient specialized stores without invalidating our reach

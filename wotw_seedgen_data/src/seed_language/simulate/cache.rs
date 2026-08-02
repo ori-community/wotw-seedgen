@@ -7,7 +7,9 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::CommandsOutput,
-        simulate::{condition_values::ConditionValues, Heap, Simulation, Snapshot, Stack},
+        simulate::{
+            condition_values::ConditionValues, Heap, Simulation, Snapshot, Stack, UberStates,
+        },
     },
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -130,19 +132,6 @@ impl Cache {
 }
 
 impl<S: Simulation> Simulation for SimulationCache<S> {
-    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
-        self.simulation.fetch(uber_identifier)
-    }
-
-    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
-        self.cache.store(uber_identifier, value);
-        self.simulation.store_impl(uber_identifier, value)
-    }
-
-    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
-        self.simulation.on_change(uber_identifier, output);
-    }
-
     fn stack(&self) -> &Stack {
         self.simulation.stack()
     }
@@ -159,8 +148,25 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
         self.simulation.heap_mut()
     }
 
+    fn uber_states(&self) -> &UberStates {
+        self.simulation.uber_states()
+    }
+
+    fn uber_states_mut(&mut self) -> &mut UberStates {
+        self.simulation.uber_states_mut()
+    }
+
     fn condition_values(&mut self) -> &mut ConditionValues {
         self.simulation.condition_values()
+    }
+
+    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
+        self.cache.store(uber_identifier, value);
+        self.simulation.store_impl(uber_identifier, value)
+    }
+
+    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.simulation.on_change(uber_identifier, output);
     }
 
     fn store_spirit_light(&mut self, value: i32, output: &CommandsOutput) {

@@ -115,8 +115,7 @@ where
                     }
 
                     let mut output = output.clone();
-                    let uber_states =
-                        UberStates::new(self.uber_state_data, &output.commands.events);
+                    let uber_states = UberStates::new(self.uber_state_data);
 
                     // TODO technically we shouldn't have to change our spawn choice between attempts anymore?
                     let world = World::new(

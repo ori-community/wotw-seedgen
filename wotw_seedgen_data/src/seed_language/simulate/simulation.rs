@@ -2,21 +2,15 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::{CommandsOutput, Trigger},
-        simulate::{condition_values::ConditionValues, set_uber_state, Heap, Simulate, Stack},
+        simulate::{
+            condition_values::ConditionValues, set_uber_state, Heap, Simulate, Stack, UberStates,
+        },
     },
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
 use strum::VariantArray;
 
 pub trait Simulation: Sized {
-    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue;
-
-    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize];
-
-    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
-        let _ = (uber_identifier, output);
-    }
-
     fn stack(&self) -> &Stack;
 
     fn stack_mut(&mut self) -> &mut Stack;
@@ -25,12 +19,30 @@ pub trait Simulation: Sized {
 
     fn heap_mut(&mut self) -> &mut Heap;
 
+    fn uber_states(&self) -> &UberStates;
+
+    fn uber_states_mut(&mut self) -> &mut UberStates;
+
     fn condition_values(&mut self) -> &mut ConditionValues;
 
-    fn register_trigger(&mut self, trigger: &mut Trigger) {
-        if let Trigger::Condition(condition) = trigger {
-            condition.register(self);
-        }
+    #[inline]
+    fn register_trigger(&mut self, trigger: &mut Trigger, event_index: usize) {
+        trigger.register(event_index, self);
+    }
+
+    #[inline]
+    fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        let _ = (uber_identifier, output);
+    }
+
+    #[inline]
+    fn fetch(&self, uber_identifier: UberIdentifier) -> UberStateValue {
+        self.uber_states().fetch(uber_identifier)
+    }
+
+    #[inline]
+    fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
+        self.uber_states_mut().store(uber_identifier, value)
     }
 
     #[inline]

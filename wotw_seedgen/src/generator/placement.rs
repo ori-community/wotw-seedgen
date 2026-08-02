@@ -37,7 +37,7 @@ use wotw_seedgen_data::{
         output::{
             postprocess, AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid,
             CommandsOutput, Concatenator, ContainedWrites, Event, IntermediateOutput, IntoConstant,
-            Operation, Trigger,
+            Operation, Trigger, TriggerCondition,
         },
         simulate::{Simulate, Simulation},
     },
@@ -792,43 +792,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 .into_iter()
                 .zip(placeholder_maps)
                 .map(|(world_context, placeholder_map)| {
-                    let WorldContext {
-                        world,
-                        mut output,
-                        index: world_index,
-                        ..
-                    } = world_context;
-
-                    assert!(
-                        output.assets.icons.is_empty(),
-                        "custom icons in seedgen aren't supported"
-                    ); // TODO custom icons in snippets
-
-                    let spawn = &world.graph.nodes[world.spawn];
-                    output.preload.spawn = Some(*spawn.position().unwrap());
-
-                    // Debug variant for the uppercase formatting
-                    output
-                        .preload
-                        .tags
-                        .push(format!("{:?}", world.settings.difficulty));
-
-                    if let Some(loop_size) = world.settings.randomize_entrances {
-                        let mut random_entrances = "Random Entrances".to_string();
-
-                        if loop_size.get() > 2 {
-                            let _ = write!(&mut random_entrances, " (Loop Size {loop_size})");
-                        }
-
-                        output.preload.tags.push(random_entrances);
-                    }
-
-                    let seedgen_info = SeedgenInfo::new(
-                        self.settings.clone(),
-                        world_index,
-                        spawn.identifier().to_string(),
-                    );
-
+                    let (seedgen_info, output) = world_context.finish(self.settings);
                     Seed::new(output, placeholder_map, debug).with_seedgen_info(seedgen_info)
                 })
                 .collect(),
@@ -877,6 +841,8 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         // between client and simulation?
         generate_entrances(&mut world, &mut output.commands, &mut rng, log_capture)?;
 
+        // TODO technically I think this should be after preplacements somehow?
+        // Because this will make wrong assumptions about the total reach if important items are in preplacements.
         let mut needs_placement = spawn::choose_spawn(
             &mut rng,
             &mut world,
@@ -955,7 +921,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 pickup_indices.swap_remove(self.rng.gen_range(0..pickup_indices.len()));
             let pickup = self.needs_placement[pickup_index];
 
-            self.place_without_simulation(pickup, command, preplacement_spoiler);
+            self.preplace(pickup, command, preplacement_spoiler);
             self.received_placement.push(pickup_index);
         }
     }
@@ -986,8 +952,42 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 .needs_placement
                 .swap_remove(self.rng.gen_range(0..self.needs_placement.len()));
 
-            self.place_without_simulation(pickup, command, preplacement_spoiler);
+            self.preplace(pickup, command, preplacement_spoiler);
         }
+    }
+
+    fn preplace(
+        &mut self,
+        pickup: &LocDataEntry,
+        command: CommandVoid,
+        placement_spoiler: &mut Vec<SpoilerPlacement>,
+    ) {
+        if log_enabled!(logger: self.item_pool.log_capture, Trace) {
+            let name = self.log_name(&command);
+
+            trace!(
+                logger: self.item_pool.log_capture,
+                "{index}Preplacing {name} at {pickup}",
+                index = self.log_index,
+                pickup = pickup.identifier,
+            );
+        }
+
+        self.write_placement_spoiler(pickup, &command, placement_spoiler);
+
+        let condition = CommandBoolean::loc_data_condition(pickup.uber_identifier, pickup.value);
+        let already_reached = self.world.simulate(&condition, &self.output.commands);
+
+        let mut trigger = Trigger::Condition(TriggerCondition::new(condition));
+
+        if already_reached {
+            command.simulate(&mut self.world, &self.output.commands);
+        } else {
+            self.world
+                .register_trigger(&mut trigger, self.output.commands.events.len());
+        }
+
+        self.output.commands.events.push(Event { trigger, command });
     }
 
     fn update_reached(&mut self) {
@@ -1428,6 +1428,46 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             command: command.clone(),
             name: self.log_name(command),
         }
+    }
+
+    fn finish(mut self, settings: &UniverseSettings) -> (SeedgenInfo, IntermediateOutput<'log>) {
+        // TODO custom icons in snippets
+        assert!(
+            self.output.assets.icons.is_empty(),
+            "custom icons in seedgen aren't supported"
+        );
+
+        if self.world.fetch_boolean(UberIdentifier::SHRIEK_BARRIER) {
+            warn!(
+                logger: self.item_pool.log_capture,
+                "{log_index}Cannot clear Shriek Barrier on these settings!",
+                log_index = self.log_index,
+            );
+        }
+
+        let spawn = &self.world.graph.nodes[self.world.spawn];
+        self.output.preload.spawn = Some(*spawn.position().unwrap());
+
+        // Debug variant for the uppercase formatting
+        self.output
+            .preload
+            .tags
+            .push(format!("{:?}", self.world.settings.difficulty));
+
+        if let Some(loop_size) = self.world.settings.randomize_entrances {
+            let mut random_entrances = "Random Entrances".to_string();
+
+            if loop_size.get() > 2 {
+                let _ = write!(&mut random_entrances, " (Loop Size {loop_size})");
+            }
+
+            self.output.preload.tags.push(random_entrances);
+        }
+
+        let seedgen_info =
+            SeedgenInfo::new(settings.clone(), self.index, spawn.identifier().to_string());
+
+        (seedgen_info, self.output)
     }
 }
 

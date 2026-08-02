@@ -47,6 +47,10 @@ impl UberIdentifier {
         Self::new(PLAYER_GROUP, member)
     }
 
+    pub const fn rando_state(member: i32) -> Self {
+        Self::new(RANDO_STATE_GROUP, member)
+    }
+
     pub const fn rando_config(member: i32) -> Self {
         Self::new(RANDO_CONFIG_GROUP, member)
     }
@@ -73,6 +77,10 @@ impl UberIdentifier {
 
     pub const fn known_entrance_connections(member: i32) -> Self {
         Self::new(KNOWN_ENTRANCE_CONNECTIONS_GROUP, member)
+    }
+
+    pub const fn settings(member: i32) -> Self {
+        Self::new(SETTINGS_GROUP, member)
     }
 
     pub const fn as_skills(self) -> Option<i32> {
@@ -131,18 +139,19 @@ impl UberIdentifier {
         self.group == 27
     }
 
-    pub const SPIRIT_LIGHT: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 0);
-    pub const GORLEK_ORE: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 1);
-    pub const KEYSTONES: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 2);
-    pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 3); // TODO client needs to add this
-    pub const CLEAN_WATER: UberIdentifier = UberIdentifier::new(RANDO_STATE_GROUP, 2000);
-    pub const BASE_MAX_HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 10);
-    pub const MAX_HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 11);
-    pub const HEALTH: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 12);
-    pub const BASE_MAX_ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 20);
-    pub const MAX_ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 21);
-    pub const ENERGY: UberIdentifier = UberIdentifier::new(PLAYER_GROUP, 22);
-    pub const RANDOM_SPIRIT_LIGHT: UberIdentifier = UberIdentifier::new(SETTINGS_GROUP, 0);
+    pub const SPIRIT_LIGHT: UberIdentifier = UberIdentifier::player(0);
+    pub const GORLEK_ORE: UberIdentifier = UberIdentifier::player(1);
+    pub const KEYSTONES: UberIdentifier = UberIdentifier::player(2);
+    pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::player(3);
+    pub const SHRIEK_BARRIER: UberIdentifier = UberIdentifier::rando_state(0);
+    pub const CLEAN_WATER: UberIdentifier = UberIdentifier::rando_state(2000);
+    pub const BASE_MAX_HEALTH: UberIdentifier = UberIdentifier::player(10);
+    pub const MAX_HEALTH: UberIdentifier = UberIdentifier::player(11);
+    pub const HEALTH: UberIdentifier = UberIdentifier::player(12);
+    pub const BASE_MAX_ENERGY: UberIdentifier = UberIdentifier::player(20);
+    pub const MAX_ENERGY: UberIdentifier = UberIdentifier::player(21);
+    pub const ENERGY: UberIdentifier = UberIdentifier::player(22);
+    pub const RANDOM_SPIRIT_LIGHT: UberIdentifier = UberIdentifier::settings(0);
 }
 
 impl Display for UberIdentifier {

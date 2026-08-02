@@ -32,12 +32,14 @@ on OuterWellspring.TheLostCompass store(itemTracker.questsCount, itemTracker.que
 on OuterWellspring.TheLostCompass == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 on MarshSpawn.MokkFangQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
 on MarshSpawn.MokkFangQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on questUberStateGroup.familyReunionQuest >= 4 store(itemTracker.questsCount, itemTracker.questsCount + 1)
-on questUberStateGroup.familyReunionQuest >= 4 == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+on GladesTown.FamilyReunion store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on GladesTown.FamilyReunion == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 on GladesTown.LastTree store(itemTracker.questsCount, itemTracker.questsCount + 1)
 on GladesTown.LastTree == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on questUberStateGroup.desertCogQuest >= 5 store(itemTracker.questsCount, itemTracker.questsCount + 1)
-on questUberStateGroup.desertCogQuest >= 5 == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+// TODO we lack fully accurate simulation in cases where quests set multiple states.
+// This should more accurately be questUberStateGroup.desertCogQuest but paths.wotwl doesn't communicate that state
+on GladesTown.TwillenGemQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on GladesTown.TwillenGemQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 on WindtornRuins.HandToHandComplete store(itemTracker.questsCount, itemTracker.questsCount + 1)
 on WindtornRuins.HandToHandComplete == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 on GladesTown.MokiAcornQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)

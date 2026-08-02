@@ -4461,13 +4461,16 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     id: 9
     target: GladesTown.KeyMokiHutInside
     enter:
-      moki: GladesTown.BuildHuts, WoodsEntry.DollQI
+      moki: GladesTown.BuildHuts, GladesTown.FamilyReunion
   refill Checkpoint
 
   quest GladesTown.HandToHandLantern:
     moki: LowerReach.HandToHandHat
   quest GladesTown.FamilyReunionKey:
     moki: GladesTown.BuildHuts
+
+  state GladesTown.FamilyReunion:
+    moki: GladesTown.FamilyReunionKey, WoodsEntry.DollQI
 
   pickup GladesTown.TwillenOre:
     moki, Hammer OR Spear=1:
