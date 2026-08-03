@@ -11,7 +11,7 @@ pub fn test_logger() {
         // Avoid log spam from test asset initialization
         let _ = *TEST_ASSETS;
 
-        Builder::from_env(Env::default().default_filter_or("debug"))
+        Builder::from_env(Env::default().default_filter_or("info"))
             .format_timestamp(None)
             .is_test(true)
             .init();
