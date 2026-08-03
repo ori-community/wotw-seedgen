@@ -101,11 +101,13 @@ impl LogConfig {
             trace_uber_states,
         } = args;
 
-        let mut config = Self::default();
+        let mut config = Self {
+            trace_seedgen: verbose.is_some() || trace_uber_states.is_some(),
+            trace_uber_states,
+            ..Self::default()
+        };
 
         if let Some(targets) = verbose {
-            config.trace_seedgen = true;
-
             if targets.is_empty() {
                 config.trace_placement = LevelFilter::Trace;
             } else {
@@ -113,8 +115,6 @@ impl LogConfig {
                     config[target] = LevelFilter::Trace;
                 }
             }
-
-            config.trace_uber_states = trace_uber_states;
         }
 
         config

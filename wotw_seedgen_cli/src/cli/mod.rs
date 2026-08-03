@@ -8,6 +8,7 @@ mod preset_args;
 mod seed_args;
 mod seed_settings;
 mod stats_args;
+mod verbose_args;
 
 use dev::Dev;
 pub use display::{
@@ -17,11 +18,10 @@ pub use display::{
 pub use http_server_args::HttpServerArgs;
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
-pub use seed_args::{
-    GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs, VerboseArgs, VerboseTarget,
-};
+pub use seed_args::{GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs};
 pub use seed_settings::{SeedSettings, SeedWorldSettings};
 pub use stats_args::{Analyzer, ChainedAnalyzers, StatsArgs};
+pub use verbose_args::{VerboseArgs, VerboseTarget};
 
 use clap::{
     builder::{styling::Style, Styles},
