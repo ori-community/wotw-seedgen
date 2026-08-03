@@ -3525,7 +3525,7 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
       SentryJump=1
     kii:
       DoubleJump, Hammer  # not too precise
-      Bash
+      Bash, DoubleJump, Sword OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
       # Glitched
       # GlideJump, DoubleJump
       # GrenadeJump=1  # can either gjump directly to the pickup or gjump on the wall
@@ -5274,10 +5274,9 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       Bash, DoubleJump, Dash
       SentryJump=1
     kii:
-      Bash, Dash OR DoubleJump OR Sword
+      Bash, Dash OR DoubleJump
       Bash, Glide, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, WaterDash, Water, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Bash, WaterDash, Damage=20, Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Bash, WaterDash, Water, Glide, Water OR Damage=20
       DoubleJump, Hammer
       # Glitched
       # GrenadeJump=1
@@ -5304,7 +5303,6 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       SentryJump=1, Combat=Tentacle, WaterDash, Damage=20
       SentryJump=2, Glide, Combat=Tentacle
     kii:
-      Bash, Sword OR Hammer
       Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=20
       DoubleJump, TripleJump, Sword  # reset jumps with sword
       Combat=Tentacle, DoubleJump, TripleJump, Hammer OR Spear=1
@@ -5314,7 +5312,7 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       # AerialHammerJump OR SentryJump=1
       # Combat=Tentacle, GrenadeJump=1, DoubleJump  # possible with a lot more abilities than djump but the left wall can be really annoying when wjumping from the very top
     unsafe:
-      Bash, GlideJump OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
+      Bash, Sword OR Hammer OR GlideJump OR Bow=1  # Glide jump OR Bow to aggro the tentacle (by hitting its mouth)
       DoubleJump, Sword  # Pogo the projectile to pass above the tentacle
       SentryJump=1 OR GlideHammerJump OR WallHammerJump
       Combat=Tentacle, GlideJump, DoubleJump
@@ -5344,17 +5342,16 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       Combat=Tentacle, DoubleJump, Dash OR Glide
       Bash, DoubleJump, Dash OR Glide
     gorlek:
-      Bash, DoubleJump OR Dash OR Grenade=1
-      DoubleJump, Damage=10 OR Combat=Tentacle
-      Dash, Damage=10 OR Combat=Tentacle OR Bash
+      Bash, Grenade=1
       WaterDash, Damage=20, Bash
+      DoubleJump, Bash OR Damage=10 OR Combat=Tentacle
+      Dash, Bash OR Damage=10 OR Combat=Tentacle
       SentryJump=1, Glide, Bash OR Damage=10 OR Combat=Tentacle
     kii:
       Damage=80, Damage=40
       WaterDash, Damage=20, Combat=Tentacle OR Damage=10:
         Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20
       Bash OR Combat=Tentacle OR Damage=10:
-        Sword OR Hammer
         Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       # Glitched
       # GlideJump, Combat=Tentacle OR Bash OR Damage=10
@@ -5365,6 +5362,7 @@ anchor WestGlades.RightLowerPool at -545, -4113:  # The right edge of the lower 
       #   GrenadeJump=1, Blaze=2 OR Flash=1 OR Sentry=1  # same as above but sjump inbetween the two log in the water
       #   Damage=20, Blaze=2 OR Flash=1 OR Sentry=1  # same as above but swim in the poisonous water
     unsafe:
+      Sword OR Hammer
       Bash, Bow=1  # Bow to aggro the tentacle (by hitting its mouth
       Bash, Grenade=2  # first grenade break the cristal
       Bash, PauseFloat OR Damage=40  # jump in the water and bait the tantacle from here
