@@ -25473,6 +25473,13 @@
           "value": 0.0,
           "value_type": "Integer"
         },
+        "200": {
+          "name": "showVisitedEntranceCount",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "500": {
           "name": "currentAreaHasUncollectedRelic",
           "readonly": false,

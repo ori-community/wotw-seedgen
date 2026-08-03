@@ -29,6 +29,7 @@ const RANDO_STATE_GROUP: i32 = 6;
 const RANDO_CONFIG_GROUP: i32 = 7;
 const MULTIWORLD_GROUP: i32 = 12;
 const MAP_SEGMENTS_GROUP: i32 = 22;
+const ITEM_TRACKER_GROUP: i32 = 23;
 const SKILLS_GROUP: i32 = 24;
 const SHARDS_GROUP: i32 = 25;
 const ENTRANCES_GROUP: i32 = 27;
@@ -53,6 +54,10 @@ impl UberIdentifier {
 
     pub const fn rando_config(member: i32) -> Self {
         Self::new(RANDO_CONFIG_GROUP, member)
+    }
+
+    pub const fn item_tracker(member: i32) -> Self {
+        Self::new(ITEM_TRACKER_GROUP, member)
     }
 
     pub const fn multiworld(member: i32) -> Self {

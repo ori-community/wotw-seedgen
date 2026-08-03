@@ -99,6 +99,11 @@ pub fn generate_entrances(
                 ArrayVec::from_iter([32]),
             ];
 
+            // enable itemTracker.showVisitedEntranceCount
+            output.events.push(Event {
+                trigger: Trigger::ClientEvent(ClientEvent::Spawn),
+                command: store_boolean(UberIdentifier::item_tracker(200), true),
+            });
             // enable randoConfig.showSmallEntrances
             output.events.push(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
