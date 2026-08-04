@@ -536,10 +536,12 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             self.force_place_command(command, target_world_index, true);
         }
 
-        self.worlds[target_world_index].force_place_spirit_light(
-            progression.spirit_light,
-            &mut self.spoiler.groups[self.step - 1].placements,
-        );
+        if progression.spirit_light > 0 {
+            self.worlds[target_world_index].force_place_spirit_light(
+                progression.spirit_light,
+                &mut self.spoiler.groups[self.step - 1].placements,
+            );
+        }
     }
 
     fn force_place_command(
@@ -1181,18 +1183,37 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         mut amount: i32,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
-        while amount > 0 {
-            let batch = self.spirit_light_provider.take();
-            amount = amount.saturating_sub(batch);
+        let mut next_spirit_light_location = self.choose_spirit_light_location().unwrap();
+        let mut next_batch = self.spirit_light_provider.take();
+
+        loop {
+            amount -= next_batch;
+
+            if amount <= 0 {
+                break;
+            }
 
             match self.choose_spirit_light_location() {
                 None => {
-                    warn!(logger: self.item_pool.log_capture, "Not enough space to place spirit light, aborting progression");
+                    trace!(logger: self.item_pool.log_capture, "Not enough space to place spirit light, forcing remaining amount");
+
+                    next_batch += amount;
                     break;
                 }
-                Some(pickup) => self.place_spirit_light(pickup, batch, placement_spoiler),
+                Some(pickup) => {
+                    self.place_spirit_light(
+                        next_spirit_light_location,
+                        next_batch,
+                        placement_spoiler,
+                    );
+
+                    next_spirit_light_location = pickup;
+                    next_batch = self.spirit_light_provider.take();
+                }
             }
         }
+
+        self.place_spirit_light(next_spirit_light_location, next_batch, placement_spoiler);
     }
 
     fn choose_non_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
