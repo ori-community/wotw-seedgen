@@ -7,8 +7,10 @@ use std::{
     time::{Duration as StdDuration, Instant},
 };
 
+use log::LevelFilter;
 use wotw_seedgen::{
     data::{assets::DefaultFileAccess, UniverseSettings},
+    log_capture::LogCapture,
     Generator,
 };
 
@@ -24,6 +26,7 @@ use crate::{
 pub fn find(command: Find) -> Result<(), Error> {
     match command {
         Find::Panic { args } => panic(args),
+        Find::Warning { args } => warning(args),
         Find::Slow { args } => slow(args),
     }
 }
@@ -37,6 +40,21 @@ fn panic(args: SeedSettingsArgs) -> Result<(), Error> {
     })?;
 
     println!("panicking seed: {seed}");
+
+    Ok(())
+}
+
+fn warning(args: SeedSettingsArgs) -> Result<(), Error> {
+    log::set_max_level(LevelFilter::Trace);
+
+    let seed = find_with(args, |generator| {
+        let log_capture = LogCapture::new().with_max_level(LevelFilter::Warn);
+
+        generator.with_log_capture(&log_capture).generate().is_err()
+            || !log_capture.finish().is_empty()
+    })?;
+
+    println!("seed with warning: {seed}");
 
     Ok(())
 }

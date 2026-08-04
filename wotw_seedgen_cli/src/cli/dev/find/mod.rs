@@ -13,6 +13,11 @@ pub enum Find {
         #[command(flatten)]
         args: SeedSettingsArgs,
     },
+    /// Find a seed that logs a warning or error
+    Warning {
+        #[command(flatten)]
+        args: SeedSettingsArgs,
+    },
     /// Find a seed that's slow to generate
     Slow {
         #[command(flatten)]
