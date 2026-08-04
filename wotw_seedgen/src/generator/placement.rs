@@ -13,11 +13,14 @@ use crate::{
     Generator, World,
 };
 use itertools::Itertools;
-use log::{log_enabled, trace, warn, Level::Trace};
+use log::{
+    log_enabled, trace, warn,
+    Level::{Trace, Warn},
+};
 use rand::{
     distributions::{Uniform, WeightedIndex},
     prelude::Distribution,
-    seq::{IteratorRandom, SliceRandom},
+    seq::SliceRandom,
     Rng, SeedableRng,
 };
 use rand_pcg::Pcg64Mcg;
@@ -857,6 +860,9 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             &output,
             log_capture,
         );
+
+        needs_placement.shuffle(&mut rng);
+
         let total_pickups = needs_placement.len() as f32;
 
         for identifier in &output.modifiers.logical_state_sets {
@@ -905,20 +911,19 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                     .collect::<Vec<_>>()
             });
 
-            if pickup_indices.is_empty() {
-                let name = self.log_name(&command);
-                warn!(
-                    logger: self.item_pool.log_capture,
-                    "{}Failed to preplace {name} in {zone} since no free placement location was available",
-                    self.log_index
-                );
+            let Some(pickup_index) = pickup_indices.pop() else {
+                if log_enabled!(logger: self.item_pool.log_capture, Warn) {
+                    let name = self.log_name(&command);
+                    warn!(
+                        logger: self.item_pool.log_capture,
+                        "{}Failed to preplace {name} in {zone} since no free placement location was available",
+                        self.log_index
+                    );
+                }
 
                 continue;
-            }
+            };
 
-            // We prefer generating indices over shuffling the nodes because usually there aren't many zone preplacements (relics)
-            let pickup_index =
-                pickup_indices.swap_remove(self.rng.gen_range(0..pickup_indices.len()));
             let pickup = self.needs_placement[pickup_index];
 
             self.preplace(pickup, command, preplacement_spoiler);
@@ -948,9 +953,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         } else {
             self.spirit_light_placements_remaining -= 1;
 
-            let pickup = self
-                .needs_placement
-                .swap_remove(self.rng.gen_range(0..self.needs_placement.len()));
+            let pickup = self.needs_placement.pop().unwrap();
 
             self.preplace(pickup, command, preplacement_spoiler);
         }
@@ -1196,11 +1199,13 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         let any_remaining = self.placements_remaining() > self.spirit_light_placements_remaining;
 
         if any_remaining {
-            if self.reached_needs_placement.is_empty() {
-                self.placeholders.pop()
-            } else {
-                let index = self.rng.gen_range(0..self.reached_needs_placement.len());
-                Some(self.commit_chosen_location(index))
+            match self.reached_needs_placement.pop() {
+                None => self.placeholders.pop(),
+                Some(index) => {
+                    self.received_placement.push(index);
+
+                    Some(self.needs_placement[index])
+                }
             }
         } else {
             None
@@ -1211,34 +1216,26 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         match self
             .reached_needs_placement
             .iter()
-            .enumerate()
-            .filter(|(_, pickup_index)| {
-                !self.needs_placement[**pickup_index]
+            .position(|pickup_index| {
+                !self.needs_placement[*pickup_index]
                     .uber_identifier
                     .is_shop()
-            })
-            .map(|(index, _)| index)
-            // TODO shuffle instead?
-            .choose(&mut self.rng)
-        {
+            }) {
             None => {
-                let (index, _) = self
+                let index = self
                     .placeholders
                     .iter()
-                    .enumerate()
-                    .find(|(_, pickup)| !pickup.uber_identifier.is_shop())?;
+                    .position(|pickup| !pickup.uber_identifier.is_shop())?;
 
                 Some(self.placeholders.swap_remove(index))
             }
-            Some(index) => Some(self.commit_chosen_location(index)),
+            Some(index) => {
+                let pickup_index = self.reached_needs_placement.swap_remove(index);
+                self.received_placement.push(pickup_index);
+
+                Some(self.needs_placement[pickup_index])
+            }
         }
-    }
-
-    fn commit_chosen_location(&mut self, index: usize) -> &'graph LocDataEntry {
-        let pickup_index = self.reached_needs_placement.swap_remove(index);
-        self.received_placement.push(pickup_index);
-
-        self.needs_placement[pickup_index]
     }
 
     pub fn name(&self, command: &CommandVoid) -> CommandString {
