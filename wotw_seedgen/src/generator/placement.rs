@@ -380,7 +380,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             }
 
             for _ in 0..missing_keystones {
-                self.force_place_command(keystone.clone(), world_index, true);
+                self.force_place_command(keystone.clone(), world_index);
             }
         }
 
@@ -390,15 +390,53 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     fn place_remaining(&mut self) {
         trace!(logger: self.log_capture, "All locations reached. Placing remaining items");
 
+        for origin_world_index in 0..self.worlds.len() {
+            let world_context = &mut self.worlds[origin_world_index];
+
+            world_context.prepare_remaining_placements();
+
+            let remaining_shops = world_context
+                .needs_placement
+                .extract_if(.., |pickup| pickup.uber_identifier.is_shop())
+                .collect::<Vec<_>>();
+
+            for shop_pickup in remaining_shops {
+                self.place_random_from_item_pool_at(shop_pickup, origin_world_index);
+            }
+        }
+
         for target_world_index in 0..self.worlds.len() {
             for command in self.worlds[target_world_index].item_pool.take() {
-                self.force_place_command(command, target_world_index, false);
+                self.place_remaining_command(command, target_world_index);
             }
         }
 
         for world_context in &mut self.worlds {
-            world_context.update_needs_placement();
             world_context.fill_remaining(&mut self.spoiler.groups[self.step - 1].placements);
+        }
+    }
+
+    fn place_remaining_command(&mut self, command: CommandVoid, target_world_index: usize) {
+        let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
+        let origin_world = &mut self.worlds[origin_world_index];
+
+        if origin_world.needs_placement.len() > origin_world.spirit_light_placements_remaining {
+            let pickup = origin_world.needs_placement.pop().unwrap();
+
+            self.place_command_at(
+                command,
+                pickup,
+                origin_world_index,
+                target_world_index,
+                false,
+            );
+        } else {
+            warn!(
+                logger: self.log_capture,
+                "Not enough space to place {target_index}{name}, skipping since everything has been reached",
+                name = self.worlds[target_world_index].log_name(&command),
+                target_index = self.worlds[target_world_index].log_index,
+            );
         }
     }
 
@@ -423,39 +461,40 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                             / placements_remaining as f64,
                     );
 
-                let (target_world_index, command) = if should_place_spirit_light {
+                if should_place_spirit_light {
                     let batch = origin_world.spirit_light_provider.take();
                     origin_world.spirit_light_placements_remaining -= 1;
 
-                    (
+                    let command = compile::spirit_light(batch.into(), &mut self.rng);
+
+                    self.place_command_at(
+                        command,
+                        pickup,
                         origin_world_index,
-                        compile::spirit_light(batch.into(), &mut self.rng),
-                    )
+                        origin_world_index,
+                        false,
+                    );
                 } else {
-                    let target_world_index = self.choose_target_world_for_random_placement();
-                    let target_world = &mut self.worlds[target_world_index];
-
-                    let item = target_world
-                        .item_pool
-                        .choose_random()
-                        .unwrap_or_else(|| target_world.backup_gorlek_ore());
-
-                    (target_world_index, item)
-                };
-
-                self.place_command_at(
-                    command,
-                    pickup,
-                    origin_world_index,
-                    target_world_index,
-                    false,
-                );
+                    self.place_random_from_item_pool_at(pickup, origin_world_index);
+                }
 
                 placements_remaining -= 1;
             }
         }
 
         any_placed
+    }
+
+    fn place_random_from_item_pool_at(&mut self, pickup: &LocDataEntry, origin_world_index: usize) {
+        let target_world_index = self.choose_target_world_for_random_placement();
+        let target_world = &mut self.worlds[target_world_index];
+
+        let item = target_world
+            .item_pool
+            .choose_random()
+            .unwrap_or_else(|| target_world.backup_gorlek_ore());
+
+        self.place_command_at(item, pickup, origin_world_index, target_world_index, false);
     }
 
     fn choose_progression(&mut self) -> Result<Option<(usize, Solution)>, String> {
@@ -533,7 +572,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         progression.items.sort_unstable();
         for item in progression.items.into_iter().rev() {
             let command = self.worlds[target_world_index].item_pool.remove(item);
-            self.force_place_command(command, target_world_index, true);
+            self.force_place_command(command, target_world_index);
         }
 
         if progression.spirit_light > 0 {
@@ -544,12 +583,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         }
     }
 
-    fn force_place_command(
-        &mut self,
-        command: CommandVoid,
-        target_world_index: usize,
-        mark_forced: bool,
-    ) {
+    fn force_place_command(&mut self, command: CommandVoid, target_world_index: usize) {
         let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
         let origin_world = &mut self.worlds[origin_world_index];
 
@@ -579,7 +613,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                     target_world_index,
                     NodeSummary::spawn(),
                     &command,
-                    mark_forced,
+                    true,
                 );
 
                 self.push_command(
@@ -595,7 +629,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                     pickup,
                     origin_world_index,
                     target_world_index,
-                    mark_forced,
+                    true,
                 );
             }
         }
@@ -1036,6 +1070,10 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         self.needs_placement.len() - self.received_placement.len() + self.placeholders.len()
     }
 
+    fn non_spirit_light_placements_remaining(&self) -> usize {
+        self.placements_remaining() - self.spirit_light_placements_remaining
+    }
+
     fn reserve_placeholders(&mut self) -> Vec<&'graph LocDataEntry> {
         self.received_placement
             .extend(self.reached_needs_placement.iter().copied());
@@ -1091,7 +1129,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     fn non_spawn_progression_slots(&self) -> usize {
         usize::min(
             self.reached_needs_placement.len() + self.placeholders.len(),
-            self.placements_remaining() - self.spirit_light_placements_remaining,
+            self.non_spirit_light_placements_remaining(),
         )
     }
 
@@ -1217,9 +1255,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     }
 
     fn choose_non_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
-        let any_remaining = self.placements_remaining() > self.spirit_light_placements_remaining;
-
-        if any_remaining {
+        if self.non_spirit_light_placements_remaining() > 0 {
             match self.reached_needs_placement.pop() {
                 None => self.placeholders.pop(),
                 Some(index) => {
@@ -1275,6 +1311,11 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             .log_name(&mut self.world, &self.output.commands)
     }
 
+    fn prepare_remaining_placements(&mut self) {
+        self.needs_placement.append(&mut self.placeholders);
+        self.needs_placement.shuffle(&mut self.rng);
+    }
+
     fn fill_remaining(&mut self, placement_spoiler: &mut Vec<SpoilerPlacement>) {
         trace!(
             logger: self.item_pool.log_capture,
@@ -1282,11 +1323,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             self.log_index
         );
 
-        let mut needs_placement = mem::take(&mut self.needs_placement);
-        needs_placement.extend(mem::take(&mut self.placeholders));
-        needs_placement.shuffle(&mut self.rng);
-
-        for pickup in needs_placement {
+        for pickup in mem::take(&mut self.needs_placement) {
             let is_shop = pickup.uber_identifier.is_shop();
 
             if is_shop {
