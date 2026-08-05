@@ -271,7 +271,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
                         Enemy::EnergyRefill => {
                             // It is possible for the total cost of a combat requirement to be different across orb variants because some of them may max out during energy refills
                             // However in between energy refills, the cost is always the same
-                            self.cost_met_or_better_weapon::<true>(cost, orb_variants)?;
+                            self.cost_met_or_better_weapon::<false>(cost, orb_variants)?;
 
                             for orbs in orb_variants.iter_mut() {
                                 self.recharge(orbs, amount);
