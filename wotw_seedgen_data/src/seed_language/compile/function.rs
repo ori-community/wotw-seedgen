@@ -370,6 +370,7 @@ pub enum FunctionIdentifier {
     SwitchWheel,
     SetWheelPinned,
     ResetAllWheels,
+    SetTrialHint,
     CloseMenu,
     CloseWeaponWheel,
     DebugLog,
@@ -543,6 +544,7 @@ impl FunctionIdentifier {
             SwitchWheel(wheel: String),
             SetWheelPinned(wheel: String, pinned: Boolean),
             ResetAllWheels(),
+            SetTrialHint(uber_identifier: UberIdentifier, text: String),
             CloseMenu(),
             CloseWeaponWheel(),
             DebugLog(message: String),
@@ -1519,6 +1521,10 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 pinned: arg(&mut context)?,
             }),
             FunctionIdentifier::ResetAllWheels => Command::Void(CommandVoid::ResetAllWheels {}),
+            FunctionIdentifier::SetTrialHint => Command::Void(CommandVoid::SetTrialHint {
+                uber_identifier: spirit_trial_identifier_arg(&mut context)?,
+                text: arg(&mut context)?,
+            }),
             FunctionIdentifier::CloseMenu => Command::Void(CommandVoid::CloseMenu {}),
             FunctionIdentifier::CloseWeaponWheel => Command::Void(CommandVoid::CloseWeaponWheel {}),
             FunctionIdentifier::DebugLog => Command::Void(CommandVoid::DebugLog {
@@ -1922,6 +1928,19 @@ fn ui_shop_identifier_arg(context: &mut ArgContext) -> Option<UberIdentifier> {
         ShopKind::Opherlike | ShopKind::Grom | ShopKind::Tuley => Ok(()),
         ShopKind::Map => Err("Only price can be set for lupo maps"),
     })
+}
+
+fn spirit_trial_identifier_arg(context: &mut ArgContext) -> Option<UberIdentifier> {
+    let (uber_identifier, span) = spanned_arg::<UberIdentifier>(context)?;
+
+    if !uber_identifier.is_spirit_trial() {
+        context.compiler.errors.push(Error::error(
+            "Expected spirit trial state".to_string(),
+            span,
+        ));
+    }
+
+    Some(uber_identifier)
 }
 
 const SPIRIT_LIGHT_NAMES: [(&str, &str); 88] = [

@@ -280,6 +280,7 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
             | FunctionIdentifier::SwitchWheel
             | FunctionIdentifier::SetWheelPinned
             | FunctionIdentifier::ResetAllWheels
+            | FunctionIdentifier::SetTrialHint
             | FunctionIdentifier::CloseMenu
             | FunctionIdentifier::CloseWeaponWheel
             | FunctionIdentifier::DebugLog

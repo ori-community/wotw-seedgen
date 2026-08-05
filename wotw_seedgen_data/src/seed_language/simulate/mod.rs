@@ -381,6 +381,7 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::SwitchWheel { .. }
             | CommandVoid::SetWheelPinned { .. }
             | CommandVoid::ResetAllWheels { .. }
+            | CommandVoid::SetTrialHint { .. }
             | CommandVoid::CloseMenu { .. }
             | CommandVoid::CloseWeaponWheel { .. }
             | CommandVoid::DebugLog { .. }

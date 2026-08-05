@@ -725,6 +725,11 @@ pub enum CommandVoid {
     },
     /// Reset all wheel items to their default state
     ResetAllWheels {},
+    /// Sets the hint text for the trial using `uber_identifier` to `text`
+    SetTrialHint {
+        uber_identifier: UberIdentifier,
+        text: CommandString,
+    },
     /// Closes any open menu screen
     CloseMenu {},
     /// Closes the weapon wheel

@@ -118,7 +118,7 @@ impl UberIdentifier {
         }
     }
 
-    // /// Returns `true` if this `UberIdentifier` corresponds to a "shop item bought" state
+    /// Returns `true` if this `UberIdentifier` corresponds to a "shop item bought" state
     pub const fn is_shop(self) -> bool {
         !matches!(self.shop_kind(), ShopKind::None)
     }
@@ -137,6 +137,17 @@ impl UberIdentifier {
             } => ShopKind::Map,
             _ => ShopKind::None,
         }
+    }
+
+    /// Returns `true` if this `UberIdentifier` corresponds to a spirit trial state
+    pub const fn is_spirit_trial(self) -> bool {
+        matches!(
+            self,
+            Self {
+                group: 44964,
+                member: 45951 | 25545 | 11512 | 54686 | 22703 | 23661 | 28552 | 30767
+            }
+        )
     }
 
     /// Returns `true` if this `UberIdentifier` corresponds to an entrance connection state

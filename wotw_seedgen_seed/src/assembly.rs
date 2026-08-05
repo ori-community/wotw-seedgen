@@ -267,6 +267,8 @@ pub enum Command {
     SetWheelPinned(/*wheel*/ usize),
     /// Reset all wheel items to their default state
     ResetAllWheels,
+    /// Sets the hint text for the trial using `uber_identifier` to String Memory 0
+    SetTrialHint(/*uber_identifier*/ UberIdentifier),
     /// Closes any visible menu screen
     CloseMenu,
     /// Closes the weapon wheel
