@@ -4,7 +4,7 @@ mod optimize_graph_args;
 mod perf_args;
 mod regenerate_args;
 
-use find::Find;
+use find::{Find, FindArgs};
 pub use optimize_graph_args::OptimizeGraphArgs;
 pub use perf_args::{PerfArgs, PerfTarget};
 pub use regenerate_args::RegenerateArgs;
@@ -28,6 +28,8 @@ pub enum Dev {
         args: OptimizeGraphArgs,
     },
     Find {
+        #[command(flatten)]
+        args: FindArgs,
         #[command(subcommand)]
         command: Find,
     },

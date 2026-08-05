@@ -16,23 +16,23 @@ use wotw_seedgen::{
 
 use crate::{
     cli::{
-        dev::find::{Find, SlowArgs},
+        dev::find::{Find, FindArgs, SlowArgs},
         SeedSettingsArgs,
     },
     seed::logic_assets,
     Error,
 };
 
-pub fn find(command: Find) -> Result<(), Error> {
+pub fn find(find_args: FindArgs, command: Find) -> Result<(), Error> {
     match command {
-        Find::Panic { args } => panic(args),
-        Find::Warning { args } => warning(args),
-        Find::Slow { args } => slow(args),
+        Find::Panic { args } => panic(find_args, args),
+        Find::Warning { args } => warning(find_args, args),
+        Find::Slow { args } => slow(find_args, args),
     }
 }
 
-fn panic(args: SeedSettingsArgs) -> Result<(), Error> {
-    let seed = find_with(args, |generator| {
+fn panic(find_args: FindArgs, args: SeedSettingsArgs) -> Result<(), Error> {
+    let seed = find_with(find_args, args, |generator| {
         panic::catch_unwind(|| {
             let _ = generator.generate();
         })
@@ -44,10 +44,10 @@ fn panic(args: SeedSettingsArgs) -> Result<(), Error> {
     Ok(())
 }
 
-fn warning(args: SeedSettingsArgs) -> Result<(), Error> {
+fn warning(find_args: FindArgs, args: SeedSettingsArgs) -> Result<(), Error> {
     log::set_max_level(LevelFilter::Trace);
 
-    let seed = find_with(args, |generator| {
+    let seed = find_with(find_args, args, |generator| {
         let log_capture = LogCapture::new().with_max_level(LevelFilter::Warn);
 
         generator.with_log_capture(&log_capture).generate().is_err()
@@ -59,7 +59,7 @@ fn warning(args: SeedSettingsArgs) -> Result<(), Error> {
     Ok(())
 }
 
-fn slow(args: SlowArgs) -> Result<(), Error> {
+fn slow(find_args: FindArgs, args: SlowArgs) -> Result<(), Error> {
     let SlowArgs {
         min_duration,
         settings_args,
@@ -67,7 +67,7 @@ fn slow(args: SlowArgs) -> Result<(), Error> {
 
     let min_duration = StdDuration::from(min_duration);
 
-    let seed = find_with(settings_args, |generator| {
+    let seed = find_with(find_args, settings_args, |generator| {
         let start = Instant::now();
 
         let _ = generator.generate();
@@ -80,7 +80,7 @@ fn slow(args: SlowArgs) -> Result<(), Error> {
     Ok(())
 }
 
-fn find_with<F>(settings_args: SeedSettingsArgs, f: F) -> Result<String, Error>
+fn find_with<F>(find_args: FindArgs, settings_args: SeedSettingsArgs, f: F) -> Result<String, Error>
 where
     F: Fn(Generator<DefaultFileAccess>) -> bool + Send + Sync,
 {
@@ -89,10 +89,12 @@ where
     let settings = settings_args.into_universe_settings()?;
     let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
 
+    let FindArgs { start: count } = find_args;
+
     let available = thread::available_parallelism().map_or(4, NonZeroUsize::get);
 
     let finished = AtomicBool::new(false);
-    let count = AtomicU32::new(0);
+    let count = AtomicU32::new(count);
 
     let seed = thread::scope(|scope| {
         iter::repeat_with(|| {

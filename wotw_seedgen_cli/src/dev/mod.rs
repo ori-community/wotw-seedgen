@@ -20,7 +20,7 @@ pub fn dev(command: Dev) -> Result<(), Error> {
         Dev::Paths => paths(),
         Dev::ImportUberStates => import_uber_states(),
         Dev::OptimizeGraph { args } => optimize_graph(args),
-        Dev::Find { command } => find(command),
+        Dev::Find { args, command } => find(args, command),
         Dev::Perf { args } => perf(args),
     }
 }

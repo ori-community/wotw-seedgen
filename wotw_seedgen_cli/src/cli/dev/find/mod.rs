@@ -2,9 +2,15 @@ mod slow;
 
 pub use slow::SlowArgs;
 
-use clap::Subcommand;
+use clap::{Args, Subcommand};
 
 use crate::cli::SeedSettingsArgs;
+
+#[derive(Args)]
+pub struct FindArgs {
+    #[arg(short, long, default_value = "0")]
+    pub start: u32,
+}
 
 #[derive(Subcommand)]
 pub enum Find {
