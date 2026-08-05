@@ -66,7 +66,7 @@ static MAX_PLACEHOLDERS: LazyLock<usize> =
     LazyLock::new(|| 10 + SOLUTION_MAX_ITEMS.saturating_mul(2));
 
 impl<A> Generator<'_, '_, '_, '_, '_, '_, '_, A> {
-    pub fn generate_placements(
+    pub(crate) fn generate_placements(
         &self,
         rng: &mut Pcg64Mcg,
         worlds: Vec<(World, IntermediateOutput)>,
@@ -175,39 +175,44 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             })
             .collect::<Result<Vec<_>, _>>()?;
 
-        let mut total_needs_placement = 0;
-        let mut total_item_count = 0;
+        let mut universe_placements = 0;
+        let mut universe_item_count = 0;
 
         for world in &worlds {
-            total_needs_placement += world.needs_placement.len();
-            total_item_count += world.item_pool.len();
+            universe_placements += world.needs_placement.len();
+            universe_item_count +=
+                world.item_pool.len() + world.output.modifiers.preplacements.len() + 1;
         }
 
-        let mut total_spirit_light_placements = usize::max(
-            total_needs_placement.saturating_sub(total_item_count),
-            worlds.len(),
-        ) as f32;
-        let mut total_needs_placement = total_needs_placement as f32;
+        let mut universe_spirit_light_placements =
+            universe_placements.saturating_sub(universe_item_count) as f32;
+        let mut universe_placements = universe_placements as f32;
+
+        trace!(
+            logger: log_capture,
+            "Universe has {universe_spirit_light_placements}/{universe_placements} spirit light placements"
+        );
 
         for world in &mut worlds {
-            let needs_placement = world.needs_placement.len() as f32;
-            let spirit_light_placements =
-                (total_spirit_light_placements * (needs_placement / total_needs_placement)).round();
+            let world_placements = world.needs_placement.len() as f32;
+            let world_spirit_light_placements = (universe_spirit_light_placements
+                * (world_placements / universe_placements))
+                .round();
 
-            total_spirit_light_placements -= spirit_light_placements;
-            total_needs_placement -= needs_placement;
+            universe_spirit_light_placements -= world_spirit_light_placements;
+            universe_placements -= world_placements;
 
             trace!(
                 logger: log_capture,
-                "{log_index}Assigned {spirit_light_placements}/{needs_placement} placements for spirit light",
+                "{log_index}Assigned {world_spirit_light_placements}/{world_placements} placements for spirit light",
                 log_index = world.log_index,
             );
 
-            debug_assert!(spirit_light_placements <= needs_placement);
+            debug_assert!(world_spirit_light_placements <= world_placements);
 
             let total_spirit_light =
                 TOTAL_SPIRIT_LIGHT + world.output.modifiers.spirit_light_change;
-            world.spirit_light_placements_remaining = spirit_light_placements as usize;
+            world.spirit_light_placements_remaining = world_spirit_light_placements as usize;
             // TODO how should !add_item(spirit_light(100)) behave?
             // TODO breaks at very low spirit light totals
             world
@@ -972,38 +977,27 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 continue;
             };
 
-            let pickup = self.needs_placement[pickup_index];
-
+            let pickup = self.needs_placement.swap_remove(pickup_index);
             self.preplace(pickup, command, preplacement_spoiler);
-            self.received_placement.push(pickup_index);
         }
     }
 
     fn hi_torin(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
         let command = compile::spirit_light(1.into(), &mut self.rng);
 
-        if self.needs_placement.is_empty() {
-            let name = self.log_name(&command);
+        match self.needs_placement.pop() {
+            None => {
+                if log_enabled!(logger: self.item_pool.log_capture, Warn) {
+                    let name = self.log_name(&command);
 
-            warn!(
-                logger: self.item_pool.log_capture,
-                "{}Failed to preplace {name} since no free placement location was available",
-                self.log_index
-            );
-        } else if self.spirit_light_placements_remaining == 0 {
-            let name = self.log_name(&command);
-
-            warn!(
-                logger: self.item_pool.log_capture,
-                "{}Failed to preplace {name} since no spirit light placement location was available",
-                self.log_index
-            );
-        } else {
-            self.spirit_light_placements_remaining -= 1;
-
-            let pickup = self.needs_placement.pop().unwrap();
-
-            self.preplace(pickup, command, preplacement_spoiler);
+                    warn!(
+                        logger: self.item_pool.log_capture,
+                        "{}Failed to preplace {name} since no free placement location was available",
+                        self.log_index
+                    );
+                }
+            }
+            Some(pickup) => self.preplace(pickup, command, preplacement_spoiler),
         }
     }
 
