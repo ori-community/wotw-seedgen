@@ -569,17 +569,18 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     }
 
     fn place_forced(&mut self, target_world_index: usize, mut progression: Solution) {
-        progression.items.sort_unstable();
-        for item in progression.items.into_iter().rev() {
-            let command = self.worlds[target_world_index].item_pool.remove(item);
-            self.force_place_command(command, target_world_index);
-        }
-
+        // Spirit Light has to be placed first since it's more restrictive
         if progression.spirit_light > 0 {
             self.worlds[target_world_index].force_place_spirit_light(
                 progression.spirit_light,
                 &mut self.spoiler.groups[self.step - 1].placements,
             );
+        }
+
+        progression.items.sort_unstable();
+        for item in progression.items.into_iter().rev() {
+            let command = self.worlds[target_world_index].item_pool.remove(item);
+            self.force_place_command(command, target_world_index);
         }
     }
 
