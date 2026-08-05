@@ -2,6 +2,8 @@
 #name("Trial Hints")
 #description("Reveal the reward a Spirit Trial gives when activating it")
 
+!builtin_icon(message_icon, "icons/game/message.png")
+
 !item_on(marsh_trial_item, MarshPastOpher.SpiritTrial)
 !item_on(hollow_trial_item, WestHollow.SpiritTrial)
 !item_on(wellspring_trial_item, OuterWellspring.SpiritTrial)
@@ -51,3 +53,84 @@ on raceGroup.desertRace == 1 {
     item_message("Complete the Wastes Spirit Trial to gain\n" + wastes_trial_item)
 }
 
+on reload {
+    set_wheel_item_name("progress_helper", TopLeft, "Trial Hints")
+    set_wheel_item_icon("progress_helper", TopLeft, message_icon)
+}
+
+on reload update_wheel()
+on change raceGroup.inkwaterMarshRace update_wheel()
+on change raceGroup.kwolokDropRace update_wheel()
+on change raceGroup.wellspringRace update_wheel()
+on change raceGroup.silentWoodlandRace update_wheel()
+on change raceGroup.baursReachWindTunnelRace update_wheel()
+on change raceGroup.mouldwoodDepthsRace update_wheel()
+on change raceGroup.lumaPoolsRace update_wheel()
+on change raceGroup.desertRace update_wheel()
+fun update_wheel() {
+    set_boolean(
+        "any_unlocked",
+        raceGroup.inkwaterMarshRace > 0
+        || raceGroup.kwolokDropRace > 0
+        || raceGroup.wellspringRace > 0
+        || raceGroup.silentWoodlandRace > 0
+        || raceGroup.baursReachWindTunnelRace > 0
+        || raceGroup.mouldwoodDepthsRace > 0
+        || raceGroup.lumaPoolsRace > 0
+        || raceGroup.desertRace > 0
+    )
+
+    if get_boolean("any_unlocked") {
+        set_wheel_item_description("progress_helper", TopLeft, "[Ability1]View Hints")
+        set_wheel_item_color("progress_helper", TopLeft, 255, 255, 255, 255)
+        set_wheel_item_all_actions("progress_helper", TopLeft, {
+            write_trial_hints()
+            priority_message(get_string("trial_hints"))
+        })
+    }
+    if get_boolean("any_unlocked") == false {
+        set_wheel_item_description("progress_helper", TopLeft, "No Spirit Trials activated")
+        set_wheel_item_color("progress_helper", TopLeft, 128, 128, 128, 196)
+        set_wheel_item_all_actions("progress_helper", TopLeft, priority_message("No Spirit Trials activated"))
+    }
+}
+
+fun write_trial_hints() {
+    set_string("trial_hints", "")
+    set_boolean("newline", false)
+
+    if raceGroup.inkwaterMarshRace == 1 add_trial_hint("#Marsh Reward#: " + marsh_trial_item)
+    if raceGroup.kwolokDropRace == 1 add_trial_hint("#Hollow Reward#: " + hollow_trial_item)
+    if raceGroup.wellspringRace == 1 add_trial_hint("#Wellspring Reward#: " + wellspring_trial_item)
+    if raceGroup.silentWoodlandRace == 1 add_trial_hint("#Woods Reward#: " + woods_trial_item)
+    if raceGroup.baursReachWindTunnelRace == 1 add_trial_hint("#Reach Reward#: " + reach_trial_item)
+    if raceGroup.mouldwoodDepthsRace == 1 add_trial_hint("#Depths Reward#: " + depths_trial_item)
+    if raceGroup.lumaPoolsRace == 1 add_trial_hint("#Pools Reward#: " + pools_trial_item)
+    if raceGroup.desertRace == 1 add_trial_hint("#Wastes Reward#: " + wastes_trial_item)
+
+    set_string("completed", "")
+    set_boolean("comma", false)
+
+    if raceGroup.inkwaterMarshRace == 2 add_trial_complete("Marsh")
+    if raceGroup.kwolokDropRace == 2 add_trial_complete("Hollow")
+    if raceGroup.wellspringRace == 2 add_trial_complete("Wellspring")
+    if raceGroup.silentWoodlandRace == 2 add_trial_complete("Woods")
+    if raceGroup.baursReachWindTunnelRace == 2 add_trial_complete("Reach")
+    if raceGroup.mouldwoodDepthsRace == 2 add_trial_complete("Depths")
+    if raceGroup.lumaPoolsRace == 2 add_trial_complete("Pools")
+    if raceGroup.desertRace == 2 add_trial_complete("Wastes")
+
+    if get_boolean("comma") add_trial_hint("$Completed$: " + get_string("completed"))
+}
+
+fun add_trial_hint(part: String) {
+    if get_boolean("newline") set_string("trial_hints", get_string("trial_hints") + "\n")
+    set_boolean("newline", true)
+    set_string("trial_hints", get_string("trial_hints") + part)
+}
+
+fun add_trial_complete(part: String) {
+    if get_boolean("comma") set_string("completed", get_string("completed") + ", ")
+    set_boolean("comma", true)
+    set_string("completed", get_string("completed") + part)
+}

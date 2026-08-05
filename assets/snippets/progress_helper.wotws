@@ -10,6 +10,7 @@ By default those are bound to
 - Alt+3 (quests)
 ")
 
+// TODO interface settings instead
 !config(entrance_helper, "Entrance Helper", "Documents entrance connections", Boolean, true)
 
 // TODO there's a regression here because previously progress messages were in a consistent order
@@ -100,65 +101,67 @@ on reload {
     set_wheel_item_data(
         "root",
         Top,
-        "Progress Summary",
-        "[Ability1]View Progress",
+        "Progress Helper",
+        "[Ability1]View Summary\n[Ability2]Open menu",
         progress_summary_icon,
     )
-    set_wheel_item_all_actions("root", Top, trigger_keybind("ShowProgressWithHints"))
+    set_wheel_item_action("root", Top, Ability1, trigger_keybind("ShowProgressWithHints"))
+    set_wheel_item_action("root", Top, Ability2, switch_wheel("progress_helper"))
+    set_wheel_item_action("root", Top, Ability3, switch_wheel("progress_helper"))
 
     set_wheel_item_data(
-        "root",
-        TopRight,
+        "progress_helper",
+        Top,
         "Tree Progress",
         "[Ability1]View Progress",
         tree_progress_icon,
     )
-    set_wheel_item_all_actions("root", TopRight, {
+    set_wheel_item_all_actions("progress_helper", Top, {
         write_tree_progress()
         controlled_priority_message("tree_progress", get_string("tree_progress"), 4)
     })
 
     set_wheel_item_data(
-        "root",
-        RightTop,
+        "progress_helper",
+        TopRight,
         "Wisp Progress",
         "[Ability1]View Progress",
         wisp_progress_icon,
     )
-    set_wheel_item_all_actions("root", RightTop, {
+    set_wheel_item_all_actions("progress_helper", TopRight, {
         write_wisp_progress()
         controlled_priority_message("wisp_progress", get_string("wisp_progress"), 4)
     })
 
     set_wheel_item_data(
-        "root",
-        Right,
+        "progress_helper",
+        RightTop,
         "Quest Progress",
         "[Ability1]View Progress",
         quest_progress_icon,
     )
-    set_wheel_item_all_actions("root", Right, show_quest_progress())
+    set_wheel_item_all_actions("progress_helper", RightTop, show_quest_progress())
 
     set_wheel_item_data(
-        "root",
-        RightBottom,
+        "progress_helper",
+        Right,
         "Teleporter Progress",
         "[Ability1]View Progress",
         teleporter_icon,
     )
-    set_wheel_item_all_actions("root", RightBottom, show_teleporter_progress())
+    set_wheel_item_all_actions("progress_helper", Right, show_teleporter_progress())
 }
 
 !if entrance_helper {
     on reload {
         set_wheel_item_data(
-            "root",
-            BottomRight,
+            "progress_helper",
+            RightBottom,
             "Entrance Progress",
             "[Ability1]View Progress",
             entrance_connections_icon,
         )
-        set_wheel_item_all_actions("root", BottomRight, show_entrance_progress())
+        set_wheel_item_all_actions("progress_helper", RightBottom, show_entrance_progress())
     }
 }
 
