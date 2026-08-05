@@ -10,6 +10,7 @@ use itertools::Itertools;
 use log::trace;
 use ordered_float::OrderedFloat;
 use smallvec::SmallVec;
+use strum::Display;
 use wotw_seedgen_data::assets::{LocDataEntry, StateDataEntry};
 use wotw_seedgen_data::logic_language::output::Node;
 use wotw_seedgen_data::Teleporter;
@@ -34,8 +35,11 @@ pub enum Missing<'graph> {
     // Noticed this with Grenade being offered as better than Bow because of DPE
     // but for common wall health values this is almost always wrong.
     EnergyOrBetterWallWeapon(OrderedFloat<f32>),
-    EnergyOrBetterEnemyWeapon(OrderedFloat<f32>),
-    EnergyOrBurrowOrBetterEnemyWeapon(OrderedFloat<f32>),
+    EnergyOrBetterCombatWeapon {
+        amount: OrderedFloat<f32>,
+        burrow_reduces_cost: bool,
+        weapon: MissingWeaponKind,
+    },
     // TODO if we don't make this type recursive but rather return lists of missing where needed we could try using smallvec
     Any(Vec<Missing<'graph>>),
     Or(
@@ -95,15 +99,11 @@ impl Missing<'_> {
         if TARGET_IS_WALL {
             Self::EnergyOrBetterWallWeapon
         } else {
-            Self::EnergyOrBetterEnemyWeapon
-        }
-    }
-
-    fn energy_or_better_enemy_weapon(burrow_reduces_cost: bool) -> fn(OrderedFloat<f32>) -> Self {
-        if burrow_reduces_cost {
-            Self::EnergyOrBurrowOrBetterEnemyWeapon
-        } else {
-            Self::EnergyOrBetterEnemyWeapon
+            |amount| Self::EnergyOrBetterCombatWeapon {
+                amount,
+                burrow_reduces_cost: false,
+                weapon: MissingWeaponKind::Any,
+            }
         }
     }
 }
@@ -122,12 +122,11 @@ impl Display for Missing<'_> {
             Missing::EnergyOrBetterWallWeapon(amount) => {
                 write!(f, "EnergyOrBetterWallWeapon*{amount}")
             }
-            Missing::EnergyOrBetterEnemyWeapon(amount) => {
-                write!(f, "EnergyOrBetterEnemyWeapon*{amount}")
-            }
-            Missing::EnergyOrBurrowOrBetterEnemyWeapon(amount) => {
-                write!(f, "EnergyOrBurrowOrBetterEnemyWeapon*{amount}")
-            }
+            Missing::EnergyOrBetterCombatWeapon {
+                amount,
+                burrow_reduces_cost,
+                weapon,
+            } => write!(f, "EnergyOrBetterCombatWeapon*{amount}(burrow_reduces_cost: {burrow_reduces_cost}, weapon: {weapon})"),
             Missing::Any(any) => any.iter().format(" or ").fmt(f),
             Missing::Or(ors, orbs) => write!(
                 f,
@@ -138,6 +137,14 @@ impl Display for Missing<'_> {
             ),
         }
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Display)]
+pub enum MissingWeaponKind {
+    Any,
+    Ranged,
+    Shield,
+    RangedOrShield,
 }
 
 impl<'graph> World<'graph, '_, '_, '_> {
@@ -262,6 +269,8 @@ impl<'graph> World<'graph, '_, '_, '_> {
 
                 let shield_weapon = self.owned_shield_weapons().next();
                 let mut cost = 0.0;
+                let mut ranged_cost = 0.0;
+                let mut shield_cost = 0.0;
                 let mut burrow_reduces_cost = false;
 
                 for (enemy, amount) in enemies {
@@ -271,13 +280,21 @@ impl<'graph> World<'graph, '_, '_, '_> {
                         Enemy::EnergyRefill => {
                             // It is possible for the total cost of a combat requirement to be different across orb variants because some of them may max out during energy refills
                             // However in between energy refills, the cost is always the same
-                            self.cost_met_or_better_weapon::<false>(cost, orb_variants)?;
+                            self.cost_met_or_better_combat_weapon(
+                                cost,
+                                ranged_cost,
+                                shield_cost,
+                                burrow_reduces_cost,
+                                orb_variants,
+                            )?;
 
                             for orbs in orb_variants.iter_mut() {
                                 self.recharge(orbs, amount);
                             }
 
                             cost = 0.0;
+                            ranged_cost = 0.0;
+                            shield_cost = 0.0;
                             continue;
                         }
                         Enemy::Sandworm => {
@@ -299,7 +316,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
                             // TODO precompiled slices for weapon identifiers?
                             return ControlFlow::Break(Missing::any_skill(SHIELD_WEAPONS));
                         };
-                        cost += self.use_cost(shield_weapon) * amount;
+                        shield_cost += self.use_cost(shield_weapon) * amount;
                         health = (health - shield_weapon.burn_damage()).max(0.0);
                     }
                     // No enemy is shielded and armored
@@ -307,33 +324,31 @@ impl<'graph> World<'graph, '_, '_, '_> {
                         health *= 2.0;
                     }
 
-                    let ranged_weapon =
-                        enemy.ranged() && self.settings.difficulty < Difficulty::Unsafe;
-                    let cost_function = if ranged_weapon {
-                        World::destroy_cost_ranged
-                    } else {
-                        World::destroy_cost::<false>
-                    };
-
-                    let Some(enemy_cost) = cost_function(self, health, enemy.flying()) else {
-                        let missing = if ranged_weapon {
-                            Missing::any_skill(self.settings.difficulty.ranged_weapons_iter())
-                        } else {
-                            // TODO same optimization for ranged / shield weapons?
-                            Missing::EnemyWeapon
+                    if enemy.ranged() && self.settings.difficulty < Difficulty::Unsafe {
+                        let Some(enemy_cost) = self.destroy_cost_ranged(health, enemy.flying())
+                        else {
+                            return ControlFlow::Break(Missing::any_skill(
+                                self.settings.difficulty.ranged_weapons_iter(),
+                            ));
                         };
 
-                        return ControlFlow::Break(missing);
-                    };
+                        ranged_cost += enemy_cost * amount;
+                    } else {
+                        let Some(enemy_cost) = self.destroy_cost::<false>(health, enemy.flying())
+                        else {
+                            return ControlFlow::Break(Missing::EnemyWeapon);
+                        };
 
-                    cost += enemy_cost * amount;
+                        cost += enemy_cost * amount;
+                    }
                 }
 
-                // TODO what if what we need is specifically a better shield / ranged weapon?
-                self.cost_met_or::<true>(
+                self.cost_met_or_better_combat_weapon(
                     cost,
+                    ranged_cost,
+                    shield_cost,
+                    burrow_reduces_cost,
                     orb_variants,
-                    Missing::energy_or_better_enemy_weapon(burrow_reduces_cost),
                 )
             }
             Requirement::And(requirements) => {
@@ -506,6 +521,40 @@ impl<'graph> World<'graph, '_, '_, '_> {
         )
     }
 
+    fn cost_met_or_better_combat_weapon(
+        &self,
+        cost: f32,
+        ranged_cost: f32,
+        shield_cost: f32,
+        burrow_reduces_cost: bool,
+        orb_variants: &mut OrbVariants,
+    ) -> ControlFlow<Missing<'static>> {
+        let total_cost = cost + ranged_cost + shield_cost;
+
+        self.cost_met_or::<true>(total_cost, orb_variants, move |amount| {
+            if cost > 0. {
+                Missing::EnergyOrBetterCombatWeapon {
+                    amount,
+                    burrow_reduces_cost,
+                    weapon: MissingWeaponKind::Any,
+                }
+            } else {
+                let weapon = match (ranged_cost > 0., shield_cost > 0.) {
+                    (false, false) => unreachable!(),
+                    (true, false) => MissingWeaponKind::Ranged,
+                    (false, true) => MissingWeaponKind::Shield,
+                    (true, true) => MissingWeaponKind::RangedOrShield,
+                };
+
+                Missing::EnergyOrBetterCombatWeapon {
+                    amount,
+                    burrow_reduces_cost,
+                    weapon,
+                }
+            }
+        })
+    }
+
     fn cost_met<const CONSUMING: bool>(
         &self,
         cost: f32,
@@ -518,7 +567,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
         &self,
         cost: f32,
         orb_variants: &mut OrbVariants,
-        energy: fn(OrderedFloat<f32>) -> Missing<'static>,
+        energy: impl FnOnce(OrderedFloat<f32>) -> Missing<'static>,
     ) -> ControlFlow<Missing<'static>> {
         let mut missing = MissingOrbStats::new();
 
@@ -738,7 +787,10 @@ impl MissingOrbStats {
         }
     }
 
-    fn finish<'graph>(self, energy: fn(OrderedFloat<f32>) -> Missing<'graph>) -> Missing<'graph> {
+    fn finish<'graph>(
+        self,
+        energy: impl FnOnce(OrderedFloat<f32>) -> Missing<'graph>,
+    ) -> Missing<'graph> {
         let mut missing = vec![];
 
         if self.health > f32::MIN {

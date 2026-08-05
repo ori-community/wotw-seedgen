@@ -6,12 +6,13 @@ use std::{
 
 use super::World;
 use crate::{
-    logical_difficulty::LogicalDifficulty,
+    logical_difficulty::{LogicalDifficulty, SHIELD_WEAPONS},
     orb_variants,
     orbs::OrbVariants,
     perf_data::PerfData,
-    world::{GraphRef, Missing, ReachUpdateState},
+    world::{is_met::MissingWeaponKind, GraphRef, Missing, ReachUpdateState},
 };
+use arrayvec::ArrayVec;
 use itertools::Itertools;
 use log::{trace, warn};
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
@@ -859,19 +860,17 @@ impl<'graph> World<'graph, '_, '_, '_> {
             Missing::WallWeapon => self.add_weapon_fail::<true>(connection),
             Missing::EnemyWeapon => self.add_weapon_fail::<false>(connection),
             Missing::EnergyOrBetterWallWeapon(_) => {
-                self.add_energy_or_better_weapon_fail::<true>(connection);
+                self.add_energy_or_better_wall_weapon_fail(connection);
             }
-            Missing::EnergyOrBetterEnemyWeapon(_) => {
-                self.add_energy_or_better_weapon_fail::<false>(connection);
-            }
-            Missing::EnergyOrBurrowOrBetterEnemyWeapon(_) => {
-                add_fail_to(
-                    &mut self.reach.state.fails.uber_state,
-                    Skill::BURROW_ID,
-                    connection.clone(),
-                );
-                self.add_energy_or_better_weapon_fail::<false>(connection);
-            }
+            Missing::EnergyOrBetterCombatWeapon {
+                amount: _,
+                burrow_reduces_cost,
+                weapon,
+            } => self.add_energy_or_better_combat_weapon_fail(
+                connection,
+                burrow_reduces_cost,
+                weapon,
+            ),
             Missing::Any(options) => {
                 for missing in options {
                     self.add_fail(missing, connection.clone());
@@ -892,16 +891,39 @@ impl<'graph> World<'graph, '_, '_, '_> {
         );
     }
 
-    fn add_energy_or_better_weapon_fail<const TARGET_IS_WALL: bool>(
-        &mut self,
-        connection: ConnectionIndex<'graph>,
-    ) {
+    fn add_energy_or_better_wall_weapon_fail(&mut self, connection: ConnectionIndex<'graph>) {
         self.reach.state.fails.energy.insert(connection.clone());
         self.add_any_skill_fail(
             connection,
             // TODO avoidable collect
-            self.better_weapons::<TARGET_IS_WALL>().collect::<Vec<_>>(),
+            self.better_weapons::<true>().collect::<Vec<_>>(),
         );
+    }
+
+    fn add_energy_or_better_combat_weapon_fail(
+        &mut self,
+        connection: ConnectionIndex<'graph>,
+        burrow_reduces_cost: bool,
+        weapon: MissingWeaponKind,
+    ) {
+        self.reach.state.fails.energy.insert(connection.clone());
+
+        if burrow_reduces_cost {
+            add_fail_to(
+                &mut self.reach.state.fails.uber_state,
+                Skill::BURROW_ID,
+                connection.clone(),
+            );
+        }
+
+        let skills = match weapon {
+            MissingWeaponKind::Any => self.better_weapons::<false>().collect(),
+            MissingWeaponKind::Ranged => self.better_ranged_weapons().collect(),
+            MissingWeaponKind::Shield => self.better_shield_weapons().collect(),
+            MissingWeaponKind::RangedOrShield => self.better_ranged_or_shield_weapons(),
+        };
+
+        self.add_any_skill_fail(connection, skills);
     }
 
     fn add_any_skill_fail<I>(&mut self, connection: ConnectionIndex<'graph>, skills: I)
@@ -921,24 +943,59 @@ impl<'graph> World<'graph, '_, '_, '_> {
     pub(crate) fn better_weapons<const TARGET_IS_WALL: bool>(
         &self,
     ) -> impl Iterator<Item = Skill> + use<'_, 'graph, TARGET_IS_WALL> {
-        let mut lowest_cost = Skill::Spear.energy_cost();
-        let mut highest_dpe = Skill::Sentry.damage_per_energy(false);
+        self.better_weapons_from(
+            Skill::Spear.energy_cost(),
+            Skill::Sentry.damage_per_energy(false),
+            self.settings.difficulty.weapons::<TARGET_IS_WALL>(),
+        )
+    }
 
-        for owned in self.owned_weapons::<TARGET_IS_WALL>() {
+    pub(crate) fn better_ranged_weapons(&self) -> impl Iterator<Item = Skill> + use<'_, 'graph> {
+        self.better_weapons_from(
+            Skill::Spear.energy_cost(),
+            Skill::Sentry.damage_per_energy(false),
+            self.settings.difficulty.ranged_weapons(),
+        )
+    }
+
+    pub(crate) fn better_shield_weapons(&self) -> impl Iterator<Item = Skill> + use<'_, 'graph> {
+        self.better_weapons_from(
+            Skill::Spear.energy_cost(),
+            Skill::Sentry.damage_per_energy(false),
+            &SHIELD_WEAPONS,
+        )
+    }
+
+    // cap 9 allows storing this in the same type as better_weapons and is only one higher than necessary
+    pub(crate) fn better_ranged_or_shield_weapons(&self) -> ArrayVec<Skill, 9> {
+        let mut weapons = self.better_ranged_weapons().collect::<ArrayVec<_, _>>();
+
+        for weapon in self.better_shield_weapons() {
+            if !weapons.contains(&weapon) {
+                weapons.push(weapon);
+            }
+        }
+
+        weapons
+    }
+
+    pub(crate) fn better_weapons_from<'a>(
+        &'a self,
+        mut lowest_cost: f32,
+        mut highest_dpe: f32,
+        weapons: &'a [Skill],
+    ) -> impl Iterator<Item = Skill> + use<'a, 'graph> {
+        for owned in self.owned_weapons_from(weapons) {
             let cost = owned.energy_cost();
             lowest_cost = lowest_cost.min(cost);
             highest_dpe = highest_dpe
                 .max(owned.total_damage(self.settings.difficulty.charge_grenade()) / cost);
         }
 
-        self.settings
-            .difficulty
-            .weapons_iter::<TARGET_IS_WALL>()
-            .filter(move |weapon| {
-                weapon.energy_cost() < lowest_cost
-                    || weapon.damage_per_energy(self.settings.difficulty.charge_grenade())
-                        > highest_dpe
-            })
+        weapons.iter().copied().filter(move |weapon| {
+            weapon.energy_cost() < lowest_cost
+                || weapon.damage_per_energy(self.settings.difficulty.charge_grenade()) > highest_dpe
+        })
     }
 }
 

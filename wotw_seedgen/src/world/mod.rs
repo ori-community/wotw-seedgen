@@ -6,7 +6,7 @@ pub(crate) mod tests;
 
 use arrayvec::ArrayVec;
 pub(crate) use graph_ref::GraphRef;
-pub(crate) use is_met::Missing;
+pub(crate) use is_met::{Missing, MissingWeaponKind};
 pub(crate) use reached::{
     ConnectionIndex, ConnectionOrRefill, ConnectionRequirement, ConnectionRequirementPartial,
     ReachStateFails,
@@ -493,26 +493,22 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     pub fn owned_weapons<const TARGET_IS_WALL: bool>(
         &self,
     ) -> impl Iterator<Item = Skill> + use<'_, 'graph, TARGET_IS_WALL> {
-        self.owned_weapons_from(Difficulty::weapons_iter::<TARGET_IS_WALL>)
+        self.owned_weapons_from(self.settings.difficulty.weapons::<TARGET_IS_WALL>())
     }
 
     pub fn owned_ranged_weapons(&self) -> impl Iterator<Item = Skill> + use<'_, 'graph> {
-        self.owned_weapons_from(Difficulty::ranged_weapons_iter)
+        self.owned_weapons_from(self.settings.difficulty.ranged_weapons())
     }
 
     pub fn owned_shield_weapons(&self) -> impl Iterator<Item = Skill> + use<'_, 'graph> {
-        self.owned_weapons_from(|_| SHIELD_WEAPONS.into_iter())
+        self.owned_weapons_from(&SHIELD_WEAPONS)
     }
 
-    fn owned_weapons_from<'s, F, I>(
-        &'s self,
-        f: F,
-    ) -> impl Iterator<Item = Skill> + use<'s, 'graph, F, I>
-    where
-        F: FnOnce(Difficulty) -> I,
-        I: Iterator<Item = Skill> + 's,
-    {
-        f(self.settings.difficulty).filter(|weapon| self.skill(*weapon))
+    fn owned_weapons_from<'a>(
+        &'a self,
+        weapons: &'a [Skill],
+    ) -> impl Iterator<Item = Skill> + use<'a, 'graph> {
+        weapons.iter().copied().filter(|weapon| self.skill(*weapon))
     }
 
     pub fn inventory_display(&self) -> InventoryDisplay<'_, 'graph, 'settings, 'perf, 'log> {

@@ -17126,6 +17126,7 @@ anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
     gorlek: BreakCrystal, DoubleJump
     kii: BreakCrystal
 
+  # TODO this doesn't really represent the fact that rock boss is flying or that you might have to destroy shields
   state WillowsEnd.MinibossHeart:
     moki: Boss=300, Damage=60, Regenerate, Bash, Dash, DoubleJump, Launch
     gorlek: Boss=300, Damage=60, Regenerate, Launch, Bash, DoubleJump OR Dash

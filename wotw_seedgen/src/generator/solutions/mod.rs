@@ -48,7 +48,7 @@ use crate::{
     orbs::OrbVariants,
     world::{
         ConnectionIndex, ConnectionOrRefill, ConnectionRequirement, ConnectionRequirementPartial,
-        GraphRef, Missing, ReachStateFails,
+        GraphRef, Missing, MissingWeaponKind, ReachStateFails,
     },
     World,
 };
@@ -456,6 +456,9 @@ impl<'graph> SolutionLike<'graph> for PartialSolution<'graph> {
 #[derive(Debug, Clone, Default)]
 struct Commitments {
     better_weapon: bool,
+    better_ranged_weapon: bool,
+    better_shield_weapon: bool,
+    better_ranged_or_shield_weapon: bool,
     burrow_as_weapon: bool,
     energy_shard: bool,
     vitality: bool,
@@ -467,6 +470,18 @@ struct Commitments {
 impl Commitments {
     fn commit_better_weapon(&mut self) -> bool {
         mem::replace(&mut self.better_weapon, true)
+    }
+
+    fn commit_better_ranged_weapon(&mut self) -> bool {
+        mem::replace(&mut self.better_ranged_weapon, true)
+    }
+
+    fn commit_better_shield_weapon(&mut self) -> bool {
+        mem::replace(&mut self.better_shield_weapon, true)
+    }
+
+    fn commit_better_ranged_or_shield_weapon(&mut self) -> bool {
+        mem::replace(&mut self.better_ranged_or_shield_weapon, true)
     }
 
     fn commit_burrow_as_weapon(&mut self) -> bool {
@@ -864,14 +879,19 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             Missing::WallWeapon => self.solve_weapon::<true>(solution, simulate),
             Missing::EnemyWeapon => self.solve_weapon::<false>(solution, simulate),
             Missing::EnergyOrBetterWallWeapon(amount) => {
-                self.solve_energy_or_better_weapon::<true>(solution, amount, simulate)
+                self.solve_energy_or_better_wall_weapon(solution, amount, simulate)
             }
-            Missing::EnergyOrBetterEnemyWeapon(amount) => {
-                self.solve_energy_or_better_weapon::<false>(solution, amount, simulate)
-            }
-            Missing::EnergyOrBurrowOrBetterEnemyWeapon(amount) => {
-                self.solve_energy_or_burrow_or_better_enemy_weapon(solution, amount, simulate)
-            }
+            Missing::EnergyOrBetterCombatWeapon {
+                amount,
+                burrow_reduces_cost,
+                weapon,
+            } => self.solve_energy_or_better_combat_weapon(
+                solution,
+                amount,
+                burrow_reduces_cost,
+                weapon,
+                simulate,
+            ),
             Missing::Any(any) => self.solve_branches(solution, any, simulate, Self::solve),
             Missing::Or(ors, orb_variants) => self.solve_or(solution, ors, orb_variants, simulate),
         }
@@ -1108,32 +1128,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         self.solve_branches(solution, branches, simulate, Self::solve_boolean)
     }
 
-    fn solve_energy_or_burrow_or_better_enemy_weapon(
-        &mut self,
-        solution: PartialSolution<'graph>,
-        amount: OrderedFloat<f32>,
-        simulate: bool,
-    ) -> ControlFlow<(), PartialSolution<'graph>> {
-        self.solve_committing_branch(
-            solution,
-            simulate,
-            Commitments::commit_burrow_as_weapon,
-            |this, solution, simulate| {
-                this.solve_energy_or_better_weapon::<false>(solution, amount, simulate)
-            },
-            Self::solve_burrow,
-        )
-    }
-
-    fn solve_burrow(
-        &mut self,
-        solution: PartialSolution<'graph>,
-        simulate: bool,
-    ) -> ControlFlow<(), PartialSolution<'graph>> {
-        self.solve_boolean(solution, Skill::BURROW_ID, simulate)
-    }
-
-    fn solve_energy_or_better_weapon<const TARGET_IS_WALL: bool>(
+    fn solve_energy_or_better_wall_weapon(
         &mut self,
         solution: PartialSolution<'graph>,
         amount: OrderedFloat<f32>,
@@ -1144,7 +1139,88 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             simulate,
             Commitments::commit_better_weapon,
             |this, solution, simulate| this.solve_energy::<true>(solution, amount, simulate),
-            Self::solve_better_weapon::<TARGET_IS_WALL>,
+            Self::solve_better_weapon::<true>,
+        )
+    }
+
+    fn solve_energy_or_better_combat_weapon(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        amount: OrderedFloat<f32>,
+        burrow_reduces_cost: bool,
+        weapon: MissingWeaponKind,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        if burrow_reduces_cost {
+            self.solve_committing_branch(
+                solution,
+                simulate,
+                Commitments::commit_burrow_as_weapon,
+                move |this, solution, simulate| {
+                    this.solve_energy_or_better_combat_weapon_after_burrow(
+                        solution, amount, weapon, simulate,
+                    )
+                },
+                Self::solve_burrow,
+            )
+        } else {
+            self.solve_energy_or_better_combat_weapon_after_burrow(
+                solution, amount, weapon, simulate,
+            )
+        }
+    }
+
+    fn solve_burrow(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_boolean(solution, Skill::BURROW_ID, simulate)
+    }
+
+    fn solve_energy_or_better_combat_weapon_after_burrow(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        amount: OrderedFloat<f32>,
+        weapon: MissingWeaponKind,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        type SolvePointer<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log> =
+            fn(
+                &mut SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
+                PartialSolution<'graph>,
+                bool,
+            ) -> ControlFlow<(), PartialSolution<'graph>>;
+
+        let (commitment, solve) = match weapon {
+            MissingWeaponKind::Any => (
+                Commitments::commit_better_weapon as fn(&mut Commitments) -> bool,
+                Self::solve_better_weapon::<false>
+                    as SolvePointer<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
+            ),
+            MissingWeaponKind::Ranged => (
+                Commitments::commit_better_ranged_weapon as fn(&mut Commitments) -> bool,
+                Self::solve_better_ranged_weapon
+                    as SolvePointer<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
+            ),
+            MissingWeaponKind::Shield => (
+                Commitments::commit_better_shield_weapon as fn(&mut Commitments) -> bool,
+                Self::solve_better_shield_weapon
+                    as SolvePointer<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
+            ),
+            MissingWeaponKind::RangedOrShield => (
+                Commitments::commit_better_ranged_or_shield_weapon as fn(&mut Commitments) -> bool,
+                Self::solve_better_ranged_or_shield_weapon
+                    as SolvePointer<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>,
+            ),
+        };
+
+        self.solve_committing_branch(
+            solution,
+            simulate,
+            commitment,
+            |this, solution, simulate| this.solve_energy::<true>(solution, amount, simulate),
+            solve,
         )
     }
 
@@ -1162,6 +1238,48 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             .better_weapons::<TARGET_IS_WALL>()
             .map(Skill::uber_identifier)
             .collect::<ArrayVec<_, 9>>();
+
+        self.solve_branches(solution, weapons, simulate, Self::solve_boolean)
+    }
+
+    fn solve_better_ranged_weapon(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        let weapons = self
+            .world
+            .better_ranged_weapons()
+            .map(Skill::uber_identifier)
+            .collect::<ArrayVec<_, 6>>();
+
+        self.solve_branches(solution, weapons, simulate, Self::solve_boolean)
+    }
+
+    fn solve_better_shield_weapon(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        let weapons = self
+            .world
+            .better_shield_weapons()
+            .map(Skill::uber_identifier)
+            .collect::<ArrayVec<_, 9>>();
+
+        self.solve_branches(solution, weapons, simulate, Self::solve_boolean)
+    }
+
+    fn solve_better_ranged_or_shield_weapon(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        let weapons = self
+            .world
+            .better_ranged_or_shield_weapons()
+            .into_iter()
+            .map(Skill::uber_identifier);
 
         self.solve_branches(solution, weapons, simulate, Self::solve_boolean)
     }
