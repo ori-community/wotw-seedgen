@@ -94,24 +94,23 @@ pub static SOLUTION_MAX_ITEMS: LazyLock<usize> = LazyLock::new(|| {
 pub type SolutionItems = SmallVec<[usize; 8]>;
 
 #[derive(Debug, Clone)]
-pub struct Solution {
-    pub items: SolutionItems,
-    pub spirit_light: i32,
+pub struct Solution<'graph> {
+    inner: PartialSolution<'graph>,
     pub new_reached: usize,
 }
 
-impl PartialEq for Solution {
+impl PartialEq for Solution<'_> {
     fn eq(&self, other: &Self) -> bool {
         // TODO can this be applied elsewhere?
         // spirit_light can be ignored because finished solutions are non-redundant
         // and solutions with the same items, but different spirit lights would be redundant.
         // new_reached can be ignored because it depends on the other two values.
-        let eq = self.items == other.items;
+        let eq = self.inner.used_items == other.inner.used_items;
 
         if cfg!(debug_assertions) {
             assert_eq!(
                 eq,
-                (eq && (self.spirit_light == other.spirit_light)
+                (eq && (self.inner.spirit_light == other.inner.spirit_light)
                     && (self.new_reached == other.new_reached))
             );
         }
@@ -120,23 +119,23 @@ impl PartialEq for Solution {
     }
 }
 
-impl Eq for Solution {}
+impl Eq for Solution<'_> {}
 
-impl PartialOrd for Solution {
+impl PartialOrd for Solution<'_> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for Solution {
+impl Ord for Solution<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
         // see notes on PartialEq impl
-        let ord = self.items.cmp(&other.items);
+        let ord = self.inner.used_items.cmp(&other.inner.used_items);
 
         if cfg!(debug_assertions) {
             assert_eq!(
                 ord,
-                ord.then(self.spirit_light.cmp(&other.spirit_light))
+                ord.then(self.inner.spirit_light.cmp(&other.inner.spirit_light))
                     .then(self.new_reached.cmp(&other.new_reached))
             );
         }
@@ -145,13 +144,17 @@ impl Ord for Solution {
     }
 }
 
-impl Solution {
-    fn new(solution: PartialSolution, new_reached: usize) -> Self {
+impl<'graph> Solution<'graph> {
+    fn new(solution: PartialSolution<'graph>, new_reached: usize) -> Self {
         Self {
-            items: solution.used_items,
-            spirit_light: solution.spirit_light,
+            inner: solution,
             new_reached,
         }
+    }
+
+    /// Dissolves the solutions into its items and spirit light, preventing later continuation
+    pub fn into_inner(self) -> (SolutionItems, i32) {
+        (self.inner.used_items, self.inner.spirit_light)
     }
 }
 
@@ -189,13 +192,13 @@ pub trait SolutionLike<'graph> {
     }
 }
 
-impl<'graph> SolutionLike<'graph> for Solution {
+impl<'graph> SolutionLike<'graph> for Solution<'_> {
     fn items(&self) -> &SolutionItems {
-        &self.items
+        &self.inner.used_items
     }
 
     fn spirit_light(&self) -> i32 {
-        self.spirit_light
+        self.inner.spirit_light
     }
 
     fn connection(&self) -> Option<&ConnectionIndex<'graph>> {
@@ -271,7 +274,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         slots: usize,
         spirit_light_slots: usize,
         search_radius: Option<u8>,
-    ) -> Vec<Solution> {
+    ) -> Vec<Solution<'graph>> {
         // This really slows down default settings for some reason? But unsafe is much more critical...
         let capped_slots = usize::min(slots, *SOLUTION_MAX_ITEMS);
         let mut solutions = self.find_solutions_no_max_items(
@@ -284,7 +287,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
 
         if solutions.is_empty() && slots > capped_slots {
             trace!(
-                logger: item_pool.log_capture,
+                logger: self.log_capture,
                 "no solutions found, retrying with uncapped solution size"
             );
 
@@ -296,13 +299,15 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
                 search_radius,
             );
 
-            if let Some(min_solution) = solutions.iter().min_by_key(|solution| solution.items.len())
+            if let Some(min_solution) = solutions
+                .iter()
+                .min_by_key(|solution| solution.inner.used_items.len())
             {
                 warn!(
-                    logger: item_pool.log_capture,
+                    logger: self.log_capture,
                     "insufficient solution max items {solution_max_items}, needed at least {min_max_items} for {min_solution}",
                     solution_max_items = *SOLUTION_MAX_ITEMS,
-                    min_max_items = min_solution.items.len(),
+                    min_max_items = min_solution.inner.used_items.len(),
                     min_solution = min_solution.display(item_pool, None)
                 );
             }
@@ -318,7 +323,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         slots: usize,
         spirit_light_slots: usize,
         search_radius: Option<u8>,
-    ) -> Vec<Solution> {
+    ) -> Vec<Solution<'graph>> {
         let fails = self.fails();
         let initial_solutions = fails
             .uber_state
@@ -344,6 +349,33 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         // Touched solutions are a queue so that branching paths predictably execute
         // one variant before the other, allowing us to prioritize paths that are
         // likely to eliminate redundancies earlier.
+        while let Some(solution) = context.solutions.pop_front() {
+            context.solve_touched(solution);
+        }
+
+        context.finish()
+    }
+
+    pub fn continue_solution(
+        &mut self,
+        mut solution: Solution<'graph>,
+        item_pool: &ItemPool<'log>,
+        output: &CommandsOutput,
+        slots: usize,
+        spirit_light_slots: usize,
+    ) -> Vec<Solution<'graph>> {
+        solution.inner.search_radius = u8::MAX;
+
+        let mut context = SolutionContext::new(self, output, item_pool, slots, spirit_light_slots);
+
+        trace!(
+            logger: item_pool.log_capture,
+            "continuing previously finished solution {}",
+            context.display_solution(&solution)
+        );
+
+        context.solve_touched(solution.inner);
+
         while let Some(solution) = context.solutions.pop_front() {
             context.solve_touched(solution);
         }
@@ -471,8 +503,8 @@ struct SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log> {
     initial_pickup_count: usize,
     initial_fails: ReachStateFails<'graph>,
     solutions: VecDeque<PartialSolution<'graph>>,
-    finished: Vec<Solution>,
-    aborted: Vec<Solution>,
+    finished: Vec<Solution<'graph>>,
+    aborted: Vec<Solution<'graph>>,
     perf_counters: IndexMap<usize, u32, FxBuildHasher>,
 }
 
@@ -1472,7 +1504,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         }
     }
 
-    fn finish(mut self) -> Vec<Solution> {
+    fn finish(mut self) -> Vec<Solution<'graph>> {
         self.finished.extend(self.aborted);
 
         if cfg!(debug_assertions) {

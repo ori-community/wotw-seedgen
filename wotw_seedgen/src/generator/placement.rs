@@ -497,7 +497,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         self.place_command_at(item, pickup, origin_world_index, target_world_index, false);
     }
 
-    fn choose_progression(&mut self) -> Result<Option<(usize, Solution)>, String> {
+    fn choose_progression(&mut self) -> Result<Option<(usize, Solution<'graph>)>, String> {
         let slots = self.progression_slots();
 
         let mut world_indices = (0..self.worlds.len())
@@ -568,17 +568,19 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         Err("Failed to reach all locations".to_string())
     }
 
-    fn place_forced(&mut self, target_world_index: usize, mut progression: Solution) {
+    fn place_forced(&mut self, target_world_index: usize, progression: Solution<'graph>) {
+        let (mut items, spirit_light) = progression.into_inner();
+
         // Spirit Light has to be placed first since it's more restrictive
-        if progression.spirit_light > 0 {
+        if spirit_light > 0 {
             self.worlds[target_world_index].force_place_spirit_light(
-                progression.spirit_light,
+                spirit_light,
                 &mut self.spoiler.groups[self.step - 1].placements,
             );
         }
 
-        progression.items.sort_unstable();
-        for item in progression.items.into_iter().rev() {
+        items.sort_unstable();
+        for item in items.into_iter().rev() {
             let command = self.worlds[target_world_index].item_pool.remove(item);
             self.force_place_command(command, target_world_index);
         }
@@ -595,7 +597,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
                     trace!(
                         logger: self.log_capture,
-                        "Placing {target_index}{name} at {origin_index}Spawn",
+                        "Placing forced {target_index}{name} at {origin_index}Spawn",
                         name = self.worlds[target_world_index].log_name(&command),
                         target_index = self.worlds[target_world_index].log_index,
                         origin_index = self.worlds[origin_world_index].log_index
@@ -709,7 +711,8 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     ) {
         trace!(
             logger: self.log_capture,
-            "Placing {target_index}{log_name} at {origin_index}{pickup}",
+            "Placing {forced}{target_index}{log_name} at {origin_index}{pickup}",
+            forced = if mark_forced { "forced " } else { "" },
             log_name = self.worlds[target_world_index].log_name(&command),
             target_index = self.worlds[target_world_index].log_index,
             origin_index = self.worlds[origin_world_index].log_index,
@@ -1146,14 +1149,16 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         )
     }
 
-    fn choose_progression(&mut self, slots: usize) -> Option<Solution> {
+    fn choose_progression(&mut self, slots: usize) -> Option<Solution<'graph>> {
         trace!(logger: self.item_pool.log_capture, "{}Attempting forced progression", self.log_index);
+
+        let spirit_light_slots = self.spirit_light_progression_slots();
 
         let progressions = self.world.find_solutions(
             &self.item_pool,
             &self.output.commands,
             slots,
-            self.spirit_light_progression_slots(),
+            spirit_light_slots,
             None,
         );
 
@@ -1163,19 +1168,51 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             return None;
         }
 
+        self.choose_from_progressions(progressions, slots, spirit_light_slots)
+    }
+
+    fn choose_from_progressions(
+        &mut self,
+        progressions: Vec<Solution<'graph>>,
+        slots: usize,
+        spirit_light_slots: usize,
+    ) -> Option<Solution<'graph>> {
         let mut with_weights = self.calculate_weights(progressions, slots);
 
-        let weights = WeightedIndex::new(with_weights.iter().map(|(_, weight)| *weight)).unwrap();
-        let (progression, _) = with_weights.swap_remove(weights.sample(&mut self.rng));
+        while !with_weights.is_empty() {
+            let weights =
+                WeightedIndex::new(with_weights.iter().map(|(_, weight)| *weight)).unwrap();
+            let (progression, _) = with_weights.swap_remove(weights.sample(&mut self.rng));
 
-        Some(progression)
+            if progression.new_reached > 0 {
+                return Some(progression);
+            }
+
+            let progressions = self.world.continue_solution(
+                progression.clone(),
+                &self.item_pool,
+                &self.output.commands,
+                slots,
+                spirit_light_slots,
+            );
+
+            if !progressions.is_empty() {
+                let choice = self.choose_from_progressions(progressions, slots, spirit_light_slots);
+
+                if choice.is_some() {
+                    return choice;
+                }
+            }
+        }
+
+        None
     }
 
     fn calculate_weights(
         &mut self,
-        progressions: Vec<Solution>,
+        progressions: Vec<Solution<'graph>>,
         slots: usize,
-    ) -> Vec<(Solution, f32)> {
+    ) -> Vec<(Solution<'graph>, f32)> {
         let mut with_weights =
             solution_weights(progressions, &self.item_pool, slots, self.spawn_slots);
 
@@ -1195,7 +1232,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     }
 
     // seedgen output should remain the same whether logging is enabled or not, so we have to sort an owned clone
-    fn log_weights(&mut self, progressions: &[(Solution, f32)]) {
+    fn log_weights(&mut self, progressions: &[(Solution<'graph>, f32)]) {
         let total_weight = progressions.iter().map(|(_, weight)| weight).sum::<f32>();
 
         trace!(

@@ -57,7 +57,8 @@ fn find_test_solutions<'log>(
             .map(|solution| {
                 amounts_from_item_list(
                     solution
-                        .items
+                        .into_inner()
+                        .0
                         .into_iter()
                         .map(|item| (*item_pool[item]).clone()),
                 )

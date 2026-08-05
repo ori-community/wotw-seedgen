@@ -18,12 +18,12 @@ use crate::{
 const HAPPY_SPAWN_SLOTS: usize = 3;
 const _: usize = SPAWN_SLOTS - HAPPY_SPAWN_SLOTS; // check that SPAWN_SLOTS >= HAPPY_SPAWN_SLOTS
 
-pub fn solution_weights(
-    solutions: Vec<Solution>,
+pub fn solution_weights<'graph>(
+    solutions: Vec<Solution<'graph>>,
     item_pool: &ItemPool,
     slots: usize,
     spawn_slots: usize,
-) -> Vec<(Solution, f32)> {
+) -> Vec<(Solution<'graph>, f32)> {
     let weight_context = WeightContext::new(item_pool, &solutions, slots, spawn_slots);
 
     solutions
@@ -67,7 +67,7 @@ impl<'pool, 'log> WeightContext<'pool, 'log> {
             let mut item_cost = 0.;
 
             let items = solution
-                .items
+                .items()
                 .iter()
                 .map(|item| {
                     let item = &item_pool[*item];
@@ -106,7 +106,7 @@ impl<'pool, 'log> WeightContext<'pool, 'log> {
         let sad_spawn_slots = used_slots.saturating_sub(non_spawn_slots + HAPPY_SPAWN_SLOTS);
 
         let data = &self.solution_data[index];
-        let cost = solution.spirit_light as f32 + data.item_cost;
+        let cost = solution.spirit_light() as f32 + data.item_cost;
         let similarity = data
             .items
             .iter()
