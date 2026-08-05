@@ -24,6 +24,12 @@
 
 on spawn store(itemTracker.wispsRequired, max_wisps)
 
+on EastHollow.ForestsVoice create_stats_entry(Wisp, "Voice")
+on WestPools.ForestsStrength create_stats_entry(Wisp, "Strength")
+on LowerReach.ForestsMemory create_stats_entry(Wisp, "Memory")
+on UpperDepths.ForestsEyes create_stats_entry(Wisp, "Eyes")
+on WindtornRuins.Seir create_stats_entry(Wisp, "Heart")
+
 on change itemTracker.wispsCount update_goals_completed()
 
 !augment_fun(write_goals_incomplete_message(), {

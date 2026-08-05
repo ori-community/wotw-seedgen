@@ -891,6 +891,7 @@ impl ResolvePlaceholders for CommandVoid {
                 y.resolve(context);
                 label.resolve(context);
             }
+            Self::CreateStatsEntry { label, .. } => label.resolve(context),
             Self::CreateWarpIcon { x, y, .. } => {
                 x.resolve(context);
                 y.resolve(context);

@@ -23,33 +23,88 @@
 
 on spawn store(itemTracker.treesRequired, max_trees)
 
-on MarshSpawn.RegenTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+on MarshSpawn.RegenTree {
+    create_stats_entry(Skill, "Regenerate")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on MarshSpawn.RegenTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on MarshSpawn.DamageTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on MarshSpawn.DamageTree {
+    create_stats_entry(Skill, "Marsh Ancestral Light")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on MarshSpawn.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on HowlsDen.SwordTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on HowlsDen.SwordTree {
+    create_stats_entry(Skill, "Sword")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on HowlsDen.SwordTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on HowlsDen.DoubleJumpTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on HowlsDen.DoubleJumpTree {
+    create_stats_entry(Skill, "Double Jump")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on HowlsDen.DoubleJumpTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on MarshPastOpher.BowTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on MarshPastOpher.BowTree {
+    create_stats_entry(Skill, "Bow")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on MarshPastOpher.BowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on WestHollow.DashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on WestHollow.DashTree {
+    create_stats_entry(Skill, "Dash")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on WestHollow.DashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on EastHollow.BashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on EastHollow.BashTree {
+    create_stats_entry(Skill, "Bash")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on EastHollow.BashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on GladesTown.DamageTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on GladesTown.DamageTree {
+    create_stats_entry(Skill, "Glades Ancestral Light")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on GladesTown.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on InnerWellspring.GrappleTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on InnerWellspring.GrappleTree {
+    create_stats_entry(Skill, "Grapple")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on InnerWellspring.GrappleTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on UpperReach.GrenadeTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on UpperReach.GrenadeTree {
+    create_stats_entry(Skill, "Grenade")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on UpperReach.GrenadeTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on UpperPools.WaterDashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on UpperPools.WaterDashTree {
+    create_stats_entry(Skill, "Water Dash")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on UpperPools.WaterDashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on LowerDepths.FlashTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on LowerDepths.FlashTree {
+    create_stats_entry(Skill, "Flash")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on LowerDepths.FlashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on LowerWastes.BurrowTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on LowerWastes.BurrowTree {
+    create_stats_entry(Skill, "Burrow")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on LowerWastes.BurrowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-on WeepingRidge.LaunchTree store(itemTracker.treesCount, itemTracker.treesCount + 1)
+
+on WeepingRidge.LaunchTree {
+    create_stats_entry(Skill, "Launch")
+    store(itemTracker.treesCount, itemTracker.treesCount + 1)
+}
 on WeepingRidge.LaunchTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
 
 on change itemTracker.treesCount update_goals_completed()

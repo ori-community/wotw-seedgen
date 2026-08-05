@@ -258,6 +258,7 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
             | FunctionIdentifier::TriggerKeybind
             | FunctionIdentifier::EnableServerSync
             | FunctionIdentifier::DisableServerSync
+            | FunctionIdentifier::CreateStatsEntry
             | FunctionIdentifier::CreateWarpIcon
             | FunctionIdentifier::SetWarpIconLabel
             | FunctionIdentifier::DestroyWarpIcon

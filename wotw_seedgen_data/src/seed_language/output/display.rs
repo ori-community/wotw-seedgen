@@ -342,6 +342,9 @@ impl Display for CommandVoid {
             CommandVoid::DisableServerSync { uber_identifier } => {
                 write!(f, "disable_server_sync({uber_identifier})")
             }
+            CommandVoid::CreateStatsEntry { icon, label } => {
+                write!(f, "create_stats_entry({icon}, {label})")
+            }
             CommandVoid::CreateSpoilerMapIcon {
                 id,
                 icon,

@@ -18,6 +18,7 @@ fun write_amount(amount: Integer) {
 }
 
 fun launch_fragment() {
+    create_stats_entry(LaunchFragment, "Launch Fragment")
     set_integer("amount", itemTracker.launchFragmentsCount + 1)
     write_amount(get_integer("amount"))
     item_message("*Launch Fragment* " + get_string("amount"))

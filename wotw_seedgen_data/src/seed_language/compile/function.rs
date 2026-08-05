@@ -348,6 +348,7 @@ pub enum FunctionIdentifier {
     TriggerKeybind,
     EnableServerSync,
     DisableServerSync,
+    CreateStatsEntry,
     CreateWarpIcon,
     SetWarpIconLabel,
     DestroyWarpIcon,
@@ -520,6 +521,7 @@ impl FunctionIdentifier {
             TriggerKeybind(bind: String),
             EnableServerSync(uber_identifier: UberIdentifier),
             DisableServerSync(uber_identifier: UberIdentifier),
+            CreateStatsEntry(icon: MapIcon, label: String),
             CreateWarpIcon(id: String, x: Float, y: Float),
             SetWarpIconLabel(id: String, label: String),
             DestroyWarpIcon(id: String),
@@ -1358,6 +1360,10 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                     uber_identifier: arg(&mut context)?,
                 })
             }
+            FunctionIdentifier::CreateStatsEntry => Command::Void(CommandVoid::CreateStatsEntry {
+                icon: arg(&mut context)?,
+                label: arg(&mut context)?,
+            }),
             FunctionIdentifier::CreateWarpIcon => Command::Void(CommandVoid::CreateWarpIcon {
                 id: write_warp_icon_id(&mut context)?,
                 x: arg(&mut context)?,

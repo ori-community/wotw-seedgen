@@ -23,32 +23,79 @@
 
 on spawn store(itemTracker.questsRequired, max_quests)
 
-on MarshSpawn.TokkKeystoneQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on MarshSpawn.TokkKeystoneQuest {
+    create_stats_entry(QuestEnd, "The Missing Key")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 // TODO optimization for state > n == false?
 on MarshSpawn.TokkKeystoneQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on MarshSpawn.TokkTabletQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on MarshSpawn.TokkTabletQuest {
+    create_stats_entry(QuestEnd, "Into the Burrows")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on MarshSpawn.TokkTabletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on OuterWellspring.TheLostCompass store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on OuterWellspring.TheLostCompass {
+    create_stats_entry(QuestEnd, "The Lost Compass")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on OuterWellspring.TheLostCompass == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on MarshSpawn.MokkFangQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on MarshSpawn.MokkFangQuest {
+    create_stats_entry(QuestEnd, "A Little Braver")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on MarshSpawn.MokkFangQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on GladesTown.FamilyReunion store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on GladesTown.FamilyReunion {
+    create_stats_entry(QuestEnd, "Family Reunion")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on GladesTown.FamilyReunion == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on GladesTown.LastTree store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on GladesTown.LastTree {
+    create_stats_entry(QuestEnd, "The Tree Keeper")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on GladesTown.LastTree == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+
 // TODO we lack fully accurate simulation in cases where quests set multiple states.
 // This should more accurately be questUberStateGroup.desertCogQuest but paths.wotwl doesn't communicate that state
-on GladesTown.TwillenGemQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+on GladesTown.TwillenGemQuest {
+    create_stats_entry(QuestEnd, "A Diamond in the Rough")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on GladesTown.TwillenGemQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on WindtornRuins.HandToHandComplete store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on WindtornRuins.HandToHandComplete {
+    create_stats_entry(QuestEnd, "Hand To Hand")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on WindtornRuins.HandToHandComplete == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on GladesTown.MokiAcornQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on GladesTown.MokiAcornQuest {
+    create_stats_entry(QuestEnd, "Into the Darkness")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on GladesTown.MokiAcornQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on EastHollow.KwolokAmuletQuest store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on EastHollow.KwolokAmuletQuest {
+    create_stats_entry(QuestEnd, "Kwolok's Wisdom")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on EastHollow.KwolokAmuletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on GladesTown.RebuildTheGlades store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on GladesTown.RebuildTheGlades {
+    create_stats_entry(QuestEnd, "Rebuilding the Glades")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on GladesTown.RebuildTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-on GladesTown.RegrowTheGlades store(itemTracker.questsCount, itemTracker.questsCount + 1)
+
+on GladesTown.RegrowTheGlades {
+    create_stats_entry(QuestEnd, "Regrowing the Glades")
+    store(itemTracker.questsCount, itemTracker.questsCount + 1)
+}
 on GladesTown.RegrowTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 
 on change itemTracker.questsCount update_goals_completed()

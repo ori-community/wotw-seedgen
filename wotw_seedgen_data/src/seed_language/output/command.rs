@@ -611,7 +611,7 @@ pub enum CommandVoid {
     DisableServerSync {
         uber_identifier: UberIdentifier,
     },
-    /// Create `icon` at (`x`, `y`) with the label set to `label`
+    /// Create a spoiler map icon with `id` and `icon` at (`x`, `y`) with the label set to `label`
     CreateSpoilerMapIcon {
         id: usize,
         icon: MapIcon,
@@ -622,6 +622,11 @@ pub enum CommandVoid {
     /// Marks spoiler map icon with id `id` as collected
     MarkSpoilerMapIconCollected {
         id: usize,
+    },
+    /// Create a stats entry with `icon` with the label set to `label`
+    CreateStatsEntry {
+        icon: MapIcon,
+        label: CommandString,
     },
     /// Create a spirit well icon that you can warp to on the map at (`x`, `y`)
     CreateWarpIcon {

@@ -33,6 +33,7 @@
     !random_float(marsh_relic, 0, 1)
     !if marsh_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Marsh Relic")
             item_message("@Marsh Relic@")
             store(marsh_relic_collected, true)
         }, Marsh)
@@ -45,6 +46,7 @@
     !random_float(hollow_relic, 0, 1)
     !if hollow_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Hollow Relic")
             item_message("@Hollow Relic@")
             store(hollow_relic_collected, true)
         }, Hollow)
@@ -57,6 +59,7 @@
     !random_float(glades_relic, 0, 1)
     !if glades_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Glades Relic")
             item_message("@Glades Relic@")
             store(glades_relic_collected, true)
         }, Glades)
@@ -69,6 +72,7 @@
     !random_float(wellspring_relic, 0, 1)
     !if wellspring_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Wellspring Relic")
             item_message("@Wellspring Relic@")
             store(wellspring_relic_collected, true)
         }, Wellspring)
@@ -81,6 +85,7 @@
     !random_float(woods_relic, 0, 1)
     !if woods_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Woods Relic")
             item_message("@Woods Relic@")
             store(woods_relic_collected, true)
         }, Woods)
@@ -93,6 +98,7 @@
     !random_float(reach_relic, 0, 1)
     !if reach_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Reach Relic")
             item_message("@Reach Relic@")
             store(reach_relic_collected, true)
         }, Reach)
@@ -105,6 +111,7 @@
     !random_float(depths_relic, 0, 1)
     !if depths_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Depths Relic")
             item_message("@Depths Relic@")
             store(depths_relic_collected, true)
         }, Depths)
@@ -117,6 +124,7 @@
     !random_float(pools_relic, 0, 1)
     !if pools_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Pools Relic")
             item_message("@Pools Relic@")
             store(pools_relic_collected, true)
         }, Pools)
@@ -129,6 +137,7 @@
     !random_float(wastes_relic, 0, 1)
     !if wastes_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Wastes Relic")
             item_message("@Wastes Relic@")
             store(wastes_relic_collected, true)
         }, Wastes)
@@ -141,6 +150,7 @@
     !random_float(willow_relic, 0, 1)
     !if willow_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Willow Relic")
             item_message("@Willow Relic@")
             store(willow_relic_collected, true)
         }, Willow)
@@ -153,6 +163,7 @@
     !random_float(burrows_relic, 0, 1)
     !if burrows_relic <= relic_chance {
         !preplace({
+            create_stats_entry(Eyestone, "Burrows Relic")
             item_message("@Burrows Relic@")
             store(burrows_relic_collected, true)
         }, Burrows)
