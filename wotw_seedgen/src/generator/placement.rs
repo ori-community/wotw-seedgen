@@ -27,6 +27,7 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{
     cmp::Ordering,
+    env,
     fmt::{Display, Write},
     iter, mem,
     ops::RangeFrom,
@@ -49,7 +50,14 @@ use wotw_seedgen_data::{
 use wotw_seedgen_log_capture::LogCapture;
 use wotw_seedgen_seed::SeedgenInfo;
 
-pub(super) const SPAWN_SLOTS: usize = 7;
+// TODO decide default using statistic
+pub(super) static SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| {
+    env::var("SPAWN_SLOTS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(7)
+});
+
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
 pub const TOTAL_SPIRIT_LIGHT: i32 = 20000;
 
@@ -929,7 +937,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             reached_needs_placement: Vec::new(),
             received_placement: Vec::new(),
             reached_item_locations: 0,
-            spawn_slots: SPAWN_SLOTS,
+            spawn_slots: *SPAWN_SLOTS,
             unshared_items: UNSHARED_ITEMS,
         })
     }

@@ -1,3 +1,5 @@
+use std::{env, sync::LazyLock};
+
 use log::trace;
 use rustc_hash::{FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
@@ -15,8 +17,17 @@ use crate::{
     item_pool::ItemPool,
 };
 
-const HAPPY_SPAWN_SLOTS: usize = 3;
-const _: usize = SPAWN_SLOTS - HAPPY_SPAWN_SLOTS; // check that SPAWN_SLOTS >= HAPPY_SPAWN_SLOTS
+// TODO decide default using statistic
+static HAPPY_SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| {
+    let happy_spawn_slots = env::var("HAPPY_SPAWN_SLOTS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(3);
+
+    assert!(*SPAWN_SLOTS >= happy_spawn_slots);
+
+    happy_spawn_slots
+});
 
 pub fn solution_weights<'graph>(
     solutions: Vec<Solution<'graph>>,
@@ -103,7 +114,7 @@ impl<'pool, 'log> WeightContext<'pool, 'log> {
         let slot_weight = (1 + non_spawn_slots.saturating_sub(used_slots)) as f32;
 
         // TODO make it less likely to use spawn slots for later progressions?
-        let sad_spawn_slots = used_slots.saturating_sub(non_spawn_slots + HAPPY_SPAWN_SLOTS);
+        let sad_spawn_slots = used_slots.saturating_sub(non_spawn_slots + *HAPPY_SPAWN_SLOTS);
 
         let data = &self.solution_data[index];
         let cost = solution.spirit_light() as f32 + data.item_cost;
