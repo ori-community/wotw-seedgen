@@ -78,6 +78,11 @@ fn listener(address: Option<SocketAddr>) -> TcpListener {
     let socket = Socket::new(domain, Type::STREAM, Some(Protocol::TCP)).unwrap();
     socket.set_nonblocking(true).unwrap();
 
+    // This is in alignment with both std and tokio defaults, see
+    // https://github.com/rust-lang/rust/blob/b070f45ad92ed45b20e57d9483a21657d0d00715/library/std/src/sys/net/connection/socket/mod.rs#L553-L563
+    #[cfg(not(windows))]
+    socket.set_reuse_address(true).unwrap();
+
     if domain == Domain::IPV6 {
         // Explicitly allow IPv6-mapped IPv4 addresses
         // e.g. access on 127.0.0.1:1234 when listening on [::]:1234
