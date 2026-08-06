@@ -39,7 +39,7 @@ HowlsDen.SlimeLoopHF, Marsh, HealthFragment, , 21786, 28908, , -332.3, -4438.6, 
 HowlsDen.SecretRoomHF, Marsh, HealthFragment, , 9593, 61304, , -569.7, -4454.1, -569.7299, -4453.08
 HowlsDen.AboveDoorKS, Marsh, Keystone, , 21786, 22068, , -439.5, -4461.4, -439.52002, -4461.38
 HowlsDen.MagnetShard, Marsh, Shard, Magnet, 21786, 63545, , -239.2, -4440.4, -239.20001, -4439.38
-HowlsDen.SwordTree, Marsh, Skill, SpiritEdge, 0, 100, , -296, -4483, -296, -4478
+HowlsDen.SwordTree, Marsh, Skill, Sword, 0, 100, , -296, -4483, -296, -4478
 HowlsDen.BoneOre, Marsh, GorlekOre, , 21786, 2046, , -432.6, -4503.3, -432.58002, -4503.26
 HowlsDen.AboveTPSL, Marsh, SpiritLight, 50, 21786, 16206, , -388.6, -4502.7, -388.58002, -4502.74
 HowlsDen.LaserKS, Marsh, Keystone, , 21786, 2852, , -399.9, -4567.2, -399.94, -4567.21
@@ -58,7 +58,7 @@ MarshPastOpher.SwingPoleSL, Marsh, SpiritLight, 50, 9593, 59344, , -492.7, -4261
 MarshPastOpher.LeftEyestone, Marsh, Keystone, Eyestone, 21786, 27433, , -461.3, -4195.3, -461.27002, -4195.29
 MarshPastOpher.RightEyestone, Marsh, Keystone, Eyestone, 21786, 37225, , -394.0, -4188.3, -393.96918, -4188.325
 MarshPastOpher.BowEF, Marsh, EnergyFragment, , 21786, 10295, , -421.5, -4272.4, -421.49, -4271.3896
-MarshPastOpher.BowTree, Marsh, Skill, SpiritArc, 0, 97, , -457, -4267, -457.04626, -4261.291
+MarshPastOpher.BowTree, Marsh, Skill, Bow, 0, 97, , -457, -4267, -457.04626, -4261.291
 MarshPastOpher.CeilingSL, Marsh, SpiritLight, 100, 21786, 50255, , -641.3, -4223.0, -641.2577, -4223.0117
 MarshPastOpher.PoolsPathEF, Marsh, EnergyFragment, , 9593, 26457, , -662.8, -4186.5, -662.76996, -4185.5103
 MarshPastOpher.PoolsPathSL, Marsh, SpiritLight, 200, 945, 10833, , -802.3, -4186.1, -802.3163, -4186.148
