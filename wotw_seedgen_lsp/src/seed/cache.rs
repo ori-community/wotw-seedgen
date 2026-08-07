@@ -16,6 +16,7 @@ use wotw_seedgen_server_shared::ServerState;
 pub type Cache = ServerState<DefaultFileAccess, CacheValues>;
 
 pub struct CacheValues {
+    pub loc_data: LocData,
     pub uber_state_data: UberStateData,
     pub uber_identifier_numeric_completion: Vec<CompletionItem>,
     pub uber_identifier_numeric_member_completion: FxHashMap<i32, Vec<CompletionItem>>,
@@ -28,7 +29,8 @@ impl AssetCacheValues for CacheValues {
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        let uber_state_data = uber_state_data(file_access)?;
+        let loc_data = file_access.loc_data()?;
+        let uber_state_data = file_access.uber_state_data(&loc_data, &file_access.state_data()?)?;
         let uber_identifier_numeric_completion =
             uber_identifier_numeric_completion(&uber_state_data);
         let uber_identifier_numeric_member_completion =
@@ -38,6 +40,7 @@ impl AssetCacheValues for CacheValues {
             uber_identifier_name_member_completion(&uber_state_data);
 
         Ok(Self {
+            loc_data,
             uber_state_data,
             uber_identifier_numeric_completion,
             uber_identifier_numeric_member_completion,
@@ -47,7 +50,7 @@ impl AssetCacheValues for CacheValues {
     }
 
     fn loc_data(&self) -> &LocData {
-        unimplemented!()
+        &self.loc_data
     }
 
     fn state_data(&self) -> &StateData {
@@ -79,8 +82,13 @@ impl AssetCacheValues for CacheValues {
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
+        if changed.loc_data {
+            self.loc_data = file_access.loc_data()?;
+        }
+
         if changed.loc_data || changed.state_data || changed.uber_state_dump {
-            self.uber_state_data = uber_state_data(file_access)?;
+            self.uber_state_data =
+                file_access.uber_state_data(&self.loc_data, &file_access.state_data()?)?;
             self.uber_identifier_numeric_completion =
                 uber_identifier_numeric_completion(&self.uber_state_data);
             self.uber_identifier_numeric_member_completion =
@@ -93,12 +101,6 @@ impl AssetCacheValues for CacheValues {
 
         Ok(())
     }
-}
-
-fn uber_state_data<F: AssetFileAccess>(file_access: &F) -> Result<UberStateData, String> {
-    let loc_data = file_access.loc_data()?;
-    let state_data = file_access.state_data()?;
-    file_access.uber_state_data(&loc_data, &state_data)
 }
 
 fn uber_identifier_numeric_completion(uber_state_data: &UberStateData) -> Vec<CompletionItem> {

@@ -21,14 +21,14 @@ use wotw_seedgen_log_capture::LogCapture;
 
 use self::preprocess::{Preprocessor, PreprocessorOutput};
 use crate::{
-    assets::{SnippetAccess, UberStateData},
+    assets::{LocData, SnippetAccess, UberStateData},
     seed_language::{
         ast::{self, Expression, Snippet, UberStateType},
         compile::{
             self, error::operand_error, ids::IdResolver, lint::LintData,
             preprocess::PreprocessedFunction, scope::Scopes,
         },
-        output::{IntermediateOutput, Literal, SnippetDebugOutput, VariableValue},
+        output::{CommandBoolean, IntermediateOutput, Literal, SnippetDebugOutput, VariableValue},
         types::{uber_state_type, InferType, Type},
     },
     UberIdentifier,
@@ -36,7 +36,7 @@ use crate::{
 use derivative::Derivative;
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxHashMap, FxHashSet};
 use std::{
     collections::hash_map::Entry,
     fmt::Debug,
@@ -182,6 +182,7 @@ impl<'source> Compile<'source> for ast::Snippet<'source> {
 #[derivative(Debug)]
 pub(crate) struct GlobalCompilerData<'snippets, 'uberstates, 'log> {
     pub output: IntermediateOutput<'log>,
+    pub loc_data_conditions: FxHashSet<CommandBoolean>,
     pub uber_state_data: &'uberstates UberStateData,
     #[derivative(Debug = "ignore")]
     pub snippet_access: &'snippets dyn SnippetAccess,
@@ -200,11 +201,19 @@ pub(crate) enum ExportedValue {
 
 impl<'snippets, 'uberstates, 'log> GlobalCompilerData<'snippets, 'uberstates, 'log> {
     pub(crate) fn new(
+        loc_data: &LocData,
         uber_state_data: &'uberstates UberStateData,
         snippet_access: &'snippets dyn SnippetAccess,
     ) -> Self {
+        let loc_data_conditions = loc_data
+            .entries
+            .iter()
+            .map(|entry| CommandBoolean::loc_data_condition(entry.uber_identifier, entry.value))
+            .collect();
+
         Self {
             output: IntermediateOutput::new(),
+            loc_data_conditions,
             uber_state_data,
             snippet_access,
             exported_values: FxHashMap::default(),
@@ -461,11 +470,12 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
         rng: &mut R,
         snippet_access: &'snippets F,
         // TODO use asset access instead?
+        loc_data: &LocData,
         uber_state_data: &'uberstates UberStateData,
     ) -> Self {
         Self {
             rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
-            global: GlobalCompilerData::new(uber_state_data, snippet_access),
+            global: GlobalCompilerData::new(loc_data, uber_state_data, snippet_access),
             compiled_snippets: FxHashMap::default(),
             errors: FxHashMap::default(),
         }

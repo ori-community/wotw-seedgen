@@ -1,5 +1,5 @@
 use crate::{
-    assets::{AssetFileAccess, SnippetAccess, SnippetFileAccess, TestAccess, UberStateData},
+    assets::{AssetCacheValues, SnippetAccess, SnippetFileAccess, TEST_ASSETS},
     seed_language::{
         ast::{
             parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
@@ -188,20 +188,17 @@ fn test_compiler<F: SnippetAccess>(snippet_access: &F) -> Compiler<'_, 'static, 
     test_compiler_with_config(snippet_access, FxHashMap::default())
 }
 
-static UBER_STATE_DATA: LazyLock<UberStateData> = LazyLock::new(|| {
-    TestAccess
-        .uber_state_data(
-            &TestAccess.loc_data().unwrap(),
-            &TestAccess.state_data().unwrap(),
-        )
-        .unwrap()
-});
-
 fn test_compiler_with_config<F: SnippetAccess>(
     snippet_access: &F,
     config: FxHashMap<String, FxHashMap<String, String>>,
 ) -> Compiler<'_, 'static, 'static> {
-    Compiler::new(&mut rand::thread_rng(), snippet_access, &UBER_STATE_DATA).with_config(config)
+    Compiler::new(
+        &mut rand::thread_rng(),
+        snippet_access,
+        TEST_ASSETS.values.loc_data(),
+        TEST_ASSETS.values.uber_state_data(),
+    )
+    .with_config(config)
 }
 
 fn test_str(source: &str) -> IntermediateOutput<'_> {

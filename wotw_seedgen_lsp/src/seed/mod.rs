@@ -232,6 +232,7 @@ impl Backend<Cache> {
                 let mut compiler = Compiler::new(
                     &mut rand::thread_rng(),
                     &snippet_access,
+                    &cache.loc_data,
                     &cache.uber_state_data,
                 );
 

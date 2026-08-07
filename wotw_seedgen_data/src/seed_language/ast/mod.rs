@@ -811,7 +811,7 @@ pub struct RemoveLocation;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct RemoveLocationArgs<'source> {
-    pub condition: Expression<'source>,
+    pub location: Expression<'source>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

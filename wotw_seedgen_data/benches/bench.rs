@@ -70,6 +70,7 @@ fn snippets(c: &mut Criterion) {
             let mut compiler = Compiler::new(
                 &mut rng,
                 &*TEST_ASSETS,
+                TEST_ASSETS.values.loc_data(),
                 TEST_ASSETS.values.uber_state_data(),
             )
             .with_lint(true);
@@ -124,6 +125,7 @@ fn simulation(c: &mut Criterion) {
     let mut compiler = Compiler::new(
         &mut Pcg64Mcg::new(0),
         &*TEST_ASSETS,
+        TEST_ASSETS.values.loc_data(),
         TEST_ASSETS.values.uber_state_data(),
     );
     compiler.compile_snippet("launch_fragments").unwrap();

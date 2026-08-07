@@ -1175,7 +1175,7 @@ impl ErrCompletion for ItemDataMapIconArgs<'_> {
 
 impl CompletionInSpan for RemoveLocationArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        self.condition.completion(index, cache)
+        self.location.completion(index, cache)
     }
 }
 

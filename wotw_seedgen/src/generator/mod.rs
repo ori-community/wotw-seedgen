@@ -91,11 +91,16 @@ where
                 let snippet_access =
                     ChainedSnippetAccess::new(&world_settings.inline_snippets, self.snippet_access);
 
-                let compiler = Compiler::new(&mut rng, &snippet_access, self.uber_state_data)
-                    .with_config(world_settings.snippet_config.clone())
-                    .with_lint(true)
-                    .with_debug(self.debug)
-                    .with_log_capture(self.log_capture);
+                let compiler = Compiler::new(
+                    &mut rng,
+                    &snippet_access,
+                    self.loc_data,
+                    self.uber_state_data,
+                )
+                .with_config(world_settings.snippet_config.clone())
+                .with_lint(true)
+                .with_debug(self.debug)
+                .with_log_capture(self.log_capture);
 
                 // TODO this is inefficient because we probably do a lot of redundant work between the worlds
                 let output = parse_snippets(world_settings, compiler)?;

@@ -7,8 +7,8 @@ use crate::{
         ast::{self, get_command_arg, UberStateType},
         compile::{self, ids::IdMap, FunctionSignature},
         output::{
-            CommandVoid, ContainedWrites, Event, ItemMetadataEntry, Literal, StringOrPlaceholder,
-            VariableValue,
+            CommandBoolean, CommandVoid, ContainedWrites, Event, ItemMetadataEntry, Literal,
+            StringOrPlaceholder, VariableValue,
         },
     },
     Position, UberIdentifier, Zone,
@@ -877,13 +877,17 @@ impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        if let Some(condition) = self.condition.compile_into(compiler) {
+        let span = self.location.span();
+
+        if let Some(location) = self.location.compile_into(compiler) {
+            compiler.check_location(&location, span);
+
             compiler
                 .global
                 .output
                 .modifiers
                 .removed_locations
-                .insert(condition);
+                .insert(location);
         }
     }
 }
@@ -892,17 +896,34 @@ impl<'source> Compile<'source> for ast::LocationSlotsArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let span = self.location.span();
+
         let location = self.location.compile_into(compiler);
         let slots =
             get_command_arg(self.slots).and_then(|slots| slots.compile_into::<i32>(compiler));
 
-        if let (Some(location), Some(slots)) = (location, slots) {
-            compiler
-                .global
-                .output
-                .modifiers
-                .location_slots
-                .insert(location, slots.try_into().unwrap_or_default());
+        if let Some(location) = location {
+            compiler.check_location(&location, span);
+
+            if let Some(slots) = slots {
+                compiler
+                    .global
+                    .output
+                    .modifiers
+                    .location_slots
+                    .insert(location, slots.try_into().unwrap_or_default());
+            }
+        }
+    }
+}
+
+impl SnippetCompiler<'_, '_, '_, '_, '_> {
+    fn check_location(&mut self, location: &CommandBoolean, span: Range<usize>) {
+        if !self.global.loc_data_conditions.contains(location) {
+            self.errors.push(Error::error(
+                "not a location from loc_data.csv".to_string(),
+                span,
+            ));
         }
     }
 }

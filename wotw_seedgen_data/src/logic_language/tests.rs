@@ -1,5 +1,5 @@
 use crate::{
-    assets::{AssetFileAccess, TestAccess},
+    assets::{AssetCacheValues, TEST_ASSETS},
     logic_language::{
         ast::{
             Amount, And, Content, Dedent, GroupContent, Indent, LogicIdentifier, Or, Paths,
@@ -157,8 +157,8 @@ fn compile() {
     let Some(graph) = Graph::compiler()
         .compile(
             paths,
-            TestAccess.loc_data().unwrap(),
-            TestAccess.state_data().unwrap(),
+            TEST_ASSETS.values.loc_data().clone(),
+            TEST_ASSETS.values.state_data().clone(),
         )
         .eprint_errors(&source)
     else {

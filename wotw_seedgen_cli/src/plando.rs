@@ -131,7 +131,7 @@ fn compile(
 ) -> Result<(), Error> {
     let start = Instant::now();
 
-    let mut compiler = Compiler::new(rng, cache, &cache.uber_state_data)
+    let mut compiler = Compiler::new(rng, cache, &cache.loc_data, &cache.uber_state_data)
         .with_lockfile(lockfile, &NO_LOG_CAPTURE)
         .with_lint(true)
         .with_debug(debug);

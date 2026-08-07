@@ -638,7 +638,7 @@ impl<H: Handler> Traverse<H> for ItemDataMapIconArgs<'_> {
 
 impl<H: Handler> Traverse<H> for RemoveLocationArgs<'_> {
     fn traverse(&self, handler: &mut H) {
-        self.condition.traverse(handler);
+        self.location.traverse(handler);
     }
 }
 
