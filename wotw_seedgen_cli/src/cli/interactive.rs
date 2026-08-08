@@ -8,12 +8,14 @@ use dialoguer::{
     console::{self, Term},
     Confirm, Input, MultiSelect, Select,
 };
+use heck::ToTitleCase;
 use itertools::Itertools;
 use rustc_hash::{FxHashMap, FxHashSet};
 use strum::{Display, VariantArray, VariantNames};
 use wotw_seedgen::data::{
     assets::{
-        DefaultFileAccess, PresetAccess, Tricks, UniversePresetSettings, WorldPresetSettings,
+        DefaultFileAccess, PresetAccess, PresetGroup, Tricks, UniversePresetSettings,
+        WorldPresetSettings,
     },
     seed_language::metadata::{ConfigDefault, ConfigValue},
     Difficulty, GreaterOneU8, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
@@ -21,8 +23,8 @@ use wotw_seedgen::data::{
 
 use crate::{
     cli::{
-        AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
-        AVAILABLE_WORLD_PRESETS, LITERAL,
+        AvailablePreset, AvailableSnippet, PresetInfoArgs, AVAILABLE_SNIPPETS,
+        AVAILABLE_UNIVERSE_PRESETS, AVAILABLE_WORLD_PRESETS, LITERAL,
     },
     Error,
 };
@@ -92,6 +94,78 @@ pub fn seed_world_settings(
     select_randomize_entrances(&prefix, settings, include_settings)?;
     select_snippets(&prefix, settings, include_settings)?;
     select_snippet_config(&prefix, settings, include_settings)?;
+    Ok(())
+}
+
+pub fn preset_info<const UNIVERSE: bool>(
+    preset_info: &mut PresetInfoArgs<UNIVERSE>,
+) -> Result<(), Error> {
+    choose_identifier::<UNIVERSE>(preset_info)?;
+    choose_name::<UNIVERSE>(preset_info)?;
+    choose_description::<UNIVERSE>(preset_info)?;
+    select_base_preset::<UNIVERSE>(preset_info)
+}
+
+fn choose_identifier<const UNIVERSE: bool>(
+    preset_info: &mut PresetInfoArgs<UNIVERSE>,
+) -> Result<(), Error> {
+    if preset_info.identifier.is_empty() {
+        preset_info.identifier = Input::new()
+            .with_prompt("Choose an identifier for the preset")
+            .interact_text()?;
+    }
+
+    Ok(())
+}
+
+fn choose_name<const UNIVERSE: bool>(
+    preset_info: &mut PresetInfoArgs<UNIVERSE>,
+) -> Result<(), Error> {
+    if preset_info.info.name.is_none() {
+        let name = Input::<String>::new()
+            .with_prompt("Write a display name for the preset")
+            .with_initial_text(preset_info.identifier.to_title_case())
+            .allow_empty(true)
+            .interact_text()?;
+
+        if !name.is_empty() {
+            preset_info.info.name = Some(name);
+        }
+    }
+
+    Ok(())
+}
+
+fn choose_description<const UNIVERSE: bool>(
+    preset_info: &mut PresetInfoArgs<UNIVERSE>,
+) -> Result<(), Error> {
+    if preset_info.info.description.is_none() {
+        let description = Input::<String>::new()
+            .with_prompt("Write a description for the preset")
+            .allow_empty(true)
+            .interact_text()?;
+
+        if !description.is_empty() {
+            preset_info.info.description = Some(description);
+        }
+    }
+
+    Ok(())
+}
+
+fn select_base_preset<const UNIVERSE: bool>(
+    preset_info: &mut PresetInfoArgs<UNIVERSE>,
+) -> Result<(), Error> {
+    if preset_info.info.group.is_none() {
+        if let Some(true) = Confirm::new()
+            .with_prompt("Choose whether the preset should be a base preset")
+            .default(false)
+            .interact_opt()?
+        {
+            preset_info.info.group = Some(PresetGroup::Base);
+        }
+    }
+
     Ok(())
 }
 

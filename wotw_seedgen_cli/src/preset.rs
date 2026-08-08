@@ -1,7 +1,6 @@
 use serde::Serialize;
 use wotw_seedgen::data::assets::{
-    self, PresetGroup, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION,
-    SEEDGEN_USER_DATA_DIR,
+    self, PresetInfo, UniversePreset, WorldPreset, CURRENT_ASSETS_VERSION, SEEDGEN_USER_DATA_DIR,
 };
 
 use crate::{
@@ -11,14 +10,15 @@ use crate::{
 
 pub fn universe_preset(args: UniversePresetArgs) -> Result<(), Error> {
     let UniversePresetArgs {
-        identifier,
         settings: SeedSettings(settings),
         info_args,
     } = args;
 
+    let (identifier, info) = info_args.into_inner();
+
     let universe_preset = UniversePreset {
         assets_version: CURRENT_ASSETS_VERSION,
-        info: info_args.into_preset_info(),
+        info,
         settings,
     };
 
@@ -27,14 +27,15 @@ pub fn universe_preset(args: UniversePresetArgs) -> Result<(), Error> {
 
 pub fn world_preset(args: WorldPresetArgs) -> Result<(), Error> {
     let WorldPresetArgs {
-        identifier,
         settings: SeedWorldSettings(settings),
         info_args,
     } = args;
 
+    let (identifier, info) = info_args.into_inner();
+
     let world_preset = WorldPreset {
         assets_version: CURRENT_ASSETS_VERSION,
-        info: info_args.into_preset_info(),
+        info,
         settings,
     };
 
@@ -53,13 +54,11 @@ fn write_preset<T: Serialize>(identifier: &str, preset: &T, dir: &str) -> Result
     Ok(())
 }
 
-impl PresetInfoArgs {
-    fn into_preset_info(self) -> Option<PresetInfo> {
-        let preset_info = PresetInfo {
-            name: self.display_name,
-            description: self.description,
-            group: self.base_preset.then_some(PresetGroup::Base),
-        };
-        (preset_info != PresetInfo::default()).then_some(preset_info)
+impl<const UNIVERSE: bool> PresetInfoArgs<UNIVERSE> {
+    fn into_inner(self) -> (String, Option<PresetInfo>) {
+        (
+            self.identifier,
+            (self.info != PresetInfo::default()).then_some(self.info),
+        )
     }
 }
