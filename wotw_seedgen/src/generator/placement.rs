@@ -1380,6 +1380,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             }
         }
 
+        let mut last_unreachable = None;
         let mut unreachable_count = 0;
 
         for (index, node) in self.world.graph.nodes.iter().enumerate() {
@@ -1396,22 +1397,27 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                     let command = compile::spirit_light(amount.into(), &mut self.rng);
                     self.place_without_simulation(pickup, command, placement_spoiler);
 
+                    last_unreachable = Some(pickup);
                     unreachable_count += 1;
                 }
             }
         }
 
         if unreachable_count != self.world.settings.difficulty.expected_unreachable() {
-            warn!(
-                logger: self.item_pool.log_capture,
-                "{}{unreachable_count} location{} unreachable on these settings!",
-                self.log_index,
-                if unreachable_count == 1 {
-                    " is"
-                } else {
-                    "s are"
-                }
-            );
+            if unreachable_count == 1 {
+                warn!(
+                    logger: self.item_pool.log_capture,
+                    "{log_index}{location} is unreachable on these settings!",
+                    log_index = self.log_index,
+                    location = last_unreachable.unwrap().identifier,
+                );
+            } else {
+                warn!(
+                    logger: self.item_pool.log_capture,
+                    "{log_index}{unreachable_count} locations are unreachable on these settings!",
+                    log_index = self.log_index,
+                );
+            }
         }
     }
 
