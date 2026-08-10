@@ -267,9 +267,7 @@ pub enum CommonUberIdentifier {
     ShardSlots,
     CleanWater,
     BaseMaxHealth,
-    Health,
     BaseMaxEnergy,
-    Energy,
     Skill(Skill),
     Shard(Shard),
     Teleporter(Teleporter),
@@ -284,8 +282,8 @@ impl CommonUberIdentifier {
             Self::Keystones => MapIcon::Keystone,
             Self::ShardSlots => MapIcon::ShardSlot,
             Self::CleanWater => MapIcon::CleanWater,
-            Self::BaseMaxHealth | Self::Health => MapIcon::HealthFragment,
-            Self::BaseMaxEnergy | Self::Energy => MapIcon::EnergyFragment,
+            Self::BaseMaxHealth => MapIcon::HealthFragment,
+            Self::BaseMaxEnergy => MapIcon::EnergyFragment,
             Self::WeaponUpgrade(_) => MapIcon::BonusItem, // TODO is this good?
             Self::Shard(_) => MapIcon::Shard,
             Self::Teleporter(_) => MapIcon::SavePedestalInactive,
@@ -299,8 +297,8 @@ impl CommonUberIdentifier {
             Self::GorlekOre | Self::Keystones => 100,
             Self::ShardSlots => 250,
             Self::CleanWater => 500,
-            Self::BaseMaxHealth | Self::Health => 200,
-            Self::BaseMaxEnergy | Self::Energy => 150,
+            Self::BaseMaxHealth => 200,
+            Self::BaseMaxEnergy => 150,
             Self::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
                 Skill::GladesAncestralLight | Skill::MarshAncestralLight => 300,
@@ -320,12 +318,8 @@ impl CommonUberIdentifier {
             Self::Keystones => Icon::File(Cow::Borrowed("icons/game/keystone.png")),
             Self::ShardSlots => Icon::File(Cow::Borrowed("icons/game/shardslot.png")),
             Self::CleanWater => Icon::File(Cow::Borrowed("icons/game/water.png")),
-            Self::BaseMaxHealth | Self::Health => {
-                Icon::File(Cow::Borrowed("icons/game/healthfragment.png"))
-            }
-            Self::BaseMaxEnergy | Self::Energy => {
-                Icon::File(Cow::Borrowed("icons/game/energyfragment.png"))
-            }
+            Self::BaseMaxHealth => Icon::File(Cow::Borrowed("icons/game/healthfragment.png")),
+            Self::BaseMaxEnergy => Icon::File(Cow::Borrowed("icons/game/energyfragment.png")),
             Self::WeaponUpgrade(weapon_upgrade) => match weapon_upgrade {
                 WeaponUpgrade::ExplodingSpear => Icon::Opher(OpherIcon::ExplodingSpear),
                 WeaponUpgrade::HammerShockwave => Icon::Opher(OpherIcon::HammerShockwave),
@@ -368,9 +362,7 @@ impl CommonUberIdentifier {
             Self::ShardSlots => UberIdentifier::SHARD_SLOTS,
             Self::CleanWater => UberIdentifier::CLEAN_WATER,
             Self::BaseMaxHealth => UberIdentifier::BASE_MAX_HEALTH,
-            Self::Health => UberIdentifier::HEALTH,
             Self::BaseMaxEnergy => UberIdentifier::BASE_MAX_ENERGY,
-            Self::Energy => UberIdentifier::ENERGY,
             Self::Skill(skill) => skill.uber_identifier(),
             Self::Shard(shard) => shard.uber_identifier(),
             Self::Teleporter(teleporter) => teleporter.uber_identifier(),
@@ -387,9 +379,7 @@ impl CommonUberIdentifier {
             UberIdentifier::SHARD_SLOTS => Some(Self::ShardSlots),
             UberIdentifier::CLEAN_WATER => Some(Self::CleanWater),
             UberIdentifier::BASE_MAX_HEALTH => Some(Self::BaseMaxHealth),
-            UberIdentifier::HEALTH => Some(Self::Health),
             UberIdentifier::BASE_MAX_ENERGY => Some(Self::BaseMaxEnergy),
-            UberIdentifier::ENERGY => Some(Self::Energy),
             uber_identifier => {
                 if let Some(skill) = Skill::from_uber_identifier(uber_identifier) {
                     Some(Self::Skill(skill))

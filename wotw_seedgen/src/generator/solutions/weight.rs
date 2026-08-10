@@ -172,7 +172,6 @@ impl Cost for CommonUberStateWrite {
 impl Cost for CommonUberIdentifier {
     fn cost(&self) -> f32 {
         match self {
-            CommonUberIdentifier::Health | CommonUberIdentifier::Energy => 0.,
             CommonUberIdentifier::SpiritLight => 1.,
             CommonUberIdentifier::BaseMaxHealth => 10.,
             CommonUberIdentifier::GorlekOre => 80.,

@@ -112,7 +112,6 @@ impl Cache {
                 self.base_max_health = value.expect_integer() as f32;
             }
             CommonUberIdentifier::BaseMaxEnergy => self.base_max_energy = value.expect_float(),
-            CommonUberIdentifier::Health | CommonUberIdentifier::Energy => {}
             CommonUberIdentifier::Skill(skill) => {
                 update_set(&mut self.skills, skill, value.expect_boolean());
             }
