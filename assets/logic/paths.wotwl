@@ -2151,12 +2151,11 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPast
       GrenadeJump, DoubleJump OR Dash OR Sword
   conn MarshPastOpher.PoolsPathOneWayWall:  # Make sure it's not redundant with going to MarshPastOpher.PoolsPathBellowOneWayWall first
     gorlek:
-      DoubleJump, TripleJump, Glide OR Dash OR Sword
-      DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword OR Hammer
-      Dash, Damage=10, Glide OR Sword OR Hammer
+      DoubleJump, TripleJump, Glide OR Dash
     kii:
-      DoubleJump, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      Dash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, TripleJump, Sword
+      DoubleJump, Damage=10, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Dash, Damage=10, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Glide, Damage=10, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Glide, DoubleJump, Sword, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Glide, Hammer, DoubleJump OR Dash
