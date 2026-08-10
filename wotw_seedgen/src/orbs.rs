@@ -119,28 +119,40 @@ impl OrbVariants {
     /// assert_eq!(OrbVariants::alternatives(a, b), combined_orbs);
     /// ```
     pub fn alternatives(mut a: Self, b: Self) -> OrbVariants {
-        a.insert_alternative(b);
+        a.insert_alternatives(b);
         a
     }
 
     /// Inserts alternative `OrbVariants` in place. See [`OrbVariants::alternatives`] for more details.
-    pub fn insert_alternative(&mut self, mut b: OrbVariants) {
-        b.retain(|b| {
-            let mut keep = true;
-
-            self.retain(|a| match (*a).partial_cmp(b) {
-                None => true,
-                Some(Ordering::Less) => false,
-                Some(Ordering::Equal | Ordering::Greater) => {
-                    keep = false;
-                    true
-                }
-            });
-
-            keep
-        });
+    pub fn insert_alternatives(&mut self, mut b: OrbVariants) {
+        b.retain(|b| self.check_alternative(*b));
 
         self.extend(b);
+    }
+
+    pub fn insert_single_alternative(&mut self, b: Orbs) -> bool {
+        let keep = self.check_alternative(b);
+
+        if keep {
+            self.push(b);
+        }
+
+        keep
+    }
+
+    fn check_alternative(&mut self, b: Orbs) -> bool {
+        let mut keep = true;
+
+        self.retain(|a| match (*a).partial_cmp(&b) {
+            None => true,
+            Some(Ordering::Less) => false,
+            Some(Ordering::Equal | Ordering::Greater) => {
+                keep = false;
+                true
+            }
+        });
+
+        keep
     }
 }
 

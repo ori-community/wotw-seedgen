@@ -729,7 +729,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
                 }
 
                 self.refill(refill.value, &mut refill_orbs);
-                orb_variants.insert_alternative(refill_orbs);
+                orb_variants.insert_alternatives(refill_orbs);
             }
         }
     }

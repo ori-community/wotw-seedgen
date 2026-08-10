@@ -369,7 +369,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
                             if cheapest.is_empty() {
                                 cheapest = orb_variants_after;
                             } else {
-                                cheapest.insert_alternative(orb_variants_after);
+                                cheapest.insert_alternatives(orb_variants_after);
                             }
 
                             if cheapest[0] == Orbs::default() {
@@ -581,7 +581,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
                 self.regenerate_preemptively(*orbs, &mut new_orb_variants, &mut missing);
             }
 
-            orb_variants.insert_alternative(new_orb_variants);
+            orb_variants.insert_alternatives(new_orb_variants);
         }
 
         orb_variants.retain(|orbs| self.orbs_meet_cost::<CONSUMING>(orbs, cost, &mut missing));
@@ -608,8 +608,10 @@ impl<'graph> World<'graph, '_, '_, '_> {
                 if orbs.energy >= higher_cost {
                     orbs.energy -= regen_cost;
                     self.heal(&mut orbs, 30.0);
-                    trace!(logger: self.log_capture, "adding regenerate option {orbs} to keep life pact enabled");
-                    new_orb_variants.push(orbs);
+
+                    if new_orb_variants.insert_single_alternative(orbs) {
+                        trace!(logger: self.log_capture, "adding regenerate option {orbs} to keep life pact enabled");
+                    }
                 } else {
                     missing.energy = f32::max(missing.energy, higher_cost - orbs.energy);
                     break;
