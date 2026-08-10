@@ -1,5 +1,6 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, VariantArray};
+use utoipa::ToSchema;
 use wotw_seedgen_derive::FromStr;
 
 /// Positioning in a weapon wheel like menu
@@ -14,6 +15,7 @@ use wotw_seedgen_derive::FromStr;
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -47,6 +49,7 @@ pub enum WheelItemPosition {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,

@@ -9,9 +9,10 @@ use crate::{
 };
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /// A Command, which may be used to affect the world, player or client state
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum Command {
     /// Commands returning [`bool`]
     Boolean(CommandBoolean),
@@ -42,7 +43,7 @@ pub trait IntoConstant: Sized {
 }
 
 /// Command which returns [`bool`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum CommandBoolean {
     /// Return `value`
     Constant { value: bool },
@@ -50,11 +51,14 @@ pub enum CommandBoolean {
     FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
+        #[schema(no_recursion)]
         commands: Vec<CommandVoid>,
+        #[schema(no_recursion)]
         last: Box<CommandBoolean>,
     },
     /// Return the result of `operation`
     CompareBoolean {
+        #[schema(no_recursion)]
         operation: Box<Operation<CommandBoolean, EqualityComparator>>,
     },
     /// Return the result of `operation`
@@ -75,6 +79,7 @@ pub enum CommandBoolean {
     },
     /// Return the result of `operation`
     LogicOperation {
+        #[schema(no_recursion)]
         operation: Box<Operation<CommandBoolean, LogicOperator>>,
     },
     /// Return the value stored in `uber_identifier`
@@ -136,7 +141,7 @@ impl From<bool> for CommandBoolean {
 }
 
 /// Command which returns [`i32`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum CommandInteger {
     /// Return `value`
     Constant { value: i32 },
@@ -144,11 +149,14 @@ pub enum CommandInteger {
     FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
+        #[schema(no_recursion)]
         commands: Vec<CommandVoid>,
+        #[schema(no_recursion)]
         last: Box<CommandInteger>,
     },
     /// Return the result of `operation`
     Arithmetic {
+        #[schema(no_recursion)]
         operation: Box<Operation<CommandInteger, ArithmeticOperator>>,
     },
     /// Return the value stored in `uber_identifier`
@@ -191,19 +199,25 @@ impl From<i32> for CommandInteger {
 }
 
 /// Command which returns [`f32`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum CommandFloat {
     /// Return `value`
-    Constant { value: OrderedFloat<f32> },
+    Constant {
+        #[schema(value_type = f32)]
+        value: OrderedFloat<f32>,
+    },
     /// Return the `index`th boolean function argument
     FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
+        #[schema(no_recursion)]
         commands: Vec<CommandVoid>,
+        #[schema(no_recursion)]
         last: Box<CommandFloat>,
     },
     /// Return the result of `operation`
     Arithmetic {
+        #[schema(no_recursion)]
         operation: Box<Operation<CommandFloat, ArithmeticOperator>>,
     },
     /// Return the value stored in `uber_identifier`
@@ -211,7 +225,10 @@ pub enum CommandFloat {
     /// Get the value stored under `id`
     GetFloat { id: usize },
     /// Convert `integer` to `f32`
-    FromInteger { integer: Box<CommandInteger> },
+    FromInteger {
+        #[schema(no_recursion)]
+        integer: Box<CommandInteger>,
+    },
 }
 
 impl AsConstant for CommandFloat {
@@ -249,7 +266,7 @@ impl From<f32> for CommandFloat {
 }
 
 /// Command which returns [`StringOrPlaceholder`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum CommandString {
     /// Return `value`
     Constant { value: StringOrPlaceholder },
@@ -257,11 +274,14 @@ pub enum CommandString {
     FunctionArgument { index: usize },
     /// Execute `commands`, then use `last` for the return value
     Multi {
+        #[schema(no_recursion)]
         commands: Vec<CommandVoid>,
+        #[schema(no_recursion)]
         last: Box<CommandString>,
     },
     /// Return a String consisting of `left`, then `right`
     Concatenate {
+        #[schema(no_recursion)]
         operation: Box<Operation<CommandString, Concatenator>>,
     },
     /// Get the value stored under `id`
@@ -269,11 +289,20 @@ pub enum CommandString {
     /// Return the name of world number `index`
     WorldName { index: usize },
     /// Convert `boolean` to `String`
-    FromBoolean { boolean: Box<CommandBoolean> },
+    FromBoolean {
+        #[schema(no_recursion)]
+        boolean: Box<CommandBoolean>,
+    },
     /// Convert `integer` to `String`
-    FromInteger { integer: Box<CommandInteger> },
+    FromInteger {
+        #[schema(no_recursion)]
+        integer: Box<CommandInteger>,
+    },
     /// Convert `float` to `String`
-    FromFloat { float: Box<CommandFloat> },
+    FromFloat {
+        #[schema(no_recursion)]
+        float: Box<CommandFloat>,
+    },
 }
 
 impl AsConstant for CommandString {
@@ -343,13 +372,15 @@ impl From<&str> for CommandString {
 }
 
 /// Command which returns [`Zone`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum CommandZone {
     /// Return `value`
     Constant { value: Zone },
     /// Execute `commands`, then use `last` for the return value
     Multi {
+        #[schema(no_recursion)]
         commands: Vec<CommandVoid>,
+        #[schema(no_recursion)]
         last: Box<CommandZone>,
     },
     /// Return the zone Ori is currently in
@@ -387,10 +418,11 @@ impl From<Zone> for CommandZone {
 }
 
 /// Command which returns nothing
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum CommandVoid {
     /// Execute `commands`
     Multi {
+        #[schema(no_recursion)]
         commands: Vec<CommandVoid>,
     },
     /// Call the function at `index` with the given arguments
@@ -404,6 +436,7 @@ pub enum CommandVoid {
     /// Only perform `command` if `condition` evaluates to true
     If {
         condition: CommandBoolean,
+        #[schema(no_recursion)]
         command: Box<CommandVoid>,
     },
     /// Until the next reload, on every tick where `toggle` is `true` increment `timer` by the delta time in seconds

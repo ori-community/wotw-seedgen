@@ -12,7 +12,7 @@ use wotw_seedgen_derive::FromStr;
 use crate::{Equipment, Shard};
 
 /// Icons which can be used in shops or wheels
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum Icon {
     Generic(GenericIcon),
     Shard(Shard),
@@ -53,6 +53,7 @@ impl Display for Icon {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -74,6 +75,7 @@ pub enum GenericIcon {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -106,6 +108,7 @@ pub enum OpherIcon {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -129,6 +132,7 @@ pub enum LupoIcon {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -156,6 +160,7 @@ pub enum GromIcon {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,

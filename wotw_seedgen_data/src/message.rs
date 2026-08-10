@@ -1,5 +1,6 @@
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, VariantArray};
+use utoipa::ToSchema;
 use wotw_seedgen_derive::FromStr;
 
 /// Text alignment in messages
@@ -14,6 +15,7 @@ use wotw_seedgen_derive::FromStr;
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -40,6 +42,7 @@ pub enum Alignment {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -63,6 +66,7 @@ pub enum HorizontalAnchor {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -86,6 +90,7 @@ pub enum VerticalAnchor {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,
@@ -124,6 +129,7 @@ pub enum Corner {
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Display,
     FromStr,
     VariantArray,

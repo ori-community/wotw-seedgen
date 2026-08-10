@@ -16,6 +16,7 @@ pub mod logic;
 pub mod presets;
 pub mod settings;
 pub mod snippets;
+pub mod spoilers;
 
 const GENERATE: &str = "/generate";
 
@@ -31,6 +32,7 @@ pub fn router(cache: RouterState) -> Router {
         .nest(settings::SETTINGS, settings::router())
         .nest(presets::PRESETS, presets::router())
         .nest(snippets::SNIPPETS, snippets::router())
+        .nest(spoilers::SPOILERS, spoilers::router())
         .layer(cors)
         .merge(SwaggerUi::new("/docs").url(
             "/docs/wotw-seedgen-openapi.json",
@@ -47,6 +49,7 @@ pub fn router(cache: RouterState) -> Router {
         (path = settings::SETTINGS, api = settings::Docs, tags = [settings::TAG]),
         (path = presets::PRESETS, api = presets::Docs, tags = [presets::TAG]),
         (path = snippets::SNIPPETS, api = snippets::Docs, tags = [snippets::TAG]),
+        (path = spoilers::SPOILERS, api = spoilers::Docs, tags = [spoilers::TAG]),
     ),
     // manually add things here that get missed by automatic collection
     components(schemas(LogLevelFilter)),

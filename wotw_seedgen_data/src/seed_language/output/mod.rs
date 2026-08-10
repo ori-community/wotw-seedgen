@@ -24,6 +24,7 @@ pub use operation::{
     LogicOperator, Operation,
 };
 pub use postprocess::{postprocess, PlaceholderMap, UniversePostprocessor};
+use utoipa::ToSchema;
 
 use crate::{Icon, Position, UberIdentifier, Zone};
 use rustc_hash::{FxHashMap, FxHashSet};
@@ -110,10 +111,11 @@ pub struct SnippetDebugOutput {
     pub function_indices: FxHashMap<String, usize>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum StringOrPlaceholder {
     Value(String),
     ZoneOfPlaceholder(Vec<UberIdentifier>),
+    #[schema(no_recursion)]
     ItemOnPlaceholder(Box<Trigger>),
     CountInZonePlaceholder(Vec<UberIdentifier>, Zone),
 }

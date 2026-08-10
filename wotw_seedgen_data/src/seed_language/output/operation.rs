@@ -8,9 +8,10 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::fmt::{self, Display};
+use utoipa::ToSchema;
 
 /// An Operation performed on two values
-#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Operation<Item, Operator> {
     pub left: Item,
     pub operator: Operator,
@@ -79,7 +80,7 @@ impl Display for ArithmeticOperator {
 }
 
 /// Concatenation performed on strings
-#[derive(Debug, Serialize_repr, Deserialize_repr, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize_repr, Deserialize_repr, ToSchema, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum Concatenator {
     /// `+`
@@ -215,7 +216,7 @@ impl Display for Comparator {
 }
 
 /// Comparison Operations performed on strings or booleans
-#[derive(Debug, Serialize_repr, Deserialize_repr, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Serialize_repr, Deserialize_repr, ToSchema, Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum EqualityComparator {
     /// `==`

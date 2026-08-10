@@ -9,6 +9,7 @@ use crate::{
     EqIgnore, UberIdentifier,
 };
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /// The main event (:badumtsss:)
 // TODO improve documentation
@@ -37,7 +38,7 @@ impl Event {
 }
 
 /// Trigger for an [`Event`]
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum Trigger {
     /// Specific client events
     ClientEvent(ClientEvent),
@@ -84,8 +85,9 @@ impl Trigger {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub struct TriggerCondition {
+    #[schema(value_type = Option<usize>)]
     pub id: EqIgnore<Option<usize>>,
     pub condition: CommandBoolean,
 }

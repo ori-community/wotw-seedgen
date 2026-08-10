@@ -127,7 +127,18 @@ pub enum Trigger<'source> {
 }
 
 #[derive(
-    Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, Serialize, Deserialize, VariantArray,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    Ast,
+    Display,
+    Serialize,
+    Deserialize,
+    ToSchema,
+    VariantArray,
 )]
 #[ast(case = "snake_case")]
 #[strum(serialize_all = "snake_case")]
@@ -305,7 +316,9 @@ pub enum Operator {
 }
 
 /// Arithmetic Operations performed on numbers
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, Ast)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, ToSchema, Ast,
+)]
 #[repr(u8)]
 pub enum ArithmeticOperator {
     /// `+`
@@ -323,7 +336,9 @@ pub enum ArithmeticOperator {
 }
 
 /// Logic Operations performed on booleans
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, Ast)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize_repr, Deserialize_repr, ToSchema, Ast,
+)]
 #[repr(u8)]
 pub enum LogicOperator {
     /// `&&`

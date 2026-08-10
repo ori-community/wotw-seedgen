@@ -1,10 +1,11 @@
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
+use utoipa::ToSchema;
 use wotw_seedgen_data::{assets::LocDataEntry, seed_language::output::CommandVoid, Position, Zone};
 
 /// Complete data to create a logic spoiler for the seed
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct SeedSpoiler {
     /// Anchor identifier of all the spawn locations
     pub spawns: Vec<String>,
@@ -30,7 +31,7 @@ impl SeedSpoiler {
 }
 
 /// One "step" of placements in a [`SeedSpoiler`]
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SpoilerGroup {
     /// The new reachables for each world
@@ -43,7 +44,7 @@ pub struct SpoilerGroup {
 }
 
 /// One item placed on one location
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SpoilerPlacement {
     /// The "sending" world
@@ -56,7 +57,7 @@ pub struct SpoilerPlacement {
     pub item: SpoilerItem,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SpoilerItem {
     /// The placed command
@@ -66,7 +67,7 @@ pub struct SpoilerItem {
 }
 
 /// Select data from a [`LocDataEntry`]
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct NodeSummary {
     /// The identifier
     pub identifier: String,
