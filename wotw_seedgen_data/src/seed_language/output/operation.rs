@@ -12,10 +12,40 @@ use utoipa::ToSchema;
 
 /// An Operation performed on two values
 #[derive(Debug, Serialize, Deserialize, ToSchema, Clone, Copy, PartialEq, Eq, Hash)]
+#[schema(bound = "Item: ToSchema + ForceUtoipaRef<This = Item>, Operator: ToSchema")]
 pub struct Operation<Item, Operator> {
+    #[schema(no_recursion, value_type = Item::This)]
     pub left: Item,
     pub operator: Operator,
+    #[schema(no_recursion, value_type = Item::This)]
     pub right: Item,
+}
+
+/// https://github.com/juhaku/utoipa/issues/1182#issuecomment-2453465750
+///
+/// If I meet Skul again, I'll tell her to blarg the utoipa devs
+trait ForceUtoipaRef {
+    type This: ForceUtoipaRef;
+}
+
+impl ForceUtoipaRef for CommandBoolean {
+    type This = Self;
+}
+
+impl ForceUtoipaRef for CommandInteger {
+    type This = Self;
+}
+
+impl ForceUtoipaRef for CommandFloat {
+    type This = Self;
+}
+
+impl ForceUtoipaRef for CommandString {
+    type This = Self;
+}
+
+impl ForceUtoipaRef for CommandZone {
+    type This = Self;
 }
 
 pub trait ExecuteOperator<T> {

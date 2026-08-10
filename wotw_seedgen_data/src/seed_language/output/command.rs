@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
 /// A Command, which may be used to affect the world, player or client state
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Command {
     /// Commands returning [`bool`]
     Boolean(CommandBoolean),
@@ -58,7 +58,6 @@ pub enum CommandBoolean {
     },
     /// Return the result of `operation`
     CompareBoolean {
-        #[schema(no_recursion)]
         operation: Box<Operation<CommandBoolean, EqualityComparator>>,
     },
     /// Return the result of `operation`
@@ -79,7 +78,6 @@ pub enum CommandBoolean {
     },
     /// Return the result of `operation`
     LogicOperation {
-        #[schema(no_recursion)]
         operation: Box<Operation<CommandBoolean, LogicOperator>>,
     },
     /// Return the value stored in `uber_identifier`
@@ -156,7 +154,6 @@ pub enum CommandInteger {
     },
     /// Return the result of `operation`
     Arithmetic {
-        #[schema(no_recursion)]
         operation: Box<Operation<CommandInteger, ArithmeticOperator>>,
     },
     /// Return the value stored in `uber_identifier`
@@ -217,7 +214,6 @@ pub enum CommandFloat {
     },
     /// Return the result of `operation`
     Arithmetic {
-        #[schema(no_recursion)]
         operation: Box<Operation<CommandFloat, ArithmeticOperator>>,
     },
     /// Return the value stored in `uber_identifier`
@@ -281,7 +277,6 @@ pub enum CommandString {
     },
     /// Return a String consisting of `left`, then `right`
     Concatenate {
-        #[schema(no_recursion)]
         operation: Box<Operation<CommandString, Concatenator>>,
     },
     /// Get the value stored under `id`

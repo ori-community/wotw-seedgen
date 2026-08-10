@@ -9,6 +9,7 @@ use tower_http::cors::{Any, CorsLayer};
 use utoipa::{IntoParams, OpenApi, ToSchema, openapi};
 use utoipa_swagger_ui::SwaggerUi;
 use wotw_seedgen::data::UniverseSettings;
+use wotw_seedgen::data::seed_language::output::{CommandZone, Trigger};
 
 use crate::{RouterState, error::Result, generate};
 
@@ -52,7 +53,17 @@ pub fn router(cache: RouterState) -> Router {
         (path = spoilers::SPOILERS, api = spoilers::Docs, tags = [spoilers::TAG]),
     ),
     // manually add things here that get missed by automatic collection
-    components(schemas(LogLevelFilter)),
+    components(schemas(
+        // Trigger is missed because for no_recursion it makes more sense to consider it high in the hierarchy
+        // but in current practice it's a relatively low leaf of spoiler and gets filtered
+        Trigger,
+        // CommandZone is missed because it's currently only referenced inside an operation which is forced to
+        // add no_recursion indiscriminately because it's impossible to add the attribute on specific generic
+        // types passed to it
+        CommandZone,
+        // LogLevelFilter is missed because oriShrug
+        LogLevelFilter
+    )),
 )]
 struct Docs;
 
