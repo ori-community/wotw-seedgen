@@ -690,16 +690,8 @@ impl ErrCompletion for Content<'_> {
     }
 }
 
-static TRIGGER_NON_EXPRESSION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
-    let mut completion = vec![keyword_completion("change")];
-
-    completion.append(&mut CLIENT_EVENT_COMPLETION.clone());
-
-    completion
-});
-
 fn trigger_completion(cache: &CacheValues) -> Vec<CompletionItem> {
-    let mut completion = TRIGGER_NON_EXPRESSION_COMPLETION.clone();
+    let mut completion = vec![keyword_completion("change")];
 
     completion.append(&mut expression_completion(cache));
 
@@ -732,7 +724,7 @@ impl CompletionInSpan for Trigger<'_> {
 
                 // If we are returning identifier completions, add relevant non expression completions
                 if completion.first().is_some_and(|item| item.label == "if") {
-                    completion.append(&mut TRIGGER_NON_EXPRESSION_COMPLETION.clone());
+                    completion.push(keyword_completion("change"));
                 }
 
                 Some(completion)
