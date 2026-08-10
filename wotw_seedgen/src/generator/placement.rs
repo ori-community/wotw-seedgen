@@ -25,14 +25,7 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{
-    cmp::Ordering,
-    env,
-    fmt::{Display, Write},
-    iter, mem,
-    ops::RangeFrom,
-    sync::LazyLock,
-};
+use std::{cmp::Ordering, env, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     logic_language::output::Node,
@@ -1549,21 +1542,9 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         let spawn = &self.world.graph.nodes[self.world.spawn];
         self.output.preload.spawn = Some(*spawn.position().unwrap());
 
-        // Debug variant for the uppercase formatting
-        self.output
-            .preload
-            .tags
-            .push(format!("{:?}", self.world.settings.difficulty));
-
-        if let Some(loop_size) = self.world.settings.randomize_entrances {
-            let mut random_entrances = "Random Entrances".to_string();
-
-            if loop_size.get() > 2 {
-                let _ = write!(&mut random_entrances, " (Loop Size {loop_size})");
-            }
-
-            self.output.preload.tags.push(random_entrances);
-        }
+        self.world
+            .settings
+            .write_tags(&mut self.output.preload.tags);
 
         let seedgen_info =
             SeedgenInfo::new(settings.clone(), self.index, spawn.identifier().to_string());

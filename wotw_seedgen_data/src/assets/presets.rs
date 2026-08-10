@@ -454,7 +454,9 @@ impl WorldPresetSettings {
 
         if let Some(tricks) = tricks {
             match tricks {
-                Tricks::All => settings.tricks = settings.difficulty.available_tricks().collect(),
+                Tricks::All => {
+                    settings.tricks = settings.difficulty.available_tricks_iter().collect()
+                }
                 Tricks::Some(tricks) => settings.tricks.extend(tricks),
             }
         }

@@ -327,7 +327,7 @@ fn select_tricks(
     let items = settings
         .difficulty
         .unwrap_or(include_settings.difficulty)
-        .available_tricks()
+        .available_tricks_iter()
         .filter(|trick| {
             let controlled = include_settings.tricks.contains(trick);
             include_controlled += u8::from(controlled);

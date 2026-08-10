@@ -5,12 +5,15 @@
 mod slug;
 
 use std::{
-    fmt::{self, Display},
+    fmt::{self, Display, Write},
+    iter,
     num::NonZeroU8,
     ops::Deref,
+    slice,
     str::FromStr,
 };
 
+use heck::ToTitleCase;
 use itertools::Itertools;
 use rand::{distributions::Bernoulli, seq::SliceRandom, Rng};
 use rustc_hash::{FxHashMap, FxHashSet};
@@ -249,6 +252,44 @@ impl WorldSettings {
     pub fn is_random_spawn(&self) -> bool {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
     }
+
+    pub fn write_tags(&self, tags: &mut Vec<String>) {
+        // Debug variant for the uppercase formatting
+        tags.push(format!("{:?}", self.difficulty));
+
+        if !self.tricks.is_empty() {
+            let available = self.difficulty.available_tricks();
+
+            // Especially with random settings some tricks may be logically irrelevant
+            let mut enabled = available.iter().filter(|trick| self.tricks.contains(trick));
+
+            if let Some(first) = enabled.next() {
+                let available_len = available.len();
+                let enabled_len = 1 + enabled.count();
+
+                let tag = if enabled_len == available_len {
+                    "All Tricks".to_string()
+                } else if enabled_len == 1 {
+                    first.to_string().to_title_case()
+                } else {
+                    // TODO allow checking details somewhere?
+                    format!("Tricks ({enabled_len}/{available_len} enabled)")
+                };
+
+                tags.push(tag);
+            }
+        }
+
+        if let Some(loop_size) = self.randomize_entrances {
+            let mut random_entrances = "Random Entrances".to_string();
+
+            if loop_size.get() > 2 {
+                let _ = write!(&mut random_entrances, " (Loop Size {loop_size})");
+            }
+
+            tags.push(random_entrances);
+        }
+    }
 }
 
 /// The Spawn location, which may either be fixed or randomly decided during seed generation
@@ -307,11 +348,62 @@ pub enum Difficulty {
 }
 
 impl Difficulty {
-    pub fn available_tricks(self) -> impl Iterator<Item = Trick> {
-        <Trick as VariantArray>::VARIANTS
-            .iter()
-            .copied()
-            .filter(move |trick| self >= trick.min_difficulty())
+    pub const fn available_tricks(self) -> &'static [Trick] {
+        const MOKI: &[Trick] = &[];
+        const GORLEK: &[Trick] = &Difficulty::Gorlek
+            .available_tricks_array::<{ Difficulty::Gorlek.available_tricks_len() }>();
+        const KII: &[Trick] =
+            &Difficulty::Kii.available_tricks_array::<{ Difficulty::Kii.available_tricks_len() }>();
+        const UNSAFE: &[Trick] = <Trick as VariantArray>::VARIANTS;
+
+        match self {
+            Difficulty::Moki => MOKI,
+            Difficulty::Gorlek => GORLEK,
+            Difficulty::Kii => KII,
+            Difficulty::Unsafe => UNSAFE,
+        }
+    }
+
+    pub fn available_tricks_iter(self) -> iter::Copied<slice::Iter<'static, Trick>> {
+        self.available_tricks().iter().copied()
+    }
+
+    const fn available_tricks_array<const N: usize>(self) -> [Trick; N] {
+        let mut tricks = [Trick::SwordSentryJump; N];
+        let mut len = 0;
+
+        let mut index = 0;
+        while index < <Trick as VariantArray>::VARIANTS.len() {
+            let trick = <Trick as VariantArray>::VARIANTS[index];
+
+            if (self as u8) >= trick.min_difficulty() as u8 {
+                tricks[len] = trick;
+                len += 1;
+            }
+
+            index += 1;
+        }
+
+        assert!(len == N);
+
+        tricks
+    }
+
+    const fn available_tricks_len(self) -> usize {
+        let mut len = 0;
+
+        let mut index = 0;
+        while index < <Trick as VariantArray>::VARIANTS.len() {
+            let trick = <Trick as VariantArray>::VARIANTS[index];
+
+            if (self as u8) >= trick.min_difficulty() as u8 {
+                len += 1;
+            }
+
+            index += 1;
+        }
+
+        len
     }
 }
 
@@ -409,7 +501,7 @@ pub enum Trick {
 
 impl Trick {
     // TODO verify usage in logic?
-    pub fn min_difficulty(self) -> Difficulty {
+    pub const fn min_difficulty(self) -> Difficulty {
         match self {
             Self::SwordSentryJump
             | Self::HammerSentryJump
