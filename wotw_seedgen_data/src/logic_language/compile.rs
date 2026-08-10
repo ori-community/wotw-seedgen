@@ -179,27 +179,6 @@ impl<'source, 'log> Compiler<'source, 'log> {
             }
         }
 
-        // partition
-        {
-            let mut iter = paths.contents.iter_mut();
-
-            while let Some(anchor) = iter.find(|content| {
-                matches!(content.value, SpannedOption::Some(ast::Content::Anchor(..)))
-            }) {
-                match iter.rfind(|content| {
-                    matches!(
-                        content.value,
-                        SpannedOption::Some(
-                            ast::Content::Requirement(..) | ast::Content::Region(..)
-                        )
-                    )
-                }) {
-                    None => break,
-                    Some(non_anchor) => mem::swap(anchor, non_anchor),
-                }
-            }
-        }
-
         let mut nodes = vec![]; // TODO capacity
         let mut anchors = Vec::with_capacity(300); // We know more about the needed capacity than collect would
         let mut anchor_map = FxHashMap::default();
