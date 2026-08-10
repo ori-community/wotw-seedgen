@@ -4,7 +4,6 @@
 
 !builtin_icon(clean_water_icon, "icons/game/water.png")
 !builtin_icon(teleporter_icon, "icons/game/teleporter.png")
-// TODO add save icon
 !builtin_icon(save_icon, "icons/game/save.png")
 !builtin_icon(health_icon, "icons/game/healthfragment.png")
 !builtin_icon(wall_icon, "map_icons/blocked_wall.png")
