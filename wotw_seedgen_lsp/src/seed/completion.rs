@@ -343,17 +343,31 @@ where
 fn enum_member_completions_full<T, F, D>(
     variants: &[T],
     detail: &str,
-    mut description: F,
+    description: F,
 ) -> Vec<CompletionItem>
 where
     T: ToString,
     F: FnMut(&T) -> D,
     D: ToString,
 {
+    enum_member_completions_full_with_label(variants, detail, T::to_string, description)
+}
+
+fn enum_member_completions_full_with_label<T, FL, FD, D>(
+    variants: &[T],
+    detail: &str,
+    mut label: FL,
+    mut description: FD,
+) -> Vec<CompletionItem>
+where
+    FL: FnMut(&T) -> String,
+    FD: FnMut(&T) -> D,
+    D: ToString,
+{
     variants
         .iter()
         .map(|variant| CompletionItem {
-            label: variant.to_string(),
+            label: label(variant),
             label_details: Some(CompletionItemLabelDetails {
                 detail: Some(format!(" ({detail})")),
                 description: Some(description(variant).to_string()),
@@ -374,9 +388,12 @@ static SHARD_COMPLETION: LazyLock<Vec<CompletionItem>> =
     LazyLock::new(|| enum_member_completions_full(Shard::VARIANTS, "Shard", |shard| *shard as u8));
 
 static TELEPORTER_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
-    enum_member_completions_full(Teleporter::VARIANTS, "Teleporter", |teleporter| {
-        *teleporter as u8
-    })
+    enum_member_completions_full_with_label(
+        Teleporter::VARIANTS,
+        "Teleporter",
+        |tp| tp.display::<false>().to_string(),
+        |tp| *tp as u8,
+    )
 });
 
 static WEAPON_UPGRADE_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {

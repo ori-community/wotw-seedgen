@@ -76,7 +76,7 @@ impl Display for Constant {
             Constant::ClientEvent(value) => value.fmt(f),
             Constant::Skill(value) => value.fmt(f),
             Constant::Shard(value) => value.fmt(f),
-            Constant::Teleporter(value) => value.fmt(f),
+            Constant::Teleporter(value) => value.display::<false>().fmt(f),
             Constant::WeaponUpgrade(value) => value.fmt(f),
             Constant::Equipment(value) => value.fmt(f),
             Constant::Zone(value) => value.fmt(f),

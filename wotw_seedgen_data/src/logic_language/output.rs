@@ -344,7 +344,7 @@ impl Display for Requirement {
             Self::GorlekOre(amount) => write!(f, "GorlekOre={amount}"),
             Self::Keystone(amount) => write!(f, "Keystone={amount}"),
             Self::Shard(shard) => shard.fmt(f),
-            Self::Teleporter(teleporter) => teleporter.fmt(f),
+            Self::Teleporter(teleporter) => teleporter.display::<true>().fmt(f),
             Self::Water => write!(f, "Water"),
             Self::State(state) => write!(f, "{{{state}}}"),
             Self::Extern(index) => write!(f, "{{extern {index}}}"),

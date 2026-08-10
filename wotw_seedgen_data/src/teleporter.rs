@@ -44,32 +44,6 @@ pub enum Teleporter {
     Shriek = 15,
 }
 
-impl Display for Teleporter {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Teleporter::Marsh => write!(f, "Marsh")?,
-            Teleporter::Den => write!(f, "Den")?,
-            Teleporter::Hollow => write!(f, "Hollow")?,
-            Teleporter::Glades => write!(f, "Glades")?,
-            Teleporter::Wellspring => write!(f, "Wellspring")?,
-            Teleporter::Burrows => write!(f, "Burrows")?,
-            Teleporter::WoodsEntrance => write!(f, "WoodsEntrance")?,
-            Teleporter::WoodsExit => write!(f, "WoodsExit")?,
-            Teleporter::Reach => write!(f, "Reach")?,
-            Teleporter::Depths => write!(f, "Depths")?,
-            Teleporter::CentralPools => write!(f, "CentralPools")?,
-            Teleporter::PoolsBoss => write!(f, "PoolsBoss")?,
-            Teleporter::FeedingGrounds => write!(f, "FeedingGrounds")?,
-            Teleporter::CentralWastes => write!(f, "CentralWastes")?,
-            Teleporter::OuterRuins => write!(f, "OuterRuins")?,
-            Teleporter::InnerRuins => write!(f, "InnerRuins")?,
-            Teleporter::Willow => write!(f, "Willow")?,
-            Teleporter::Shriek => write!(f, "Shriek")?,
-        }
-        write!(f, "TP")
-    }
-}
-
 impl Teleporter {
     pub const MARSH_ID: UberIdentifier = UberIdentifier::new(21786, 10185);
     pub const DEN_ID: UberIdentifier = UberIdentifier::new(11666, 61594);
@@ -162,6 +136,24 @@ impl Teleporter {
             Teleporter::Shriek => UberIdentifier::map_segment(146432),
         }
     }
+
+    pub const fn display<const SUFFIX: bool>(self) -> TeleporterDisplay<SUFFIX> {
+        TeleporterDisplay(self)
+    }
+}
+
+pub struct TeleporterDisplay<const SUFFIX: bool>(Teleporter);
+
+impl<const SUFFIX: bool> Display for TeleporterDisplay<SUFFIX> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self.0)?;
+
+        if SUFFIX {
+            f.write_str("TP")?;
+        }
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -179,14 +171,16 @@ mod tests {
                 uber_state_data
                     .id_lookup
                     .contains_key(&teleporter.uber_identifier()),
-                "invalid UberIdentifier for {teleporter}"
+                "invalid UberIdentifier for {}",
+                teleporter.display::<true>()
             );
 
             assert!(
                 uber_state_data
                     .id_lookup
                     .contains_key(&teleporter.map_segment()),
-                "invalid map segment UberIdentifier for {teleporter}"
+                "invalid map segment UberIdentifier for {}",
+                teleporter.display::<true>()
             );
         }
     }

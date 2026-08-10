@@ -1750,14 +1750,12 @@ fn shard_string(shard: Shard, remove: bool) -> CommandString {
 }
 
 fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
-    let teleporter = teleporter.to_string();
-    let teleporter = &teleporter[..teleporter.len() - 2];
-    let teleporter_cased = teleporter.to_string().to_title_case();
+    let teleporter = teleporter.display::<false>().to_string().to_title_case();
 
     if remove {
-        format!("@Remove {teleporter_cased} Teleporter@")
+        format!("@Remove {teleporter} Teleporter@")
     } else {
-        format!("#{teleporter_cased} Teleporter#")
+        format!("#{teleporter} Teleporter#")
     }
     .into()
 }

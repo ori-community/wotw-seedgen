@@ -15,7 +15,6 @@ use crate::{
 use rustc_hash::FxHashMap;
 use std::{
     array,
-    fmt::Display,
     path::{Path, PathBuf},
     sync::LazyLock,
 };
@@ -214,13 +213,13 @@ fn test_str(source: &str) -> IntermediateOutput<'_> {
 
 #[test]
 fn coersions() {
-    fn test_variants_with_prefix<T: VariantArray + Display>(prefix: &str, f: fn(&T) -> String) {
+    fn test_variants_with_prefix<T: VariantArray>(prefix: &str, f: fn(&T) -> String) {
         let variants = T::VARIANTS.iter().map(f).collect::<String>();
 
         test_str(&format!("{prefix} {{{variants}}}"));
     }
 
-    fn test_variants<T: VariantArray + Display>(f: fn(&T) -> String) {
+    fn test_variants<T: VariantArray>(f: fn(&T) -> String) {
         test_variants_with_prefix("on spawn", f);
     }
 

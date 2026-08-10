@@ -402,7 +402,7 @@ pub enum Constant {
     ClientEvent(ClientEvent),
     Skill(#[ast(with = "constant_ast::<Skill, E>")] Skill),
     Shard(#[ast(with = "constant_ast::<Shard, E>")] Shard),
-    Teleporter(#[ast(with = "constant_ast::<Teleporter, E>")] Teleporter),
+    Teleporter(#[ast(with = "teleporter_ast::<E>")] Teleporter),
     WeaponUpgrade(#[ast(with = "constant_ast::<WeaponUpgrade, E>")] WeaponUpgrade),
     Equipment(#[ast(with = "constant_ast::<Equipment, E>")] Equipment),
     Zone(#[ast(with = "constant_ast::<Zone, E>")] Zone),
@@ -424,7 +424,22 @@ pub enum Constant {
 
 fn constant_ast<T, E: ErrorMode>(parser: &mut Parser<Tokenizer>) -> Option<T>
 where
-    T: FromStr<Err = String> + VariantArray + Display,
+    T: FromStr<Err = String> + VariantArray + Copy + Display,
+{
+    constant_ast_with_label::<T, _, E>(parser, |t| t.to_string())
+}
+
+fn teleporter_ast<E: ErrorMode>(parser: &mut Parser<Tokenizer>) -> Option<Teleporter> {
+    constant_ast_with_label::<Teleporter, _, E>(parser, |tp| tp.display::<false>().to_string())
+}
+
+fn constant_ast_with_label<T, F, E: ErrorMode>(
+    parser: &mut Parser<Tokenizer>,
+    mut f: F,
+) -> Option<T>
+where
+    T: FromStr<Err = String> + VariantArray + Copy,
+    F: FnMut(T) -> String,
 {
     let before = parser.position();
 
@@ -436,7 +451,7 @@ where
                 .iter()
                 .map(|t| {
                     Error::new(
-                        ErrorKind::ExpectedToken(t.to_string()),
+                        ErrorKind::ExpectedToken(f(*t).to_string()),
                         identifier.span.clone(),
                     )
                 })

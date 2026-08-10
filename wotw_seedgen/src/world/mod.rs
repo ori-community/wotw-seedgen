@@ -736,7 +736,11 @@ impl Display for InventoryDisplay<'_, '_, '_, '_, '_> {
         resource::<true>(f, &mut first, self.world.shard_slots(), "Shard Slot")?;
         iter_item(f, &mut first, self.world.skills())?;
         iter_item(f, &mut first, self.world.shards())?;
-        iter_item(f, &mut first, self.world.teleporters())?;
+        iter_item(
+            f,
+            &mut first,
+            self.world.teleporters().map(Teleporter::display::<true>),
+        )?;
         bool_item(f, &mut first, self.world.clean_water(), "Clean Water")?;
         iter_item(f, &mut first, self.world.weapon_upgrades())?;
 
