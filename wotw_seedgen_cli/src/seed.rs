@@ -1,12 +1,12 @@
 use std::{
     fs::{self, File},
-    io,
+    io::{self, Write},
     path::{Path, PathBuf},
     time::Instant,
 };
 
 use crate::{
-    cli::{GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs},
+    cli::{CompileArgs, GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs},
     log_config::LogConfig,
     Error,
 };
@@ -21,13 +21,14 @@ use wotw_seedgen::{
         parse::Source,
         UniverseSettings, WorldSettings,
     },
+    spoiler::SeedSpoiler,
     Generator, SeedUniverse,
 };
 
 pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let SeedArgs {
         settings_args,
-        generation_args: GenerationArgs { debug, launch },
+        generation_args,
         verbose_args,
     } = args;
 
@@ -49,8 +50,8 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
         &settings.seed
     };
 
-    let seed_universe = generate(&settings, debug)?;
-    let path = write_seed(seed_universe, name, debug, launch)?;
+    let seed_universe = generate(&settings, generation_args.compile_args.debug)?;
+    let path = write_seed(seed_universe, name, generation_args)?;
 
     eprintln!(
         "Generated seed in {:.1}s to \"{}\"",
@@ -86,9 +87,13 @@ impl SeedSettingsArgs {
 pub fn write_seed(
     seed_universe: SeedUniverse,
     name: &str,
-    debug: bool,
-    launch: LaunchArgs,
+    generation_args: GenerationArgs,
 ) -> Result<PathBuf, Error> {
+    let GenerationArgs {
+        json_spoiler,
+        compile_args: CompileArgs { debug, launch_args },
+    } = generation_args;
+
     let seeds_dir = SEEDGEN_USER_DATA_DIR.join("seeds");
     assets::create_dir_all(&seeds_dir)?;
 
@@ -98,10 +103,13 @@ pub fn write_seed(
         // TODO BufWriter needed on packages to file?
         seed.package(&mut file, !debug)?;
 
-        launch_seed(&path, launch)?;
+        launch_seed(&path, launch_args)?;
 
-        let spoiler_path = path.with_extension("spoiler.txt");
-        assets::write(&spoiler_path, seed_universe.spoiler.to_string())?;
+        write_spoiler(
+            path.with_extension("spoiler"),
+            seed_universe.spoiler,
+            json_spoiler,
+        )?;
 
         Ok(path)
     } else {
@@ -113,8 +121,7 @@ pub fn write_seed(
             seed.package(&mut file, !debug)?;
         }
 
-        let spoiler_path = path.join("spoiler.txt");
-        assets::write(&spoiler_path, seed_universe.spoiler.to_string())?;
+        write_spoiler(path.join("spoiler"), seed_universe.spoiler, json_spoiler)?;
 
         Ok(path)
     }
@@ -183,6 +190,22 @@ pub fn write_new_game_seed_source(path: &Path) -> Result<(), Error> {
     let newgameseedsource = RANDOMIZER_USER_DATA_DIR.join("randomizer/.newgameseedsource");
 
     write(newgameseedsource, format!("file:{path}"))?;
+
+    Ok(())
+}
+
+fn write_spoiler(mut path: PathBuf, spoiler: SeedSpoiler, json_spoiler: bool) -> Result<(), Error> {
+    if json_spoiler {
+        path.add_extension("json");
+
+        let file = assets::file_create(&path)?;
+        serde_json::to_writer(file, &spoiler).map_err(|err| file_err("write", &path, err))?;
+    } else {
+        path.add_extension("txt");
+
+        let mut file = assets::file_create(&path)?;
+        write!(file, "{spoiler}").map_err(|err| file_err("write", &path, err))?;
+    }
 
     Ok(())
 }

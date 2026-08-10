@@ -1,5 +1,5 @@
 use crate::{
-    cli::{GenerationArgs, PlandoArgs},
+    cli::{CompileArgs, PlandoArgs},
     log_config::LogConfig,
     seed::launch_seed,
     Error,
@@ -27,7 +27,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         path,
         out,
         watch,
-        generation_args: GenerationArgs { debug, launch },
+        compile_args: CompileArgs { debug, launch_args },
         verbose_args,
     } = args;
 
@@ -80,7 +80,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
 
     let result = compile(&mut rng, &cache, entry, &out, lockfile.clone(), debug);
 
-    launch_seed(&out, launch)?;
+    launch_seed(&out, launch_args)?;
 
     if watch {
         if let Err(err) = result {

@@ -10,7 +10,7 @@ use wotw_seedgen_git_info::{GitInfo, GIT_HEAD, GIT_STATUS};
 use zip::{read::ZipFile, ZipArchive};
 
 use crate::{
-    cli::{dev::RegenerateArgs, GenerationArgs},
+    cli::{dev::RegenerateArgs, CompileArgs},
     log_config::LogConfig,
     seed::{generate, write_new_game_seed_source, write_seed},
     Error,
@@ -19,9 +19,10 @@ use crate::{
 pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
     let RegenerateArgs {
         path,
-        generation_args: GenerationArgs { debug, launch },
+        generation_args,
         verbose_args,
     } = args;
+    let CompileArgs { debug, launch_args } = generation_args.compile_args;
 
     let start = Instant::now();
 
@@ -40,12 +41,12 @@ pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
         return Err(Error("Regenerated seed did not match".to_string()));
     }
 
-    let path = if debug || launch.launch {
+    let path = if debug || launch_args.launch {
         let name = format!("{}_regenerate", path.file_stem().unwrap().display());
 
-        Some(write_seed(seed_universe, &name, debug, launch)?)
+        Some(write_seed(seed_universe, &name, generation_args)?)
     } else {
-        if launch.new_game_seed_source {
+        if launch_args.new_game_seed_source {
             write_new_game_seed_source(&path)?;
         }
 

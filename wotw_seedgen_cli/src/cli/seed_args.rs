@@ -20,16 +20,25 @@ pub struct SeedSettingsArgs {
     pub settings: SeedSettings,
 }
 
-#[derive(Args, Debug, Default)]
+#[derive(Args, Debug, Clone, Copy, Default)]
 pub struct GenerationArgs {
+    /// Write the spoiler in JSON instead of text format
+    #[arg(long)]
+    pub json_spoiler: bool,
+    #[command(flatten)]
+    pub compile_args: CompileArgs,
+}
+
+#[derive(Args, Debug, Clone, Copy, Default)]
+pub struct CompileArgs {
     /// Write information useful for debugging into the seed
     #[arg(long)]
     pub debug: bool,
     #[command(flatten)]
-    pub launch: LaunchArgs,
+    pub launch_args: LaunchArgs,
 }
 
-#[derive(Args, Debug, Default)]
+#[derive(Args, Debug, Clone, Copy, Default)]
 pub struct LaunchArgs {
     /// Load the seed into the randomizer after finishing
     ///
