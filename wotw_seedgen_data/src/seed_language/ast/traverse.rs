@@ -168,7 +168,10 @@ impl<H: Handler> Traverse<H> for Spanned<Literal<'_>> {
             Literal::Boolean(_) => handler.boolean(&self.span),
             Literal::Integer(_) => handler.integer(&self.span),
             Literal::Float(_) => handler.float(&self.span),
-            Literal::String(_) => handler.string(&self.span),
+            Literal::String(s) => {
+                handler.string(&self.span);
+                handler.string_literal(s, &self.span);
+            }
             Literal::Constant(_) => handler.constant(&self.span),
         }
     }
@@ -793,6 +796,10 @@ pub trait Handler {
         let _ = span;
     }
 
+    fn string_literal(&mut self, s: &str, span: &Range<usize>) {
+        let _ = (s, span);
+    }
+
     fn constant(&mut self, span: &Range<usize>) {
         let _ = span;
     }
@@ -831,5 +838,112 @@ pub trait Handler {
 
     fn annotation(&mut self, annotation: &Annotation) {
         let _ = annotation;
+    }
+}
+
+impl<H1: Handler, H2: Handler> Handler for (H1, H2) {
+    fn keyword(&mut self, span: &Range<usize>) {
+        self.0.keyword(span);
+        self.1.keyword(span);
+    }
+
+    fn command_keyword(&mut self, span: &Range<usize>) {
+        self.0.command_keyword(span);
+        self.1.command_keyword(span);
+    }
+
+    fn annotation_keyword(&mut self, span: &Range<usize>) {
+        self.0.annotation_keyword(span);
+        self.1.annotation_keyword(span);
+    }
+
+    fn command_symbol(&mut self, span: &Range<usize>) {
+        self.0.command_symbol(span);
+        self.1.command_symbol(span);
+    }
+
+    fn annotation_symbol(&mut self, span: &Range<usize>) {
+        self.0.annotation_symbol(span);
+        self.1.annotation_symbol(span);
+    }
+
+    fn operator(&mut self, span: &Range<usize>) {
+        self.0.operator(span);
+        self.1.operator(span);
+    }
+
+    fn boolean(&mut self, span: &Range<usize>) {
+        self.0.boolean(span);
+        self.1.boolean(span);
+    }
+
+    fn integer(&mut self, span: &Range<usize>) {
+        self.0.integer(span);
+        self.1.integer(span);
+    }
+
+    fn float(&mut self, span: &Range<usize>) {
+        self.0.float(span);
+        self.1.float(span);
+    }
+
+    fn string(&mut self, span: &Range<usize>) {
+        self.0.string(span);
+        self.1.string(span);
+    }
+
+    fn string_literal(&mut self, s: &str, span: &Range<usize>) {
+        self.0.string_literal(s, span);
+        self.1.string_literal(s, span);
+    }
+
+    fn constant(&mut self, span: &Range<usize>) {
+        self.0.constant(span);
+        self.1.constant(span);
+    }
+
+    fn ty(&mut self, span: &Range<usize>) {
+        self.0.ty(span);
+        self.1.ty(span);
+    }
+
+    fn uber_identifier(&mut self, uber_identifier: &UberIdentifier) {
+        self.0.uber_identifier(uber_identifier);
+        self.1.uber_identifier(uber_identifier);
+    }
+
+    fn identifier(&mut self, identifier: &Spanned<Identifier>) {
+        self.0.identifier(identifier);
+        self.1.identifier(identifier);
+    }
+
+    fn identifier_def(&mut self, identifier: &Spanned<Identifier>) {
+        self.0.identifier_def(identifier);
+        self.1.identifier_def(identifier);
+    }
+
+    fn identifier_use(&mut self, identifier: &Spanned<Identifier>) {
+        self.0.identifier_use(identifier);
+        self.1.identifier_use(identifier);
+    }
+
+    fn function_def(&mut self, identifier: &Spanned<Identifier>) {
+        self.0.function_def(identifier);
+        self.1.function_def(identifier);
+    }
+
+    fn function_use(&mut self, identifier: &Spanned<Identifier>) {
+        self.0.function_use(identifier);
+        self.1.function_use(identifier);
+    }
+
+    fn config(&mut self, config: &ConfigArgs) {
+        self.0.config(config);
+        self.1.config(config);
+    }
+
+    fn annotation(&mut self, annotation: &Annotation) {
+        self.0.annotation(annotation);
+        self.1.annotation(annotation);
     }
 }

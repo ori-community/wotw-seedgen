@@ -1,3 +1,4 @@
+mod format_strings;
 mod id_use;
 mod identifier_use;
 
@@ -6,12 +7,17 @@ use wotw_seedgen_parse::{Error, Source};
 
 use crate::seed_language::{
     ast::{self, Traverse},
-    compile::lint::{id_use::IdUse, identifier_use::Unused},
+    compile::lint::{format_strings::FormatStrings, id_use::IdUse, identifier_use::Unused},
 };
 
 pub fn lint_ast(ast: &ast::Snippet, errors: &mut Vec<Error>) {
-    let mut unused = Unused::default();
-    ast.traverse(&mut unused);
+    let unused = Unused::default();
+    let format_strings = FormatStrings::new(errors);
+
+    let mut handler = (unused, format_strings);
+    ast.traverse(&mut handler);
+    let (unused, _) = handler;
+
     unused.finish(errors);
 }
 

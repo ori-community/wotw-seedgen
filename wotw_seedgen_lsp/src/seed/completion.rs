@@ -25,8 +25,9 @@ use wotw_seedgen_data::{
         types::Type,
     },
     Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon,
-    HorizontalAnchor, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon,
-    VariantArray, VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+    HorizontalAnchor, InputAction, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter,
+    TuleyIcon, VariantArray, VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind,
+    WheelItemPosition, Zone,
 };
 
 // TODO add controlflow functionality to handler trait and use it here?
@@ -44,7 +45,8 @@ trait CompletionInSpan: Span {
         index: usize,
         cache: &CacheValues,
     ) -> Option<Vec<CompletionItem>> {
-        if span.contains(&index) {
+        // index is the cursor position, we want to offer completions for whatever was typed before.
+        if span.contains(&(index - 1)) {
             self.completion_in_span(index, cache)
         } else {
             None
@@ -483,7 +485,7 @@ static VERTICAL_ANCHOR_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new
     )
 });
 
-static CORNER: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+static CORNER_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
     enum_member_completions_full(Corner::VARIANTS, "Corner", |corner| *corner as u8)
 });
 
@@ -524,7 +526,7 @@ fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem
         ConstantDiscriminants::Alignment => ALIGNMENT_COMPLETION.clone(),
         ConstantDiscriminants::HorizontalAnchor => HORIZONTAL_ANCHOR_COMPLETION.clone(),
         ConstantDiscriminants::VerticalAnchor => VERTICAL_ANCHOR_COMPLETION.clone(),
-        ConstantDiscriminants::Corner => CORNER.clone(),
+        ConstantDiscriminants::Corner => CORNER_COMPLETION.clone(),
         ConstantDiscriminants::CoordinateSystem => COORDINATE_SYSTEM_COMPLETION.clone(),
     }
 }
@@ -540,20 +542,13 @@ static ACTION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
 
 static FUNCTION_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(function_completion);
 
-fn literal_completion(cache: &CacheValues) -> Vec<CompletionItem> {
-    let mut completion = cache.uber_identifier_numeric_completion.clone();
-
-    completion.append(&mut CONSTANT_COMPLETION.clone());
-
-    completion
-}
-
 fn expression_completion(cache: &CacheValues) -> Vec<CompletionItem> {
     // Important: we use the "if" from ACTION_COMPLETION in first position as a marker in Trigger::completion_after_span_check
     let mut completion = ACTION_COMPLETION.clone();
 
-    completion.append(&mut literal_completion(cache));
+    completion.append(&mut CONSTANT_COMPLETION.clone());
 
+    completion.append(&mut cache.uber_identifier_numeric_completion.clone());
     completion.append(&mut cache.uber_identifier_name_completion.clone());
 
     completion
@@ -587,7 +582,7 @@ impl CompletionInSpan for ExpressionValue<'_> {
         match self {
             ExpressionValue::Group(group) => group.completion(index, cache),
             ExpressionValue::Action(action) => action.completion(index, cache),
-            ExpressionValue::Literal(literal) => literal.completion(index, cache),
+            ExpressionValue::Literal(literal) => literal_completion(literal, index, cache),
             ExpressionValue::Identifier(identifier) => {
                 // Important: we use the "if" from EXPRESSION_COMPLETION in first position as a marker in Trigger::completion_after_span_check
                 let mut completion = expression_completion(cache);
@@ -632,21 +627,38 @@ impl CompletionInSpan for FunctionCall<'_> {
     }
 }
 
-impl Completion for Literal<'_> {
-    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        match self {
-            Literal::UberIdentifier(uber_identifier) => uber_identifier.completion(index, cache),
-            Literal::Integer(_) => Some(cache.uber_identifier_numeric_completion.clone()),
-            Literal::Constant(_) => Some(CONSTANT_COMPLETION.clone()),
-            Literal::Boolean(_) | Literal::Float(_) | Literal::String(_) => None,
-        }
+fn literal_completion(
+    literal: &Spanned<Literal>,
+    index: usize,
+    cache: &CacheValues,
+) -> Option<Vec<CompletionItem>> {
+    match &literal.data {
+        Literal::UberIdentifier(uber_identifier) => uber_identifier.completion(index, cache),
+        Literal::Integer(_) => Some(cache.uber_identifier_numeric_completion.clone()),
+        Literal::String(string) => string_literal_completion(string, literal.span.start, index),
+        Literal::Constant(_) => Some(CONSTANT_COMPLETION.clone()),
+        Literal::Boolean(_) | Literal::Float(_) => None,
     }
 }
 
-impl ErrCompletion for Literal<'_> {
-    fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
-        literal_completion(cache)
+static INPUT_ACTION_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(<InputAction as VariantArray>::VARIANTS));
+
+fn string_literal_completion(
+    string: &str,
+    literal_start: usize,
+    index: usize,
+) -> Option<Vec<CompletionItem>> {
+    let index_in_string = index - literal_start - 1;
+    let string_until_index = &string[..index_in_string];
+
+    let action_start = string_until_index.rfind('[')? + 1;
+
+    if string[action_start..index_in_string].contains(']') {
+        return None;
     }
+
+    Some(INPUT_ACTION_COMPLETION.clone())
 }
 
 impl Completion for Snippet<'_> {
@@ -926,9 +938,14 @@ impl ErrCompletion for TagsArg<'_> {
 // TODO identifier completions in lots of places, just search for identifier in the ast...
 impl CompletionInSpan for ConfigArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        self.ty
-            .completion(index, cache)
-            .or_else(|| self.default.completion(index, cache))
+        self.ty.completion(index, cache).or_else(|| {
+            self.default.value.as_option().and_then(|(_, default)| {
+                default
+                    .value
+                    .as_option()
+                    .and_then(|literal| literal_completion(literal, index, cache))
+            })
+        })
     }
 }
 

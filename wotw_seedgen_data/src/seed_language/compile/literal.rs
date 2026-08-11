@@ -1,7 +1,7 @@
 use super::{Compile, SnippetCompiler};
 use crate::{
     assets::UberStateAlias,
-    seed_language::{ast, output::Literal},
+    seed_language::{ast, compile::helpers::suggestion, output::Literal},
     UberIdentifier,
 };
 use itertools::Itertools;
@@ -131,32 +131,4 @@ impl ast::UberIdentifierName<'_> {
             None
         }
     }
-}
-
-fn suggestion<T, I>(input: &str, options: I) -> Option<String>
-where
-    T: AsRef<str>,
-    I: IntoIterator<Item = T>,
-{
-    let mut distances = options
-        .into_iter()
-        .map(|option| (strsim::jaro(input, option.as_ref()), option))
-        .filter(|(confidence, option)| *confidence > 0.7 || option.as_ref().contains(input))
-        .collect::<Vec<_>>();
-
-    (!distances.is_empty()).then(|| {
-        if distances.len() == 1 {
-            format!("Did you mean \"{}\"?", distances[0].1.as_ref())
-        } else {
-            distances.sort_unstable_by(|(a, _), (b, _)| b.total_cmp(a));
-
-            format!(
-                "Did you mean one of these? {}",
-                distances
-                    .into_iter()
-                    .map(|(_, option)| format!("\"{}\"", option.as_ref()))
-                    .format(", ")
-            )
-        }
-    })
 }

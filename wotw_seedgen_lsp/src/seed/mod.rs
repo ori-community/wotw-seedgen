@@ -52,7 +52,7 @@ impl LanguageServer for Backend<Cache> {
                 completion_provider: Some(CompletionOptions {
                     trigger_characters: Some(
                         ('0'..='9')
-                            .chain(['|', '.', ':', '!', '#'])
+                            .chain(['|', '.', ':', '!', '#', '['])
                             .map(|c| c.to_string())
                             .collect(),
                     ),
@@ -147,8 +147,7 @@ impl LanguageServer for Backend<Cache> {
 
         let cache = self.cache.read().await;
 
-        // index is the cursor position, we want to offer completions for whatever was typed before.
-        let completion = ast.parsed.completion(index - 1, &cache.values);
+        let completion = ast.parsed.completion(index, &cache.values);
 
         Ok(completion.map(CompletionResponse::Array))
     }
@@ -234,7 +233,8 @@ impl Backend<Cache> {
                     &snippet_access,
                     &cache.loc_data,
                     &cache.uber_state_data,
-                );
+                )
+                .with_lint(true);
 
                 // TODO currently we can only give diagnostics for saved files because we're not using the editors in-memory changes
                 // Need to do changes in the language create to improve that
