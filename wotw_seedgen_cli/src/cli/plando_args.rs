@@ -1,4 +1,4 @@
-use clap::Args;
+use clap::{Args, ValueHint};
 use std::path::PathBuf;
 
 use super::{CompileArgs, VerboseArgs};
@@ -9,9 +9,10 @@ pub struct PlandoArgs {
     ///
     /// If the path leads to a file, it will be used as entry point.
     /// If it leads to a folder, "main.wotws" in that folder will be used as entry point.
+    #[arg(value_hint = ValueHint::FilePath)]
     pub path: PathBuf,
     /// Destination for the compiled seed
-    #[arg(long, value_name = "PATH")]
+    #[arg(long, value_name = "PATH", value_hint = ValueHint::FilePath)]
     pub out: Option<PathBuf>,
     /// Recompile when the source changes
     #[arg(short, long)]

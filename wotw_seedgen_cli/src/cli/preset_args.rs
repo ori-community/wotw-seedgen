@@ -1,6 +1,6 @@
 use clap::{
     builder::styling::Reset, error::ErrorKind, Arg, ArgAction, ArgGroup, ArgMatches, Args,
-    FromArgMatches,
+    FromArgMatches, ValueHint,
 };
 use wotw_seedgen::data::assets::{PresetGroup, PresetInfo};
 
@@ -105,6 +105,7 @@ impl<const UNIVERSE: bool> Args for PresetInfoArgs<UNIVERSE> {
 fn identifier_arg<const UNIVERSE: bool>() -> Arg {
     Arg::new("identifier")
         .value_name("IDENTIFIER")
+        .value_hint(ValueHint::Other)
         .required_unless_present("interactive")
         .help("The preset's identifier")
         .long_help(format!(
@@ -121,6 +122,7 @@ fn display_name_arg() -> Arg {
         .long("display-name")
         .short('n')
         .value_name("STRING")
+        .value_hint(ValueHint::Other)
         .help("The preset's display name")
 }
 
@@ -130,6 +132,7 @@ fn description_arg() -> Arg {
         .long("description")
         .short('D')
         .value_name("STRING")
+        .value_hint(ValueHint::Other)
         .help("The preset's extended description")
 }
 

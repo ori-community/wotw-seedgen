@@ -1,4 +1,4 @@
-use clap::{builder::styling::Reset, Args, ValueEnum};
+use clap::{builder::styling::Reset, Args, ValueEnum, ValueHint};
 use wotw_seedgen::data::UberIdentifier;
 
 use super::LITERAL;
@@ -24,6 +24,7 @@ pub struct VerboseArgs {
     #[arg(
         long,
         value_name = "UBER_IDENTIFIER",
+        value_hint = ValueHint::Other,
         num_args = 0..,
         help = TRACE_UBER_STATES_HELP,
         long_help = format!(

@@ -10,6 +10,7 @@ wotw_seedgen_http_server = { path = "../wotw_seedgen_http_server" }
 wotw_seedgen_stats = { path = "../wotw_seedgen_stats" }
 wotw_seedgen_lsp = { path = "../wotw_seedgen_lsp" }
 clap = { version = "4.4", features = ["derive", "string"] }
+clap_complete = "4.6.9"
 itertools = "0.13"
 rand = "0.8"
 rand_pcg = "0.3"

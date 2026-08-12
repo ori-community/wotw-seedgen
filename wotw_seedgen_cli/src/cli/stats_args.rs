@@ -1,5 +1,5 @@
 use super::{SeedSettingsArgs, LITERAL};
-use clap::{builder::styling::Reset, error::ErrorKind, Args, Parser};
+use clap::{builder::styling::Reset, error::ErrorKind, Args, Parser, ValueHint};
 use std::{num::NonZeroUsize, str::FromStr};
 use wotw_seedgen::data::Zone;
 
@@ -8,9 +8,9 @@ pub struct StatsArgs {
     #[command(flatten)]
     pub settings_args: SeedSettingsArgs,
     /// How many samples (seeds) to use
-    #[arg(short = 'z', long, value_name = "NUMBER", default_value = "10000")]
+    #[arg(short = 'z', long, value_name = "NUMBER", value_hint = ValueHint::Other, default_value = "10000")]
     pub sample_size: usize,
-    #[arg(short, long, required = true, num_args = 1.., long_help = format!(
+    #[arg(short, long, value_hint = ValueHint::Other, required = true, num_args = 1.., long_help = format!(
         "Any amount of analyzers that will provide statistics\n\n\
         Some analyzers take additional arguments. You can provide those like <ANALYZER>:<ARG>[,<ARG>]...\n\
         For instance, '{literal}--analyzers item-unlock:Launch{reset}' will create a 'Reachables on launch unlock.csv'\n\n\

@@ -10,6 +10,7 @@ mod seed_settings;
 mod stats_args;
 mod verbose_args;
 
+use clap_complete::Shell;
 use dev::Dev;
 pub use display::{
     AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
@@ -65,6 +66,13 @@ pub enum Cli {
     Stats {
         #[command(flatten)]
         args: StatsArgs,
+    },
+    /// Generate shell completions
+    ///
+    /// This only outputs the completion file, installation depends on your shell
+    ShellCompletions {
+        /// Explicitely request completions for the given shell
+        shell: Option<Shell>,
     },
     /// Various utilities primarily intended for seedgen development
     Dev {

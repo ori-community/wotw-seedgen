@@ -9,7 +9,7 @@ use crate::{
 use clap::{
     builder::{styling::Reset, PossibleValue, StringValueParser, TypedValueParser},
     error::ErrorKind,
-    value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches, Id,
+    value_parser, Arg, ArgAction, ArgGroup, ArgMatches, Args, FromArgMatches, Id, ValueHint,
 };
 use itertools::Itertools;
 use rustc_hash::{FxHashMap, FxHashSet};
@@ -101,6 +101,7 @@ fn seed_arg() -> Arg {
         .group("seed_settings")
         .long("seed")
         .value_name("STRING")
+        .value_hint(ValueHint::Other)
         .help("The seed that determines all randomness")
         .long_help("Generating with the same seed on the same seedgen version should always output the same result")
 }
@@ -111,6 +112,7 @@ fn universe_presets_arg() -> Arg {
         .long("universe-presets")
         .short('P')
         .value_name("NAME")
+        .value_hint(ValueHint::Other)
         .num_args(1..)
         .help("Universe presets to include")
         .long_help(preset_help(&AVAILABLE_UNIVERSE_PRESETS, "Universe"))
@@ -122,6 +124,7 @@ fn worlds_arg() -> Arg {
         .long("worlds")
         .short('w')
         .value_name("NUMBER")
+        .value_hint(ValueHint::Other)
         .value_parser(value_parser!(NonZeroUsize))
         .default_value("1")
         .help("Number of worlds for multiworld")
@@ -184,6 +187,7 @@ fn world_presets_arg(world_scoped: bool) -> Arg {
         .long("world-presets")
         .short('p')
         .value_name("NAME")
+        .value_hint(ValueHint::Other)
         .num_args(1..)
         .help("World presets to include")
         .long_help(preset_help(&AVAILABLE_WORLD_PRESETS, "World"));
@@ -197,6 +201,7 @@ fn spawn_arg(world_scoped: bool) -> Arg {
         .long("spawn")
         .short('S')
         .value_name("IDENTIFIER")
+        .value_hint(ValueHint::Other)
         .help("Spawn location")
         .long_help(format!(
             "Use any anchor identifier from paths.wotwl to spawn on a specific location\n\
@@ -281,6 +286,7 @@ fn randomize_entrances_arg(world_scoped: bool) -> Arg {
         .long("randomize-entrances")
         .short('e')
         .value_name("NUMBER")
+        .value_hint(ValueHint::Other)
         .default_missing_value("2")
         .help("Randomize entrance connections")
         .long_help("Randomize entrance connections. Provide a value to set the entrance loop size");
@@ -300,6 +306,7 @@ fn snippets_arg(world_scoped: bool) -> Arg {
         .long("snippets")
         .short('s')
         .value_name("NAME")
+        .value_hint(ValueHint::Other)
         .num_args(1..)
         .help("Snippets to use")
         .long_help(snippets_help(&AVAILABLE_SNIPPETS));
@@ -313,6 +320,7 @@ fn snippet_config_arg(world_scoped: bool) -> Arg {
         .long("snippet_config")
         .short('c')
         .value_name("SNIPPET.CONFIG=VALUE")
+        .value_hint(ValueHint::Other)
         .num_args(1..)
         .help("Configuration to pass to snippets")
         .long_help(snippet_config_help(&AVAILABLE_SNIPPETS));
@@ -324,7 +332,7 @@ fn world_scoped_flag_arg(id: impl Into<Id>, world_scoped: bool) -> Arg {
     let arg = Arg::new(id).group("seed_settings").value_name("BOOLEAN");
 
     if world_scoped {
-        arg.num_args(0..)
+        arg.value_hint(ValueHint::Other).num_args(0..)
     } else {
         arg.action(ArgAction::SetTrue)
     }

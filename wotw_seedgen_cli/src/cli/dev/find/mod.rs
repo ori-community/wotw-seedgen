@@ -2,13 +2,13 @@ mod slow;
 
 pub use slow::SlowArgs;
 
-use clap::{Args, Subcommand};
+use clap::{Args, Subcommand, ValueHint};
 
 use crate::cli::SeedSettingsArgs;
 
 #[derive(Args)]
 pub struct FindArgs {
-    #[arg(short, long, default_value = "0")]
+    #[arg(short, long, value_name = "NUMBER", value_hint = ValueHint::Other, default_value = "0")]
     pub start: u32,
 }
 

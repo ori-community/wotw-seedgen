@@ -5,6 +5,7 @@ mod log_config;
 mod plando;
 mod preset;
 mod seed;
+mod shell_completions;
 mod stats;
 
 use bugsalot::debugger;
@@ -14,6 +15,7 @@ use dev::dev;
 use plando::plando;
 use preset::{universe_preset, world_preset};
 use seed::seed;
+use shell_completions::shell_completions;
 use stats::stats;
 use std::{
     env,
@@ -36,6 +38,7 @@ fn main() -> Result<(), Error> {
         Cli::WorldPreset { args } => world_preset(args),
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
+        Cli::ShellCompletions { shell } => shell_completions(shell),
         Cli::Dev { command } => dev(command),
         Cli::HttpServer { args } => http_server(args),
         Cli::SeedLsp => {
