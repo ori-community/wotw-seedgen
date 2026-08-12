@@ -579,7 +579,7 @@ fn uber_state<const GROUP: i32, const AVAILABLE: usize>(
     state_identifier: &str,
     span: impl Span,
 ) -> Result<UberIdentifier> {
-    let id = ids.id(format!("{snippet_identifier}_{state_identifier}"));
+    let id = ids.id(format!("{snippet_identifier}/{state_identifier}"));
 
     if id < AVAILABLE {
         Ok(UberIdentifier {
