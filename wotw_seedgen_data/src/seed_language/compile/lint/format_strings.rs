@@ -26,13 +26,9 @@ impl Handler for FormatStrings<'_> {
 
         let content_start = span.start + 1;
 
-        eprintln!("checking input action interpolation on {s}");
-
         for input_action in INPUT_ACTION_SHAPED.captures_iter(s) {
             let input_action = input_action.get(1).unwrap();
             let input_action_str = input_action.as_str();
-
-            eprintln!("checking {input_action_str}");
 
             if !InputAction::VARIANTS.contains(&input_action_str) {
                 let span = input_action.start() + content_start..input_action.end() + content_start;
