@@ -11,6 +11,8 @@ pub use regenerate_args::RegenerateArgs;
 
 use clap::Subcommand;
 
+use crate::cli::LaunchArgs;
+
 #[derive(Subcommand)]
 pub enum Dev {
     /// Import an UberState dump
@@ -22,6 +24,10 @@ pub enum Dev {
     },
     /// Display which local paths seedgen is using
     Paths,
+    GenerateUberStateLog {
+        #[command(flatten)]
+        args: LaunchArgs,
+    },
     /// Compiles and decompiles the logic graph
     OptimizeGraph {
         #[command(flatten)]

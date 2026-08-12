@@ -79,6 +79,14 @@ impl SnippetAccess for InlineSnippets {
     }
 }
 
+impl FromIterator<(String, Source)> for InlineSnippets {
+    fn from_iter<T: IntoIterator<Item = (String, Source)>>(iter: T) -> Self {
+        Self {
+            snippets: FxHashMap::from_iter(iter),
+        }
+    }
+}
+
 pub struct ChainedSnippetAccess<'a, 'b, A, B> {
     a: &'a A,
     b: &'b B,

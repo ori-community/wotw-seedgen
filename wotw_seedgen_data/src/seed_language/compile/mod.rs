@@ -530,8 +530,16 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
         }
 
         let source = self.global.snippet_access.read_snippet(identifier)?;
+        let errors = self.compile_source(identifier, &source.content);
+        self.errors.insert(identifier.to_string(), (source, errors));
 
-        let ast = Snippet::parse(&source.content);
+        *self.compiled_snippets.get_mut(identifier).unwrap() = CompileState::Finished;
+
+        Ok(())
+    }
+
+    fn compile_source(&mut self, identifier: &str, source: &str) -> Vec<Error> {
+        let ast = Snippet::parse(source);
         let mut errors = ast.errors;
 
         if let Some(ast) = ast.parsed {
@@ -580,11 +588,7 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
             errors.extend(compiler.errors);
         }
 
-        self.errors.insert(identifier.to_string(), (source, errors));
-
-        *self.compiled_snippets.get_mut(identifier).unwrap() = CompileState::Finished;
-
-        Ok(())
+        errors
     }
 
     pub fn finish(mut self) -> CompileResult<'log> {

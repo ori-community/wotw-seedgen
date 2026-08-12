@@ -1,5 +1,5 @@
 use crate::{
-    assets::{AssetCacheValues, SnippetAccess, SnippetFileAccess, TEST_ASSETS},
+    assets::{AssetCacheValues, InlineSnippets, SnippetAccess, SnippetFileAccess, TEST_ASSETS},
     seed_language::{
         ast::{
             parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
@@ -143,24 +143,6 @@ fn function_call() {
     assert_eq!(function_call, Some(expected));
 }
 
-struct ExampleFileAccess<'a>(&'a str);
-impl SnippetAccess for ExampleFileAccess<'_> {
-    fn read_snippet(&self, _identifier: &str) -> Result<Source, String> {
-        Ok(Source {
-            id: String::new(),
-            content: self.0.to_string(),
-        })
-    }
-
-    fn read_file(&self, _path: &Path) -> Result<Vec<u8>, String> {
-        unimplemented!()
-    }
-
-    fn available_snippets(&self) -> Vec<String> {
-        unimplemented!()
-    }
-}
-
 // works while debugging, but doesn't work to jump into code from errors
 // static WORKDIR: LazyLock<&Path> =
 //     LazyLock::new(|| Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap());
@@ -200,11 +182,13 @@ fn test_compiler_with_config<F: SnippetAccess>(
     .with_config(config)
 }
 
-fn test_str(source: &str) -> IntermediateOutput<'_> {
+fn test_str(source: String) -> IntermediateOutput<'static> {
     eprintln!("testing snippet:\n{source}");
 
-    let snippet_access = ExampleFileAccess(source);
-    let mut compiler = test_compiler(&snippet_access);
+    let snippets =
+        InlineSnippets::from_iter([(String::new(), Source::new("test".to_string(), source))]);
+
+    let mut compiler = test_compiler(&snippets);
 
     compiler.compile_snippet("").unwrap();
 
@@ -216,17 +200,21 @@ fn coersions() {
     fn test_variants_with_prefix<T: VariantArray>(prefix: &str, f: fn(&T) -> String) {
         let variants = T::VARIANTS.iter().map(f).collect::<String>();
 
-        test_str(&format!("{prefix} {{{variants}}}"));
+        test_str(format!("{prefix} {{{variants}}}"));
     }
 
     fn test_variants<T: VariantArray>(f: fn(&T) -> String) {
         test_variants_with_prefix("on spawn", f);
     }
 
-    test_str("on spawn store(player.spiritLight, player.spiritLight + player.spiritLight)");
-    test_str("!state(float, Float)  on float > 5 {}");
-    test_str("on spawn item_message(player.spiritLight - 1)");
-    test_str("on spawn item_message((player.spiritLight - player.gorlekOre) + \"SL/Ore\")");
+    test_str(
+        "on spawn store(player.spiritLight, player.spiritLight + player.spiritLight)".to_string(),
+    );
+    test_str("!state(float, Float)  on float > 5 {}".to_string());
+    test_str("on spawn item_message(player.spiritLight - 1)".to_string());
+    test_str(
+        "on spawn item_message((player.spiritLight - player.gorlekOre) + \"SL/Ore\")".to_string(),
+    );
 
     for kind in ConstantDiscriminants::VARIANTS {
         match kind {
@@ -314,7 +302,7 @@ fn coersions() {
 fn operator_precedence() {
     fn test_precedence(term: &str, value: i32) {
         let source = format!("on spawn set_integer(\"oriLurk\", {term})");
-        let output = test_str(&source);
+        let output = test_str(source);
         assert_eq!(
             output.commands.events[0].command,
             CommandVoid::SetInteger {
