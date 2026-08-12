@@ -1,5 +1,5 @@
 use crate::{Result, Seed, FORMAT_VERSION};
-use std::io::{Seek, Write};
+use std::io::{Cursor, Seek, Write};
 use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
 impl Seed {
@@ -30,6 +30,13 @@ impl Seed {
 
         package.finish()?;
         Ok(())
+    }
+
+    pub fn package_into_bytes(&self, compress: bool) -> Vec<u8> {
+        let mut bytes = Cursor::new(Vec::new());
+        // Write into bytes shouldn't fail
+        self.package(&mut bytes, compress).unwrap();
+        bytes.into_inner()
     }
 }
 

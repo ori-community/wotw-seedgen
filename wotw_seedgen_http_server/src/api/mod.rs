@@ -14,6 +14,7 @@ use wotw_seedgen::data::seed_language::output::{CommandZone, Trigger};
 use crate::{RouterState, error::Result, generate};
 
 pub mod logic;
+pub mod plando;
 pub mod presets;
 pub mod settings;
 pub mod snippets;
@@ -33,6 +34,7 @@ pub fn router(cache: RouterState) -> Router {
         .nest(settings::SETTINGS, settings::router())
         .nest(presets::PRESETS, presets::router())
         .nest(snippets::SNIPPETS, snippets::router())
+        .nest(plando::PLANDO, plando::router())
         .nest(spoilers::SPOILERS, spoilers::router())
         .layer(cors)
         .merge(SwaggerUi::new("/docs").url(
@@ -50,6 +52,7 @@ pub fn router(cache: RouterState) -> Router {
         (path = settings::SETTINGS, api = settings::Docs, tags = [settings::TAG]),
         (path = presets::PRESETS, api = presets::Docs, tags = [presets::TAG]),
         (path = snippets::SNIPPETS, api = snippets::Docs, tags = [snippets::TAG]),
+        (path = plando::PLANDO, api = plando::Docs, tags = [plando::TAG]),
         (path = spoilers::SPOILERS, api = spoilers::Docs, tags = [spoilers::TAG]),
     ),
     // manually add things here that get missed by automatic collection
@@ -98,6 +101,8 @@ impl Docs {
         openapi
     }
 }
+
+// Can't dedup cbor documentations because utoipa doesn't catch #[doc = macro!()] attributes......
 
 /// Generate a seed
 ///
