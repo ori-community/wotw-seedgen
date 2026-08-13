@@ -7,7 +7,6 @@ use crate::{
 use rand_pcg::Pcg64Mcg;
 use std::{
     ffi::OsStr,
-    fs,
     path::{Path, PathBuf},
     time::{Duration, Instant},
 };
@@ -92,23 +91,11 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         cache.watch(&mut watcher)?;
 
         for res in watcher {
-            let mut events = res?;
+            let events = res?;
 
-            events.retain_mut(|event| {
-                event.event.paths.retain(|path| {
-                    fs::canonicalize(path)
-                        .ok()
-                        .is_some_and(|path| !ignore_file_event(&path, &out))
-                });
-
-                !event.event.paths.is_empty()
-            });
-
-            if events.is_empty() {
+            if !cache.update_from_watcher_event(events)? {
                 continue;
             }
-
-            cache.update_from_watcher_event(&events)?;
 
             if let Err(err) = compile(&mut rng, &cache, entry, &out, lockfile.clone(), debug) {
                 err.eprint();
@@ -158,16 +145,4 @@ fn compile(
     );
 
     Ok(())
-}
-
-fn ignore_file_event(path: &Path, out: &Path) -> bool {
-    let Ok(path) = fs::canonicalize(path) else {
-        return true;
-    };
-
-    let Some(file_name) = path.file_name() else {
-        return true;
-    };
-
-    file_name.as_encoded_bytes().ends_with(b".id_lock.json") || path == out
 }

@@ -1,7 +1,16 @@
-use std::{ffi::OsStr, fs, io, ops::Deref, path::Path};
+use std::{
+    array, fs, io,
+    ops::Deref,
+    path::{Path, PathBuf},
+};
 
+use itertools::Itertools;
+use log::warn;
 use notify_debouncer_full::{
-    notify::{EventKind, RecursiveMode},
+    notify::{
+        event::{CreateKind, DataChange, ModifyKind, RemoveKind, RenameMode},
+        Event, EventKind, RecursiveMode,
+    },
     DebouncedEvent,
 };
 use rustc_hash::FxHashMap;
@@ -50,49 +59,40 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
         Ok(())
     }
 
-    pub fn update_from_watcher_event(&mut self, events: &[DebouncedEvent]) -> Result<bool, String> {
+    pub fn update_from_watcher_event(
+        &mut self,
+        events: Vec<DebouncedEvent>,
+    ) -> Result<bool, String> {
         let mut changed = ChangedAssets::default();
 
-        for event in events {
-            for path in &event.paths {
-                let Ok(path) = path.canonicalize() else {
+        for debounced in events {
+            let Event { kind, paths, .. } = debounced.event;
+
+            match kind {
+                EventKind::Create(CreateKind::Any | CreateKind::File) => changed.create(paths, &self.file_access),
+                EventKind::Modify(ModifyKind::Data(DataChange::Any | DataChange::Content)) => changed.modify(paths, &self.file_access),
+                EventKind::Modify(ModifyKind::Name(RenameMode::To)) => changed.create(paths, &self.file_access),
+                EventKind::Modify(ModifyKind::Name(RenameMode::From)) => changed.remove(paths, &self.file_access),
+                EventKind::Modify(ModifyKind::Name(RenameMode::Both)) => changed.rename(paths, &self.file_access),
+                EventKind::Remove(RemoveKind::File) => changed.remove(paths, &self.file_access),
+                EventKind::Access(_)
+                | EventKind::Create(CreateKind::Folder)
+                | EventKind::Modify(ModifyKind::Data(DataChange::Size) | ModifyKind::Metadata(_))
+                // TODO remove folder could be relevant for contained assets, something we generally don't handle well
+                | EventKind::Remove(RemoveKind::Folder) => continue,
+                EventKind::Any
+                | EventKind::Other
+                | EventKind::Create(CreateKind::Other)
+                | EventKind::Modify(
+                    ModifyKind::Any
+                    | ModifyKind::Data(DataChange::Other)
+                    | ModifyKind::Name(RenameMode::Any | RenameMode::Other)
+                    | ModifyKind::Other,
+                )
+                | EventKind::Remove(RemoveKind::Any | RemoveKind::Other) => {
+                    warn!("unprocessable file event {kind:?}");
+
                     continue;
-                };
-
-                if path.ends_with(F::LOC_DATA_PATH) {
-                    changed.loc_data = true;
-                } else if path.ends_with(F::STATE_DATA_PATH) {
-                    changed.state_data = true;
-                } else if path.ends_with(F::UBER_STATE_DUMP_PATH) {
-                    changed.loc_data = true;
-                    changed.state_data = true;
-                    changed.uber_state_dump = true;
-                } else if path.ends_with(F::PATHS_PATH) {
-                    changed.paths = true;
-                } else {
-                    subfolder_changed(
-                        &mut changed.snippets,
-                        &path,
-                        self.file_access.snippet_folders(),
-                        "wotws",
-                        event.kind,
-                    );
-
-                    subfolder_changed(
-                        &mut changed.universe_presets,
-                        &path,
-                        self.file_access.universe_folders(),
-                        "json",
-                        event.kind,
-                    );
-
-                    subfolder_changed(
-                        &mut changed.world_presets,
-                        &path,
-                        self.file_access.world_folders(),
-                        "json",
-                        event.kind,
-                    );
                 }
             }
         }
@@ -172,31 +172,178 @@ pub struct ChangedAssets {
     pub state_data: bool,
     pub uber_state_dump: bool,
     pub paths: bool,
-    pub snippets: Vec<(String, EventKind)>,
-    pub universe_presets: Vec<(String, EventKind)>,
-    pub world_presets: Vec<(String, EventKind)>,
+    pub snippets: Vec<ChangeDetails>,
+    pub universe_presets: Vec<ChangeDetails>,
+    pub world_presets: Vec<ChangeDetails>,
 }
 
-fn subfolder_changed(
-    identifiers: &mut Vec<(String, EventKind)>,
-    path: &Path,
-    mut folders: impl Iterator<Item = impl AsRef<Path>>,
-    extension: &str,
-    kind: EventKind,
-) {
-    if path.extension() != Some(OsStr::new(extension)) {
-        return;
+#[derive(Debug, Clone, PartialEq)]
+pub enum ChangeDetails {
+    Create(String),
+    Modify(String),
+    Remove(String),
+    Rename(String, String),
+}
+
+impl ChangedAssets {
+    fn create<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
+    where
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        self.update_single_path(paths, "create", ChangeDetails::Create, file_access);
     }
 
-    let changed =
-        folders.any(|folder| fs::canonicalize(folder).is_ok_and(|folder| path.starts_with(folder)));
-
-    if changed {
-        identifiers.push((
-            path.file_stem().unwrap().to_str().unwrap().to_string(),
-            kind,
-        ));
+    fn remove<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
+    where
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        self.update_single_path(paths, "remove", ChangeDetails::Remove, file_access);
     }
+
+    fn rename<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
+    where
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        let Some([from, to]) = validate_paths(paths, "rename") else {
+            return;
+        };
+
+        let from_kind = PathKind::detect(&from, file_access);
+        let to_kind = PathKind::detect(&to, file_access);
+
+        let rename_for_kind = |changes: &mut Vec<ChangeDetails>, kind: PathKind| match (
+            from_kind == Some(kind),
+            to_kind == Some(kind),
+        ) {
+            (false, false) => {}
+            (true, false) => changes.push(ChangeDetails::Remove(to_identifier(&from))),
+            (false, true) => changes.push(ChangeDetails::Create(to_identifier(&to))),
+            (true, true) => {
+                let details = ChangeDetails::Rename(to_identifier(&from), to_identifier(&to));
+                changes.push(details);
+            }
+        };
+
+        rename_for_kind(&mut self.snippets, PathKind::Snippet);
+        rename_for_kind(&mut self.universe_presets, PathKind::UniversePreset);
+        rename_for_kind(&mut self.world_presets, PathKind::WorldPreset);
+
+        if let Some(path_kind) = from_kind {
+            self.update_known_files(path_kind);
+        }
+        if let Some(path_kind) = to_kind {
+            self.update_known_files(path_kind);
+        }
+    }
+
+    fn modify<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
+    where
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        self.update_single_path(paths, "modify", ChangeDetails::Modify, file_access);
+    }
+
+    fn update_single_path<D, F>(
+        &mut self,
+        paths: Vec<PathBuf>,
+        kind: &str,
+        details: D,
+        file_access: &F,
+    ) where
+        D: FnOnce(String) -> ChangeDetails,
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        let Some([path]) = validate_paths(paths, kind) else {
+            return;
+        };
+
+        let Some(path_kind) = PathKind::detect(&path, file_access) else {
+            return;
+        };
+
+        match path_kind {
+            PathKind::Snippet => self.snippets.push(details(to_identifier(&path))),
+            PathKind::UniversePreset => self.universe_presets.push(details(to_identifier(&path))),
+            PathKind::WorldPreset => self.world_presets.push(details(to_identifier(&path))),
+            _ => self.update_known_files(path_kind),
+        }
+    }
+
+    fn update_known_files(&mut self, path_kind: PathKind) {
+        match path_kind {
+            PathKind::LocData => self.loc_data = true,
+            PathKind::StateData => self.state_data = true,
+            PathKind::UberStateDump => self.uber_state_dump = true,
+            PathKind::Paths => self.paths = true,
+            _ => {}
+        }
+    }
+}
+
+fn validate_paths<const N: usize>(paths: Vec<PathBuf>, kind: &str) -> Option<[PathBuf; N]> {
+    if paths.len() == N {
+        let mut iter = paths.into_iter();
+        Some(array::from_fn(|_| iter.next().unwrap()))
+    } else {
+        warn!(
+            "unprocessable {kind} event paths [{paths}]",
+            paths = paths.iter().map(|path| path.display()).format(", ")
+        );
+
+        None
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum PathKind {
+    LocData,
+    StateData,
+    UberStateDump,
+    Paths,
+    Snippet,
+    UniversePreset,
+    WorldPreset,
+}
+
+impl PathKind {
+    fn detect<F>(path: &Path, file_access: &F) -> Option<Self>
+    where
+        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    {
+        if path.ends_with(F::LOC_DATA_PATH) {
+            Some(Self::LocData)
+        } else if path.ends_with(F::STATE_DATA_PATH) {
+            Some(Self::StateData)
+        } else if path.ends_with(F::UBER_STATE_DUMP_PATH) {
+            Some(Self::UberStateDump)
+        } else if path.ends_with(F::PATHS_PATH) {
+            Some(Self::Paths)
+        } else {
+            let extension = path.extension()?;
+
+            if extension == "wotws" {
+                is_in_folders(path, file_access.snippet_folders()).then_some(Self::Snippet)
+            } else if extension == "json" {
+                if is_in_folders(path, file_access.world_folders()) {
+                    Some(Self::WorldPreset)
+                } else if is_in_folders(path, file_access.universe_folders()) {
+                    Some(Self::UniversePreset)
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        }
+    }
+}
+
+fn is_in_folders(path: &Path, mut folders: impl Iterator<Item = impl AsRef<Path>>) -> bool {
+    folders.any(|folder| fs::canonicalize(folder).is_ok_and(|folder| path.starts_with(folder)))
+}
+
+fn to_identifier(path: &Path) -> String {
+    path.file_stem().unwrap().to_str().unwrap().to_string()
 }
 
 impl<F: SnippetAccess, V: AssetCacheValues> SnippetAccess for AssetCache<F, V> {
@@ -380,19 +527,26 @@ impl AssetCacheValues for DefaultAssetCacheValues {
 }
 
 fn update_subfolder<F, V>(
-    identifiers: Vec<(String, EventKind)>,
+    changes: Vec<ChangeDetails>,
     values: &mut FxHashMap<String, V>,
     mut f: F,
 ) -> Result<(), String>
 where
     F: FnMut(&str) -> Result<V, String>,
 {
-    for (identifier, kind) in identifiers {
-        if kind.is_remove() {
-            values.remove(&identifier);
-        } else {
-            let source = f(&identifier)?;
-            values.insert(identifier, source);
+    for change in changes {
+        match change {
+            ChangeDetails::Create(identifier) | ChangeDetails::Modify(identifier) => {
+                let value = f(&identifier)?;
+                values.insert(identifier, value);
+            }
+            ChangeDetails::Remove(identifier) => {
+                values.remove(&identifier);
+            }
+            ChangeDetails::Rename(from, to) => {
+                let value = values.remove(&from).unwrap();
+                values.insert(to, value);
+            }
         }
     }
 

@@ -57,7 +57,7 @@ where
                 let mut cache = state.write().await;
 
                 let any_changed = cache
-                    .update_from_watcher_event(&events)
+                    .update_from_watcher_event(events)
                     .map_err(Error::LoadAssets)?;
 
                 if any_changed {
