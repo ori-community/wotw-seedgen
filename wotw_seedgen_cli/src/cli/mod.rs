@@ -10,7 +10,6 @@ mod seed_settings;
 mod stats_args;
 mod verbose_args;
 
-use clap_complete::Shell;
 use dev::Dev;
 pub use display::{
     AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
@@ -28,6 +27,7 @@ use clap::{
     builder::{styling::Style, Styles},
     Parser,
 };
+use crate::shell_completions::CompletionGenerator;
 
 const STYLES: Styles = Styles::styled();
 const LITERAL: Style = *STYLES.get_literal();
@@ -71,8 +71,8 @@ pub enum Cli {
     ///
     /// This only outputs the completion file, installation depends on your shell
     ShellCompletions {
-        /// Explicitely request completions for the given shell
-        shell: Option<Shell>,
+        /// Explicitly request completions for the given shell
+        shell: Option<CompletionGenerator>,
     },
     /// Various utilities primarily intended for seedgen development
     Dev {
