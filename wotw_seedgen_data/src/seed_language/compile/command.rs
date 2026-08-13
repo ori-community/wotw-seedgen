@@ -688,9 +688,7 @@ impl<'source> Compile<'source> for ast::AddSpiritLightArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        if let Some(amount) = self.0.evaluate::<i32>(compiler) {
-            compiler.global.output.modifiers.spirit_light_change += amount;
-        }
+        modify_spirit_light(compiler, self.0, 1)
     }
 }
 
@@ -698,8 +696,25 @@ impl<'source> Compile<'source> for ast::RemoveSpiritLightArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        if let Some(amount) = self.0.evaluate::<i32>(compiler) {
-            compiler.global.output.modifiers.spirit_light_change -= amount;
+        modify_spirit_light(compiler, self.0, -1)
+    }
+}
+
+fn modify_spirit_light<'source>(
+    compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
+    amount: ast::Expression<'source>,
+    sign: i32,
+) {
+    let span = amount.span();
+
+    if let Some(amount) = amount.evaluate::<i32>(compiler) {
+        compiler.global.output.modifiers.spirit_light_change += amount * sign;
+
+        if compiler.global.output.modifiers.total_spirit_light() < 0 {
+            compiler.errors.push(Error::error(
+                "Cannot reduce spirit light below zero".to_string(),
+                span,
+            ));
         }
     }
 }

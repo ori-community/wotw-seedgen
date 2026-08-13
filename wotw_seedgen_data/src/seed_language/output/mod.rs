@@ -84,6 +84,12 @@ pub struct GenerationModifiers<'log> {
     pub preplacements: Vec<(CommandVoid, Zone)>,
 }
 
+impl GenerationModifiers<'_> {
+    pub fn total_spirit_light(&self) -> i32 {
+        20000 + self.spirit_light_change
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct AssetsOutput {
     pub icons: Vec<(String, Vec<u8>)>, // TODO poor memory

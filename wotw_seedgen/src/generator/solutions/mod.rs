@@ -270,6 +270,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
     pub fn find_solutions(
         &mut self,
         item_pool: &ItemPool<'log>,
+        available_spirit_light: i32,
         output: &CommandsOutput,
         slots: usize,
         spirit_light_slots: usize,
@@ -279,6 +280,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         let capped_slots = usize::min(slots, *SOLUTION_MAX_ITEMS);
         let mut solutions = self.find_solutions_no_max_items(
             item_pool,
+            available_spirit_light,
             output,
             capped_slots,
             spirit_light_slots,
@@ -293,6 +295,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
 
             solutions = self.find_solutions_no_max_items(
                 item_pool,
+                available_spirit_light,
                 output,
                 slots,
                 spirit_light_slots,
@@ -319,6 +322,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
     pub fn find_solutions_no_max_items(
         &mut self,
         item_pool: &ItemPool<'log>,
+        available_spirit_light: i32,
         output: &CommandsOutput,
         slots: usize,
         spirit_light_slots: usize,
@@ -336,7 +340,14 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
             .map(|fail| PartialSolution::new(fail.clone(), item_pool, search_radius))
             .collect::<Vec<_>>();
 
-        let mut context = SolutionContext::new(self, output, item_pool, slots, spirit_light_slots);
+        let mut context = SolutionContext::new(
+            self,
+            output,
+            item_pool,
+            available_spirit_light,
+            slots,
+            spirit_light_slots,
+        );
 
         // First going through all untouched solutions is not always, but generally faster.
         // I think it's because solving untouched solutions is cheaper so it's a big win
@@ -360,13 +371,21 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         &mut self,
         mut solution: Solution<'graph>,
         item_pool: &ItemPool<'log>,
+        available_spirit_light: i32,
         output: &CommandsOutput,
         slots: usize,
         spirit_light_slots: usize,
     ) -> Vec<Solution<'graph>> {
         solution.inner.search_radius = u8::MAX;
 
-        let mut context = SolutionContext::new(self, output, item_pool, slots, spirit_light_slots);
+        let mut context = SolutionContext::new(
+            self,
+            output,
+            item_pool,
+            available_spirit_light,
+            slots,
+            spirit_light_slots,
+        );
 
         trace!(
             logger: item_pool.log_capture,
@@ -513,6 +532,7 @@ struct SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log> {
     world: &'world mut World<'graph, 'settings, 'perf, 'log>,
     output: &'output CommandsOutput,
     item_pool: &'pool ItemPool<'log>,
+    available_spirit_light: i32,
     slots: usize,
     spirit_light_slots: usize,
     initial_pickup_count: usize,
@@ -530,6 +550,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         world: &'world mut World<'graph, 'settings, 'perf, 'log>,
         output: &'output CommandsOutput,
         item_pool: &'pool ItemPool<'log>,
+        available_spirit_light: i32,
         slots: usize,
         spirit_light_slots: usize,
     ) -> Self {
@@ -543,6 +564,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             world,
             output,
             item_pool,
+            available_spirit_light,
             slots,
             spirit_light_slots,
             initial_pickup_count,
@@ -1602,6 +1624,10 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         simulate: bool,
     ) -> ControlFlow<()> {
         solution.spirit_light += amount;
+
+        if self.available_spirit_light < solution.spirit_light {
+            return ControlFlow::Break(());
+        }
 
         self.check_redundancy(solution)?;
 

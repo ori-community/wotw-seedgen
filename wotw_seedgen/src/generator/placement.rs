@@ -52,7 +52,6 @@ pub(super) static SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| {
 });
 
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
-pub const TOTAL_SPIRIT_LIGHT: i32 = 20000;
 
 const MIN_PLACEHOLDERS: usize = 3;
 static MAX_PLACEHOLDERS: LazyLock<usize> =
@@ -203,14 +202,12 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
             debug_assert!(world_spirit_light_placements <= world_placements);
 
-            let total_spirit_light =
-                TOTAL_SPIRIT_LIGHT + world.output.modifiers.spirit_light_change;
             world.spirit_light_placements_remaining = world_spirit_light_placements as usize;
             // TODO how should !add_item(spirit_light(100)) behave?
-            // TODO breaks at very low spirit light totals
-            world
-                .spirit_light_provider
-                .init(total_spirit_light, world.spirit_light_placements_remaining);
+            world.spirit_light_provider.init(
+                world.output.modifiers.total_spirit_light(),
+                world.spirit_light_placements_remaining,
+            );
         }
 
         let ordering_distribution = OrderingDistribution::new(rng);
@@ -892,13 +889,8 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
         // TODO technically I think this should be after preplacements somehow?
         // Because this will make wrong assumptions about the total reach if important items are in preplacements.
-        let mut needs_placement = spawn::choose_spawn(
-            &mut rng,
-            &mut world,
-            &log_index,
-            &item_pool,
-            &mut output.commands,
-        )?;
+        let mut needs_placement =
+            spawn::choose_spawn(&mut rng, &mut world, &log_index, &item_pool, &mut output)?;
         filter_needs_placement(
             &world,
             &log_index,
@@ -1151,6 +1143,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
         let progressions = self.world.find_solutions(
             &self.item_pool,
+            self.spirit_light_provider.remaining(),
             &self.output.commands,
             slots,
             spirit_light_slots,
@@ -1186,6 +1179,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             let progressions = self.world.continue_solution(
                 progression.clone(),
                 &self.item_pool,
+                self.spirit_light_provider.remaining(),
                 &self.output.commands,
                 slots,
                 spirit_light_slots,

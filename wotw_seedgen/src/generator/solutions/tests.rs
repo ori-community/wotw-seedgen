@@ -52,7 +52,14 @@ fn find_test_solutions<'log>(
 ) -> Vec<Vec<(CommandVoid, u32)>> {
     sorted_test_solutions(
         world
-            .find_solutions_no_max_items(item_pool, &CommandsOutput::NONE, slots, 0, Some(u8::MAX))
+            .find_solutions_no_max_items(
+                item_pool,
+                i32::MAX,
+                &CommandsOutput::NONE,
+                slots,
+                0,
+                Some(u8::MAX),
+            )
             .into_iter()
             .map(|solution| {
                 amounts_from_item_list(

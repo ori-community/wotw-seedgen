@@ -13,25 +13,21 @@ use wotw_seedgen_data::{
     seed_language::{
         ast::ClientEvent,
         compile::store_boolean,
-        output::{CommandVoid, CommandsOutput, Event, Trigger},
+        output::{CommandVoid, Event, IntermediateOutput, Trigger},
         simulate::{Simulate, Simulation, Snapshot},
     },
     Difficulty, Spawn, UberIdentifier, DEFAULT_SPAWN,
 };
 use wotw_seedgen_log_capture::LogCapture;
 
-use crate::{
-    generator::{placement::TOTAL_SPIRIT_LIGHT, SEED_FAILED_MESSAGE},
-    item_pool::ItemPool,
-    LogicalDifficulty, World,
-};
+use crate::{generator::SEED_FAILED_MESSAGE, item_pool::ItemPool, LogicalDifficulty, World};
 
 pub fn choose_spawn<'graph, 'log>(
     rng: &mut Pcg64Mcg,
     world: &mut World<'graph, '_, '_, 'log>,
     log_index: &str,
     item_pool: &ItemPool<'log>,
-    output: &mut CommandsOutput,
+    output: &mut IntermediateOutput<'log>,
 ) -> Result<Vec<&'graph LocDataEntry>, String> {
     let mut context = SpawnContext::new(rng, world, log_index, item_pool, output);
     context.choose_spawn()?;
@@ -43,7 +39,7 @@ struct SpawnContext<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'l
     world: &'world mut World<'graph, 'settings, 'perf, 'log>,
     log_index: &'index str,
     item_pool: &'pool ItemPool<'log>,
-    output: &'output mut CommandsOutput,
+    output: &'output mut IntermediateOutput<'log>,
     default_spawn: usize,
     total_reach: Vec<&'graph LocDataEntry>,
 }
@@ -56,7 +52,7 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
         world: &'world mut World<'graph, 'settings, 'perf, 'log>,
         log_index: &'index str,
         item_pool: &'pool ItemPool<'log>,
-        output: &'output mut CommandsOutput,
+        output: &'output mut IntermediateOutput<'log>,
     ) -> Self {
         let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
 
@@ -177,11 +173,14 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
     fn total_reach_check(&mut self) {
         // TODO could avoid redoing this with a snapshot stack
         for command in &**self.item_pool {
-            command.simulate(self.world, self.output);
+            command.simulate(self.world, &self.output.commands);
         }
-        self.world.add_spirit_light(TOTAL_SPIRIT_LIGHT, self.output);
+        self.world.add_spirit_light(
+            self.output.modifiers.total_spirit_light(),
+            &self.output.commands,
+        );
 
-        self.world.traverse_spawn(self.output);
+        self.world.traverse_spawn(&self.output.commands);
     }
 
     fn finish(self) -> Vec<&'graph LocDataEntry> {
@@ -191,7 +190,7 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
         match spawn_node.identifier() {
             "EastPools.Teleporter" => {
                 // Lower the water at the pools teleporter if we spawn there
-                self.output.events.push(Event {
+                self.output.commands.events.push(Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                     command: store_boolean(UberIdentifier::new(5377, 63173), true),
                 });
@@ -215,7 +214,7 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
             | "WillowsEnd.ShriekArena" => {}
             _ => {
                 if let Some(spawn_position) = spawn_node.position() {
-                    self.output.events.push(Event {
+                    self.output.commands.events.push(Event {
                         trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                         command: CommandVoid::CreateWarpIcon {
                             id: 0,

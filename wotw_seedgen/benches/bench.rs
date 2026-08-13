@@ -80,7 +80,7 @@ fn solutions(c: &mut Criterion) {
         world.traverse_spawn(&CommandsOutput::NONE);
 
         group.bench_function(id, |b| {
-            b.iter(|| world.find_solutions(&item_pool, &CommandsOutput::NONE, 7, 7, None))
+            b.iter(|| world.find_solutions(&item_pool, i32::MAX, &CommandsOutput::NONE, 7, 7, None))
         });
     }
 
