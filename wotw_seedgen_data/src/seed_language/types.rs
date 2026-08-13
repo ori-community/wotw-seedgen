@@ -77,14 +77,16 @@ pub(crate) fn uber_state_type(
     uber_state_data: &UberStateData,
     uber_identifier: UberIdentifier,
 ) -> Option<UberStateType> {
-    uber_state_data
-        .id_lookup
-        .get(&uber_identifier)
-        .map(|meta| match meta.default_value {
-            UberStateValue::Boolean(_) => UberStateType::Boolean,
-            UberStateValue::Integer(_) => UberStateType::Integer,
-            UberStateValue::Float(_) => UberStateType::Float,
-        })
+    uber_identifier.custom_type().or_else(|| {
+        uber_state_data
+            .id_lookup
+            .get(&uber_identifier)
+            .map(|meta| match meta.default_value {
+                UberStateValue::Boolean(_) => UberStateType::Boolean,
+                UberStateValue::Integer(_) => UberStateType::Integer,
+                UberStateValue::Float(_) => UberStateType::Float,
+            })
+    })
 }
 
 pub(crate) trait InferType<'source> {

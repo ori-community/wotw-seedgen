@@ -75,8 +75,8 @@ pub fn compile(
     let compile::CompileResult { mut output, errors } = compiler.finish();
 
     let errors = errors
-        .into_iter()
-        .flat_map(|(_, (source, errors))| {
+        .into_values()
+        .flat_map(|(source, errors)| {
             errors
                 .into_iter()
                 .map(move |error| error.with_source(&source).to_string())

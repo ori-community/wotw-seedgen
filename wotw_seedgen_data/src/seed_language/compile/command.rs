@@ -16,7 +16,7 @@ use crate::{
 use ordered_float::OrderedFloat;
 use rand::Rng;
 use std::{iter, mem, ops::Range};
-use wotw_seedgen_parse::{Error, Identifier, Result, Span, SpanEnd, SpanStart, SpannedOption};
+use wotw_seedgen_parse::{Error, Identifier, Span, SpanEnd, SpanStart, SpannedOption};
 
 impl<'source> Compile<'source> for ast::Command<'source> {
     type Output = ();
@@ -494,12 +494,10 @@ impl<'source> Compile<'source> for ast::StateArgs<'source> {
             UberStateType::Float => float_uber_state(compiler, self.identifier.data.0, span),
         };
 
-        if let Some(uber_identifier) = compiler.consume_result(uber_identifier) {
-            compiler.define_variable(
-                self.identifier.data,
-                UberStateAlias::regular(uber_identifier),
-            );
-        }
+        compiler.define_variable(
+            self.identifier.data,
+            UberStateAlias::regular(uber_identifier),
+        );
     }
 }
 
@@ -512,25 +510,21 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
             self.toggle_identifier.data.0,
             self.toggle_identifier.span,
         );
-        let toggle = compiler.consume_result(toggle);
 
         let Some(timer_identifier) = get_command_arg(self.timer_identifier) else {
             return;
         };
         let timer = float_uber_state(compiler, timer_identifier.data.0, timer_identifier.span);
-        let timer = compiler.consume_result(timer);
 
-        if let (Some(toggle), Some(timer)) = (toggle, timer) {
-            compiler
-                .global
-                .output
-                .commands
-                .events
-                .push(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
+        compiler
+            .global
+            .output
+            .commands
+            .events
+            .push(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
 
-            compiler.define_variable(self.toggle_identifier.data, UberStateAlias::regular(toggle));
-            compiler.define_variable(timer_identifier.data, UberStateAlias::regular(timer));
-        }
+        compiler.define_variable(self.toggle_identifier.data, UberStateAlias::regular(toggle));
+        compiler.define_variable(timer_identifier.data, UberStateAlias::regular(timer));
     }
 }
 
@@ -538,11 +532,13 @@ fn boolean_uber_state<S: Span>(
     compiler: &mut SnippetCompiler,
     identifier: &str,
     span: S,
-) -> Result<UberIdentifier> {
-    uber_state::<8, 100>(
+) -> UberIdentifier {
+    uber_state(
         &mut compiler.global.id_resolver.boolean_state,
+        UberIdentifier::custom_boolean,
         &compiler.identifier,
         identifier,
+        &mut compiler.errors,
         span,
     )
 }
@@ -551,11 +547,13 @@ fn integer_uber_state<S: Span>(
     compiler: &mut SnippetCompiler,
     identifier: &str,
     span: S,
-) -> Result<UberIdentifier> {
-    uber_state::<9, 100>(
+) -> UberIdentifier {
+    uber_state(
         &mut compiler.global.id_resolver.integer_state,
+        UberIdentifier::custom_integer,
         &compiler.identifier,
         identifier,
+        &mut compiler.errors,
         span,
     )
 }
@@ -564,31 +562,37 @@ fn float_uber_state<S: Span>(
     compiler: &mut SnippetCompiler,
     identifier: &str,
     span: S,
-) -> Result<UberIdentifier> {
-    uber_state::<10, 25>(
+) -> UberIdentifier {
+    uber_state(
         &mut compiler.global.id_resolver.float_state,
+        UberIdentifier::custom_float,
         &compiler.identifier,
         identifier,
+        &mut compiler.errors,
         span,
     )
 }
 
-fn uber_state<const GROUP: i32, const AVAILABLE: usize>(
-    ids: &mut IdMap<0>,
+fn uber_state<const LIMIT: usize>(
+    ids: &mut IdMap<0, LIMIT>,
+    group: impl FnOnce(i32) -> UberIdentifier,
     snippet_identifier: &str,
     state_identifier: &str,
+    errors: &mut Vec<Error>,
     span: impl Span,
-) -> Result<UberIdentifier> {
+) -> UberIdentifier {
     let id = ids.id(format!("{snippet_identifier}/{state_identifier}"));
 
-    if id < AVAILABLE {
-        Ok(UberIdentifier {
-            group: GROUP,
-            member: id as i32,
-        })
-    } else {
-        Err(Error::error(format!("Only {AVAILABLE} UberStates of this type are available (What on earth are you doing?)"), span.span()))
+    if ids.is_above_limit(id) {
+        errors.push(Error::error(
+            format!(
+                "Only {LIMIT} UberStates of this type are available (What on earth are you doing?)"
+            ),
+            span.span(),
+        ));
     }
+
+    group(id as i32)
 }
 
 impl<'source> Compile<'source> for ast::LetArgs<'source> {

@@ -30,9 +30,9 @@ impl<'source> Compile<'source> for ast::UberIdentifier<'source> {
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
         let uber_state = self.resolve(compiler)?;
 
-        if uber_state.uber_identifier.group == 9 {
+        if uber_state.uber_identifier.is_custom() {
             compiler.errors.push(Error::error(
-                "Cannot use group 9 directly. Use !state instead".to_string(),
+                "Cannot use this group directly. Use !state instead".to_string(),
                 self.span(),
             ));
 

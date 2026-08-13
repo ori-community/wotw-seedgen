@@ -218,17 +218,17 @@ pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     string: IdMap<FREE_MEMORY_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub boolean_state: IdMap<0>,
+    pub boolean_state: IdMap<0, 100>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub integer_state: IdMap<0>,
+    pub integer_state: IdMap<0, 100>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub float_state: IdMap<0>,
+    pub float_state: IdMap<0, 25>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     message: IdMap<0>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     box_trigger: IdMap<0>,
     // never empty
-    pub wheel: IdMap<0, IdMapWheel>,
+    pub wheel: IdMap<0, 0, IdMapWheel>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     warp_icon: IdMap<0>,
 }
@@ -265,7 +265,7 @@ impl Ids {
 
 #[derive(Derivative, Serialize, Deserialize)]
 #[derivative(Debug(bound = ""))]
-pub struct IdMap<const OFFSET: usize, S = IdMapEmpty> {
+pub struct IdMap<const OFFSET: usize, const LIMIT: usize = 0, S = IdMapEmpty> {
     /// Ids which have become unused and may be reassigned
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     gaps: Vec<usize>,
@@ -276,15 +276,28 @@ pub struct IdMap<const OFFSET: usize, S = IdMapEmpty> {
     special: PhantomData<S>,
 }
 
-impl<const OFFSET: usize, S> IdMap<OFFSET, S>
+impl<const OFFSET: usize, const LIMIT: usize, S> IdMap<OFFSET, LIMIT, S>
 where
     S: IdMapDefault,
 {
     pub fn id(&mut self, id: String) -> usize {
         match self.ids.get_mut(&id) {
             None => {
-                let value = self.gaps.pop().unwrap_or_else(|| self.ids.len() + OFFSET);
+                let value = match self.gaps.pop() {
+                    None => {
+                        let next = self.ids.len();
+
+                        if next >= LIMIT {
+                            return LIMIT + OFFSET;
+                        }
+
+                        next
+                    }
+                    Some(gap) => gap,
+                };
+
                 self.ids.insert(id, Id::new(value));
+
                 value
             }
             Some(id) => {
@@ -292,6 +305,10 @@ where
                 id.value
             }
         }
+    }
+
+    pub const fn is_above_limit(&self, id: usize) -> bool {
+        id >= LIMIT + OFFSET
     }
 
     pub fn is_empty(&self) -> bool {
@@ -320,7 +337,7 @@ where
     }
 }
 
-impl<const OFFSET: usize, S> Default for IdMap<OFFSET, S>
+impl<const OFFSET: usize, const LIMIT: usize, S> Default for IdMap<OFFSET, LIMIT, S>
 where
     S: IdMapDefault,
 {

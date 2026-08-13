@@ -12,7 +12,10 @@ use utoipa::{
     PartialSchema, ToSchema,
 };
 
-use crate::{Icon, MapIcon, OpherIcon, Shard, Skill, Teleporter, WeaponUpgrade};
+use crate::{
+    seed_language::ast::UberStateType, Icon, MapIcon, OpherIcon, Shard, Skill, Teleporter,
+    WeaponUpgrade,
+};
 
 /// Identifier for an UberState
 ///
@@ -27,6 +30,9 @@ pub struct UberIdentifier {
 const PLAYER_GROUP: i32 = 5;
 const RANDO_STATE_GROUP: i32 = 6;
 const RANDO_CONFIG_GROUP: i32 = 7;
+const CUSTOM_BOOLEANS_GROUP: i32 = 8;
+const CUSTOM_INTEGERS_GROUP: i32 = 9;
+const CUSTOM_FLOATS_GROUP: i32 = 10;
 const MULTIWORLD_GROUP: i32 = 12;
 const MAP_SEGMENTS_GROUP: i32 = 22;
 const ITEM_TRACKER_GROUP: i32 = 23;
@@ -54,6 +60,18 @@ impl UberIdentifier {
 
     pub const fn rando_config(member: i32) -> Self {
         Self::new(RANDO_CONFIG_GROUP, member)
+    }
+
+    pub const fn custom_boolean(member: i32) -> Self {
+        Self::new(CUSTOM_BOOLEANS_GROUP, member)
+    }
+
+    pub const fn custom_integer(member: i32) -> Self {
+        Self::new(CUSTOM_INTEGERS_GROUP, member)
+    }
+
+    pub const fn custom_float(member: i32) -> Self {
+        Self::new(CUSTOM_FLOATS_GROUP, member)
     }
 
     pub const fn item_tracker(member: i32) -> Self {
@@ -136,6 +154,33 @@ impl UberIdentifier {
                 member: 18767 | 45538 | 3638 | 1590 | 1557 | 29604 | 48423 | 61146 | 4045,
             } => ShopKind::Map,
             _ => ShopKind::None,
+        }
+    }
+
+    /// Returns `true` if this `UberIdentifier` corresponds to a custom snippet state
+    pub const fn is_custom(self) -> bool {
+        matches!(
+            self.group,
+            CUSTOM_BOOLEANS_GROUP | CUSTOM_INTEGERS_GROUP | CUSTOM_FLOATS_GROUP
+        )
+    }
+
+    /// If this is a custom snippet state, returns its type
+    pub const fn custom_type(self) -> Option<UberStateType> {
+        match self {
+            Self {
+                group: CUSTOM_BOOLEANS_GROUP,
+                ..
+            } => Some(UberStateType::Boolean),
+            Self {
+                group: CUSTOM_INTEGERS_GROUP,
+                ..
+            } => Some(UberStateType::Integer),
+            Self {
+                group: CUSTOM_FLOATS_GROUP,
+                ..
+            } => Some(UberStateType::Float),
+            _ => None,
         }
     }
 
