@@ -228,7 +228,8 @@ pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     box_trigger: IdMap<0>,
     // never empty
-    pub wheel: IdMap<0, 0, IdMapWheel>,
+    // 9000 is the first rando-reserved wheel (aside from root)
+    pub wheel: IdMap<0, 9000, IdMapWheel>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     warp_icon: IdMap<0>,
 }
@@ -287,11 +288,12 @@ where
                     None => {
                         let next = self.ids.len();
 
-                        if next >= LIMIT {
-                            return LIMIT + OFFSET;
+                        // We use LIMIT = 0 to signal no limit
+                        if LIMIT > 0 && next >= LIMIT {
+                            return LIMIT - 1 + OFFSET;
                         }
 
-                        next
+                        next + OFFSET
                     }
                     Some(gap) => gap,
                 };
