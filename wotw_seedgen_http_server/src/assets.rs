@@ -1,6 +1,6 @@
 use std::{ffi::OsStr, fs, path::Path};
 
-use rustc_hash::{FxHashMap, FxHashSet};
+use rustc_hash::FxHashMap;
 use wotw_seedgen::{
     Generator, SeedUniverse,
     data::{
@@ -17,7 +17,10 @@ use wotw_seedgen::{
     log_capture::{LogCapture, Record},
 };
 
-use crate::api::logic::{MapIcons, RelevantUberStates, SpawnAnchors};
+use crate::api::{
+    logic::{MapIcons, RelevantUberStates, SpawnAnchors},
+    snippets::{SnippetInfo, SnippetOrigin},
+};
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
 
@@ -30,8 +33,7 @@ pub struct CacheValues {
     pub node_index_to_map_icon_index: FxHashMap<usize, usize>,
     pub relevant_uber_states: RelevantUberStates,
     pub spawn_anchors: SpawnAnchors,
-    pub snippet_info: FxHashMap<String, Metadata>,
-    pub data_dir_snippets: FxHashSet<String>,
+    pub snippet_info: FxHashMap<String, SnippetInfo>,
 }
 
 impl CacheValues {
@@ -75,7 +77,6 @@ impl AssetCacheValues for CacheValues {
         let node_index_to_map_icon_index = node_index_to_map_icon_index(&graph, &map_icons);
 
         let snippet_info = snippet_info(&base.snippets);
-        let data_dir_snippets = data_dir_snippets();
 
         Ok(Self {
             base,
@@ -87,7 +88,6 @@ impl AssetCacheValues for CacheValues {
             relevant_uber_states,
             spawn_anchors,
             snippet_info,
-            data_dir_snippets,
         })
     }
 
@@ -150,7 +150,6 @@ impl AssetCacheValues for CacheValues {
         // TODO patch maybe?
         if !changed.snippets.is_empty() {
             self.snippet_info = snippet_info(&self.base.snippets);
-            self.data_dir_snippets = data_dir_snippets();
         }
 
         Ok(())
@@ -198,15 +197,29 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
         .collect()
 }
 
-fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, Metadata> {
+fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, SnippetInfo> {
     // TODO cache asts?
-    snippets
+    let mut snippet_info = snippets
         .iter()
-        .map(|(identifier, source)| (identifier.clone(), Metadata::from_source(&source.content)))
-        .collect()
+        .map(|(identifier, source)| {
+            (
+                identifier.clone(),
+                SnippetInfo {
+                    origin: SnippetOrigin::ExecutableDir,
+                    metadata: Metadata::from_source(&source.content),
+                },
+            )
+        })
+        .collect::<FxHashMap<_, _>>();
+
+    for data_dir_snippet in data_dir_snippets() {
+        snippet_info.get_mut(&data_dir_snippet).unwrap().origin = SnippetOrigin::UserDataDir;
+    }
+
+    snippet_info
 }
 
-fn data_dir_snippets() -> FxHashSet<String> {
+fn data_dir_snippets() -> impl Iterator<Item = String> {
     fs::read_dir(SEEDGEN_USER_DATA_DIR.join("snippets"))
         .into_iter()
         .flatten()
@@ -220,5 +233,4 @@ fn data_dir_snippets() -> FxHashSet<String> {
                 .to_string_lossy()
                 .to_string()
         })
-        .collect()
 }
