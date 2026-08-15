@@ -5,9 +5,10 @@
 Tracks your progress as you play
 By default those are bound to
 - Alt+P (general progress)
-- Alt+1 (trees)
-- Alt+2 (wisps)
-- Alt+3 (quests)
+- Alt+1 (trees and wisps)
+- Alt+2 (quests)
+- Alt+3 (teleporters)
+- Alt+4 (entrances)
 ")
 
 // TODO interface settings instead
