@@ -39,7 +39,7 @@
 fun energy_regeneration() {
     store(energy_regenerations, energy_regenerations + 1)
     item_message("#Energy Regeneration x" + energy_regenerations + "#")
-    store(energy_per_second, energy_per_second + 1 / 60)
+    store(energy_per_second, energy_per_second + 1. / 60.)
     update_bonus_items()
 }
 !augment_fun(write_bonus_items(), if energy_regenerations != 0 write_bonus_items_part("#Energy Regeneration# x" + energy_regenerations))
@@ -58,7 +58,7 @@ fun energy_regeneration() {
 fun health_regeneration() {
     store(health_regenerations, health_regenerations + 1)
     item_message("#Health Regeneration x" + health_regenerations + "#")
-    store(health_per_second, health_per_second + 10 / 60)
+    store(health_per_second, health_per_second + 10. / 60.)
     update_bonus_items()
 }
 !augment_fun(write_bonus_items(), if health_regenerations != 0 write_bonus_items_part("#Health Regeneration# x" + health_regenerations))
