@@ -1,16 +1,16 @@
-use std::{fs::File, time::Instant};
+use std::time::Instant;
 
 use log::{trace, warn};
-use serde::de::DeserializeOwned;
 use wotw_seedgen::{
     data::assets::{self, file_err},
     seed::{assembly::Assembly, SeedgenInfo},
 };
 use wotw_seedgen_git_info::{GitInfo, GIT_HEAD, GIT_STATUS};
-use zip::{read::ZipFile, ZipArchive};
+use zip::ZipArchive;
 
 use crate::{
     cli::{dev::RegenerateArgs, CompileArgs},
+    dev::helpers::json_by_name,
     log_config::LogConfig,
     seed::{generate, write_new_game_seed_source, write_seed},
     Error,
@@ -62,19 +62,6 @@ pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
     eprintln!();
 
     Ok(())
-}
-
-fn json_by_name<T: DeserializeOwned>(
-    archive: &mut ZipArchive<File>,
-    name: &str,
-) -> Result<T, Error> {
-    Ok(serde_json::from_reader(by_name(archive, name)?)?)
-}
-
-fn by_name<'a>(archive: &'a mut ZipArchive<File>, name: &str) -> Result<ZipFile<'a, File>, Error> {
-    Ok(archive
-        .by_name(name)
-        .map_err(|err| format!("failed to read \"{name}\" from seed: {err}"))?)
 }
 
 fn check_git_info(git_info: Option<GitInfo>) {

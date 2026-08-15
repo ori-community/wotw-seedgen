@@ -1,7 +1,9 @@
 mod find;
 mod generate_uber_state_log;
+mod helpers;
 mod import_uber_states;
 mod optimize_graph;
+mod patch;
 mod paths;
 mod perf;
 mod regenerate;
@@ -10,6 +12,7 @@ use find::find;
 use generate_uber_state_log::generate_uber_state_log;
 use import_uber_states::import_uber_states;
 use optimize_graph::optimize_graph;
+use patch::patch;
 use paths::paths;
 use perf::perf;
 use regenerate::regenerate;
@@ -20,6 +23,7 @@ pub fn dev(command: Dev) -> Result<(), Error> {
     match command {
         Dev::ImportUberStates => import_uber_states(),
         Dev::Regenerate { args } => regenerate(args),
+        Dev::Patch { args } => patch(args),
         Dev::Paths => paths(),
         Dev::GenerateUberStateLog { args } => generate_uber_state_log(args),
         Dev::OptimizeGraph { args } => optimize_graph(args),
