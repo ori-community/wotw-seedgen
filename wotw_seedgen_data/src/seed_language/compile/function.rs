@@ -184,7 +184,7 @@ fn read_boolean_id(context: &mut ArgContext) -> Option<usize> {
 }
 
 fn write_boolean_id(context: &mut ArgContext) -> Option<usize> {
-    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_boolean_id(id))
+    string_literal(context).map(|id| context.compiler.global.write_boolean_id(id))
 }
 
 fn read_integer_id(context: &mut ArgContext) -> Option<usize> {
@@ -193,7 +193,7 @@ fn read_integer_id(context: &mut ArgContext) -> Option<usize> {
 }
 
 fn write_integer_id(context: &mut ArgContext) -> Option<usize> {
-    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_integer_id(id))
+    string_literal(context).map(|id| context.compiler.global.write_integer_id(id))
 }
 
 fn read_float_id(context: &mut ArgContext) -> Option<usize> {
@@ -202,7 +202,7 @@ fn read_float_id(context: &mut ArgContext) -> Option<usize> {
 }
 
 fn write_float_id(context: &mut ArgContext) -> Option<usize> {
-    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_float_id(id))
+    string_literal(context).map(|id| context.compiler.global.write_float_id(id))
 }
 
 fn read_string_id(context: &mut ArgContext) -> Option<usize> {
@@ -211,7 +211,7 @@ fn read_string_id(context: &mut ArgContext) -> Option<usize> {
 }
 
 fn write_string_id(context: &mut ArgContext) -> Option<usize> {
-    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_string_id(id))
+    string_literal(context).map(|id| context.compiler.global.write_string_id(id))
 }
 
 fn read_message_id(context: &mut ArgContext) -> Option<usize> {
@@ -220,7 +220,7 @@ fn read_message_id(context: &mut ArgContext) -> Option<usize> {
 }
 
 fn write_message_id(context: &mut ArgContext) -> Option<usize> {
-    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_message_id(id))
+    string_literal(context).map(|id| context.compiler.global.write_message_id(id))
 }
 
 fn read_box_trigger_id(context: &mut ArgContext) -> Option<usize> {
@@ -229,7 +229,7 @@ fn read_box_trigger_id(context: &mut ArgContext) -> Option<usize> {
 }
 
 fn write_box_trigger_id(context: &mut ArgContext) -> Option<usize> {
-    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_box_trigger_id(id))
+    string_literal(context).map(|id| context.compiler.global.write_box_trigger_id(id))
 }
 
 fn read_warp_icon_id(context: &mut ArgContext) -> Option<usize> {
@@ -238,11 +238,14 @@ fn read_warp_icon_id(context: &mut ArgContext) -> Option<usize> {
 }
 
 fn write_warp_icon_id(context: &mut ArgContext) -> Option<usize> {
-    spanned_string_literal(context).map(|(id, _)| context.compiler.global.write_warp_icon_id(id))
+    string_literal(context).map(|id| context.compiler.global.write_warp_icon_id(id))
 }
 
 fn wheel_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.id_resolver.wheel.id(id))
+    spanned_string_literal(context).map(|(id, span)| {
+        let ids = &mut context.compiler.global.id_resolver.wheel;
+        ids.try_id(id, &mut context.compiler.errors, span)
+    })
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumString, Display, VariantArray)]

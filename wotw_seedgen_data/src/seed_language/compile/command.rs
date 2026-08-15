@@ -581,17 +581,8 @@ fn uber_state<const LIMIT: usize>(
     errors: &mut Vec<Error>,
     span: impl Span,
 ) -> UberIdentifier {
-    let id = ids.id(format!("{snippet_identifier}/{state_identifier}"));
-
-    if ids.is_above_limit(id) {
-        errors.push(Error::error(
-            format!(
-                "Only {LIMIT} UberStates of this type are available (What on earth are you doing?)"
-            ),
-            span.span(),
-        ));
-    }
-
+    let id = format!("{snippet_identifier}/{state_identifier}");
+    let id = ids.try_id(id, errors, span);
     group(id as i32)
 }
 

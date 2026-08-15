@@ -1,7 +1,7 @@
 use std::{
     fs::File,
     marker::PhantomData,
-    ops::{Deref, DerefMut, Range},
+    ops::{ControlFlow, Deref, DerefMut, Range},
     path::PathBuf,
 };
 
@@ -10,6 +10,7 @@ use log::warn;
 use rustc_hash::FxHashMap;
 use serde::{Deserialize, Serialize};
 use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
+use wotw_seedgen_parse::{Error, Span};
 
 use crate::{
     assets::{file_create, file_err},
@@ -266,7 +267,7 @@ impl Ids {
 
 #[derive(Derivative, Serialize, Deserialize)]
 #[derivative(Debug(bound = ""))]
-pub struct IdMap<const OFFSET: usize, const LIMIT: usize = 0, S = IdMapEmpty> {
+pub struct IdMap<const OFFSET: usize, const LIMIT: usize = { usize::MAX }, S = IdMapEmpty> {
     /// Ids which have become unused and may be reassigned
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     gaps: Vec<usize>,
@@ -277,24 +278,42 @@ pub struct IdMap<const OFFSET: usize, const LIMIT: usize = 0, S = IdMapEmpty> {
     special: PhantomData<S>,
 }
 
-impl<const OFFSET: usize, const LIMIT: usize, S> IdMap<OFFSET, LIMIT, S>
-where
-    S: IdMapDefault,
-{
+impl<const OFFSET: usize, S> IdMap<OFFSET, { usize::MAX }, S> {
     pub fn id(&mut self, id: String) -> usize {
+        self.id_impl(id, |next| ControlFlow::Continue(next + OFFSET))
+    }
+}
+
+impl<const LIMIT: usize, SD> IdMap<0, LIMIT, SD> {
+    pub fn try_id<S: Span>(&mut self, id: String, errors: &mut Vec<Error>, span: S) -> usize {
+        self.id_impl(id, move |next| 
+            if next >= LIMIT {
+                errors.push(Error::error(
+                    format!(
+                        "Only {LIMIT} instances of this type are available (What on earth are you doing?)"
+                    ),
+                    span.span(),
+                ));
+                ControlFlow::Break(LIMIT - 1)
+            } else {
+                ControlFlow::Continue(next)
+            })
+    }
+}
+
+impl<const OFFSET: usize, const LIMIT: usize, S> IdMap<OFFSET, LIMIT, S> {
+    pub fn is_empty(&self) -> bool {
+        self.ids.is_empty()
+    }
+
+    fn id_impl<F: FnOnce(usize) -> ControlFlow<usize, usize>>(&mut self, id: String, new: F) -> usize {
         match self.ids.get_mut(&id) {
             None => {
                 let value = match self.gaps.pop() {
-                    None => {
-                        let next = self.ids.len();
-
-                        // We use LIMIT = 0 to signal no limit
-                        if LIMIT > 0 && next >= LIMIT {
-                            return LIMIT - 1 + OFFSET;
-                        }
-
-                        next + OFFSET
-                    }
+                    None => match new(self.ids.len()) {
+                        ControlFlow::Continue(next) => next,
+                        ControlFlow::Break(dummy) => return dummy,
+                    },
                     Some(gap) => gap,
                 };
 
@@ -309,16 +328,11 @@ where
         }
     }
 
-    pub const fn is_above_limit(&self, id: usize) -> bool {
-        id >= LIMIT + OFFSET
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.ids.is_empty()
-    }
-
     /// Purges ids which have not been confirmed used since restoring from the lockfile
-    fn purge_unused(&mut self) {
+    fn purge_unused(&mut self)
+    where
+        S: IdMapDefault,
+    {
         let mut max = 0;
 
         self.ids.retain(|_, id| {
