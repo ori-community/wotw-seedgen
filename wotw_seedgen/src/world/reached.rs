@@ -427,7 +427,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
         self.attempt_spawn_teleport(output);
     }
 
-    pub(crate) fn set_logical_state(&mut self, identifier: &str) {
+    pub fn set_logical_state(&mut self, identifier: &str) {
         match self.graph.find_node(identifier) {
             Ok(index) => {
                 if self.graph.nodes[index].is_anchor() {

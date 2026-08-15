@@ -1540,8 +1540,12 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             .settings
             .write_tags(&mut self.output.preload.tags);
 
-        let seedgen_info =
-            SeedgenInfo::new(settings.clone(), self.index, spawn.identifier().to_string());
+        let seedgen_info = SeedgenInfo::new(
+            settings.clone(),
+            self.index,
+            spawn.identifier().to_string(),
+            self.output.modifiers.logical_state_sets.clone(),
+        );
 
         (seedgen_info, self.output)
     }

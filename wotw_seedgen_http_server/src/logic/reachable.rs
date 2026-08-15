@@ -20,15 +20,22 @@ pub fn reachable(
     current_uber_states: Vec<(UberIdentifier, OrderedFloat<f32>)>,
     seedgen_info: SeedgenInfo,
 ) -> Result<Vec<usize>> {
+    let SeedgenInfo {
+        universe_settings,
+        world_index,
+        spawn_identifier,
+        logical_state_sets,
+        git_info: _,
+    } = seedgen_info;
+
     let spawn = cache
         .graph
-        .find_node(&seedgen_info.spawn_identifier)
+        .find_node(&spawn_identifier)
         .map_err(Error::Custom)?;
 
-    let settings = seedgen_info
-        .universe_settings
+    let settings = universe_settings
         .world_settings
-        .get(seedgen_info.world_index)
+        .get(world_index)
         .ok_or_else(|| "world_index in seedgen_info out of bounds".to_string())
         .map_err(Error::Custom)?;
 
@@ -55,6 +62,10 @@ pub fn reachable(
                 world.store_float(uber_identifier, *value, &CommandsOutput::NONE);
             }
         }
+    }
+
+    for identifier in logical_state_sets {
+        world.set_logical_state(&identifier);
     }
 
     world.traverse_spawn(&CommandsOutput::NONE);
