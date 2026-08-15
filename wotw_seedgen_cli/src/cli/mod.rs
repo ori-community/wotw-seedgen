@@ -3,6 +3,7 @@ pub mod dev;
 mod display;
 mod http_server_args;
 mod interactive;
+mod open_args;
 mod plando_args;
 mod preset_args;
 mod seed_args;
@@ -16,6 +17,7 @@ pub use display::{
     AVAILABLE_WORLD_PRESETS,
 };
 pub use http_server_args::HttpServerArgs;
+pub use open_args::{OpenArgs, OpenDirectory};
 pub use plando_args::PlandoArgs;
 pub use preset_args::{PresetInfoArgs, UniversePresetArgs, WorldPresetArgs};
 pub use seed_args::{CompileArgs, GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs};
@@ -23,11 +25,11 @@ pub use seed_settings::{SeedSettings, SeedWorldSettings};
 pub use stats_args::{Analyzer, ChainedAnalyzers, StatsArgs};
 pub use verbose_args::{VerboseArgs, VerboseTarget};
 
+use crate::shell_completions::CompletionGenerator;
 use clap::{
     builder::{styling::Style, Styles},
     Parser,
 };
-use crate::shell_completions::CompletionGenerator;
 
 const STYLES: Styles = Styles::styled();
 const LITERAL: Style = *STYLES.get_literal();
@@ -66,6 +68,11 @@ pub enum Cli {
     Stats {
         #[command(flatten)]
         args: StatsArgs,
+    },
+    /// Open directories related to seedgen
+    Open {
+        #[command(flatten)]
+        args: OpenArgs,
     },
     /// Generate shell completions
     ///

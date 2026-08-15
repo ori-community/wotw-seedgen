@@ -2,6 +2,7 @@ mod cli;
 mod dev;
 mod http_server;
 mod log_config;
+mod open;
 mod plando;
 mod preset;
 mod seed;
@@ -12,6 +13,7 @@ use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
 use dev::dev;
+use open::open;
 use plando::plando;
 use preset::{universe_preset, world_preset};
 use seed::seed;
@@ -38,6 +40,7 @@ fn main() -> Result<(), Error> {
         Cli::WorldPreset { args } => world_preset(args),
         Cli::Plando { args } => plando(args),
         Cli::Stats { args } => stats(args),
+        Cli::Open { args } => open(args),
         Cli::ShellCompletions { shell } => shell_completions(shell),
         Cli::Dev { command } => dev(command),
         Cli::HttpServer { args } => http_server(args),
