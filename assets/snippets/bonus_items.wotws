@@ -12,7 +12,7 @@
 !config(shuriken_efficiencies, "Shuriken Efficiency Count", "Makes Shuriken cost less energy", Integer, 1)
 !config(sentry_efficiencies, "Sentry Efficiency Count", "Makes Sentry cost less energy", Integer, 1)
 !config(bow_efficiencies, "Bow Efficiency Count", "Makes Bow cost less energy", Integer, 0)
-!config(regenerate_efficiencies, "Regenerate Efficiency Count", "Makes Regenrate cost less energy", Integer, 0)
+!config(regenerate_efficiencies, "Regenerate Efficiency Count", "Makes Regenerate cost less energy", Integer, 0)
 !config(flash_efficiencies, "Flash Efficiency Count", "Makes Flash cost less energy", Integer, 0)
 !config(grenade_efficiencies, "Grenade Efficiency Count", "Make Grenade cost less energy", Integer, 1)
 
