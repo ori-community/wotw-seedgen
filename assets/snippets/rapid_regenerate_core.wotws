@@ -6,6 +6,7 @@
 !state(collected, Integer)
 
 !include("bonus_core", update_bonus_wheel, any_collected, any_enabled, enable_all, disable_all)
+!include("bonus_progress_helper", write_bonus_items, write_bonus_items_part, update_bonus_items)
 
 !augment_fun(any_collected(), if collected > 0 set_boolean("any_collected", true))
 !augment_fun(any_enabled(), if collected > 0 && enabled set_boolean("any_enabled", true))
@@ -17,8 +18,11 @@
 fun rapid_regenerate() {
     item_message("#Rapid Regenerate x" + (collected + 1) + "#") // TODO I don't think this item message is used in the display
     store(collected, collected + 1)
+    update_bonus_items()
 }
 !export(rapid_regenerate)
+
+!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Rapid Regenerate# x" + collected))
 
 !item_data(
     rapid_regenerate(),

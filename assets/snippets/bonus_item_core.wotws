@@ -2,10 +2,11 @@
 #name("Bonus Item Core")
 #description("Convenience functions for simple bonus items")
 
-!include("delta_time", tick)
+!include("regeneration_core", energy_per_second, health_per_second)
+!include("bonus_progress_helper", write_bonus_items, write_bonus_items_part, update_bonus_items)
 
-!builtin_icon(health_regeneration_icon, "icons/bonus/healthregeneration.png")
 !builtin_icon(energy_regeneration_icon, "icons/bonus/energyregeneration.png")
+!builtin_icon(health_regeneration_icon, "icons/bonus/healthregeneration.png")
 !builtin_icon(extra_double_jump_icon, "icons/bonus/extradoublejump.png")
 !builtin_icon(extra_air_dash_icon, "icons/bonus/extraairdash.png")
 !builtin_icon(blaze_efficiency_icon, "icons/bonus/blazeefficiency.png")
@@ -32,33 +33,6 @@
 !builtin_icon(bashable_shuriken_icon, "icons/bonus/bashableshuriken.png")
 !builtin_icon(ultra_flap_icon, "icons/bonus/ultraflap.png")
 
-!state(health_per_second, Float)
-!export(health_per_second)
-
-!augment_fun(tick(delta: Float), if health_per_second != 0 store(player.health, player.health + health_per_second * delta))
-
-!state(health_regenerations, Integer)
-!export(health_regenerations)
-
-fun health_regeneration() {
-    store(health_regenerations, health_regenerations + 1)
-    item_message("#Health Regeneration x" + health_regenerations + "#")
-    store(health_per_second, health_per_second + 10 / 60)
-}
-!item_data(health_regeneration(),
-    "#Health Regeneration#",
-    200,
-    "Passively regenerate one health orb per minute",
-    health_regeneration_icon,
-    BonusItem
-)
-!export(health_regeneration)
-
-!state(energy_per_second, Float)
-!export(energy_per_second)
-
-!augment_fun(tick(delta: Float), if energy_per_second != 0 store(player.energy, player.energy + energy_per_second * delta))
-
 !state(energy_regenerations, Integer)
 !export(energy_regenerations)
 
@@ -66,7 +40,9 @@ fun energy_regeneration() {
     store(energy_regenerations, energy_regenerations + 1)
     item_message("#Energy Regeneration x" + energy_regenerations + "#")
     store(energy_per_second, energy_per_second + 1 / 60)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if energy_regenerations != 0 write_bonus_items_part("#Energy Regeneration# x" + energy_regenerations))
 !item_data(energy_regeneration(),
     "#Energy Regeneration#",
     200,
@@ -76,10 +52,31 @@ fun energy_regeneration() {
 )
 !export(energy_regeneration)
 
+!state(health_regenerations, Integer)
+!export(health_regenerations)
+
+fun health_regeneration() {
+    store(health_regenerations, health_regenerations + 1)
+    item_message("#Health Regeneration x" + health_regenerations + "#")
+    store(health_per_second, health_per_second + 10 / 60)
+    update_bonus_items()
+}
+!augment_fun(write_bonus_items(), if health_regenerations != 0 write_bonus_items_part("#Health Regeneration# x" + health_regenerations))
+!item_data(health_regeneration(),
+    "#Health Regeneration#",
+    200,
+    "Passively regenerate one health orb per minute",
+    health_regeneration_icon,
+    BonusItem
+)
+!export(health_regeneration)
+
 fun extra_double_jump() {
     store(randoUpgrades.extraDoubleJumps, randoUpgrades.extraDoubleJumps + 1)
     item_message("#Extra Double Jump x" + randoUpgrades.extraDoubleJumps + "#")
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.extraDoubleJumps != 0 write_bonus_items_part("#Extra Double Jump# x" + randoUpgrades.extraDoubleJumps))
 !item_data(extra_double_jump(),
     "#Extra Double Jump#",
     200,
@@ -92,7 +89,9 @@ fun extra_double_jump() {
 fun extra_air_dash() {
     store(randoUpgrades.extraDashes, randoUpgrades.extraDashes + 1)
     item_message("#Extra Air Dash x" + randoUpgrades.extraDashes + "#")
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.extraDashes != 0 write_bonus_items_part("#Extra Air Dash# x" + randoUpgrades.extraDashes))
 !item_data(extra_air_dash(),
     "#Extra Air Dash#",
     200,
@@ -109,7 +108,9 @@ fun blaze_efficiency() {
     store(blaze_efficiencies, blaze_efficiencies + 1)
     item_message("#Blaze Efficiency x" + blaze_efficiencies + "#")
     store(randoUpgrades.blazeCostMultiplier, randoUpgrades.blazeCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if blaze_efficiencies != 0 write_bonus_items_part("#Blaze Efficiency# x" + blaze_efficiencies))
 !item_data(blaze_efficiency(),
     "#Blaze Efficiency#",
     200,
@@ -126,7 +127,9 @@ fun spear_efficiency() {
     store(spear_efficiencies, spear_efficiencies + 1)
     item_message("#Spear Efficiency x" + spear_efficiencies + "#")
     store(randoUpgrades.spearCostMultiplier, randoUpgrades.spearCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if spear_efficiencies != 0 write_bonus_items_part("#Spear Efficiency# x" + spear_efficiencies))
 !item_data(spear_efficiency(),
     "#Spear Efficiency#",
     200,
@@ -143,7 +146,9 @@ fun shuriken_efficiency() {
     store(shuriken_efficiencies, shuriken_efficiencies + 1)
     item_message("#Shuriken Efficiency x" + shuriken_efficiencies + "#")
     store(randoUpgrades.shurikenCostMultiplier, randoUpgrades.shurikenCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if shuriken_efficiencies != 0 write_bonus_items_part("#Shuriken Efficiency# x" + shuriken_efficiencies))
 !item_data(shuriken_efficiency(),
     "#Shuriken Efficiency#",
     200,
@@ -160,7 +165,9 @@ fun sentry_efficiency() {
     store(sentry_efficiencies, sentry_efficiencies + 1)
     item_message("#Sentry Efficiency x" + sentry_efficiencies + "#")
     store(randoUpgrades.sentryCostMultiplier, randoUpgrades.sentryCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if sentry_efficiencies != 0 write_bonus_items_part("#Sentry Efficiency# x" + sentry_efficiencies))
 !item_data(sentry_efficiency(),
     "#Sentry Efficiency#",
     200,
@@ -177,7 +184,9 @@ fun bow_efficiency() {
     store(bow_efficiencies, bow_efficiencies + 1)
     item_message("#Bow Efficiency x" + bow_efficiencies + "#")
     store(randoUpgrades.bowCostMultiplier, randoUpgrades.bowCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if bow_efficiencies != 0 write_bonus_items_part("#Bow Efficiency# x" + bow_efficiencies))
 !item_data(bow_efficiency(),
     "#Bow Efficiency#",
     200,
@@ -194,7 +203,9 @@ fun regenerate_efficiency() {
     store(regenerate_efficiencies, regenerate_efficiencies + 1)
     item_message("#Regenerate Efficiency x" + regenerate_efficiencies + "#")
     store(randoUpgrades.regenerateCostMultiplier, randoUpgrades.regenerateCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if regenerate_efficiencies != 0 write_bonus_items_part("#Regenerate Efficiency# x" + regenerate_efficiencies))
 !item_data(regenerate_efficiency(),
     "#Regenerate Efficiency#",
     200,
@@ -211,7 +222,9 @@ fun flash_efficiency() {
     store(flash_efficiencies, flash_efficiencies + 1)
     item_message("#Flash Efficiency x" + flash_efficiencies + "#")
     store(randoUpgrades.flashCostMultiplier, randoUpgrades.flashCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if flash_efficiencies != 0 write_bonus_items_part("#Flash Efficiency# x" + flash_efficiencies))
 !item_data(flash_efficiency(),
     "#Flash Efficiency#",
     200,
@@ -228,7 +241,9 @@ fun grenade_efficiency() {
     store(grenade_efficiencies, grenade_efficiencies + 1)
     item_message("#Grenade Efficiency x" + grenade_efficiencies + "#")
     store(randoUpgrades.grenadeCostMultiplier, randoUpgrades.grenadeCostMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if grenade_efficiencies != 0 write_bonus_items_part("#Grenade Efficiency# x" + grenade_efficiencies))
 !item_data(grenade_efficiency(),
     "#Grenade Efficiency#",
     200,
@@ -247,7 +262,9 @@ fun rapid_grenade() {
     store(rapid_grenades, rapid_grenades + 1)
     item_message("#Rapid Grenade x" + rapid_grenades + "#")
     store(randoUpgrades.grenadeChargeDurationMultiplier, randoUpgrades.grenadeChargeDurationMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if rapid_grenades != 0 write_bonus_items_part("#Rapid Grenade# x" + rapid_grenades))
 !item_data(
     rapid_grenade(),
     "#Rapid Grenade#",
@@ -265,7 +282,9 @@ fun quickshot_upgrade() {
     store(quickshot_upgrades, quickshot_upgrades + 1)
     item_message("#Quickshot Upgrade x" + quickshot_upgrades + "#")
     store(randoUpgrades.bowRapidFireIntervalDurationMultiplier, randoUpgrades.bowRapidFireIntervalDurationMultiplier / 2)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if quickshot_upgrades != 0 write_bonus_items_part("#Quickshot Upgrade# x" + quickshot_upgrades))
 !item_data(
     quickshot_upgrade(),
     "#Quickshot Upgrade#",
@@ -279,7 +298,9 @@ fun quickshot_upgrade() {
 fun melting_blaze() {
     item_message("#Melting Blaze#")
     store(randoUpgrades.blazeAsFireSource, true)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.blazeAsFireSource write_bonus_items_part("#Melting Blaze#"))
 !item_data(
     melting_blaze(),
     "#Melting Blaze#",
@@ -293,7 +314,9 @@ fun melting_blaze() {
 fun melting_sword() {
     item_message("#Melting Sword#")
     store(randoUpgrades.swordAsFireSource, true)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.swordAsFireSource write_bonus_items_part("#Melting Sword#"))
 !item_data(
     melting_sword(),
     "#Melting Sword#",
@@ -307,7 +330,9 @@ fun melting_sword() {
 fun melting_shuriken() {
     item_message("#Melting Shuriken#")
     store(randoUpgrades.shurikenAsFireSource, true)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.shurikenAsFireSource write_bonus_items_part("#Melting Shuriken#"))
 !item_data(
     melting_shuriken(),
     "#Melting Shuriken#",
@@ -321,7 +346,9 @@ fun melting_shuriken() {
 fun uncharged_bashnade() {
     item_message("#Uncharged Bashgrenades#")
     store(randoUpgrades.unchargedGrenadesBashable, true)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.unchargedGrenadesBashable write_bonus_items_part("#Uncharged Bashgrenades#"))
 !item_data(
     uncharged_bashnade(),
     "#Uncharged Bashgrenades#",
@@ -335,7 +362,9 @@ fun uncharged_bashnade() {
 fun extra_grenade() {
     store(randoUpgrades.extraGrenades, randoUpgrades.extraGrenades + 1)
     item_message("#Extra Grenade x" + randoUpgrades.extraGrenades + "#")
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.extraGrenades != 0 write_bonus_items_part("#Extra Grenade# x" + randoUpgrades.extraGrenades))
 !item_data(
     extra_grenade(),
     "#Extra Grenade#",
@@ -349,7 +378,9 @@ fun extra_grenade() {
 fun splinter_grenade() {
     store(randoUpgrades.grenadeMultishotCount, randoUpgrades.grenadeMultishotCount + 1)
     item_message("#Splinter Grenade x" + randoUpgrades.grenadeMultishotCount + "#")
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.grenadeMultishotCount != 0 write_bonus_items_part("#Splinter Grenade# x" + randoUpgrades.grenadeMultishotCount))
 !item_data(
     splinter_grenade(),
     "#Splinter Grenade#",
@@ -362,8 +393,10 @@ fun splinter_grenade() {
 
 fun unlimited_sentries() {
     item_message("#Unlimited Sentries#")
-    store(randoUpgrades.extraSentries, 100)
+    store(randoUpgrades.extraSentries, 99)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.extraSentries >= 99 write_bonus_items_part("#Unlimited Sentries#"))
 !item_data(
     unlimited_sentries(),
     "#Unlimited Sentries#",
@@ -377,6 +410,7 @@ fun unlimited_sentries() {
 
 // TODO merge burst and fire rate upgrade to make the names less confusing?
 // TODO vague descriptions
+// TODO why no x{num}?
 
 !state(sentry_burst_upgrades, Integer)
 !export(sentry_burst_upgrades)
@@ -385,7 +419,9 @@ fun sentry_burst_upgrade() {
     store(sentry_burst_upgrades, sentry_burst_upgrades + 1)
     item_message("#Sentry Burst Upgrade#")
     store(randoUpgrades.sentryShots, randoUpgrades.sentryShots + 10)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if sentry_burst_upgrades != 0 write_bonus_items_part("#Sentry Burst Upgrade# x" + sentry_burst_upgrades))
 !item_data(
     sentry_burst_upgrade(),
     "#Sentry Burst Upgrade#",
@@ -403,7 +439,9 @@ fun sentry_fire_rate_upgrade() {
     store(sentry_fire_rate_upgrades, sentry_fire_rate_upgrades + 1)
     item_message("#Sentry Fire Rate Upgrade#")
     store(randoUpgrades.sentryFireRateSpeed, randoUpgrades.sentryFireRateSpeed + 2.5)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if sentry_fire_rate_upgrades != 0 write_bonus_items_part("#Sentry Fire Rate Upgrade# x" + sentry_fire_rate_upgrades))
 !item_data(
     sentry_fire_rate_upgrade(),
     "#Sentry Fire Rate Upgrade#",
@@ -420,7 +458,9 @@ fun sentry_fire_rate_upgrade() {
 fun extra_shuriken() {
     store(randoUpgrades.extraShurikens, randoUpgrades.extraShurikens + 1)
     item_message("#Extra Shuriken x" + randoUpgrades.extraShurikens + "#")
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.extraShurikens != 0 write_bonus_items_part("#Extra Shuriken# x" + randoUpgrades.extraShurikens))
 !item_data(
     extra_shuriken(),
     "#Extra Shuriken#",
@@ -434,7 +474,9 @@ fun extra_shuriken() {
 fun splinter_shuriken() {
     store(randoUpgrades.shurikenMultishotCount, randoUpgrades.shurikenMultishotCount + 2)
     item_message("#Splinter Shuriken x" + randoUpgrades.shurikenMultishotCount / 2 + "#")
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.shurikenMultishotCount != 0 write_bonus_items_part("#Splinter Shuriken# x" + randoUpgrades.shurikenMultishotCount / 2))
 !item_data(
     splinter_shuriken(),
     "#Splinter Shuriken#",
@@ -448,7 +490,9 @@ fun splinter_shuriken() {
 fun bashable_shuriken() {
     item_message("#Bashable Shuriken#")
     store(randoUpgrades.shurikenBashable, true)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if randoUpgrades.shurikenBashable write_bonus_items_part("#Bashable Shuriken#"))
 !item_data(
     bashable_shuriken(),
     "#Bashable Shuriken#",
@@ -466,7 +510,9 @@ fun ultra_flap() {
     store(ultra_flaps, ultra_flaps + 1)
     item_message("#Ultra Flap x" + ultra_flaps + "#")
     store(randoUpgrades.flapDamage, randoUpgrades.flapDamage + 4)
+    update_bonus_items()
 }
+!augment_fun(write_bonus_items(), if ultra_flaps != 0 write_bonus_items_part("#Ultra Flap# x" + ultra_flaps))
 !item_data(
     ultra_flap(),
     "#Ultra Flap#",

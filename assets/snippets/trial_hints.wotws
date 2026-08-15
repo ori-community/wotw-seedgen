@@ -54,8 +54,8 @@ on raceGroup.desertRace == 1 {
 }
 
 on reload {
-    set_wheel_item_name("progress_helper", TopLeft, "Trial Hints")
-    set_wheel_item_icon("progress_helper", TopLeft, message_icon)
+    set_wheel_item_name("progress_helper", LeftTop, "Trial Hints")
+    set_wheel_item_icon("progress_helper", LeftTop, message_icon)
 }
 
 on reload update_wheel()
@@ -81,17 +81,17 @@ fun update_wheel() {
     )
 
     if get_boolean("any_unlocked") {
-        set_wheel_item_description("progress_helper", TopLeft, "[Ability1]View Hints")
-        set_wheel_item_color("progress_helper", TopLeft, 255, 255, 255, 255)
-        set_wheel_item_all_actions("progress_helper", TopLeft, {
+        set_wheel_item_description("progress_helper", LeftTop, "[Ability1]View Hints")
+        set_wheel_item_color("progress_helper", LeftTop, 255, 255, 255, 255)
+        set_wheel_item_all_actions("progress_helper", LeftTop, {
             write_trial_hints()
             priority_message(get_string("trial_hints"))
         })
     }
     if get_boolean("any_unlocked") == false {
-        set_wheel_item_description("progress_helper", TopLeft, "No Spirit Trials activated")
-        set_wheel_item_color("progress_helper", TopLeft, 128, 128, 128, 196)
-        set_wheel_item_all_actions("progress_helper", TopLeft, priority_message("No Spirit Trials activated"))
+        set_wheel_item_description("progress_helper", LeftTop, "No Spirit Trials activated")
+        set_wheel_item_color("progress_helper", LeftTop, 128, 128, 128, 196)
+        set_wheel_item_all_actions("progress_helper", LeftTop, priority_message("No Spirit Trials activated"))
     }
 }
 

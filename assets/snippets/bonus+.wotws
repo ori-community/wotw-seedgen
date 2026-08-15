@@ -4,6 +4,8 @@
 
 !tags("Bonus+")
 
+// TODO why is jumpgrades separate from this?
+
 !include("bonus_item_core",
     rapid_grenade,
     quickshot_upgrade,
