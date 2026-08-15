@@ -102,66 +102,75 @@ on reload {
         "root",
         Top,
         "Progress Helper",
-        "[Ability1]View Summary\n[Ability2]Open menu",
+        "[Ability1]Open Menu\n[Ability2]View Summary",
         progress_summary_icon,
     )
-    set_wheel_item_action("root", Top, Ability1, trigger_keybind("ShowProgressWithHints"))
-    set_wheel_item_action("root", Top, Ability2, switch_wheel("progress_helper"))
-    set_wheel_item_action("root", Top, Ability3, switch_wheel("progress_helper"))
+    set_wheel_item_action("root", Top, Ability1, switch_wheel("progress_helper"))
+    set_wheel_item_action("root", Top, Ability2, trigger_client_event(progress_message))
+    set_wheel_item_action("root", Top, Ability3, trigger_client_event(progress_message))
 
     set_wheel_item_data(
         "progress_helper",
         Top,
+        "Summary",
+        "[Ability1]View Summary",
+        progress_summary_icon,
+    )
+    set_wheel_item_all_actions("progress_helper", Top, trigger_client_event(progress_message))
+
+    set_wheel_item_data(
+        "progress_helper",
+        TopRight,
         "Tree Progress",
         "[Ability1]View Progress",
         tree_progress_icon,
     )
-    set_wheel_item_all_actions("progress_helper", Top, {
+    set_wheel_item_all_actions("progress_helper", TopRight, {
         write_tree_progress()
         controlled_priority_message("tree_progress", get_string("tree_progress"), 4)
     })
 
     set_wheel_item_data(
         "progress_helper",
-        TopRight,
+        RightTop,
         "Wisp Progress",
         "[Ability1]View Progress",
         wisp_progress_icon,
     )
-    set_wheel_item_all_actions("progress_helper", TopRight, {
+    set_wheel_item_all_actions("progress_helper", RightTop, {
         write_wisp_progress()
         controlled_priority_message("wisp_progress", get_string("wisp_progress"), 4)
     })
 
     set_wheel_item_data(
         "progress_helper",
-        RightTop,
+        Right,
         "Quest Progress",
         "[Ability1]View Progress",
         quest_progress_icon,
     )
-    set_wheel_item_all_actions("progress_helper", RightTop, show_quest_progress())
+    set_wheel_item_all_actions("progress_helper", Right, show_quest_progress())
 
     set_wheel_item_data(
         "progress_helper",
-        Right,
+        RightBottom,
         "Teleporter Progress",
         "[Ability1]View Progress",
         teleporter_icon,
     )
-    set_wheel_item_all_actions("progress_helper", Right, show_teleporter_progress())
+    set_wheel_item_all_actions("progress_helper", RightBottom, show_teleporter_progress())
 }
 
 !if entrance_helper {
     on reload {
         set_wheel_item_data(
             "progress_helper",
-            RightBottom,
+            BottomRight,
             "Entrance Progress",
             "[Ability1]View Progress",
             entrance_connections_icon,
         )
-        set_wheel_item_all_actions("progress_helper", RightBottom, show_entrance_progress())
+        set_wheel_item_all_actions("progress_helper", BottomRight, show_entrance_progress())
     }
 }
 
