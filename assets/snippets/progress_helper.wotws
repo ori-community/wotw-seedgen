@@ -490,7 +490,7 @@ fun teleporter_string_piece(teleporter: String) {
 !if entrance_helper {
     fun show_entrance_progress() {
         write_entrance_progress()
-        controlled_priority_message("entrance_progress", get_string("entrance_progress"), 4)
+        controlled_priority_message("entrance_progress", get_string("entrance_progress"), 6)
     }
 
     on change entrances.lupoShopOutside update_entrance_progress()
