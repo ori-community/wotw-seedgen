@@ -20,6 +20,7 @@ Twillen tells the zones holding Bow and Bash")
 !zone_of(bow_zone, skill(Bow))
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
+!include("list_core", add_row)
 
 !augment_fun(write_progress_message(), write_hints())
 !augment_fun(write_map_progress_message(), write_hints())
@@ -27,15 +28,15 @@ Twillen tells the zones holding Bow and Bash")
 fun write_hints() {
     if LupoShop.Slot3 {
         write_lupo_hint()
-        set_string("progress_message", get_string("progress_message") + "\n" + get_string("lupo_hint"))
+        add_row(get_string("hint"))
     }
     if OpherShop.Slot11 {
         write_opher_hint()
-        set_string("progress_message", get_string("progress_message") + "\n" + get_string("opher_hint"))
+        add_row(get_string("hint"))
     }
     if TwillenShop.Slot8 {
         write_twillen_hint()
-        set_string("progress_message", get_string("progress_message") + "\n" + get_string("twillen_hint"))
+        add_row(get_string("hint"))
     }
 }
 
@@ -49,7 +50,7 @@ fun write_lupo_hint() {
     set_string("flash_color", "")
     if skills.flash set_string("flash_color", "$")
 
-    set_string("lupo_hint",
+    set_string("hint",
         get_string("burrow_color") + "Burrow: " + burrow_zone + get_string("burrow_color") + ", " +
         get_string("water_dash_color") + "Water Dash: " + water_dash_zone + get_string("water_dash_color") + ", " +
         get_string("grenade_color") + "Grenade: " + grenade_zone + get_string("grenade_color") + ", " +
@@ -64,7 +65,7 @@ fun write_opher_hint() {
     set_string("glide_color", "")
     if skills.glide set_string("glide_color", "$")
 
-    set_string("opher_hint",
+    set_string("hint",
         get_string("clean_water_color") + "Clean Water: " + clean_water_zone + get_string("clean_water_color") + ", " +
         get_string("flap_color") + "Flap: " + flap_zone + get_string("flap_color") + ", " +
         get_string("glide_color") + "Glide: " + glide_zone + get_string("glide_color")
@@ -76,7 +77,7 @@ fun write_twillen_hint() {
     set_string("bow_color", "")
     if skills.bow set_string("bow_color", "$")
 
-    set_string("twillen_hint",
+    set_string("hint",
         get_string("bash_color") + "Bash: " + bash_zone + get_string("bash_color") + ", " +
         get_string("bow_color") + "Bow: " + bow_zone + get_string("bow_color")
     )
@@ -156,17 +157,17 @@ on skills.bow updateTwillenHintPrice()
 on LupoShop.Slot3 {
     create_stats_entry(Lupo, "Lupo Hint")
     write_lupo_hint()
-    item_message(get_string("lupo_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(OpherShop.Slot11)
 on OpherShop.Slot11 {
     create_stats_entry(Opher, "Opher Hint")
     write_opher_hint()
-    item_message(get_string("opher_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(TwillenShop.Slot8)
 on TwillenShop.Slot8 {
     create_stats_entry(Twillen, "Twillen Hint")
     write_twillen_hint()
-    item_message(get_string("twillen_hint"))
+    item_message(get_string("hint"))
 }

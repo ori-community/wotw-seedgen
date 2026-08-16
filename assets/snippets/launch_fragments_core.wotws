@@ -5,10 +5,11 @@
 !builtin_icon(launch_fragment_icon, "icons/bonus/launchfragment.png")
 
 !include("progress_helper", write_progress_message)
+!include("list_core", add_row)
 
 !augment_fun(write_progress_message(), {
     write_amount(itemTracker.launchFragmentsCount)
-    set_string("progress_message", get_string("progress_message") + "\n*Launch Fragments* " + get_string("amount"))
+    add_row("*Launch Fragments* " + get_string("amount"))
 })
 
 fun write_amount(amount: Integer) {

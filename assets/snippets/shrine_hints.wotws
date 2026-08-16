@@ -4,6 +4,8 @@
 
 !builtin_icon(message_icon, "icons/game/message.png")
 
+!include("list_core", new_column, add_row, add_current_row, new_row, add_row_item)
+
 !state(marsh_visited, Boolean)
 !state(howls_den_visited, Boolean)
 !state(glades_visited, Boolean)
@@ -40,6 +42,10 @@ on shrines.depthsWave == 1 {
 on reload {
     set_wheel_item_name("progress_helper", Left, "Shrine Hints")
     set_wheel_item_icon("progress_helper", Left, message_icon)
+    set_wheel_item_all_actions("progress_helper", Left, {
+        write_shrine_hints()
+        priority_message(get_string("column"))
+    })
 }
 
 on reload update_wheel()
@@ -71,48 +77,31 @@ fun update_wheel() {
     if get_boolean("any_unlocked") {
         set_wheel_item_description("progress_helper", Left, "[Ability1]View Hints")
         set_wheel_item_color("progress_helper", Left, 255, 255, 255, 255)
-        set_wheel_item_all_actions("progress_helper", Left, {
-            write_shrine_hints()
-            priority_message(get_string("shrine_hints"))
-        })
     }
     if get_boolean("any_unlocked") == false {
         set_wheel_item_description("progress_helper", Left, "No Combat Shrines visited")
         set_wheel_item_color("progress_helper", Left, 128, 128, 128, 196)
-        set_wheel_item_all_actions("progress_helper", Left, priority_message("No Combat Shrines visited"))
     }
 }
 
 fun write_shrine_hints() {
-    set_string("shrine_hints", "")
-    set_boolean("newline", false)
+    new_column("")
 
-    if marsh_visited && MarshPastOpher.CombatShrineCompleted == false add_shrine_hint("#Marsh Reward#: " + marsh_shrine_item)
-    if howls_den_visited && HowlsDen.CombatShrineCompleted == false add_shrine_hint("#Den Reward#: " + den_shrine_item)
-    if glades_visited && WestGlades.CombatShrineCompleted == false add_shrine_hint("#Glades Reward#: " + glades_shrine_item)
-    if woods_visited && WoodsMain.CombatShrineCompleted == false add_shrine_hint("#Woods Reward#: " + woods_shrine_item)
-    if depths_visited && LowerDepths.CombatShrineCompleted == false add_shrine_hint("#Depths Reward#: " + depths_shrine_item)
+    if marsh_visited && MarshPastOpher.CombatShrineCompleted == false add_row("#Marsh Reward#: " + marsh_shrine_item)
+    if howls_den_visited && HowlsDen.CombatShrineCompleted == false add_row("#Den Reward#: " + den_shrine_item)
+    if glades_visited && WestGlades.CombatShrineCompleted == false add_row("#Glades Reward#: " + glades_shrine_item)
+    if woods_visited && WoodsMain.CombatShrineCompleted == false add_row("#Woods Reward#: " + woods_shrine_item)
+    if depths_visited && LowerDepths.CombatShrineCompleted == false add_row("#Depths Reward#: " + depths_shrine_item)
 
-    set_string("completed", "")
-    set_boolean("comma", false)
+    new_row("$Completed$: ")
 
-    if MarshPastOpher.CombatShrineCompleted add_shrine_complete("Marsh")
-    if HowlsDen.CombatShrineCompleted add_shrine_complete("Den")
-    if WestGlades.CombatShrineCompleted add_shrine_complete("Glades")
-    if WoodsMain.CombatShrineCompleted add_shrine_complete("Woods")
-    if LowerDepths.CombatShrineCompleted add_shrine_complete("Depths")
+    if MarshPastOpher.CombatShrineCompleted add_row_item("Marsh")
+    if HowlsDen.CombatShrineCompleted add_row_item("Den")
+    if WestGlades.CombatShrineCompleted add_row_item("Glades")
+    if WoodsMain.CombatShrineCompleted add_row_item("Woods")
+    if LowerDepths.CombatShrineCompleted add_row_item("Depths")
 
-    if get_boolean("comma") add_shrine_hint("$Completed$: " + get_string("completed"))
-}
+    add_current_row()
 
-fun add_shrine_hint(part: String) {
-    if get_boolean("newline") set_string("shrine_hints", get_string("shrine_hints") + "\n")
-    set_boolean("newline", true)
-    set_string("shrine_hints", get_string("shrine_hints") + part)
-}
-
-fun add_shrine_complete(part: String) {
-    if get_boolean("comma") set_string("completed", get_string("completed") + ", ")
-    set_boolean("comma", true)
-    set_string("completed", get_string("completed") + part)
+    if get_integer("lines") == 0 set_string("column", "No Combat Shrines visited")
 }

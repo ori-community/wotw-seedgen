@@ -25,242 +25,211 @@ The Clean Water Hint is on the Wellspring Escape")
 !zone_of(launch_zone, skill(Launch))
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
+!include("list_core", new_row, add_row_item, add_current_row)
 
 !augment_fun(write_progress_message(), write_hints())
 !augment_fun(write_map_progress_message(), write_hints())
 
 fun write_hints() {
-    set_string("tree_hints", "")
-    set_boolean("comma", false)
+    new_row("")
+
     if MarshSpawn.RegenTree {
         write_regenerate_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("regenerate_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if HowlsDen.SwordTree {
-        add_comma()
         write_sword_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("sword_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if HowlsDen.DoubleJumpTree {
-        add_comma()
         write_double_jump_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("double_jump_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if MarshPastOpher.BowTree {
-        add_comma()
         write_bow_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("bow_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if WestHollow.DashTree {
-        add_comma()
         write_dash_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("dash_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if EastHollow.BashTree {
-        add_comma()
         write_bash_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("bash_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if InnerWellspring.GrappleTree {
-        add_comma()
         write_grapple_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("grapple_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if InnerWellspring.WaterEscape {
-        add_comma()
         write_clean_water_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("clean_water_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if GladesTown.DamageTree {
-        add_comma()
         write_flap_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("flap_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if MarshSpawn.DamageTree {
-        add_comma()
         write_glide_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("glide_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if UpperReach.GrenadeTree {
-        add_comma()
         write_grenade_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("grenade_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if LowerDepths.FlashTree {
-        add_comma()
         write_flash_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("flash_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
-    // TODO look at renaming some of these
     if UpperPools.WaterDashTree {
-        add_comma()
         write_water_dash_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("water_dash_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if LowerWastes.BurrowTree {
-        add_comma()
         write_burrow_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("burrow_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
     if WeepingRidge.LaunchTree {
-        add_comma()
         write_launch_hint()
-        set_string("tree_hints", get_string("tree_hints") + get_string("launch_hint"))
-        set_boolean("comma", true)
+        add_row_item(get_string("hint"))
     }
-    if get_boolean("comma") set_string("progress_message", get_string("progress_message") + "\n" + get_string("tree_hints"))
-}
-fun add_comma() {
-    if get_boolean("comma") set_string("tree_hints", get_string("tree_hints") + ", ")
+
+    add_current_row()
 }
 
 on MarshSpawn.RegenTree {
     write_regenerate_hint()
-    item_message(get_string("regenerate_hint"))
+    item_message(get_string("hint"))
 }
 on HowlsDen.SwordTree {
     write_sword_hint()
-    item_message(get_string("sword_hint"))
+    item_message(get_string("hint"))
 }
 on HowlsDen.DoubleJumpTree {
     write_double_jump_hint()
-    item_message(get_string("double_jump_hint"))
+    item_message(get_string("hint"))
 }
 on MarshPastOpher.BowTree {
     write_bow_hint()
-    item_message(get_string("bow_hint"))
+    item_message(get_string("hint"))
 }
 on WestHollow.DashTree {
     write_dash_hint()
-    item_message(get_string("dash_hint"))
+    item_message(get_string("hint"))
 }
 on EastHollow.BashTree {
     write_bash_hint()
-    item_message(get_string("bash_hint"))
+    item_message(get_string("hint"))
 }
 on InnerWellspring.GrappleTree {
     write_grapple_hint()
-    item_message(get_string("grapple_hint"))
+    item_message(get_string("hint"))
 }
 on InnerWellspring.WaterEscape {
     write_clean_water_hint()
-    item_message(get_string("clean_water_hint"))
+    item_message(get_string("hint"))
 }
 on GladesTown.DamageTree {
     write_flap_hint()
-    item_message(get_string("flap_hint"))
+    item_message(get_string("hint"))
 }
 on MarshSpawn.DamageTree {
     write_glide_hint()
-    item_message(get_string("glide_hint"))
+    item_message(get_string("hint"))
 }
 on UpperReach.GrenadeTree {
     write_grenade_hint()
-    item_message(get_string("grenade_hint"))
+    item_message(get_string("hint"))
 }
 on LowerDepths.FlashTree {
     write_flash_hint()
-    item_message(get_string("flash_hint"))
+    item_message(get_string("hint"))
 }
 on UpperPools.WaterDashTree {
     write_water_dash_hint()
-    item_message(get_string("water_dash_hint"))
+    item_message(get_string("hint"))
 }
 on LowerWastes.BurrowTree {
     write_burrow_hint()
-    item_message(get_string("burrow_hint"))
+    item_message(get_string("hint"))
 }
 on WeepingRidge.LaunchTree {
     write_launch_hint()
-    item_message(get_string("launch_hint"))
+    item_message(get_string("hint"))
 }
 
 fun write_regenerate_hint() {
     set_string("color", "")
     if skills.regenerate set_string("color", "$")
-    set_string("regenerate_hint", get_string("color") + "Regenerate: " + regenerate_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Regenerate: " + regenerate_zone + get_string("color"))
 }
 fun write_sword_hint() {
     set_string("color", "")
     if skills.sword set_string("color", "$")
-    set_string("sword_hint", get_string("color") + "Sword: " + sword_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Sword: " + sword_zone + get_string("color"))
 }
 fun write_double_jump_hint() {
     set_string("color", "")
     if skills.doubleJump set_string("color", "$")
-    set_string("double_jump_hint", get_string("color") + "Double Jump: " + double_jump_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Double Jump: " + double_jump_zone + get_string("color"))
 }
 fun write_bow_hint() {
     set_string("color", "")
     if skills.bow set_string("color", "$")
-    set_string("bow_hint", get_string("color") + "Bow: " + bow_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Bow: " + bow_zone + get_string("color"))
 }
 fun write_dash_hint() {
     set_string("color", "")
     if skills.dash set_string("color", "$")
-    set_string("dash_hint", get_string("color") + "Dash: " + dash_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Dash: " + dash_zone + get_string("color"))
 }
 fun write_bash_hint() {
     set_string("color", "")
     if skills.bash set_string("color", "$")
-    set_string("bash_hint", get_string("color") + "Bash: " + bash_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Bash: " + bash_zone + get_string("color"))
 }
 fun write_grapple_hint() {
     set_string("color", "")
     if skills.grapple set_string("color", "$")
-    set_string("grapple_hint", get_string("color") + "Grapple: " + grapple_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Grapple: " + grapple_zone + get_string("color"))
 }
 fun write_clean_water_hint() {
     set_string("color", "")
     if randoState.cleanWater set_string("color", "$")
-    set_string("clean_water_hint", get_string("color") + "Clean Water: " + clean_water_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Clean Water: " + clean_water_zone + get_string("color"))
 }
 fun write_flap_hint() {
     set_string("color", "")
     if skills.flap set_string("color", "$")
-    set_string("flap_hint", get_string("color") + "Flap: " + flap_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Flap: " + flap_zone + get_string("color"))
 }
 fun write_glide_hint() {
     set_string("color", "")
     if skills.glide set_string("color", "$")
-    set_string("glide_hint", get_string("color") + "Glide: " + glide_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Glide: " + glide_zone + get_string("color"))
 }
 fun write_grenade_hint() {
     set_string("color", "")
     if skills.grenade set_string("color", "$")
-    set_string("grenade_hint", get_string("color") + "Grenade: " + grenade_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Grenade: " + grenade_zone + get_string("color"))
 }
 fun write_flash_hint() {
     set_string("color", "")
     if skills.flash set_string("color", "$")
-    set_string("flash_hint", get_string("color") + "Flash: " + flash_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Flash: " + flash_zone + get_string("color"))
 }
 fun write_water_dash_hint() {
     set_string("color", "")
     if skills.waterDash set_string("color", "$")
-    set_string("water_dash_hint", get_string("color") + "Water Dash: " + water_dash_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Water Dash: " + water_dash_zone + get_string("color"))
 }
 fun write_burrow_hint() {
     set_string("color", "")
     if skills.burrow set_string("color", "$")
-    set_string("burrow_hint", get_string("color") + "Burrow: " + burrow_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Burrow: " + burrow_zone + get_string("color"))
 }
 fun write_launch_hint() {
     set_string("color", "")
     if skills.launch set_string("color", "$")
-    set_string("launch_hint", get_string("color") + "Launch: " + launch_zone + get_string("color"))
+    set_string("hint", get_string("color") + "Launch: " + launch_zone + get_string("color"))
 }

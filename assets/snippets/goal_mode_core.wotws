@@ -3,11 +3,13 @@
 #description("Manages access to Shriek")
 
 !include("progress_helper", write_progress_message, update_progress_message)
+!include("list_core", new_column, new_row, add_row_item, add_current_row)
+
+!export(add_row_item)
 
 !export(write_goal_progress_message)
 fun write_goal_progress_message() {
-    set_string("goal_progress_message", "")
-    set_boolean("comma", false)
+    new_row("")
 }
 
 !export(check_goals_completed)
@@ -17,13 +19,13 @@ fun check_goals_completed() {
 
 !export(write_goals_incomplete_message)
 fun write_goals_incomplete_message() {
-    set_string("goals_incomplete_message", "<s_0.9><ls_0.9>Incomplete Goals:")
+    new_column("<s_0.9><ls_0.9>Incomplete Goals:")
 }
 
 on change player.currentArea update_goals_incomplete_message() // Need this because the zone updates 1 frame delayed from the position change
 fun update_goals_incomplete_message() {
     write_goals_incomplete_message()
-    set_message_text("goals_incomplete", get_string("goals_incomplete_message"))
+    set_message_text("goals_incomplete", get_string("column"))
 }
 
 on player.currentMapArea < 12 free_message_hide("goals_incomplete", false)
@@ -49,9 +51,7 @@ fun update_goals_completed() {
 // TODO try shrinking or graying the Trees: etc. labels to make the numbers easier to parse
 !augment_fun(write_progress_message(), {
     write_goal_progress_message()
-    if get_boolean("comma") {
-        set_string("progress_message", get_string("progress_message") + "\n" + get_string("goal_progress_message"))
-    }
+    add_current_row()
 })
 
 on reload {
@@ -61,7 +61,7 @@ on reload {
         check_goals_completed()
         if get_boolean("goals_completed") == false {
             write_goals_incomplete_message()
-            free_message("goals_incomplete", get_string("goals_incomplete_message"))
+            free_message("goals_incomplete", get_string("column"))
             set_message_vertical_anchor("goals_incomplete", Bottom)
             set_message_position("goals_incomplete", 0.5, 0.84)
         }

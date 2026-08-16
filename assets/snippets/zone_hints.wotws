@@ -2,21 +2,20 @@
 #name("Zone Hints")
 #description("Lupo's maps give information about the number of important items in the current zone. Lupo in Glades sells the hints for Woods and Glades.")
 
-// TODO set the Lupo prices here
-
 !tags("Zone Hints")
 
 !config(skill_hints, "Skill Hints", "Lupo reveals the amount of skills in an area", Boolean, true)
 !config(teleporter_hints, "Teleporter Hints", "Lupo reveals the amount of teleporters in an area", Boolean, true)
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
+!include("list_core", add_row)
 
 !augment_fun(write_progress_message(), write_hints(player.currentArea))
-
 !augment_fun(write_map_progress_message(), write_hints(player.currentMapArea))
 
 fun write_hints(zone: Integer) {
-    set_string("zone_hint", "")
+    set_string("hint", "")
+
     // TODO have to write the zone integers here, no way to pass the zone type around
     if zone == 0 && MarshSpawn.LupoMap write_marsh_hint()
     if zone == 1 && WestHollow.LupoMap write_hollow_hint()
@@ -29,9 +28,8 @@ fun write_hints(zone: Integer) {
     if zone == 8 && LowerWastes.LupoMap write_wastes_hint()
     if zone == 10 && WillowsEnd.LupoMap write_willow_hint()
     if zone == 11 && MidnightBurrows.LupoMap write_burrows_hint()
-    if get_string("zone_hint") != "" {
-        set_string("progress_message", get_string("progress_message") + "\n" + get_string("zone_hint"))
-    }
+
+    if get_string("hint") != "" add_row(get_string("hint"))
 }
 
 fun write_marsh_hint() {}
@@ -91,37 +89,37 @@ fun write_burrows_hint() {}
     )
 
     !augment_fun(write_marsh_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Marsh Skills - " + skills_in_marsh)
+        set_string("hint", get_string("hint") + "Marsh Skills - " + skills_in_marsh)
     })
     !augment_fun(write_hollow_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Hollow Skills - " + skills_in_hollow)
+        set_string("hint", get_string("hint") + "Hollow Skills - " + skills_in_hollow)
     })
     !augment_fun(write_glades_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Glades Skills - " + skills_in_glades)
+        set_string("hint", get_string("hint") + "Glades Skills - " + skills_in_glades)
     })
     !augment_fun(write_wellspring_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Wellspring Skills - " + skills_in_wellspring)
+        set_string("hint", get_string("hint") + "Wellspring Skills - " + skills_in_wellspring)
     })
     !augment_fun(write_woods_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Woods Skills - " + skills_in_woods)
+        set_string("hint", get_string("hint") + "Woods Skills - " + skills_in_woods)
     })
     !augment_fun(write_reach_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Reach Skills - " + skills_in_reach)
+        set_string("hint", get_string("hint") + "Reach Skills - " + skills_in_reach)
     })
     !augment_fun(write_depths_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Depths Skills - " + skills_in_depths)
+        set_string("hint", get_string("hint") + "Depths Skills - " + skills_in_depths)
     })
     !augment_fun(write_pools_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Pools Skills - " + skills_in_pools)
+        set_string("hint", get_string("hint") + "Pools Skills - " + skills_in_pools)
     })
     !augment_fun(write_wastes_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Wastes Skills - " + skills_in_wastes)
+        set_string("hint", get_string("hint") + "Wastes Skills - " + skills_in_wastes)
     })
     !augment_fun(write_willow_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Willow Skills - " + skills_in_willow)
+        set_string("hint", get_string("hint") + "Willow Skills - " + skills_in_willow)
     })
     !augment_fun(write_burrows_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + "Burrows Skills - " + skills_in_burrows)
+        set_string("hint", get_string("hint") + "Burrows Skills - " + skills_in_burrows)
     })
 }
 
@@ -172,37 +170,37 @@ fun write_burrows_hint() {}
     )
 
     !augment_fun(write_marsh_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Marsh TPs - " + teleporters_in_marsh)
+        set_string("hint", get_string("hint") + separator + "Marsh TPs - " + teleporters_in_marsh)
     })
     !augment_fun(write_hollow_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Hollow TPs - " + teleporters_in_hollow)
+        set_string("hint", get_string("hint") + separator + "Hollow TPs - " + teleporters_in_hollow)
     })
     !augment_fun(write_glades_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Glades TPs - " + teleporters_in_glades)
+        set_string("hint", get_string("hint") + separator + "Glades TPs - " + teleporters_in_glades)
     })
     !augment_fun(write_wellspring_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Wellspring TPs - " + teleporters_in_wellspring)
+        set_string("hint", get_string("hint") + separator + "Wellspring TPs - " + teleporters_in_wellspring)
     })
     !augment_fun(write_woods_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Woods TPs - " + teleporters_in_woods)
+        set_string("hint", get_string("hint") + separator + "Woods TPs - " + teleporters_in_woods)
     })
     !augment_fun(write_reach_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Reach TPs - " + teleporters_in_reach)
+        set_string("hint", get_string("hint") + separator + "Reach TPs - " + teleporters_in_reach)
     })
     !augment_fun(write_depths_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Depths TPs - " + teleporters_in_depths)
+        set_string("hint", get_string("hint") + separator + "Depths TPs - " + teleporters_in_depths)
     })
     !augment_fun(write_pools_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Pools TPs - " + teleporters_in_pools)
+        set_string("hint", get_string("hint") + separator + "Pools TPs - " + teleporters_in_pools)
     })
     !augment_fun(write_wastes_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Wastes TPs - " + teleporters_in_wastes)
+        set_string("hint", get_string("hint") + separator + "Wastes TPs - " + teleporters_in_wastes)
     })
     !augment_fun(write_willow_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Willow TPs - " + teleporters_in_willow)
+        set_string("hint", get_string("hint") + separator + "Willow TPs - " + teleporters_in_willow)
     })
     !augment_fun(write_burrows_hint(), {
-        set_string("zone_hint", get_string("zone_hint") + separator + "Burrows TPs - " + teleporters_in_burrows)
+        set_string("hint", get_string("hint") + separator + "Burrows TPs - " + teleporters_in_burrows)
     })
 }
 
@@ -243,67 +241,67 @@ on spawn {
 
 !remove_location(MarshSpawn.LupoMap)
 on MarshSpawn.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_marsh_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(WestHollow.LupoMap)
 on WestHollow.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_hollow_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(LupoShop.Slot1)
 on LupoShop.Slot1 {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_glades_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(InnerWellspring.LupoMap)
 on InnerWellspring.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_wellspring_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(LupoShop.Slot2)
 on LupoShop.Slot2 {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_woods_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(LowerReach.LupoMap)
 on LowerReach.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_reach_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(LowerDepths.LupoMap)
 on LowerDepths.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_depths_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(EastPools.LupoMap)
 on EastPools.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_pools_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(LowerWastes.LupoMap)
 on LowerWastes.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_wastes_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(WillowsEnd.LupoMap)
 on WillowsEnd.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_willow_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }
 !remove_location(MidnightBurrows.LupoMap)
 on MidnightBurrows.LupoMap {
-    set_string("zone_hint", "")
+    set_string("hint", "")
     write_burrows_hint()
-    item_message(get_string("zone_hint"))
+    item_message(get_string("hint"))
 }

@@ -1,0 +1,63 @@
+!let(bright_yellow, "<hex_ffdd88ff>")
+
+!export(new_row)
+fun new_row(front: String) {
+    set_string("row", front)
+    set_boolean("comma", false)
+}
+
+!export(add_row_item)
+fun add_row_item(item: String) {
+    if get_boolean("comma") set_string("row", get_string("row") + ", ")
+    set_string("row", get_string("row") + item)
+    set_boolean("comma", true)
+}
+
+!export(new_colored_row)
+fun new_colored_row(front: String) {
+    set_string("row", front)
+    set_integer("color", 0) // 0 = not started, 1 = next yellow, 2 = next white
+}
+
+!export(add_colored_row_item)
+fun add_colored_row_item(item: String) {
+    if get_integer("color") > 0 set_string("row", get_string("row") + ", ")
+
+    if get_integer("color") == 1 set_string("row", get_string("row") + bright_yellow)
+    set_string("row", get_string("row") + item)
+    if get_integer("color") == 1 set_string("row", get_string("row") + "</>")
+
+    set_integer("color", get_integer("color") + 1)
+    if get_integer("color") == 3 set_integer("color", 1)
+}
+
+!export(new_column)
+fun new_column(top: String) {
+    set_string("column", top)
+    set_integer("lines", 0)
+}
+
+!export(add_row)
+fun add_row(row: String) {
+    if get_integer("lines") > 0 set_string("column", get_string("column") + "\n")
+    set_string("column", get_string("column") + row)
+    set_integer("lines", get_integer("lines") + 1)
+}
+
+!export(add_current_row)
+fun add_current_row() {
+    if get_boolean("comma") add_row(get_string("row"))
+}
+
+!export(add_current_colored_row)
+fun add_current_colored_row() {
+    if get_integer("color") > 0 add_row(get_string("row"))
+}
+
+!export(auto_negative_margin)
+fun auto_negative_margin() {
+    if get_integer("lines") > 0 {
+        // negative margin hack
+        set_string("column", "<ls_-" + (get_integer("lines") - 1) * 0.1 + "><hex_00000000>.</></>\n" + get_string("column"))
+    }
+}

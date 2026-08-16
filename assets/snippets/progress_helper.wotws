@@ -15,14 +15,18 @@ By default those are bound to
 !config(entrance_helper, "Entrance Helper", "Documents entrance connections", Boolean, true)
 
 // TODO there's a regression here because previously progress messages were in a consistent order
-// To add a progress message from your header, use the write_progress_message event and append your progress message to the string with id progress_message
-// If you also want to add to the progress displayed over the map, use the write_map_progress_message event and append to the string with id progress_message
-// Usually, you'll want to start with a newline so you have your own line
+
+// To add a progress message from your header, use the write_progress_message event and add_row
+// If you also want to add to the progress displayed over the map, use the write_map_progress_message event and add_row
+//
 // This example shows how to add a line "Fun: 10/10" into both the progress message and the map:
 // !include("progress_helper", write_progress_message, write_map_progress_message)
-// !augment_fun(write_progress_message(), set_string("progress_message", get_string("progress_message") + "\nFun: 10/10"))
-// !augment_fun(write_map_progress_message(), set_string("map_progress_message", get_string("map_progress_message") + "\nFun: 10/10"))
+// !include("list_core", add_row)
+//
+// !augment_fun(write_progress_message(), add_row("Fun: 10/10"))
+// !augment_fun(write_map_progress_message(), add_row("Fun: 10/10"))
 
+!include("list_core", new_column, add_row, new_colored_row, add_colored_row_item)
 !include("stats")
 
 !builtin_icon(progress_summary_icon, "icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
@@ -34,65 +38,60 @@ By default those are bound to
 
 !export(write_progress_message)
 fun write_progress_message() {
-    set_string("progress_message", "")
-    write_pickups_progress("", randoStats.pickupsCollected, randoStats.pickupsTotal)
-    write_zone_pickup_progress(player.currentArea)
+    new_column("")
+    add_pickups_row("", randoStats.pickupsCollected, randoStats.pickupsTotal)
+    add_zone_pickups_row(player.currentArea)
 }
 
 !export(write_map_progress_message)
 fun write_map_progress_message() {
-    set_string("progress_message", "")
-    write_zone_pickup_progress(player.currentMapArea)
+    new_column("")
+    add_zone_pickups_row(player.currentMapArea)
 }
 
-fun write_zone_pickup_progress(zone: Integer) {
+fun add_zone_pickups_row(zone: Integer) {
     if zone == 0 {
-        write_pickups_progress("Marsh ", randoStats.pickupsCollectedMarsh, randoStats.pickupsTotalMarsh)
+        add_pickups_row("Marsh ", randoStats.pickupsCollectedMarsh, randoStats.pickupsTotalMarsh)
     }
     if zone == 1 {
-        write_pickups_progress("Hollow ", randoStats.pickupsCollectedHollow, randoStats.pickupsTotalHollow)
+        add_pickups_row("Hollow ", randoStats.pickupsCollectedHollow, randoStats.pickupsTotalHollow)
     }
     if zone == 2 {
-        write_pickups_progress("Glades ", randoStats.pickupsCollectedGlades, randoStats.pickupsTotalGlades)
+        add_pickups_row("Glades ", randoStats.pickupsCollectedGlades, randoStats.pickupsTotalGlades)
     }
     if zone == 3 {
-        write_pickups_progress("Wellspring ", randoStats.pickupsCollectedWellspring, randoStats.pickupsTotalWellspring)
+        add_pickups_row("Wellspring ", randoStats.pickupsCollectedWellspring, randoStats.pickupsTotalWellspring)
     }
     if zone == 4 {
-        write_pickups_progress("Woods ", randoStats.pickupsCollectedWoods, randoStats.pickupsTotalWoods)
+        add_pickups_row("Woods ", randoStats.pickupsCollectedWoods, randoStats.pickupsTotalWoods)
     }
     if zone == 5 {
-        write_pickups_progress("Reach ", randoStats.pickupsCollectedReach, randoStats.pickupsTotalReach)
+        add_pickups_row("Reach ", randoStats.pickupsCollectedReach, randoStats.pickupsTotalReach)
     }
     if zone == 6 {
-        write_pickups_progress("Depths ", randoStats.pickupsCollectedDepths, randoStats.pickupsTotalDepths)
+        add_pickups_row("Depths ", randoStats.pickupsCollectedDepths, randoStats.pickupsTotalDepths)
     }
     if zone == 7 {
-        write_pickups_progress("Pools ", randoStats.pickupsCollectedPools, randoStats.pickupsTotalPools)
+        add_pickups_row("Pools ", randoStats.pickupsCollectedPools, randoStats.pickupsTotalPools)
     }
     if zone == 8 {
-        write_pickups_progress("Wastes ", randoStats.pickupsCollectedWastes, randoStats.pickupsTotalWastes)
+        add_pickups_row("Wastes ", randoStats.pickupsCollectedWastes, randoStats.pickupsTotalWastes)
     }
     if zone == 9 {
-        write_pickups_progress("Ruins ", randoStats.pickupsCollectedRuins, randoStats.pickupsTotalRuins)
+        add_pickups_row("Ruins ", randoStats.pickupsCollectedRuins, randoStats.pickupsTotalRuins)
     }
     if zone == 10 {
-        write_pickups_progress("Willow ", randoStats.pickupsCollectedWillow, randoStats.pickupsTotalWillow)
+        add_pickups_row("Willow ", randoStats.pickupsCollectedWillow, randoStats.pickupsTotalWillow)
     }
     if zone == 11 {
-        write_pickups_progress("Burrows ", randoStats.pickupsCollectedBurrows, randoStats.pickupsTotalBurrows)
+        add_pickups_row("Burrows ", randoStats.pickupsCollectedBurrows, randoStats.pickupsTotalBurrows)
     }
 }
 
-fun write_pickups_progress(zone: String, collected: Integer, total: Integer) {
-    if get_string("progress_message") != "" {
-        set_string("progress_message", get_string("progress_message") + "\n")
-    }
-
+fun add_pickups_row(zone: String, collected: Integer, total: Integer) {
     set_string("color", "")
     if collected >= total set_string("color", "$")
-
-    set_string("progress_message", get_string("progress_message") + zone + "Pickups: " + get_string("color") + collected + "/" + total + get_string("color"))
+    add_row(zone + "Pickups: " + get_string("color") + collected + "/" + total + get_string("color"))
 }
 
 !state(disable_keybinds, Boolean)
@@ -177,13 +176,13 @@ on reload {
 
 on progress_message {
     write_progress_message()
-    controlled_priority_message("progress_message", get_string("progress_message"), 4)
+    controlled_priority_message("progress_message", get_string("column"), 4)
 }
 
 !export(update_progress_message)
 fun update_progress_message() {
     write_progress_message()
-    set_message_text("progress_message", get_string("progress_message"))
+    set_message_text("progress_message", get_string("column"))
 }
 
 on change randoStats.pickupsCollected update_progress_message()
@@ -201,18 +200,18 @@ on reload {
 on change player.currentMapArea {
     if player.currentMapArea < 12 {
         write_map_progress_message()
-        set_integer("length", string_length(get_string("progress_message")))
+        set_integer("length", string_length(get_string("column")))
 
         if get_integer("length") > 125 {
             if get_integer("length") > 250 {
-                set_string("progress_message", "<s_0.7><ls_0.7>" + get_string("progress_message") + "</></>")
+                set_string("column", "<s_0.7><ls_0.7>" + get_string("column") + "</></>")
             }
             if get_integer("length") <= 250 {
-                set_string("progress_message", "<s_0.85><ls_0.85>" + get_string("progress_message") + "</></>")
+                set_string("column", "<s_0.85><ls_0.85>" + get_string("column") + "</></>")
             }
         }
 
-        set_message_text("map_message", get_string("progress_message"))
+        set_message_text("map_message", get_string("column"))
     }
     if player.currentMapArea >= 12 set_message_text("map_message", "")
 }
@@ -230,11 +229,13 @@ on binding3 if disable_keybinds == false show_teleporter_progress()
 }
 
 fun write_tree_progress() {
-    set_string("tree_progress", "#Trees found#: ")
+    new_colored_row("#Trees found#: ")
     tree_string(true)
 
-    set_string("tree_progress", get_string("tree_progress") + "\n#Trees remaining#: ")
+    new_colored_row(get_string("row") + "\n#Trees remaining#: ")
     tree_string(false)
+
+    set_string("tree_progress", get_string("row"))
 }
 
 on change MarshSpawn.RegenTree update_tree_progress()
@@ -258,40 +259,32 @@ fun update_tree_progress() {
 }
 
 fun tree_string(found: Boolean) {
-    set_boolean("comma", false)
+    if MarshSpawn.RegenTree == found add_colored_row_item("Regenerate")
+    if HowlsDen.SwordTree == found add_colored_row_item("Sword")
+    if HowlsDen.DoubleJumpTree == found add_colored_row_item("Double Jump")
+    if MarshPastOpher.BowTree == found add_colored_row_item("Bow")
+    if WestHollow.DashTree == found add_colored_row_item("Dash")
+    if EastHollow.BashTree == found add_colored_row_item("Bash")
+    if InnerWellspring.GrappleTree == found add_colored_row_item("Grapple")
+    if MarshSpawn.DamageTree == found add_colored_row_item("Marsh Ancestral Light")
+    if GladesTown.DamageTree == found add_colored_row_item("Glades Ancestral Light")
+    if LowerWastes.BurrowTree == found add_colored_row_item("Burrow")
+    if UpperReach.GrenadeTree == found add_colored_row_item("Grenade")
+    if LowerDepths.FlashTree == found add_colored_row_item("Flash")
+    if UpperPools.WaterDashTree == found add_colored_row_item("Water Dash")
+    if WeepingRidge.LaunchTree == found add_colored_row_item("Launch")
 
-    if MarshSpawn.RegenTree == found tree_string_piece("Regenerate")
-    if HowlsDen.SwordTree == found tree_string_piece("Sword")
-    if HowlsDen.DoubleJumpTree == found tree_string_piece("Double Jump")
-    if MarshPastOpher.BowTree == found tree_string_piece("Bow")
-    if WestHollow.DashTree == found tree_string_piece("Dash")
-    if EastHollow.BashTree == found tree_string_piece("Bash")
-    if InnerWellspring.GrappleTree == found tree_string_piece("Grapple")
-    if MarshSpawn.DamageTree == found tree_string_piece("Marsh Ancestral Light")
-    if GladesTown.DamageTree == found tree_string_piece("Glades Ancestral Light")
-    if LowerWastes.BurrowTree == found tree_string_piece("Burrow")
-    if UpperReach.GrenadeTree == found tree_string_piece("Grenade")
-    if LowerDepths.FlashTree == found tree_string_piece("Flash")
-    if UpperPools.WaterDashTree == found tree_string_piece("Water Dash")
-    if WeepingRidge.LaunchTree == found tree_string_piece("Launch")
-
-    if get_boolean("comma") == false {
-        set_string("tree_progress", get_string("tree_progress") + "None")
-    }
-}
-
-fun tree_string_piece(tree: String) {
-    if get_boolean("comma") set_string("tree_progress", get_string("tree_progress") + ", ")
-    set_string("tree_progress", get_string("tree_progress") + tree)
-    set_boolean("comma", true)
+    if get_integer("color") == 0 set_string("row", get_string("row") + "None")
 }
 
 fun write_wisp_progress() {
-    set_string("wisp_progress", "#Wisps found#: ")
+    new_colored_row("#Wisps found#: ")
     wisp_string(true)
 
-    set_string("wisp_progress", get_string("wisp_progress") + "\n#Wisps remaining#: ")
+    new_colored_row(get_string("row") + "\n#Wisps remaining#: ")
     wisp_string(false)
+
+    set_string("wisp_progress", get_string("row"))
 }
 
 on change EastHollow.ForestsVoice update_wisp_progress()
@@ -306,23 +299,13 @@ fun update_wisp_progress() {
 }
 
 fun wisp_string(found: Boolean) {
-    set_boolean("comma", false)
+    if EastHollow.ForestsVoice == found add_colored_row_item("Voice")
+    if LowerReach.ForestsMemory == found add_colored_row_item("Memory")
+    if UpperDepths.ForestsEyes == found add_colored_row_item("Eyes")
+    if WestPools.ForestsStrength == found add_colored_row_item("Strength")
+    if WindtornRuins.Seir == found add_colored_row_item("Heart")
 
-    if EastHollow.ForestsVoice == found wisp_string_piece("Voice")
-    if LowerReach.ForestsMemory == found wisp_string_piece("Memory")
-    if UpperDepths.ForestsEyes == found wisp_string_piece("Eyes")
-    if WestPools.ForestsStrength == found wisp_string_piece("Strength")
-    if WindtornRuins.Seir == found wisp_string_piece("Heart")
-
-    if get_boolean("comma") == false {
-        set_string("wisp_progress", get_string("wisp_progress") + "None")
-    }
-}
-
-fun wisp_string_piece(wisp: String) {
-    if get_boolean("comma") set_string("wisp_progress", get_string("wisp_progress") + ", ")
-    set_string("wisp_progress", get_string("wisp_progress") + wisp)
-    set_boolean("comma", true)
+    if get_integer("color") == 0 set_string("row", get_string("row") + "None")
 }
 
 fun show_quest_progress() {
@@ -427,7 +410,7 @@ fun write_quest_progress() {
 
 fun show_teleporter_progress() {
     write_teleporter_progress()
-    controlled_priority_message("teleporter_progress", get_string("teleporter_progress"), 4)
+    controlled_priority_message("teleporter_progress", get_string("row"), 4)
 }
 
 on change MarshSpawn.TeleporterActive update_teleporter_progress()
@@ -450,42 +433,32 @@ on change WillowsEnd.InnerTeleporterActive update_teleporter_progress()
 on change WillowsEnd.ShriekTeleporterActive update_teleporter_progress()
 fun update_teleporter_progress() {
     write_teleporter_progress()
-    set_message_text("teleporter_progress", get_string("teleporter_progress"))
+    set_message_text("teleporter_progress", get_string("row"))
 }
 
 fun write_teleporter_progress() {
-    set_string("teleporter_progress", "#Teleporters activated#: ")
+    new_colored_row("#Teleporters activated#: ")
 
-    set_boolean("comma", false)
+    if MarshSpawn.TeleporterActive add_colored_row_item("Inkwater Marsh")
+    if HowlsDen.TeleporterActive add_colored_row_item("Howl's Den")
+    if EastHollow.TeleporterActive add_colored_row_item("Kwolok's Hollow")
+    if GladesTown.TeleporterActive add_colored_row_item("Glades")
+    if InnerWellspring.TeleporterActive add_colored_row_item("Wellspring")
+    if MidnightBurrows.TeleporterActive add_colored_row_item("Midnight Burrows")
+    if WoodsEntry.TeleporterActive add_colored_row_item("Woods Entrance")
+    if WoodsMain.TeleporterActive add_colored_row_item("Woods Exit")
+    if LowerReach.TeleporterActive add_colored_row_item("Baur's Reach")
+    if UpperDepths.TeleporterActive add_colored_row_item("Mouldwood Depths")
+    if EastPools.TeleporterActive add_colored_row_item("Central Pools")
+    if WestPools.TeleporterActive add_colored_row_item("Pools Boss")
+    if LowerWastes.FeedingGroundsTeleporterActive add_colored_row_item("Feeding Grounds")
+    if LowerWastes.CentralTeleporterActive add_colored_row_item("Central Wastes")
+    if UpperWastes.TeleporterActive add_colored_row_item("Outer Ruins")
+    if WindtornRuins.TeleporterActive add_colored_row_item("Inner Ruins")
+    if WillowsEnd.InnerTeleporterActive add_colored_row_item("Willow's End")
+    if WillowsEnd.ShriekTeleporterActive add_colored_row_item("Shriek")
 
-    if MarshSpawn.TeleporterActive teleporter_string_piece("Inkwater Marsh")
-    if HowlsDen.TeleporterActive teleporter_string_piece("Howl's Den")
-    if EastHollow.TeleporterActive teleporter_string_piece("Kwolok's Hollow")
-    if GladesTown.TeleporterActive teleporter_string_piece("Glades")
-    if InnerWellspring.TeleporterActive teleporter_string_piece("Wellspring")
-    if MidnightBurrows.TeleporterActive teleporter_string_piece("Midnight Burrows")
-    if WoodsEntry.TeleporterActive teleporter_string_piece("Woods Entrance")
-    if WoodsMain.TeleporterActive teleporter_string_piece("Woods Exit")
-    if LowerReach.TeleporterActive teleporter_string_piece("Baur's Reach")
-    if UpperDepths.TeleporterActive teleporter_string_piece("Mouldwood Depths")
-    if EastPools.TeleporterActive teleporter_string_piece("Central Pools")
-    if WestPools.TeleporterActive teleporter_string_piece("Pools Boss")
-    if LowerWastes.FeedingGroundsTeleporterActive teleporter_string_piece("Feeding Grounds")
-    if LowerWastes.CentralTeleporterActive teleporter_string_piece("Central Wastes")
-    if UpperWastes.TeleporterActive teleporter_string_piece("Outer Ruins")
-    if WindtornRuins.TeleporterActive teleporter_string_piece("Inner Ruins")
-    if WillowsEnd.InnerTeleporterActive teleporter_string_piece("Willow's End")
-    if WillowsEnd.ShriekTeleporterActive teleporter_string_piece("Shriek")
-
-    if get_boolean("comma") == false {
-        set_string("teleporter_progress", get_string("teleporter_progress") + "None")
-    }
-}
-
-fun teleporter_string_piece(teleporter: String) {
-    if get_boolean("comma") set_string("teleporter_progress", get_string("teleporter_progress") + ", ")
-    set_string("teleporter_progress", get_string("teleporter_progress") + teleporter)
-    set_boolean("comma", true)
+    if get_integer("color") == 0 set_string("row", get_string("row") + "None")
 }
 
 !if entrance_helper {

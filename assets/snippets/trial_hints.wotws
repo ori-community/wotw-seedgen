@@ -4,6 +4,8 @@
 
 !builtin_icon(message_icon, "icons/game/message.png")
 
+!include("list_core", new_column, add_row, add_current_row, new_row, add_row_item)
+
 !item_on(marsh_trial_item, MarshPastOpher.SpiritTrial)
 !item_on(hollow_trial_item, WestHollow.SpiritTrial)
 !item_on(wellspring_trial_item, OuterWellspring.SpiritTrial)
@@ -56,6 +58,10 @@ on raceGroup.desertRace == 1 {
 on reload {
     set_wheel_item_name("progress_helper", LeftTop, "Trial Hints")
     set_wheel_item_icon("progress_helper", LeftTop, message_icon)
+    set_wheel_item_all_actions("progress_helper", LeftTop, {
+        write_trial_hints()
+        priority_message(get_string("column"))
+    })
 }
 
 on reload update_wheel()
@@ -83,54 +89,37 @@ fun update_wheel() {
     if get_boolean("any_unlocked") {
         set_wheel_item_description("progress_helper", LeftTop, "[Ability1]View Hints")
         set_wheel_item_color("progress_helper", LeftTop, 255, 255, 255, 255)
-        set_wheel_item_all_actions("progress_helper", LeftTop, {
-            write_trial_hints()
-            priority_message(get_string("trial_hints"))
-        })
     }
     if get_boolean("any_unlocked") == false {
         set_wheel_item_description("progress_helper", LeftTop, "No Spirit Trials activated")
         set_wheel_item_color("progress_helper", LeftTop, 128, 128, 128, 196)
-        set_wheel_item_all_actions("progress_helper", LeftTop, priority_message("No Spirit Trials activated"))
     }
 }
 
 fun write_trial_hints() {
-    set_string("trial_hints", "")
-    set_boolean("newline", false)
+    new_column("")
 
-    if raceGroup.inkwaterMarshRace == 1 add_trial_hint("#Marsh Reward#: " + marsh_trial_item)
-    if raceGroup.kwolokDropRace == 1 add_trial_hint("#Hollow Reward#: " + hollow_trial_item)
-    if raceGroup.wellspringRace == 1 add_trial_hint("#Wellspring Reward#: " + wellspring_trial_item)
-    if raceGroup.silentWoodlandRace == 1 add_trial_hint("#Woods Reward#: " + woods_trial_item)
-    if raceGroup.baursReachWindTunnelRace == 1 add_trial_hint("#Reach Reward#: " + reach_trial_item)
-    if raceGroup.mouldwoodDepthsRace == 1 add_trial_hint("#Depths Reward#: " + depths_trial_item)
-    if raceGroup.lumaPoolsRace == 1 add_trial_hint("#Pools Reward#: " + pools_trial_item)
-    if raceGroup.desertRace == 1 add_trial_hint("#Wastes Reward#: " + wastes_trial_item)
+    if raceGroup.inkwaterMarshRace == 1 add_row("#Marsh Reward#: " + marsh_trial_item)
+    if raceGroup.kwolokDropRace == 1 add_row("#Hollow Reward#: " + hollow_trial_item)
+    if raceGroup.wellspringRace == 1 add_row("#Wellspring Reward#: " + wellspring_trial_item)
+    if raceGroup.silentWoodlandRace == 1 add_row("#Woods Reward#: " + woods_trial_item)
+    if raceGroup.baursReachWindTunnelRace == 1 add_row("#Reach Reward#: " + reach_trial_item)
+    if raceGroup.mouldwoodDepthsRace == 1 add_row("#Depths Reward#: " + depths_trial_item)
+    if raceGroup.lumaPoolsRace == 1 add_row("#Pools Reward#: " + pools_trial_item)
+    if raceGroup.desertRace == 1 add_row("#Wastes Reward#: " + wastes_trial_item)
 
-    set_string("completed", "")
-    set_boolean("comma", false)
+    new_row("$Completed$: ")
 
-    if raceGroup.inkwaterMarshRace == 2 add_trial_complete("Marsh")
-    if raceGroup.kwolokDropRace == 2 add_trial_complete("Hollow")
-    if raceGroup.wellspringRace == 2 add_trial_complete("Wellspring")
-    if raceGroup.silentWoodlandRace == 2 add_trial_complete("Woods")
-    if raceGroup.baursReachWindTunnelRace == 2 add_trial_complete("Reach")
-    if raceGroup.mouldwoodDepthsRace == 2 add_trial_complete("Depths")
-    if raceGroup.lumaPoolsRace == 2 add_trial_complete("Pools")
-    if raceGroup.desertRace == 2 add_trial_complete("Wastes")
+    if raceGroup.inkwaterMarshRace == 2 add_row_item("Marsh")
+    if raceGroup.kwolokDropRace == 2 add_row_item("Hollow")
+    if raceGroup.wellspringRace == 2 add_row_item("Wellspring")
+    if raceGroup.silentWoodlandRace == 2 add_row_item("Woods")
+    if raceGroup.baursReachWindTunnelRace == 2 add_row_item("Reach")
+    if raceGroup.mouldwoodDepthsRace == 2 add_row_item("Depths")
+    if raceGroup.lumaPoolsRace == 2 add_row_item("Pools")
+    if raceGroup.desertRace == 2 add_row_item("Wastes")
 
-    if get_boolean("comma") add_trial_hint("$Completed$: " + get_string("completed"))
-}
+    add_current_row()
 
-fun add_trial_hint(part: String) {
-    if get_boolean("newline") set_string("trial_hints", get_string("trial_hints") + "\n")
-    set_boolean("newline", true)
-    set_string("trial_hints", get_string("trial_hints") + part)
-}
-
-fun add_trial_complete(part: String) {
-    if get_boolean("comma") set_string("completed", get_string("completed") + ", ")
-    set_boolean("comma", true)
-    set_string("completed", get_string("completed") + part)
+    if get_integer("lines") == 0 set_string("column", "No Spirit Trials activated")
 }

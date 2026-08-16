@@ -4,30 +4,25 @@
 
 !builtin_icon(message_icon, "icons/game/message.png")
 
+!include("list_core", new_column, add_row, add_current_colored_row, new_colored_row, add_colored_row_item, auto_negative_margin)
 !include("regeneration_core", energy_per_second, health_per_second)
+
+!export(add_colored_row_item)
 
 !export(write_bonus_items)
 fun write_bonus_items() {
-    set_string("bonus_items", "")
-    set_boolean("comma", false)
-}
-
-!export(write_bonus_items_part)
-fun write_bonus_items_part(part: String) {
-    if get_boolean("comma") set_string("bonus_items", get_string("bonus_items") + ", ")
-    set_boolean("comma", true)
-    set_string("bonus_items", get_string("bonus_items") + part)
+    new_colored_row("")
 }
 
 !export(update_bonus_items)
 fun update_bonus_items() {
     bonus_items_string()
-    set_message_text("bonus_items", get_string("bonus_items"))
+    set_message_text("bonus_items", get_string("row"))
 }
 
 fun bonus_items_string() {
     write_bonus_items()
-    if get_boolean("comma") == false set_string("bonus_items", "No Bonus Items")
+    if get_integer("color") == 0 set_string("row", "No Bonus Items")
 }
 
 on reload {
@@ -40,7 +35,7 @@ on reload {
     )
     set_wheel_item_action("progress_helper", TopLeft, Ability1, {
         bonus_items_string()
-        controlled_priority_message("bonus_items", get_string("bonus_items"), 4)
+        controlled_priority_message("bonus_items", get_string("row"), 4)
     })
     set_wheel_item_action("progress_helper", TopLeft, Ability2, show_bonus_item_effects())
     set_wheel_item_action("progress_helper", TopLeft, Ability3, show_bonus_item_effects())
@@ -48,7 +43,7 @@ on reload {
 
 fun show_bonus_item_effects() {
     write_bonus_item_effects()
-    controlled_priority_message("bonus_item_effects", get_string("bonus_items"), 6.0)
+    controlled_priority_message("bonus_item_effects", get_string("column"), 6.0)
 }
 
 on change randoUpgrades.swordSpeedMultiplier update_bonus_item_effects()
@@ -103,172 +98,142 @@ on change energy_per_second update_bonus_item_effects()
 on change health_per_second update_bonus_item_effects()
 fun update_bonus_item_effects() {
     write_bonus_item_effects()
-    set_message_text("bonus_item_effects", get_string("bonus_items"))
+    set_message_text("bonus_item_effects", get_string("column"))
 }
 
 fun write_bonus_item_effects() {
-    set_string("bonus_items", "")
-    set_integer("lines", 0)
+    new_column("")
 
-    set_string("line", "#Sword#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.swordSpeedMultiplier, "x Speed")
-    write_melting_part(randoUpgrades.swordAsFireSource)
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Sword#: ")
+    multiplier_row_item(randoUpgrades.swordSpeedMultiplier, "x Speed")
+    melting_row_item(randoUpgrades.swordAsFireSource)
+    add_current_colored_row()
 
-    set_string("line", "#Bow#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.bowCostMultiplier, "x Cost")
-    write_multiplier_part(1 / randoUpgrades.bowRapidFireIntervalDurationMultiplier, "x Quickshot Speed")
-    write_melting_part(randoUpgrades.bowAsFireSource)
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Bow#: ")
+    multiplier_row_item(randoUpgrades.bowCostMultiplier, "x Cost")
+    multiplier_row_item(1 / randoUpgrades.bowRapidFireIntervalDurationMultiplier, "x Quickshot Speed")
+    melting_row_item(randoUpgrades.bowAsFireSource)
+    add_current_colored_row()
 
-    set_string("line", "#Spear#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.spearCostMultiplier, "x Cost")
-    write_multiplier_part(randoUpgrades.spearSpeedMultiplier, "x Speed")
-    write_melting_part(randoUpgrades.spearAsFireSource)
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Spear#: ")
+    multiplier_row_item(randoUpgrades.spearCostMultiplier, "x Cost")
+    multiplier_row_item(randoUpgrades.spearSpeedMultiplier, "x Speed")
+    melting_row_item(randoUpgrades.spearAsFireSource)
+    add_current_colored_row()
 
-    set_string("line", "#Hammer#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.hammerSpeedMultiplier, "x Speed")
-    write_melting_part(randoUpgrades.hammerAsFireSource)
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Hammer#: ")
+    multiplier_row_item(randoUpgrades.hammerSpeedMultiplier, "x Speed")
+    melting_row_item(randoUpgrades.hammerAsFireSource)
+    add_current_colored_row()
 
-    set_string("line", "#Shuriken#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.shurikenCostMultiplier, "x Cost")
-    write_multiplier_part(randoUpgrades.shurikenDamageMultiplier, "x Damage")
-    write_melting_part(randoUpgrades.shurikenAsFireSource)
-    write_toggle_part(randoUpgrades.shurikenBashable, "Bashable")
-    write_extra_part(randoUpgrades.extraShurikens, " Max")
-    write_extra_part(randoUpgrades.shurikenMultishotCount, " Splinter")
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Shuriken#: ")
+    multiplier_row_item(randoUpgrades.shurikenCostMultiplier, "x Cost")
+    multiplier_row_item(randoUpgrades.shurikenDamageMultiplier, "x Damage")
+    melting_row_item(randoUpgrades.shurikenAsFireSource)
+    toggle_row_item(randoUpgrades.shurikenBashable, "Bashable")
+    extra_row_item(randoUpgrades.extraShurikens, " Max")
+    extra_row_item(randoUpgrades.shurikenMultishotCount, " Splinter")
+    add_current_colored_row()
 
-    set_string("line", "#Grenade#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.grenadeCostMultiplier, "x Cost")
-    write_multiplier_part(1 / randoUpgrades.grenadeChargeDurationMultiplier, "x Charge Speed")
-    write_toggle_part(randoUpgrades.unchargedGrenadesBashable, "Uncharged Bashable")
-    write_extra_part(randoUpgrades.extraGrenades, " Max")
-    write_extra_part(randoUpgrades.grenadeMultishotCount, " Splinter")
-    write_toggle_part(randoUpgrades.unchargedGrenadesBashable, "Air Charge")
-    write_toggle_part(randoUpgrades.grenadesExplodeOnCollision == false, "Manual Detonation")
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Grenade#: ")
+    multiplier_row_item(randoUpgrades.grenadeCostMultiplier, "x Cost")
+    multiplier_row_item(1 / randoUpgrades.grenadeChargeDurationMultiplier, "x Charge Speed")
+    toggle_row_item(randoUpgrades.unchargedGrenadesBashable, "Uncharged Bashable")
+    extra_row_item(randoUpgrades.extraGrenades, " Max")
+    extra_row_item(randoUpgrades.grenadeMultishotCount, " Splinter")
+    toggle_row_item(randoUpgrades.unchargedGrenadesBashable, "Air Charge")
+    toggle_row_item(randoUpgrades.grenadesExplodeOnCollision == false, "Manual Detonation")
+    add_current_colored_row()
 
-    set_string("line", "#Regenerate#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.regenerateCostMultiplier, "x Cost")
-    write_multiplier_part(randoUpgrades.regenerateSpeedMultiplier, "x Speed")
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Regenerate#: ")
+    multiplier_row_item(randoUpgrades.regenerateCostMultiplier, "x Cost")
+    multiplier_row_item(randoUpgrades.regenerateSpeedMultiplier, "x Speed")
+    add_current_colored_row()
 
-    if randoUpgrades.flapDamage != 0 {
-        set_string("line", "#Flap#: " + randoUpgrades.flapDamage + " Damage")
-        write_effects_line()
+    if randoUpgrades.flapDamage != 0 add_row("#Flap#: " + randoUpgrades.flapDamage + " Damage")
+
+    new_colored_row("#Blaze#: ")
+    multiplier_row_item(randoUpgrades.blazeCostMultiplier, "x Cost")
+    melting_row_item(randoUpgrades.blazeAsFireSource)
+    add_current_colored_row()
+
+    new_colored_row("#Flash#: ")
+    multiplier_row_item(randoUpgrades.flashCostMultiplier, "x Cost")
+    multiplier_row_item(1 / randoUpgrades.flashTickInterval, "x Speed")
+    multiplier_row_item(randoUpgrades.flashDamageMultiplier, "x Damage")
+    add_current_colored_row()
+
+    new_colored_row("#Sentry#: ")
+    multiplier_row_item(randoUpgrades.sentryCostMultiplier, "x Cost")
+    multiplier_row_item(randoUpgrades.sentryFireRateSpeed, "x Fire Rate")
+    integer_row_item(randoUpgrades.sentryShots, " Sentry Burst Shots", 3)
+    extra_row_item(randoUpgrades.extraSentries, " Max")
+    add_current_colored_row()
+
+    new_colored_row("#Jumps#: ")
+    extra_row_item(randoUpgrades.extraDoubleJumps, " Double Jumps")
+    multiplier_row_item(randoUpgrades.jumpHeightMultiplier, "x Grounded Jump Height")
+    multiplier_row_item(randoUpgrades.wallJumpHeightMultiplier, "x Wall Jump Height")
+    multiplier_row_item(randoUpgrades.doubleJumpHeightMultiplier, "x Double Jump Height")
+    add_current_colored_row()
+
+    new_colored_row("#Dash#: ")
+    extra_row_item(randoUpgrades.extraDashes, " Air Dashes")
+    multiplier_row_item(randoUpgrades.dashDistanceMultiplier, "x Distance")
+    if get_integer("color") == 0 set_string("row", "")
+    if get_integer("color") == 1 set_integer("color", 2)
+    if randoUpgrades.bashSpeedMultiplier != 1 add_colored_row_item("#Bash#: " + randoUpgrades.bashSpeedMultiplier + "x Speed")
+    add_current_colored_row()
+
+    new_colored_row("")
+    if randoUpgrades.grappleSpeedMultiplier != 1 add_colored_row_item("#Grapple#: " + randoUpgrades.grappleSpeedMultiplier + "x Speed")
+    if get_integer("color") == 1 set_integer("color", 2)
+    if randoUpgrades.launchSpeedMultiplier != 1 add_colored_row_item("#Launch#: " + randoUpgrades.launchSpeedMultiplier + "x Speed")
+    add_current_colored_row()
+
+    set_string("right_row", "")
+    new_colored_row("#Burrow#: ")
+    multiplier_row_item(randoUpgrades.burrowSpeedMultiplier, "x Speed")
+    multiplier_row_item(randoUpgrades.burrowDashSpeedMultiplier, "x Dash Speed")
+    if get_integer("color") > 0 set_string("right_row", get_string("row"))
+    new_colored_row("#Swimming#: ")
+    multiplier_row_item(randoUpgrades.swimSpeedMultiplier, "x Speed")
+    multiplier_row_item(randoUpgrades.waterDashSpeedMultiplier, "x Dash Speed")
+    if get_string("right_row") != "" {
+        if get_integer("color") == 1 set_integer("color", 2)
+        add_colored_row_item(get_string("right_row"))
     }
+    add_current_colored_row()
 
-    set_string("line", "#Blaze#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.blazeCostMultiplier, "x Cost")
-    write_melting_part(randoUpgrades.blazeAsFireSource)
-    if get_boolean("comma") write_effects_line()
-
-    set_string("line", "#Flash#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.flashCostMultiplier, "x Cost")
-    write_multiplier_part(1 / randoUpgrades.flashTickInterval, "x Speed")
-    write_multiplier_part(randoUpgrades.flashDamageMultiplier, "x Damage")
-    if get_boolean("comma") write_effects_line()
-
-    set_string("line", "#Sentry#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.sentryCostMultiplier, "x Cost")
-    write_multiplier_part(randoUpgrades.sentryFireRateSpeed, "x Fire Rate")
-    write_integer_part(randoUpgrades.sentryShots, " Sentry Burst Shots", 3)
-    write_extra_part(randoUpgrades.extraSentries, " Max")
-    if get_boolean("comma") write_effects_line()
-
-    set_string("line", "#Jumps#: ")
-    set_boolean("comma", false)
-    write_extra_part(randoUpgrades.extraDoubleJumps, " Double Jumps")
-    write_multiplier_part(randoUpgrades.jumpHeightMultiplier, "x Grounded Jump Height")
-    write_multiplier_part(randoUpgrades.wallJumpHeightMultiplier, "x Wall Jump Height")
-    write_multiplier_part(randoUpgrades.doubleJumpHeightMultiplier, "x Double Jump Height")
-    if get_boolean("comma") write_effects_line()
-
-    set_string("line", "#Dash#: ")
-    set_boolean("comma", false)
-    write_extra_part(randoUpgrades.extraDashes, " Air Dashes")
-    write_multiplier_part(randoUpgrades.dashDistanceMultiplier, "x Distance")
-    if get_boolean("comma") == false set_string("line", "")
-    if randoUpgrades.bashSpeedMultiplier != 1 write_effects_part("#Bash#: " + randoUpgrades.bashSpeedMultiplier + "x Speed")
-    if get_boolean("comma") write_effects_line()
-
-    set_string("line", "")
-    set_boolean("comma", false)
-    if randoUpgrades.grappleSpeedMultiplier != 1 write_effects_part("#Grapple#: " + randoUpgrades.grappleSpeedMultiplier + "x Speed")
-    if randoUpgrades.launchSpeedMultiplier != 1 write_effects_part("#Launch#: " + randoUpgrades.launchSpeedMultiplier + "x Speed")
-    if get_boolean("comma") write_effects_line()
-
-    set_string("right_line", "")
-    set_string("line", "#Burrow#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.burrowSpeedMultiplier, "x Speed")
-    write_multiplier_part(randoUpgrades.burrowDashSpeedMultiplier, "x Dash Speed")
-    if get_boolean("comma") set_string("right_line", get_string("line"))
-    set_string("line", "#Swimming#: ")
-    set_boolean("comma", false)
-    write_multiplier_part(randoUpgrades.swimSpeedMultiplier, "x Speed")
-    write_multiplier_part(randoUpgrades.waterDashSpeedMultiplier, "x Dash Speed")
-    if get_string("right_line") != "" write_effects_part(get_string("right_line"))
-    if get_boolean("comma") write_effects_line()
-
-    set_string("line", "#Passive Regeneration#: ")
-    set_boolean("comma", false)
-    if energy_per_second != 0 write_effects_part(energy_per_second + " Energy/s")
-    if health_per_second != 0 write_effects_part(health_per_second + " Health/s")
-    if get_boolean("comma") write_effects_line()
+    new_colored_row("#Passive Regeneration#: ")
+    if energy_per_second != 0 add_colored_row_item(energy_per_second + " Energy/s")
+    if health_per_second != 0 add_colored_row_item(health_per_second + " Health/s")
+    add_current_colored_row()
 
     // TODO remove?
     // randoUpgrades.healthRegenerationPerMinute
     // randoUpgrades.energyRegenerationPerMinute
 
-    if get_integer("lines") == 0 set_string("bonus_items", "No Bonus Item Effects")
-    if get_integer("lines") > 0 {
-        // negative margin hack
-        set_string("bonus_items", "<ls_-" + (get_integer("lines") - 1) * 0.1 + "><hex_00000000>.</></>\n" + get_string("bonus_items"))
-    }
+    if get_integer("lines") == 0 set_string("column", "No Bonus Item Effects")
+    auto_negative_margin()
 }
 
-fun write_multiplier_part(value: Float, name: String) {
-    if value != 1 write_effects_part(value + name)
+fun multiplier_row_item(value: Float, name: String) {
+    if value != 1 add_colored_row_item(value + name)
 }
 
-fun write_melting_part(value: Boolean) {
-    write_toggle_part(value, "Melting")
+fun melting_row_item(value: Boolean) {
+    toggle_row_item(value, "Melting")
 }
 
-fun write_toggle_part(value: Boolean, name: String) {
-    if value write_effects_part(name)
+fun toggle_row_item(value: Boolean, name: String) {
+    if value add_colored_row_item(name)
 }
 
-fun write_extra_part(value: Integer, name: String) {
-   if value != 0 write_effects_part((1 + value) + name)
+fun extra_row_item(value: Integer, name: String) {
+   if value != 0 add_colored_row_item((1 + value) + name)
 }
 
-fun write_integer_part(value: Integer, name: String, default: Integer) {
-    if value != default write_effects_part(value + name)
-}
-
-fun write_effects_part(part: String) {
-    if get_boolean("comma") set_string("line", get_string("line") + ", ")
-    set_boolean("comma", true)
-    set_string("line", get_string("line") + part)
-}
-
-fun write_effects_line() {
-    if get_integer("lines") > 0 set_string("bonus_items", get_string("bonus_items") + "\n")
-    set_integer("lines", get_integer("lines") + 1)
-    set_string("bonus_items", get_string("bonus_items") + get_string("line"))
+fun integer_row_item(value: Integer, name: String, default: Integer) {
+    if value != default add_colored_row_item(value + name)
 }

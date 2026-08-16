@@ -15,6 +15,7 @@
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
 !include("goal_mode_core", check_goals_completed, write_goals_incomplete_message, update_goals_completed)
+!include("list_core", new_row, add_row_item, add_row)
 
 !state(marsh_relic_collected, Boolean)
 !state(hollow_relic_collected, Boolean)
@@ -346,7 +347,7 @@ fun update_current_area_has_uncollected_relic() {
     set_string("color", "")
     if itemTracker.relicsCount == itemTracker.relicsRequired set_string("color", "$")
     write_relics_message(get_string("color"))
-    set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
+    add_row(get_string("row"))
 })
 
 !augment_fun(write_map_progress_message(), {
@@ -434,17 +435,15 @@ fun update_current_area_has_uncollected_relic() {
 !augment_fun(write_map_progress_message(), {
     if get_boolean("exists") {
         if get_boolean("collected") {
-            set_string("relics_message", "$Relic found$")
+            add_row("$Relic found$")
         }
         if get_boolean("collected") == false {
-            set_string("relics_message", "#Relic not found#")
+            add_row("#Relic not found#")
         }
     }
     if get_boolean("exists") == false {
-        set_string("relics_message", "Relicless")
+        add_row("Relicless")
     }
-
-    set_string("progress_message", get_string("progress_message") + "\n" + get_string("relics_message"))
 })
 
 !augment_fun(check_goals_completed(), {
@@ -457,13 +456,12 @@ on change itemTracker.relicsRequired update_goals_completed()
 !augment_fun(write_goals_incomplete_message(), {
     if itemTracker.relicsCount < itemTracker.relicsRequired {
         write_relics_message("@")
-        set_string("goals_incomplete_message", get_string("goals_incomplete_message") + "\n" + get_string("relics_message"))
+        add_row(get_string("row"))
     }
 })
 
 fun write_relics_message(color: String) {
-    set_string("relics_message", "Relics (" + color + itemTracker.relicsCount + "/" + itemTracker.relicsRequired + color + "): ")
-    set_boolean("comma", false)
+    new_row("Relics (" + color + itemTracker.relicsCount + "/" + itemTracker.relicsRequired + color + "): ")
 }
 
 !if marsh_relic_exists {
@@ -475,14 +473,12 @@ fun write_relics_message(color: String) {
         if marsh_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Marsh" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Marsh" + get_string("color"))
     })
 }
 
 !if hollow_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Hollow {
             set_string("color", "#")
@@ -490,14 +486,12 @@ fun write_relics_message(color: String) {
         if hollow_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Hollow" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Hollow" + get_string("color"))
     })
 }
 
 !if glades_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Glades {
             set_string("color", "#")
@@ -505,14 +499,12 @@ fun write_relics_message(color: String) {
         if glades_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Glades" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Glades" + get_string("color"))
     })
 }
 
 !if wellspring_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Wellspring {
             set_string("color", "#")
@@ -520,14 +512,12 @@ fun write_relics_message(color: String) {
         if wellspring_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Wellspring" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Wellspring" + get_string("color"))
     })
 }
 
 !if woods_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Woods {
             set_string("color", "#")
@@ -535,14 +525,12 @@ fun write_relics_message(color: String) {
         if woods_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Woods" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Woods" + get_string("color"))
     })
 }
 
 !if reach_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Reach {
             set_string("color", "#")
@@ -550,14 +538,12 @@ fun write_relics_message(color: String) {
         if reach_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Reach" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Reach" + get_string("color"))
     })
 }
 
 !if depths_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Depths {
             set_string("color", "#")
@@ -565,14 +551,12 @@ fun write_relics_message(color: String) {
         if depths_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Depths" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Depths" + get_string("color"))
     })
 }
 
 !if pools_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Pools {
             set_string("color", "#")
@@ -580,14 +564,12 @@ fun write_relics_message(color: String) {
         if pools_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Pools" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Pools" + get_string("color"))
     })
 }
 
 !if wastes_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Wastes {
             set_string("color", "#")
@@ -595,14 +577,12 @@ fun write_relics_message(color: String) {
         if wastes_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Wastes" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Wastes" + get_string("color"))
     })
 }
 
 !if willow_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Willow {
             set_string("color", "#")
@@ -610,14 +590,12 @@ fun write_relics_message(color: String) {
         if willow_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Willow" + get_string("color"))
-        set_boolean("comma", true)
+        add_row_item(get_string("color") + "Willow" + get_string("color"))
     })
 }
 
 !if burrows_relic_exists {
     !augment_fun(write_relics_message(color: String), {
-        relics_add_comma()
         set_string("color", "")
         if current_zone() == Burrows {
             set_string("color", "#")
@@ -625,10 +603,6 @@ fun write_relics_message(color: String) {
         if burrows_relic_collected {
             set_string("color", "$")
         }
-        set_string("relics_message", get_string("relics_message") + get_string("color") + "Burrows" + get_string("color"))
+        add_row_item(get_string("color") + "Burrows" + get_string("color"))
     })
-}
-
-fun relics_add_comma() {
-    if get_boolean("comma") set_string("relics_message", get_string("relics_message") + ", ")
 }

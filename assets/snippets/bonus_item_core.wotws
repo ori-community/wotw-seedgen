@@ -3,7 +3,7 @@
 #description("Convenience functions for simple bonus items")
 
 !include("regeneration_core", energy_per_second, health_per_second)
-!include("bonus_progress_helper", write_bonus_items, write_bonus_items_part, update_bonus_items)
+!include("bonus_progress_helper", write_bonus_items, add_colored_row_item, update_bonus_items)
 
 !builtin_icon(energy_regeneration_icon, "icons/bonus/energyregeneration.png")
 !builtin_icon(health_regeneration_icon, "icons/bonus/healthregeneration.png")
@@ -42,7 +42,7 @@ fun energy_regeneration() {
     store(energy_per_second, energy_per_second + 1. / 60.)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if energy_regenerations != 0 write_bonus_items_part("#Energy Regeneration# x" + energy_regenerations))
+!augment_fun(write_bonus_items(), if energy_regenerations != 0 add_colored_row_item("Energy Regeneration x" + energy_regenerations))
 !item_data(energy_regeneration(),
     "#Energy Regeneration#",
     200,
@@ -61,7 +61,7 @@ fun health_regeneration() {
     store(health_per_second, health_per_second + 10. / 60.)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if health_regenerations != 0 write_bonus_items_part("#Health Regeneration# x" + health_regenerations))
+!augment_fun(write_bonus_items(), if health_regenerations != 0 add_colored_row_item("Health Regeneration x" + health_regenerations))
 !item_data(health_regeneration(),
     "#Health Regeneration#",
     200,
@@ -76,7 +76,7 @@ fun extra_double_jump() {
     item_message("#Extra Double Jump x" + randoUpgrades.extraDoubleJumps + "#")
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.extraDoubleJumps != 0 write_bonus_items_part("#Extra Double Jump# x" + randoUpgrades.extraDoubleJumps))
+!augment_fun(write_bonus_items(), if randoUpgrades.extraDoubleJumps != 0 add_colored_row_item("Extra Double Jump x" + randoUpgrades.extraDoubleJumps))
 !item_data(extra_double_jump(),
     "#Extra Double Jump#",
     200,
@@ -91,7 +91,7 @@ fun extra_air_dash() {
     item_message("#Extra Air Dash x" + randoUpgrades.extraDashes + "#")
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.extraDashes != 0 write_bonus_items_part("#Extra Air Dash# x" + randoUpgrades.extraDashes))
+!augment_fun(write_bonus_items(), if randoUpgrades.extraDashes != 0 add_colored_row_item("Extra Air Dash x" + randoUpgrades.extraDashes))
 !item_data(extra_air_dash(),
     "#Extra Air Dash#",
     200,
@@ -110,7 +110,7 @@ fun blaze_efficiency() {
     store(randoUpgrades.blazeCostMultiplier, randoUpgrades.blazeCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if blaze_efficiencies != 0 write_bonus_items_part("#Blaze Efficiency# x" + blaze_efficiencies))
+!augment_fun(write_bonus_items(), if blaze_efficiencies != 0 add_colored_row_item("Blaze Efficiency x" + blaze_efficiencies))
 !item_data(blaze_efficiency(),
     "#Blaze Efficiency#",
     200,
@@ -129,7 +129,7 @@ fun spear_efficiency() {
     store(randoUpgrades.spearCostMultiplier, randoUpgrades.spearCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if spear_efficiencies != 0 write_bonus_items_part("#Spear Efficiency# x" + spear_efficiencies))
+!augment_fun(write_bonus_items(), if spear_efficiencies != 0 add_colored_row_item("Spear Efficiency x" + spear_efficiencies))
 !item_data(spear_efficiency(),
     "#Spear Efficiency#",
     200,
@@ -148,7 +148,7 @@ fun shuriken_efficiency() {
     store(randoUpgrades.shurikenCostMultiplier, randoUpgrades.shurikenCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if shuriken_efficiencies != 0 write_bonus_items_part("#Shuriken Efficiency# x" + shuriken_efficiencies))
+!augment_fun(write_bonus_items(), if shuriken_efficiencies != 0 add_colored_row_item("Shuriken Efficiency x" + shuriken_efficiencies))
 !item_data(shuriken_efficiency(),
     "#Shuriken Efficiency#",
     200,
@@ -167,7 +167,7 @@ fun sentry_efficiency() {
     store(randoUpgrades.sentryCostMultiplier, randoUpgrades.sentryCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if sentry_efficiencies != 0 write_bonus_items_part("#Sentry Efficiency# x" + sentry_efficiencies))
+!augment_fun(write_bonus_items(), if sentry_efficiencies != 0 add_colored_row_item("Sentry Efficiency x" + sentry_efficiencies))
 !item_data(sentry_efficiency(),
     "#Sentry Efficiency#",
     200,
@@ -186,7 +186,7 @@ fun bow_efficiency() {
     store(randoUpgrades.bowCostMultiplier, randoUpgrades.bowCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if bow_efficiencies != 0 write_bonus_items_part("#Bow Efficiency# x" + bow_efficiencies))
+!augment_fun(write_bonus_items(), if bow_efficiencies != 0 add_colored_row_item("Bow Efficiency x" + bow_efficiencies))
 !item_data(bow_efficiency(),
     "#Bow Efficiency#",
     200,
@@ -205,7 +205,7 @@ fun regenerate_efficiency() {
     store(randoUpgrades.regenerateCostMultiplier, randoUpgrades.regenerateCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if regenerate_efficiencies != 0 write_bonus_items_part("#Regenerate Efficiency# x" + regenerate_efficiencies))
+!augment_fun(write_bonus_items(), if regenerate_efficiencies != 0 add_colored_row_item("Regenerate Efficiency x" + regenerate_efficiencies))
 !item_data(regenerate_efficiency(),
     "#Regenerate Efficiency#",
     200,
@@ -224,7 +224,7 @@ fun flash_efficiency() {
     store(randoUpgrades.flashCostMultiplier, randoUpgrades.flashCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if flash_efficiencies != 0 write_bonus_items_part("#Flash Efficiency# x" + flash_efficiencies))
+!augment_fun(write_bonus_items(), if flash_efficiencies != 0 add_colored_row_item("Flash Efficiency x" + flash_efficiencies))
 !item_data(flash_efficiency(),
     "#Flash Efficiency#",
     200,
@@ -243,7 +243,7 @@ fun grenade_efficiency() {
     store(randoUpgrades.grenadeCostMultiplier, randoUpgrades.grenadeCostMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if grenade_efficiencies != 0 write_bonus_items_part("#Grenade Efficiency# x" + grenade_efficiencies))
+!augment_fun(write_bonus_items(), if grenade_efficiencies != 0 add_colored_row_item("Grenade Efficiency x" + grenade_efficiencies))
 !item_data(grenade_efficiency(),
     "#Grenade Efficiency#",
     200,
@@ -264,7 +264,7 @@ fun rapid_grenade() {
     store(randoUpgrades.grenadeChargeDurationMultiplier, randoUpgrades.grenadeChargeDurationMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if rapid_grenades != 0 write_bonus_items_part("#Rapid Grenade# x" + rapid_grenades))
+!augment_fun(write_bonus_items(), if rapid_grenades != 0 add_colored_row_item("Rapid Grenade x" + rapid_grenades))
 !item_data(
     rapid_grenade(),
     "#Rapid Grenade#",
@@ -284,7 +284,7 @@ fun quickshot_upgrade() {
     store(randoUpgrades.bowRapidFireIntervalDurationMultiplier, randoUpgrades.bowRapidFireIntervalDurationMultiplier / 2)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if quickshot_upgrades != 0 write_bonus_items_part("#Quickshot Upgrade# x" + quickshot_upgrades))
+!augment_fun(write_bonus_items(), if quickshot_upgrades != 0 add_colored_row_item("Quickshot Upgrade x" + quickshot_upgrades))
 !item_data(
     quickshot_upgrade(),
     "#Quickshot Upgrade#",
@@ -300,7 +300,7 @@ fun melting_blaze() {
     store(randoUpgrades.blazeAsFireSource, true)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.blazeAsFireSource write_bonus_items_part("#Melting Blaze#"))
+!augment_fun(write_bonus_items(), if randoUpgrades.blazeAsFireSource add_colored_row_item("Melting Blaze"))
 !item_data(
     melting_blaze(),
     "#Melting Blaze#",
@@ -316,7 +316,7 @@ fun melting_sword() {
     store(randoUpgrades.swordAsFireSource, true)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.swordAsFireSource write_bonus_items_part("#Melting Sword#"))
+!augment_fun(write_bonus_items(), if randoUpgrades.swordAsFireSource add_colored_row_item("Melting Sword"))
 !item_data(
     melting_sword(),
     "#Melting Sword#",
@@ -332,7 +332,7 @@ fun melting_shuriken() {
     store(randoUpgrades.shurikenAsFireSource, true)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.shurikenAsFireSource write_bonus_items_part("#Melting Shuriken#"))
+!augment_fun(write_bonus_items(), if randoUpgrades.shurikenAsFireSource add_colored_row_item("Melting Shuriken"))
 !item_data(
     melting_shuriken(),
     "#Melting Shuriken#",
@@ -348,7 +348,7 @@ fun uncharged_bashnade() {
     store(randoUpgrades.unchargedGrenadesBashable, true)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.unchargedGrenadesBashable write_bonus_items_part("#Uncharged Bashgrenades#"))
+!augment_fun(write_bonus_items(), if randoUpgrades.unchargedGrenadesBashable add_colored_row_item("Uncharged Bashgrenades"))
 !item_data(
     uncharged_bashnade(),
     "#Uncharged Bashgrenades#",
@@ -364,7 +364,7 @@ fun extra_grenade() {
     item_message("#Extra Grenade x" + randoUpgrades.extraGrenades + "#")
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.extraGrenades != 0 write_bonus_items_part("#Extra Grenade# x" + randoUpgrades.extraGrenades))
+!augment_fun(write_bonus_items(), if randoUpgrades.extraGrenades != 0 add_colored_row_item("Extra Grenade x" + randoUpgrades.extraGrenades))
 !item_data(
     extra_grenade(),
     "#Extra Grenade#",
@@ -380,7 +380,7 @@ fun splinter_grenade() {
     item_message("#Splinter Grenade x" + randoUpgrades.grenadeMultishotCount + "#")
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.grenadeMultishotCount != 0 write_bonus_items_part("#Splinter Grenade# x" + randoUpgrades.grenadeMultishotCount))
+!augment_fun(write_bonus_items(), if randoUpgrades.grenadeMultishotCount != 0 add_colored_row_item("Splinter Grenade x" + randoUpgrades.grenadeMultishotCount))
 !item_data(
     splinter_grenade(),
     "#Splinter Grenade#",
@@ -396,7 +396,7 @@ fun unlimited_sentries() {
     store(randoUpgrades.extraSentries, 99)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.extraSentries >= 99 write_bonus_items_part("#Unlimited Sentries#"))
+!augment_fun(write_bonus_items(), if randoUpgrades.extraSentries >= 99 add_colored_row_item("Unlimited Sentries"))
 !item_data(
     unlimited_sentries(),
     "#Unlimited Sentries#",
@@ -421,7 +421,7 @@ fun sentry_burst_upgrade() {
     store(randoUpgrades.sentryShots, randoUpgrades.sentryShots + 10)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if sentry_burst_upgrades != 0 write_bonus_items_part("#Sentry Burst Upgrade# x" + sentry_burst_upgrades))
+!augment_fun(write_bonus_items(), if sentry_burst_upgrades != 0 add_colored_row_item("Sentry Burst Upgrade x" + sentry_burst_upgrades))
 !item_data(
     sentry_burst_upgrade(),
     "#Sentry Burst Upgrade#",
@@ -441,7 +441,7 @@ fun sentry_fire_rate_upgrade() {
     store(randoUpgrades.sentryFireRateSpeed, randoUpgrades.sentryFireRateSpeed + 2.5)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if sentry_fire_rate_upgrades != 0 write_bonus_items_part("#Sentry Fire Rate Upgrade# x" + sentry_fire_rate_upgrades))
+!augment_fun(write_bonus_items(), if sentry_fire_rate_upgrades != 0 add_colored_row_item("Sentry Fire Rate Upgrade x" + sentry_fire_rate_upgrades))
 !item_data(
     sentry_fire_rate_upgrade(),
     "#Sentry Fire Rate Upgrade#",
@@ -460,7 +460,7 @@ fun extra_shuriken() {
     item_message("#Extra Shuriken x" + randoUpgrades.extraShurikens + "#")
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.extraShurikens != 0 write_bonus_items_part("#Extra Shuriken# x" + randoUpgrades.extraShurikens))
+!augment_fun(write_bonus_items(), if randoUpgrades.extraShurikens != 0 add_colored_row_item("Extra Shuriken x" + randoUpgrades.extraShurikens))
 !item_data(
     extra_shuriken(),
     "#Extra Shuriken#",
@@ -476,7 +476,7 @@ fun splinter_shuriken() {
     item_message("#Splinter Shuriken x" + randoUpgrades.shurikenMultishotCount / 2 + "#")
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.shurikenMultishotCount != 0 write_bonus_items_part("#Splinter Shuriken# x" + randoUpgrades.shurikenMultishotCount / 2))
+!augment_fun(write_bonus_items(), if randoUpgrades.shurikenMultishotCount != 0 add_colored_row_item("Splinter Shuriken x" + randoUpgrades.shurikenMultishotCount / 2))
 !item_data(
     splinter_shuriken(),
     "#Splinter Shuriken#",
@@ -492,7 +492,7 @@ fun bashable_shuriken() {
     store(randoUpgrades.shurikenBashable, true)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if randoUpgrades.shurikenBashable write_bonus_items_part("#Bashable Shuriken#"))
+!augment_fun(write_bonus_items(), if randoUpgrades.shurikenBashable add_colored_row_item("Bashable Shuriken"))
 !item_data(
     bashable_shuriken(),
     "#Bashable Shuriken#",
@@ -512,7 +512,7 @@ fun ultra_flap() {
     store(randoUpgrades.flapDamage, randoUpgrades.flapDamage + 4)
     update_bonus_items()
 }
-!augment_fun(write_bonus_items(), if ultra_flaps != 0 write_bonus_items_part("#Ultra Flap# x" + ultra_flaps))
+!augment_fun(write_bonus_items(), if ultra_flaps != 0 add_colored_row_item("Ultra Flap x" + ultra_flaps))
 !item_data(
     ultra_flap(),
     "#Ultra Flap#",
