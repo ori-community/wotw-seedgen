@@ -557,6 +557,10 @@ pub enum Command<'source> {
         Spanned<CountInZone>,
         CommandArgs<Box<CountInZoneArgs<'source>>>,
     ),
+    RandomBoolean(
+        Spanned<RandomBoolean>,
+        CommandArgs<RandomBooleanArgs<'source>>,
+    ),
     RandomInteger(
         Spanned<RandomInteger>,
         CommandArgs<RandomIntegerArgs<'source>>,
@@ -909,6 +913,15 @@ pub struct CountInZoneArgs<'source> {
 pub struct CountInZoneBinding<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub zone: CommandArg<Expression<'source>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct RandomBoolean;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct RandomBooleanArgs<'source> {
+    pub identifier: Spanned<Identifier<'source>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

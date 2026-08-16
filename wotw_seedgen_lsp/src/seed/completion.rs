@@ -876,6 +876,7 @@ impl CompletionInSpan for Command<'_> {
             Command::CountInZone(count_in_zone, args) => {
                 args.span_checked_completion((count_in_zone, args).span(), index, cache)
             }
+            Command::RandomBoolean(_, _) => None,
             Command::RandomInteger(random_integer, args) => {
                 args.span_checked_completion((random_integer, args).span(), index, cache)
             }

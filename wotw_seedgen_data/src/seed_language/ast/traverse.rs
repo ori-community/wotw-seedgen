@@ -11,10 +11,10 @@ use crate::seed_language::ast::{
     Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs,
     ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
     ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
-    RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-    RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs,
-    Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
-    ZoneOfArgs,
+    RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs,
+    RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs,
+    SetLogicStateArgs, Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
+    UberIdentifier, ZoneOfArgs,
 };
 
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
@@ -414,6 +414,10 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
+            Self::RandomBoolean(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
             Self::RandomInteger(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
@@ -690,6 +694,12 @@ impl<H: Handler> Traverse<H> for CountInZoneBinding<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.identifier_def(&self.identifier);
         inspect_command_arg(&self.zone, |zone| zone.traverse(handler));
+    }
+}
+
+impl<H: Handler> Traverse<H> for RandomBooleanArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        handler.identifier_def(&self.identifier);
     }
 }
 

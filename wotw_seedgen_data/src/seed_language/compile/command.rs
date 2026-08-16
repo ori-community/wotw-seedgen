@@ -116,6 +116,9 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::CountInZone(_, command) => {
                 command.compile(compiler);
             }
+            ast::Command::RandomBoolean(_, command) => {
+                command.compile(compiler);
+            }
             ast::Command::RandomInteger(_, command) => {
                 command.compile(compiler);
             }
@@ -1062,6 +1065,15 @@ impl<'source> Compile<'source> for ast::CountInZoneBinding<'source> {
         get_command_arg(self.zone)
             .and_then(|zone| zone.evaluate(compiler))
             .map(|zone| (self.identifier.data, zone))
+    }
+}
+
+impl<'source> Compile<'source> for ast::RandomBooleanArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let value = compiler.rng.gen::<bool>();
+        compiler.define_variable(self.identifier.data, value);
     }
 }
 
