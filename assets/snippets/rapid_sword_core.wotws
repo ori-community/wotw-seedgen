@@ -22,7 +22,7 @@ fun rapid_sword() {
 }
 !export(rapid_sword)
 
-!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Rapid Sword# x" + collected))
+!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Rapid Sword# x" + collected))
 
 !item_data(rapid_sword(),
     "#Rapid Sword#",

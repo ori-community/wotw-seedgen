@@ -192,75 +192,75 @@ on WeepingRidge.LaunchTree {
 fun write_regenerate_hint() {
     set_string("color", "")
     if skills.regenerate set_string("color", "$")
-    set_string("regenerate_hint", get_string("color") + "Regenerate: " + regenerate_zone + get_string("color"))
+    set_string("regenerate_hint", get_string("color") + "Regenerate: " + regenerate_zone + get_string("color"))
 }
 fun write_sword_hint() {
     set_string("color", "")
     if skills.sword set_string("color", "$")
-    set_string("sword_hint", get_string("color") + "Sword: " + sword_zone + get_string("color"))
+    set_string("sword_hint", get_string("color") + "Sword: " + sword_zone + get_string("color"))
 }
 fun write_double_jump_hint() {
     set_string("color", "")
     if skills.doubleJump set_string("color", "$")
-    set_string("double_jump_hint", get_string("color") + "Double Jump: " + double_jump_zone + get_string("color"))
+    set_string("double_jump_hint", get_string("color") + "Double Jump: " + double_jump_zone + get_string("color"))
 }
 fun write_bow_hint() {
     set_string("color", "")
     if skills.bow set_string("color", "$")
-    set_string("bow_hint", get_string("color") + "Bow: " + bow_zone + get_string("color"))
+    set_string("bow_hint", get_string("color") + "Bow: " + bow_zone + get_string("color"))
 }
 fun write_dash_hint() {
     set_string("color", "")
     if skills.dash set_string("color", "$")
-    set_string("dash_hint", get_string("color") + "Dash: " + dash_zone + get_string("color"))
+    set_string("dash_hint", get_string("color") + "Dash: " + dash_zone + get_string("color"))
 }
 fun write_bash_hint() {
     set_string("color", "")
     if skills.bash set_string("color", "$")
-    set_string("bash_hint", get_string("color") + "Bash: " + bash_zone + get_string("color"))
+    set_string("bash_hint", get_string("color") + "Bash: " + bash_zone + get_string("color"))
 }
 fun write_grapple_hint() {
     set_string("color", "")
     if skills.grapple set_string("color", "$")
-    set_string("grapple_hint", get_string("color") + "Grapple: " + grapple_zone + get_string("color"))
+    set_string("grapple_hint", get_string("color") + "Grapple: " + grapple_zone + get_string("color"))
 }
 fun write_clean_water_hint() {
     set_string("color", "")
     if randoState.cleanWater set_string("color", "$")
-    set_string("clean_water_hint", get_string("color") + "Clean Water: " + clean_water_zone + get_string("color"))
+    set_string("clean_water_hint", get_string("color") + "Clean Water: " + clean_water_zone + get_string("color"))
 }
 fun write_flap_hint() {
     set_string("color", "")
     if skills.flap set_string("color", "$")
-    set_string("flap_hint", get_string("color") + "Flap: " + flap_zone + get_string("color"))
+    set_string("flap_hint", get_string("color") + "Flap: " + flap_zone + get_string("color"))
 }
 fun write_glide_hint() {
     set_string("color", "")
     if skills.glide set_string("color", "$")
-    set_string("glide_hint", get_string("color") + "Glide: " + glide_zone + get_string("color"))
+    set_string("glide_hint", get_string("color") + "Glide: " + glide_zone + get_string("color"))
 }
 fun write_grenade_hint() {
     set_string("color", "")
     if skills.grenade set_string("color", "$")
-    set_string("grenade_hint", get_string("color") + "Grenade: " + grenade_zone + get_string("color"))
+    set_string("grenade_hint", get_string("color") + "Grenade: " + grenade_zone + get_string("color"))
 }
 fun write_flash_hint() {
     set_string("color", "")
     if skills.flash set_string("color", "$")
-    set_string("flash_hint", get_string("color") + "Flash: " + flash_zone + get_string("color"))
+    set_string("flash_hint", get_string("color") + "Flash: " + flash_zone + get_string("color"))
 }
 fun write_water_dash_hint() {
     set_string("color", "")
     if skills.waterDash set_string("color", "$")
-    set_string("water_dash_hint", get_string("color") + "Water Dash: " + water_dash_zone + get_string("color"))
+    set_string("water_dash_hint", get_string("color") + "Water Dash: " + water_dash_zone + get_string("color"))
 }
 fun write_burrow_hint() {
     set_string("color", "")
     if skills.burrow set_string("color", "$")
-    set_string("burrow_hint", get_string("color") + "Burrow: " + burrow_zone + get_string("color"))
+    set_string("burrow_hint", get_string("color") + "Burrow: " + burrow_zone + get_string("color"))
 }
 fun write_launch_hint() {
     set_string("color", "")
     if skills.launch set_string("color", "$")
-    set_string("launch_hint", get_string("color") + "Launch: " + launch_zone + get_string("color"))
+    set_string("launch_hint", get_string("color") + "Launch: " + launch_zone + get_string("color"))
 }

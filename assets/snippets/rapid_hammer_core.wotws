@@ -23,7 +23,7 @@ fun rapid_hammer() {
 }
 !export(rapid_hammer)
 
-!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Rapid Hammer# x" + collected))
+!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Rapid Hammer# x" + collected))
 
 !item_data(rapid_hammer(),
     "#Rapid Hammer#",

@@ -22,7 +22,7 @@ fun rapid_regenerate() {
 }
 !export(rapid_regenerate)
 
-!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Rapid Regenerate# x" + collected))
+!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Rapid Regenerate# x" + collected))
 
 !item_data(
     rapid_regenerate(),

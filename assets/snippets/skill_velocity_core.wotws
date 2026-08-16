@@ -22,7 +22,7 @@ fun skill_velocity() {
 }
 !export(skill_velocity)
 
-!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Skill Velocity# x" + collected))
+!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Skill Velocity# x" + collected))
 
 !item_data(skill_velocity(),
     "#Skill Velocity#",

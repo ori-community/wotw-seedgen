@@ -22,7 +22,7 @@ fun jumpgrade() {
 }
 !export(jumpgrade)
 
-!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Jumpgrade# x" + collected))
+!augment_fun(write_bonus_items(), if collected != 0 write_bonus_items_part("#Jumpgrade# x" + collected))
 
 !item_data(jumpgrade(),
     "#Jumpgrade#",

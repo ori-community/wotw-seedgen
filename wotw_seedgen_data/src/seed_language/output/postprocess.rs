@@ -1131,6 +1131,7 @@ fn count_in_zone_message(
                         value: CommandString::from(Operation {
                             left: CommandString::GetString { id: MESSAGE },
                             operator: Concatenator::Concat,
+                            // TODO non-breaking spaces?
                             right: item_metadata.get(&event.command).force_name(), // TODO could this have placeholders again?
                         }),
                     },

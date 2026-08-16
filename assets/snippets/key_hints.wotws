@@ -50,10 +50,10 @@ fun write_lupo_hint() {
     if skills.flash set_string("flash_color", "$")
 
     set_string("lupo_hint",
-        get_string("burrow_color") + "Burrow: " + burrow_zone + get_string("burrow_color") + ", " +
-        get_string("water_dash_color") + "Water Dash: " + water_dash_zone + get_string("water_dash_color") + ", " +
-        get_string("grenade_color") + "Grenade: " + grenade_zone + get_string("grenade_color") + ", " +
-        get_string("flash_color") + "Flash: " + flash_zone + get_string("flash_color")
+        get_string("burrow_color") + "Burrow: " + burrow_zone + get_string("burrow_color") + ", " +
+        get_string("water_dash_color") + "Water Dash: " + water_dash_zone + get_string("water_dash_color") + ", " +
+        get_string("grenade_color") + "Grenade: " + grenade_zone + get_string("grenade_color") + ", " +
+        get_string("flash_color") + "Flash: " + flash_zone + get_string("flash_color")
     )
 }
 fun write_opher_hint() {
@@ -65,9 +65,9 @@ fun write_opher_hint() {
     if skills.glide set_string("glide_color", "$")
 
     set_string("opher_hint",
-        get_string("clean_water_color") + "Clean Water: " + clean_water_zone + get_string("clean_water_color") + ", " +
-        get_string("flap_color") + "Flap: " + flap_zone + get_string("flap_color") + ", " +
-        get_string("glide_color") + "Glide: " + glide_zone + get_string("glide_color")
+        get_string("clean_water_color") + "Clean Water: " + clean_water_zone + get_string("clean_water_color") + ", " +
+        get_string("flap_color") + "Flap: " + flap_zone + get_string("flap_color") + ", " +
+        get_string("glide_color") + "Glide: " + glide_zone + get_string("glide_color")
     )
 }
 fun write_twillen_hint() {
@@ -77,8 +77,8 @@ fun write_twillen_hint() {
     if skills.bow set_string("bow_color", "$")
 
     set_string("twillen_hint",
-        get_string("bash_color") + "Bash: " + bash_zone + get_string("bash_color") + ", " +
-        get_string("bow_color") + "Bow: " + bow_zone + get_string("bow_color")
+        get_string("bash_color") + "Bash: " + bash_zone + get_string("bash_color") + ", " +
+        get_string("bow_color") + "Bow: " + bow_zone + get_string("bow_color")
     )
 }
 
