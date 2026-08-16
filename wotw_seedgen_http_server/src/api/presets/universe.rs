@@ -11,6 +11,7 @@ use wotw_seedgen::data::{UniverseSettings, assets::UniversePreset};
 
 use crate::{
     RouterState,
+    api::assets::AssetInfo,
     error::{Error, Result},
 };
 
@@ -34,11 +35,13 @@ pub struct Docs;
 #[utoipa::path(
     get,
     path = LIST,
-    responses((status = OK, body = FxHashMap<String, UniversePreset>)),
+    responses((status = OK, body = FxHashMap<String, UniversePresetInfo>)),
 )]
-async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, UniversePreset>> {
-    Json(cache.read().await.base.universe_presets.clone())
+async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, UniversePresetInfo>> {
+    Json(cache.read().await.universe_preset_info.clone())
 }
+
+pub type UniversePresetInfo = AssetInfo<UniversePreset>;
 
 /// Apply a universe preset to universe settings
 #[utoipa::path(

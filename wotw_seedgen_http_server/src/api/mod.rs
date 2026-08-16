@@ -13,6 +13,7 @@ use wotw_seedgen::data::seed_language::output::{CommandZone, Trigger};
 
 use crate::{RouterState, error::Result, generate};
 
+pub mod assets;
 pub mod logic;
 pub mod plando;
 pub mod presets;

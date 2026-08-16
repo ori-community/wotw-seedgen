@@ -1,11 +1,10 @@
 use axum::{Json, Router, extract::State, routing::get};
 use constcat::concat;
 use rustc_hash::FxHashMap;
-use serde::Serialize;
-use utoipa::{OpenApi, ToSchema};
+use utoipa::OpenApi;
 use wotw_seedgen::data::seed_language::metadata::Metadata;
 
-use crate::RouterState;
+use crate::{RouterState, api::assets::AssetInfo};
 
 pub const TAG: &str = "snippets";
 pub const SNIPPETS: &str = concat!("/", TAG);
@@ -30,21 +29,4 @@ async fn info(State(cache): State<RouterState>) -> Json<FxHashMap<String, Snippe
     Json(cache.read().await.snippet_info.clone())
 }
 
-/// Selection of relevant information about a snippet
-#[derive(Clone, Serialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
-pub struct SnippetInfo {
-    /// Where this snippet came from
-    pub origin: SnippetOrigin,
-    /// Metadata defined in the snippet
-    pub metadata: Metadata,
-}
-
-/// Origin of a snippet
-#[derive(Clone, Serialize, ToSchema)]
-pub enum SnippetOrigin {
-    /// This snippet was found within the seedgen executable's parent directory
-    ExecutableDir,
-    /// This snippet was found within the user data directory
-    UserDataDir,
-}
+pub type SnippetInfo = AssetInfo<Metadata>;

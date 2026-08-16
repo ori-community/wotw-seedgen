@@ -8,7 +8,7 @@ use wotw_seedgen::{
         assets::{
             AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
             DefaultFileAccess, LocData, PresetFileAccess, SEEDGEN_USER_DATA_DIR, SnippetFileAccess,
-            StateData, UberStateData,
+            StateData, UberStateData, UniversePreset, WorldPreset,
         },
         logic_language::{ast::Paths, output::Graph},
         parse::Source,
@@ -18,8 +18,10 @@ use wotw_seedgen::{
 };
 
 use crate::api::{
+    assets::{AssetInfo, AssetOrigin},
     logic::{MapIcons, RelevantUberStates, SpawnAnchors},
-    snippets::{SnippetInfo, SnippetOrigin},
+    presets::{universe::UniversePresetInfo, world::WorldPresetInfo},
+    snippets::SnippetInfo,
 };
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
@@ -34,6 +36,8 @@ pub struct CacheValues {
     pub relevant_uber_states: RelevantUberStates,
     pub spawn_anchors: SpawnAnchors,
     pub snippet_info: FxHashMap<String, SnippetInfo>,
+    pub universe_preset_info: FxHashMap<String, UniversePresetInfo>,
+    pub world_preset_info: FxHashMap<String, WorldPresetInfo>,
 }
 
 impl CacheValues {
@@ -77,6 +81,8 @@ impl AssetCacheValues for CacheValues {
         let node_index_to_map_icon_index = node_index_to_map_icon_index(&graph, &map_icons);
 
         let snippet_info = snippet_info(&base.snippets);
+        let universe_preset_info = universe_preset_info(&base.universe_presets);
+        let world_preset_info = world_preset_info(&base.world_presets);
 
         Ok(Self {
             base,
@@ -88,6 +94,8 @@ impl AssetCacheValues for CacheValues {
             relevant_uber_states,
             spawn_anchors,
             snippet_info,
+            universe_preset_info,
+            world_preset_info,
         })
     }
 
@@ -197,35 +205,42 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
         .collect()
 }
 
-fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, SnippetInfo> {
-    // TODO cache asts?
-    let mut snippet_info = snippets
+fn asset_info<T, TI, FI>(
+    assets: &FxHashMap<String, T>,
+    folder: &str,
+    extension: &str,
+    mut info: FI,
+) -> FxHashMap<String, AssetInfo<TI>>
+where
+    FI: FnMut(&T) -> TI,
+{
+    let mut asset_info = assets
         .iter()
         .map(|(identifier, source)| {
             (
                 identifier.clone(),
-                SnippetInfo {
-                    origin: SnippetOrigin::ExecutableDir,
-                    metadata: Metadata::from_source(&source.content),
+                AssetInfo {
+                    origin: AssetOrigin::ExecutableDir,
+                    metadata: info(source),
                 },
             )
         })
         .collect::<FxHashMap<_, _>>();
 
-    for data_dir_snippet in data_dir_snippets() {
-        snippet_info.get_mut(&data_dir_snippet).unwrap().origin = SnippetOrigin::UserDataDir;
+    for data_dir_asset in data_dir_assets(folder, extension) {
+        asset_info.get_mut(&data_dir_asset).unwrap().origin = AssetOrigin::UserDataDir;
     }
 
-    snippet_info
+    asset_info
 }
 
-fn data_dir_snippets() -> impl Iterator<Item = String> {
-    fs::read_dir(SEEDGEN_USER_DATA_DIR.join("snippets"))
+fn data_dir_assets(folder: &str, extension: &str) -> impl Iterator<Item = String> {
+    fs::read_dir(SEEDGEN_USER_DATA_DIR.join(folder))
         .into_iter()
         .flatten()
         .flatten()
         .map(|entry| entry.file_name())
-        .filter(|file_name| Path::new(file_name).extension() == Some(OsStr::new("wotws")))
+        .filter(|file_name| Path::new(file_name).extension() == Some(OsStr::new(extension)))
         .map(|file_name| {
             Path::new(&file_name)
                 .file_stem()
@@ -233,4 +248,23 @@ fn data_dir_snippets() -> impl Iterator<Item = String> {
                 .to_string_lossy()
                 .to_string()
         })
+}
+
+fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, SnippetInfo> {
+    asset_info(snippets, "snippets", "wotws", |source| {
+        // TODO cache asts?
+        Metadata::from_source(&source.content)
+    })
+}
+
+fn universe_preset_info(
+    universe_presets: &FxHashMap<String, UniversePreset>,
+) -> FxHashMap<String, AssetInfo<UniversePreset>> {
+    asset_info(universe_presets, "universe_presets", "json", Clone::clone)
+}
+
+fn world_preset_info(
+    world_presets: &FxHashMap<String, WorldPreset>,
+) -> FxHashMap<String, AssetInfo<WorldPreset>> {
+    asset_info(world_presets, "world_presets", "json", Clone::clone)
 }

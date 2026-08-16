@@ -7,7 +7,7 @@ use wotw_seedgen::data::{
     env_or,
 };
 
-use crate::{api::snippets::SnippetOrigin, assets::Cache};
+use crate::{api::assets::AssetOrigin, assets::Cache};
 
 static ALWAYS_INLINE_SNIPPETS: LazyLock<bool> =
     LazyLock::new(|| env_or("ALWAYS_INLINE_SNIPPETS", false));
@@ -29,8 +29,8 @@ pub fn inline_world_snippets(world_settings: &mut WorldSettings, cache: &RwLockR
     } else {
         world_settings.snippets.retain_mut(|identifier| {
             match cache.snippet_info[identifier].origin {
-                SnippetOrigin::ExecutableDir => true,
-                SnippetOrigin::UserDataDir => {
+                AssetOrigin::ExecutableDir => true,
+                AssetOrigin::UserDataDir => {
                     let identifier = mem::take(identifier);
                     inline_snippet(&mut world_settings.inline_snippets, cache, identifier);
                     false
