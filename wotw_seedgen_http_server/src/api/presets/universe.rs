@@ -5,13 +5,13 @@ use axum::{
 };
 use constcat::concat;
 use rustc_hash::FxHashMap;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema};
 use wotw_seedgen::data::{UniverseSettings, assets::UniversePreset};
 
 use crate::{
     RouterState,
-    api::assets::AssetInfo,
+    api::assets::AssetOrigin,
     error::{Error, Result},
 };
 
@@ -41,7 +41,15 @@ async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, Univer
     Json(cache.read().await.universe_preset_info.clone())
 }
 
-pub type UniversePresetInfo = AssetInfo<UniversePreset>;
+/// Information about a universe preset
+#[derive(Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct UniversePresetInfo {
+    /// Where this universe preset came from
+    pub origin: AssetOrigin,
+    /// The universe preset
+    pub content: UniversePreset,
+}
 
 /// Apply a universe preset to universe settings
 #[utoipa::path(

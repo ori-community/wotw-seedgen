@@ -18,7 +18,7 @@ use wotw_seedgen::{
 };
 
 use crate::api::{
-    assets::{AssetInfo, AssetOrigin},
+    assets::AssetOrigin,
     logic::{MapIcons, RelevantUberStates, SpawnAnchors},
     presets::{universe::UniversePresetInfo, world::WorldPresetInfo},
     snippets::SnippetInfo,
@@ -205,32 +205,77 @@ fn node_index_to_map_icon_index(graph: &Graph, map_icons: &MapIcons) -> FxHashMa
         .collect()
 }
 
-fn asset_info<T, TI, FI>(
+trait AssetInfo {
+    type Asset;
+
+    fn new(asset: &Self::Asset) -> Self;
+
+    fn origin(&mut self) -> &mut AssetOrigin;
+}
+
+impl AssetInfo for SnippetInfo {
+    type Asset = Source;
+
+    fn new(asset: &Self::Asset) -> Self {
+        Self {
+            origin: AssetOrigin::ExecutableDir,
+            // TODO cache asts?
+            metadata: Metadata::from_source(&asset.content),
+        }
+    }
+
+    fn origin(&mut self) -> &mut AssetOrigin {
+        &mut self.origin
+    }
+}
+
+impl AssetInfo for UniversePresetInfo {
+    type Asset = UniversePreset;
+
+    fn new(asset: &Self::Asset) -> Self {
+        Self {
+            origin: AssetOrigin::ExecutableDir,
+            content: asset.clone(),
+        }
+    }
+
+    fn origin(&mut self) -> &mut AssetOrigin {
+        &mut self.origin
+    }
+}
+
+impl AssetInfo for WorldPresetInfo {
+    type Asset = WorldPreset;
+
+    fn new(asset: &Self::Asset) -> Self {
+        Self {
+            origin: AssetOrigin::ExecutableDir,
+            content: asset.clone(),
+        }
+    }
+
+    fn origin(&mut self) -> &mut AssetOrigin {
+        &mut self.origin
+    }
+}
+
+fn asset_info<T, I>(
     assets: &FxHashMap<String, T>,
     folder: &str,
     extension: &str,
-    mut info: FI,
-) -> FxHashMap<String, AssetInfo<TI>>
+) -> FxHashMap<String, I>
 where
-    FI: FnMut(&T) -> TI,
+    I: AssetInfo<Asset = T>,
 {
     let mut asset_info = assets
         .iter()
-        .map(|(identifier, source)| {
-            (
-                identifier.clone(),
-                AssetInfo {
-                    origin: AssetOrigin::ExecutableDir,
-                    metadata: info(source),
-                },
-            )
-        })
+        .map(|(identifier, asset)| (identifier.clone(), I::new(asset)))
         .collect::<FxHashMap<_, _>>();
 
     for path in data_dir_assets(folder, extension) {
         let identifier = path.file_stem().unwrap().to_str().unwrap();
         let path = path.to_str().unwrap().to_string();
-        asset_info.get_mut(identifier).unwrap().origin = AssetOrigin::UserDataDir(path);
+        *asset_info.get_mut(identifier).unwrap().origin() = AssetOrigin::UserDataDir(path);
     }
 
     asset_info
@@ -246,20 +291,17 @@ fn data_dir_assets(folder: &str, extension: &str) -> impl Iterator<Item = PathBu
 }
 
 fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, SnippetInfo> {
-    asset_info(snippets, "snippets", "wotws", |source| {
-        // TODO cache asts?
-        Metadata::from_source(&source.content)
-    })
+    asset_info(snippets, "snippets", "wotws")
 }
 
 fn universe_preset_info(
     universe_presets: &FxHashMap<String, UniversePreset>,
-) -> FxHashMap<String, AssetInfo<UniversePreset>> {
-    asset_info(universe_presets, "universe_presets", "json", Clone::clone)
+) -> FxHashMap<String, UniversePresetInfo> {
+    asset_info(universe_presets, "universe_presets", "json")
 }
 
 fn world_preset_info(
     world_presets: &FxHashMap<String, WorldPreset>,
-) -> FxHashMap<String, AssetInfo<WorldPreset>> {
-    asset_info(world_presets, "world_presets", "json", Clone::clone)
+) -> FxHashMap<String, WorldPresetInfo> {
+    asset_info(world_presets, "world_presets", "json")
 }

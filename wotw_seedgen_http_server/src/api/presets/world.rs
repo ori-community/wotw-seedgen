@@ -5,13 +5,13 @@ use axum::{
 };
 use constcat::concat;
 use rustc_hash::FxHashMap;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use utoipa::{OpenApi, ToSchema};
 use wotw_seedgen::data::{WorldSettings, assets::WorldPreset};
 
 use crate::{
     RouterState,
-    api::assets::AssetInfo,
+    api::assets::AssetOrigin,
     error::{Error, Result},
 };
 
@@ -41,7 +41,15 @@ async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, WorldP
     Json(cache.read().await.world_preset_info.clone())
 }
 
-pub type WorldPresetInfo = AssetInfo<WorldPreset>;
+/// Information about a world preset
+#[derive(Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct WorldPresetInfo {
+    /// Where this world preset came from
+    pub origin: AssetOrigin,
+    /// The world preset
+    pub content: WorldPreset,
+}
 
 /// Apply world presets to world settings.
 /// If no settings are given, presets are applied on top of the default world settings.
