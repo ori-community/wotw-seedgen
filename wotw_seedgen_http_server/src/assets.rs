@@ -1,4 +1,4 @@
-use std::{ffi::OsStr, fs, path::Path};
+use std::{ffi::OsStr, fs, path::PathBuf};
 
 use rustc_hash::FxHashMap;
 use wotw_seedgen::{
@@ -227,27 +227,22 @@ where
         })
         .collect::<FxHashMap<_, _>>();
 
-    for data_dir_asset in data_dir_assets(folder, extension) {
-        asset_info.get_mut(&data_dir_asset).unwrap().origin = AssetOrigin::UserDataDir;
+    for path in data_dir_assets(folder, extension) {
+        let identifier = path.file_stem().unwrap().to_str().unwrap();
+        let path = path.to_str().unwrap().to_string();
+        asset_info.get_mut(identifier).unwrap().origin = AssetOrigin::UserDataDir(path);
     }
 
     asset_info
 }
 
-fn data_dir_assets(folder: &str, extension: &str) -> impl Iterator<Item = String> {
+fn data_dir_assets(folder: &str, extension: &str) -> impl Iterator<Item = PathBuf> {
     fs::read_dir(SEEDGEN_USER_DATA_DIR.join(folder))
         .into_iter()
         .flatten()
         .flatten()
-        .map(|entry| entry.file_name())
-        .filter(|file_name| Path::new(file_name).extension() == Some(OsStr::new(extension)))
-        .map(|file_name| {
-            Path::new(&file_name)
-                .file_stem()
-                .unwrap()
-                .to_string_lossy()
-                .to_string()
-        })
+        .map(|entry| entry.path())
+        .filter(|path| path.extension() == Some(OsStr::new(extension)))
 }
 
 fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, SnippetInfo> {

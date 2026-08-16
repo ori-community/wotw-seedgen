@@ -30,7 +30,7 @@ pub fn inline_world_snippets(world_settings: &mut WorldSettings, cache: &RwLockR
         world_settings.snippets.retain_mut(|identifier| {
             match cache.snippet_info[identifier].origin {
                 AssetOrigin::ExecutableDir => true,
-                AssetOrigin::UserDataDir => {
+                AssetOrigin::UserDataDir(_) => {
                     let identifier = mem::take(identifier);
                     inline_snippet(&mut world_settings.inline_snippets, cache, identifier);
                     false
