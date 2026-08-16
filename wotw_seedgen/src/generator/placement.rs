@@ -25,9 +25,10 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, env, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
+use std::{cmp::Ordering, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
+    env_or,
     logic_language::output::Node,
     seed_language::{
         compile,
@@ -44,12 +45,7 @@ use wotw_seedgen_log_capture::LogCapture;
 use wotw_seedgen_seed::SeedgenInfo;
 
 // TODO decide default using statistic
-pub(super) static SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| {
-    env::var("SPAWN_SLOTS")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(7)
-});
+pub(super) static SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| env_or("SPAWN_SLOTS", 7));
 
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
 

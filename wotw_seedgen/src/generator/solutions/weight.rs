@@ -1,8 +1,9 @@
-use std::{env, sync::LazyLock};
+use std::sync::LazyLock;
 
 use log::trace;
 use rustc_hash::{FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
+    env_or,
     seed_language::output::{
         CommonUberStateWrite, CommonWriteCommand, ContainedWrites, UberStateWriteOwned,
     },
@@ -19,10 +20,7 @@ use crate::{
 
 // TODO decide default using statistic
 static HAPPY_SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| {
-    let happy_spawn_slots = env::var("HAPPY_SPAWN_SLOTS")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(3);
+    let happy_spawn_slots = env_or("HAPPY_SPAWN_SLOTS", 3);
 
     assert!(*SPAWN_SLOTS >= happy_spawn_slots);
 

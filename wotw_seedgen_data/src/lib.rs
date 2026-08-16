@@ -8,6 +8,7 @@ pub use strum::{VariantArray, VariantNames};
 
 mod action;
 pub mod assets;
+mod env;
 mod eq_ignore;
 mod equipment;
 mod icon;
@@ -28,6 +29,7 @@ mod wheel;
 mod zone;
 
 pub use action::InputAction;
+pub use env::env_or;
 pub use eq_ignore::EqIgnore;
 pub use equipment::{EquipSlot, Equipment};
 pub use icon::{GenericIcon, GromIcon, Icon, LupoIcon, MapIcon, OpherIcon, TuleyIcon};

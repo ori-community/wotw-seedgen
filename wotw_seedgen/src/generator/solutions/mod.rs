@@ -22,7 +22,6 @@ use smallvec::SmallVec;
 use std::{
     cmp::Ordering,
     collections::{hash_map::Entry, VecDeque},
-    env,
     fmt::{self, Display},
     mem,
     ops::{ControlFlow, Sub},
@@ -32,6 +31,7 @@ use std::{
 use itertools::Itertools;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
+    env_or,
     logic_language::output::{Connection, Graph, Node, Requirement},
     seed_language::{
         output::{
@@ -68,12 +68,7 @@ use crate::{
 /// - `MAX_SEARCH_RADIUS=0`: 549.56 ms
 /// - `MAX_SEARCH_RADIUS=1`: 868.59 ms
 /// - `MAX_SEARCH_RADIUS=2`: 1.4614 s
-static MAX_SEARCH_RADIUS: LazyLock<u8> = LazyLock::new(|| {
-    env::var("SOLUTION_MAX_SEARCH_RADIUS")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(0)
-});
+static MAX_SEARCH_RADIUS: LazyLock<u8> = LazyLock::new(|| env_or("SOLUTION_MAX_SEARCH_RADIUS", 0));
 
 /// Maximum number of progression items in a solution
 ///
@@ -84,12 +79,7 @@ static MAX_SEARCH_RADIUS: LazyLock<u8> = LazyLock::new(|| {
 /// - `SOLUTION_MAX_ITEMS=7`: 556.95 ms
 /// - `SOLUTION_MAX_ITEMS=10`: 933.20 ms
 /// - `SOLUTION_MAX_ITEMS=usize::MAX`: 1.2723 s
-pub static SOLUTION_MAX_ITEMS: LazyLock<usize> = LazyLock::new(|| {
-    env::var("SOLUTION_MAX_ITEMS")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or(5)
-});
+pub static SOLUTION_MAX_ITEMS: LazyLock<usize> = LazyLock::new(|| env_or("SOLUTION_MAX_ITEMS", 5));
 
 pub type SolutionItems = SmallVec<[usize; 8]>;
 
