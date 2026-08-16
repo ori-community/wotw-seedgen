@@ -60,7 +60,7 @@ on reload {
     set_wheel_item_icon("progress_helper", LeftTop, message_icon)
     set_wheel_item_all_actions("progress_helper", LeftTop, {
         write_trial_hints()
-        priority_message(get_string("column"))
+        controlled_priority_message("trial_hints", get_string("column"), 4)
     })
 }
 
@@ -94,6 +94,20 @@ fun update_wheel() {
         set_wheel_item_description("progress_helper", LeftTop, "No Spirit Trials activated")
         set_wheel_item_color("progress_helper", LeftTop, 128, 128, 128, 196)
     }
+}
+
+on change raceGroup.inkwaterMarshRace update_trial_hints()
+on change raceGroup.kwolokDropRace update_trial_hints()
+on change raceGroup.wellspringRace update_trial_hints()
+on change raceGroup.silentWoodlandRace update_trial_hints()
+on change raceGroup.baursReachWindTunnelRace update_trial_hints()
+on change raceGroup.mouldwoodDepthsRace update_trial_hints()
+on change raceGroup.lumaPoolsRace update_trial_hints()
+on change raceGroup.desertRace update_trial_hints()
+fun update_trial_hints() {
+    // TODO check if message exists to save compute?
+    write_trial_hints()
+    set_message_text("trial_hints", get_string("column"))
 }
 
 fun write_trial_hints() {

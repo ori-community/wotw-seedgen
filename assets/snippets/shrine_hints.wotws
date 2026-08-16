@@ -44,7 +44,7 @@ on reload {
     set_wheel_item_icon("progress_helper", Left, message_icon)
     set_wheel_item_all_actions("progress_helper", Left, {
         write_shrine_hints()
-        priority_message(get_string("column"))
+        controlled_priority_message("shrine_hints", get_string("column"), 4)
     })
 }
 
@@ -82,6 +82,21 @@ fun update_wheel() {
         set_wheel_item_description("progress_helper", Left, "No Combat Shrines visited")
         set_wheel_item_color("progress_helper", Left, 128, 128, 128, 196)
     }
+}
+
+on change marsh_visited update_shrine_hints()
+on change howls_den_visited update_shrine_hints()
+on change glades_visited update_shrine_hints()
+on change woods_visited update_shrine_hints()
+on change depths_visited update_shrine_hints()
+on change MarshPastOpher.CombatShrineCompleted update_shrine_hints()
+on change HowlsDen.CombatShrineCompleted update_shrine_hints()
+on change WestGlades.CombatShrineCompleted update_shrine_hints()
+on change WoodsMain.CombatShrineCompleted update_shrine_hints()
+on change LowerDepths.CombatShrineCompleted update_shrine_hints()
+fun update_shrine_hints() {
+    write_shrine_hints()
+    set_message_text("shrine_hints", get_string("column"))
 }
 
 fun write_shrine_hints() {
