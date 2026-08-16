@@ -108,7 +108,7 @@ fun update_bonus_item_effects() {
 
 fun write_bonus_item_effects() {
     set_string("bonus_items", "")
-    set_boolean("newline", false)
+    set_integer("lines", 0)
 
     set_string("line", "#Sword#: ")
     set_boolean("comma", false)
@@ -234,7 +234,11 @@ fun write_bonus_item_effects() {
     // randoUpgrades.healthRegenerationPerMinute
     // randoUpgrades.energyRegenerationPerMinute
 
-    if get_boolean("newline") == false set_string("bonus_items", "No Bonus Item Effects")
+    if get_integer("lines") == 0 set_string("bonus_items", "No Bonus Item Effects")
+    if get_integer("lines") > 0 {
+        // negative margin hack
+        set_string("bonus_items", "<ls_-" + (get_integer("lines") - 1) * 0.1 + "><hex_00000000>.</></>\n" + get_string("bonus_items"))
+    }
 }
 
 fun write_multiplier_part(value: Float, name: String) {
@@ -264,7 +268,7 @@ fun write_effects_part(part: String) {
 }
 
 fun write_effects_line() {
-    if get_boolean("newline") set_string("bonus_items", get_string("bonus_items") + "\n")
-    set_boolean("newline", true)
+    if get_integer("lines") > 0 set_string("bonus_items", get_string("bonus_items") + "\n")
+    set_integer("lines", get_integer("lines") + 1)
     set_string("bonus_items", get_string("bonus_items") + get_string("line"))
 }
