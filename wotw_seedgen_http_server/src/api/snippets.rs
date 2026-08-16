@@ -42,7 +42,6 @@ pub struct SnippetInfo {
 
 /// Origin of a snippet
 #[derive(Clone, Serialize, ToSchema)]
-#[serde(rename_all = "camelCase")]
 pub enum SnippetOrigin {
     /// This snippet was found within the seedgen executable's parent directory
     ExecutableDir,
