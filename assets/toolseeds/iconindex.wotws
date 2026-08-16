@@ -94,7 +94,7 @@ fun equipment() {
     set_wheel_item_data("equipment", Right, "Sword", "", Sword)
     set_wheel_item_data("equipment", RightBottom, "Torch", "", Torch)
     set_wheel_item_data("equipment", BottomRight, "Swordstaff", "", Swordstaff)
-    set_wheel_item_data("equipment", Bottom, "Chainsword", "", Chainsword)
+    // set_wheel_item_data("equipment", Bottom, "Chainsword", "", Chainsword) no icon
     set_wheel_item_data("equipment", BottomLeft, "Shot", "", Shot)
     set_wheel_item_data("equipment", LeftBottom, "HomingMissiles", "", HomingMissiles)
     set_wheel_item_data("equipment", Left, "Wave", "", Wave)
@@ -132,11 +132,11 @@ fun equipment() {
     set_wheel_item_data("equipment_4", RightTop, "Glide", "", Glide)
     set_wheel_item_data("equipment_4", Right, "ChargeJump", "", ChargeJump)
     set_wheel_item_data("equipment_4", RightBottom, "WaterDash", "", WaterDash)
-    set_wheel_item_data("equipment_4", BottomRight, "Climb", "", Climb)
-    set_wheel_item_data("equipment_4", Bottom, "WeaponCharge", "", WeaponCharge)
+    // set_wheel_item_data("equipment_4", BottomRight, "Climb", "", Climb) no icon
+    // set_wheel_item_data("equipment_4", Bottom, "WeaponCharge", "", WeaponCharge) no icon
     set_wheel_item_data("equipment_4", BottomLeft, "DamageUpgradeA", "", DamageUpgradeA)
     set_wheel_item_data("equipment_4", LeftBottom, "DamageUpgradeB", "", DamageUpgradeB)
-    set_wheel_item_data("equipment_4", Left, "WaterBreath", "", WaterBreath)
+    // set_wheel_item_data("equipment_4", Left, "WaterBreath", "", WaterBreath) no icon
 }
 
 fun opher() {

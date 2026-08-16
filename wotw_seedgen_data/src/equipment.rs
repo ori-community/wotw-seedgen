@@ -95,3 +95,12 @@ pub enum Equipment {
     DamageUpgradeB = 4008,   // AutoAbility_DamageUpgradeB
     WaterBreath = 4009,      // AutoAbility_WaterBreath
 }
+
+impl Equipment {
+    pub const fn has_icon(self) -> bool {
+        !matches!(
+            self,
+            Self::Chainsword | Self::Climb | Self::WeaponCharge | Self::WaterBreath,
+        )
+    }
+}

@@ -762,10 +762,24 @@ impl CompileIntoLiteral for Icon {
             Literal::Constant(Constant::LupoIcon(value)) => Ok(Icon::Lupo(value)),
             Literal::Constant(Constant::GromIcon(value)) => Ok(Icon::Grom(value)),
             Literal::Constant(Constant::TuleyIcon(value)) => Ok(Icon::Tuley(value)),
-            Literal::Constant(constant) => Equipment::coerce_constant(constant)
-                .map(Icon::Equipment)
-                .or_else(|| OpherIcon::coerce_constant(constant).map(Icon::Opher))
-                .ok_or_else(|| type_error(constant.ty(), Type::Icon, span)),
+            Literal::Constant(constant) => {
+                if let Some(opher_icon) = OpherIcon::coerce_constant(constant) {
+                    return Ok(Icon::Opher(opher_icon));
+                }
+
+                if let Some(equipment) = Equipment::coerce_constant(constant) {
+                    if equipment.has_icon() {
+                        return Ok(Icon::Equipment(equipment));
+                    }
+
+                    return Err(Error::error(
+                        format!("{equipment} has no associated icon"),
+                        span,
+                    ));
+                }
+
+                Err(type_error(constant.ty(), Type::Icon, span))
+            }
             Literal::IconAsset(path) => Ok(Icon::File(Cow::Owned(path))),
             Literal::CustomIcon(path) => Ok(Icon::Bundle(path)),
             other => Err(type_error(other.ty(), Type::Icon, span)),
