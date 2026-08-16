@@ -275,7 +275,7 @@ where
     for path in data_dir_assets(folder, extension) {
         let identifier = path.file_stem().unwrap().to_str().unwrap();
         let path = path.to_str().unwrap().to_string();
-        *asset_info.get_mut(identifier).unwrap().origin() = AssetOrigin::UserDataDir(path);
+        *asset_info.get_mut(identifier).unwrap().origin() = AssetOrigin::UserDataDir { path };
     }
 
     asset_info
