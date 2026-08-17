@@ -64,10 +64,13 @@ fn inline_snippet(
     identifier: String,
     failed: &mut Vec<String>,
 ) {
-    if cache.snippet_info[&identifier].metadata.can_inline {
+    if cache.snippet_info[&identifier]
+        .metadata
+        .requires_local_files
+    {
+        failed.push(identifier);
+    } else {
         let snippet = cache.read_snippet(&identifier).unwrap();
         inline_snippets.insert(identifier, snippet);
-    } else {
-        failed.push(identifier);
     }
 }

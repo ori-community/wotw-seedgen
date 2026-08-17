@@ -21,10 +21,10 @@ pub struct Metadata {
     pub description: Option<String>,
     /// Available configuration
     pub config: FxHashMap<String, ConfigValue>,
-    /// Whether this snippet can be inlined
+    /// Whether this snippet requires local files, preventing it from being inlined
     ///
-    /// Note that a value of `true` is not fully reliable if included snippets cannot be inlined
-    pub can_inline: bool,
+    /// Note that included snippets may require local files even if this one doesn't
+    pub requires_local_files: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
@@ -98,7 +98,7 @@ impl Metadata {
 impl Handler for Metadata {
     fn command(&mut self, command: &ast::Command) {
         match command {
-            ast::Command::IncludeIcon(..) => self.can_inline = false,
+            ast::Command::IncludeIcon(..) => self.requires_local_files = true,
             ast::Command::Config(_, args) => {
                 if let Some(config) = get_command_args_ref(args) {
                     self.config(config);
