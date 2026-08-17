@@ -8,7 +8,7 @@ use rand::thread_rng;
 use utoipa::OpenApi;
 use wotw_seedgen::data::WorldSettings;
 
-use crate::{RouterState, settings::inline_world_snippets};
+use crate::{RouterState, error::Result, settings::inline_world_snippets};
 
 pub const TAG: &str = "world";
 pub const WORLD: &str = concat!("/", TAG);
@@ -54,15 +54,18 @@ async fn random(State(cache): State<RouterState>) -> Json<WorldSettings> {
 #[utoipa::path(
     post,
     path = INLINE_SNIPPETS,
-    responses((status = OK, body = WorldSettings)),
+    responses(
+        (status = OK, body = WorldSettings),
+        (status = UNPROCESSABLE_ENTITY, body = String),
+    ),
 )]
 async fn inline_snippets(
     State(cache): State<RouterState>,
     Json(mut body): Json<WorldSettings>,
-) -> Json<WorldSettings> {
+) -> Result<Json<WorldSettings>> {
     let cache = cache.read().await;
 
-    inline_world_snippets(&mut body, &cache);
+    inline_world_snippets(&mut body, &cache)?;
 
-    Json(body)
+    Ok(Json(body))
 }

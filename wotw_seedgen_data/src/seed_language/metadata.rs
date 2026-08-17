@@ -1,20 +1,30 @@
 use std::fmt::{self, Display};
 
 use crate::seed_language::ast::{
-    self, get_command_arg_ref, inspect_command_args, Handler, Traverse,
+    self, get_command_arg_ref, get_command_args_ref, inspect_command_args, Handler, Traverse,
 };
 use ordered_float::OrderedFloat;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
 use utoipa::ToSchema;
 
+/// Metadata about a snippet
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, ToSchema)]
 pub struct Metadata {
+    /// Whether the snippet should be hidden from the options when generating seeds
     pub hidden: bool,
+    /// Display name
     pub name: Option<String>,
+    /// Category shared with other snippets
     pub category: Option<String>,
+    /// Longer description
     pub description: Option<String>,
+    /// Available configuration
     pub config: FxHashMap<String, ConfigValue>,
+    /// Whether this snippet can be inlined
+    ///
+    /// Note that a value of `true` is not fully reliable if included snippets cannot be inlined
+    pub can_inline: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
@@ -56,23 +66,6 @@ impl Metadata {
         ast.traverse(&mut metadata);
         metadata
     }
-}
-
-impl Handler for Metadata {
-    fn annotation(&mut self, annotation: &ast::Annotation) {
-        match annotation {
-            ast::Annotation::Hidden(_) => self.hidden = true,
-            ast::Annotation::Name(_, args) => {
-                inspect_command_args(args, |name| self.name = Some(name.data.to_string()));
-            }
-            ast::Annotation::Category(_, args) => inspect_command_args(args, |category| {
-                self.category = Some(category.data.to_string());
-            }),
-            ast::Annotation::Description(_, args) => inspect_command_args(args, |description| {
-                self.description = Some(description.data.to_string());
-            }),
-        }
-    }
 
     fn config(&mut self, config: &ast::ConfigArgs) {
         let (Some(name), Some(default)) = (
@@ -99,5 +92,34 @@ impl Handler for Metadata {
 
         self.config
             .insert(config.identifier.data.to_string(), value);
+    }
+}
+
+impl Handler for Metadata {
+    fn command(&mut self, command: &ast::Command) {
+        match command {
+            ast::Command::IncludeIcon(..) => self.can_inline = false,
+            ast::Command::Config(_, args) => {
+                if let Some(config) = get_command_args_ref(args) {
+                    self.config(config);
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn annotation(&mut self, annotation: &ast::Annotation) {
+        match annotation {
+            ast::Annotation::Hidden(_) => self.hidden = true,
+            ast::Annotation::Name(_, args) => {
+                inspect_command_args(args, |name| self.name = Some(name.data.to_string()));
+            }
+            ast::Annotation::Category(_, args) => inspect_command_args(args, |category| {
+                self.category = Some(category.data.to_string());
+            }),
+            ast::Annotation::Description(_, args) => inspect_command_args(args, |description| {
+                self.description = Some(description.data.to_string());
+            }),
+        }
     }
 }

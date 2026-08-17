@@ -4,6 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
+use itertools::Itertools;
 use single_instance::error::SingleInstanceError;
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -22,6 +23,8 @@ pub enum Error {
     Serve(io::Error),
     #[error("failed to apply preset: {0}")]
     ApplyPreset(String),
+    #[error("failed to inline custom snippets: {} referenced local files", .0.iter().format(", "))]
+    InlineSnippets(Vec<String>),
     #[error("failed to generate seed: {0}")]
     Generate(String),
 }
@@ -37,7 +40,7 @@ impl IntoResponse for Error {
                     StatusCode::BAD_REQUEST
                 }
             }
-            Error::ApplyPreset(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            Error::ApplyPreset(_) | Error::InlineSnippets(_) => StatusCode::UNPROCESSABLE_ENTITY,
             Error::ServerCore(_) | Error::SingleInstance(_) | Error::Serve(_) => unreachable!(),
         };
 

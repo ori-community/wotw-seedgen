@@ -289,6 +289,8 @@ impl<H: Handler> Traverse<H> for FunctionDefinition<'_> {
 
 impl<H: Handler> Traverse<H> for Command<'_> {
     fn traverse(&self, handler: &mut H) {
+        handler.command(self);
+
         match self {
             Self::Include(keyword, args) => {
                 handler.command_keyword(&keyword.span);
@@ -502,8 +504,6 @@ impl<H: Handler> Traverse<H> for TagsArg<'_> {
 
 impl<H: Handler> Traverse<H> for ConfigArgs<'_> {
     fn traverse(&self, handler: &mut H) {
-        handler.config(self);
-
         handler.identifier_def(&self.identifier);
 
         if let Some(description) = &self.description {
@@ -842,8 +842,8 @@ pub trait Handler {
         let _ = identifier;
     }
 
-    fn config(&mut self, config: &ConfigArgs) {
-        let _ = config;
+    fn command(&mut self, command: &Command) {
+        let _ = command;
     }
 
     fn annotation(&mut self, annotation: &Annotation) {
@@ -947,9 +947,9 @@ impl<H1: Handler, H2: Handler> Handler for (H1, H2) {
         self.1.function_use(identifier);
     }
 
-    fn config(&mut self, config: &ConfigArgs) {
-        self.0.config(config);
-        self.1.config(config);
+    fn command(&mut self, command: &Command) {
+        self.0.command(command);
+        self.1.command(command);
     }
 
     fn annotation(&mut self, annotation: &Annotation) {
