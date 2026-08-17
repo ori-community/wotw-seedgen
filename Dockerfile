@@ -4,7 +4,7 @@ COPY . /app
 WORKDIR /app
 
 RUN apk --no-cache add musl-dev curl git && \
-    cargo build
+    cargo build --release
 
 
 FROM alpine
@@ -19,7 +19,7 @@ RUN mkdir /data && \
     apk add --no-cache tini
 
 COPY --from=build-seedgen /app/assets /app
-COPY --from=build-seedgen /app/target/debug/wotw-seedgen /app/wotw-seedgen
+COPY --from=build-seedgen /app/target/release/wotw-seedgen /app/wotw-seedgen
 
 USER seedgen
 
