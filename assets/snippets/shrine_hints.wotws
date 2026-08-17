@@ -2,7 +2,7 @@
 #name("Shrine Hints")
 #description("Reveal the reward a Combat Shrine gives when starting it")
 
-!builtin_icon(message_icon, "icons/game/message.png")
+!builtin_icon(shrine_hints_icon, "icons/wheel/shrine_hints.blue.png")
 
 !include("list_core", new_column, add_row, add_current_row, new_row, add_row_item)
 
@@ -41,7 +41,7 @@ on shrines.depthsWave == 1 {
 
 on reload {
     set_wheel_item_name("progress_helper", Left, "Shrine Hints")
-    set_wheel_item_icon("progress_helper", Left, message_icon)
+    set_wheel_item_icon("progress_helper", Left, shrine_hints_icon)
     set_wheel_item_all_actions("progress_helper", Left, {
         write_shrine_hints()
         controlled_priority_message("shrine_hints", get_string("column"), 4)

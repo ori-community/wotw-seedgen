@@ -2,7 +2,7 @@
 #name("Trial Hints")
 #description("Reveal the reward a Spirit Trial gives when activating it")
 
-!builtin_icon(message_icon, "icons/game/message.png")
+!builtin_icon(trial_hints_icon, "icons/wheel/trial_hints.blue.png")
 
 !include("list_core", new_column, add_row, add_current_row, new_row, add_row_item)
 
@@ -57,7 +57,7 @@ on raceGroup.desertRace == 1 {
 
 on reload {
     set_wheel_item_name("progress_helper", LeftTop, "Trial Hints")
-    set_wheel_item_icon("progress_helper", LeftTop, message_icon)
+    set_wheel_item_icon("progress_helper", LeftTop, trial_hints_icon)
     set_wheel_item_all_actions("progress_helper", LeftTop, {
         write_trial_hints()
         controlled_priority_message("trial_hints", get_string("column"), 4)
