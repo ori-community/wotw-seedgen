@@ -1,3 +1,7 @@
+#hidden
+#name("List Core")
+#description("Various helpers to create lists")
+
 !let(bright_yellow, "<hex_ffdd88ff>")
 
 !export(new_row)
