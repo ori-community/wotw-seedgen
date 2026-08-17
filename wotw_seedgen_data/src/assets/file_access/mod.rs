@@ -10,7 +10,7 @@ pub use default_dirs::{
     SEEDGEN_USER_DATA_DIR,
 };
 pub use plando::PlandoFileAccess;
-pub use watch::{Watcher, WatcherError};
+pub use watch::{Watcher, WatcherError, WatcherMessage, WatcherResult};
 
 use crate::assets::{
     LocData, PresetAccess, SnippetAccess, StateData, UberStateData, UberStateDump, UniversePreset,

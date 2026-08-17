@@ -8,6 +8,7 @@ use rand_pcg::Pcg64Mcg;
 use std::{
     ffi::OsStr,
     path::{Path, PathBuf},
+    sync::mpsc,
     time::{Duration, Instant},
 };
 use wotw_seedgen::{
@@ -86,11 +87,16 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
             err.eprint();
         }
 
-        let mut watcher = Watcher::new(Duration::from_millis(50))?;
+        let (sender, receiver) = mpsc::channel();
+        let sender = move |message| {
+            let _ = sender.send(message);
+        };
+
+        let mut watcher = Watcher::new(Duration::from_millis(50), sender)?;
 
         cache.watch(&mut watcher)?;
 
-        for res in watcher {
+        for res in receiver {
             let events = res?;
 
             if !cache.update_from_watcher_event(events)? {

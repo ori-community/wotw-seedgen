@@ -18,7 +18,7 @@ use wotw_seedgen_parse::Source;
 
 use crate::assets::{
     file_err, AssetFileAccess, LocData, PresetAccess, PresetFileAccess, SnippetAccess,
-    SnippetFileAccess, StateData, UberStateData, UniversePreset, Watcher, WatcherError,
+    SnippetFileAccess, StateData, UberStateData, UniversePreset, Watcher, WatcherResult,
     WorldPreset,
 };
 
@@ -39,7 +39,7 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
         })
     }
 
-    pub fn watch(&self, watcher: &mut Watcher) -> Result<(), WatcherError> {
+    pub fn watch(&self, watcher: &mut Watcher) -> WatcherResult<()> {
         for folder in self.file_access.asset_folders() {
             watcher.watch(folder, RecursiveMode::NonRecursive)?;
         }

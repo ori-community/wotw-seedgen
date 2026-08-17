@@ -1,8 +1,15 @@
 mod error;
 
-use tokio::{runtime::Runtime, sync::RwLock};
+use tokio::{
+    runtime::Runtime,
+    sync::{
+        RwLock,
+        mpsc::{self, UnboundedReceiver},
+    },
+};
 use wotw_seedgen_data::assets::{
     AssetCache, AssetCacheValues, AssetFileAccess, PresetFileAccess, SnippetFileAccess, Watcher,
+    WatcherMessage,
 };
 
 pub use crate::error::{Error, Result};
@@ -28,14 +35,19 @@ where
 
     eprintln!("Started runtime");
 
-    let mut watcher = Watcher::new(Duration::from_secs(1))?;
+    let (sender, receiver) = mpsc::unbounded_channel();
+    let sender = move |message| {
+        let _ = sender.send(message);
+    };
+
+    let mut watcher = Watcher::new(Duration::from_secs(1), sender)?;
 
     cache.watch(&mut watcher)?;
 
     let state = Arc::new(RwLock::new(cache));
 
     let watcher_state = state.clone();
-    runtime.spawn(watch_assets(watcher_state, watcher));
+    runtime.spawn(watch_assets(watcher_state, watcher, receiver));
 
     eprintln!("Loaded assets");
 
@@ -44,12 +56,16 @@ where
     Ok((runtime, state))
 }
 
-pub async fn watch_assets<F, V>(state: Arc<RwLock<AssetCache<F, V>>>, watcher: Watcher)
-where
+pub async fn watch_assets<F, V>(
+    state: Arc<RwLock<AssetCache<F, V>>>,
+    // passed to keep alive
+    _watcher: Watcher,
+    mut receiver: UnboundedReceiver<WatcherMessage>,
+) where
     F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     V: AssetCacheValues,
 {
-    for res in watcher {
+    while let Some(res) = receiver.recv().await {
         or_print(
             async {
                 let events = res?;
