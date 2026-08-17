@@ -1,10 +1,10 @@
-FROM rust:alpine as build-seedgen
+FROM rust:alpine AS build-seedgen
 
 COPY . /app
 WORKDIR /app
 
 RUN apk --no-cache add musl-dev curl git && \
-    cargo build --release
+    cargo build
 
 
 FROM alpine
@@ -15,11 +15,12 @@ ENV RANDOMIZER_USER_DATA_DIR=/data
 
 RUN mkdir /data && \
     adduser -H -D -u 1010 seedgen && \
-    chown -R 1010 /data
+    chown -R 1010 /data && \
+    apk add --no-cache tini
 
 COPY --from=build-seedgen /app/assets /app
-COPY --from=build-seedgen /app/target/release/wotw-seedgen /app/wotw-seedgen
+COPY --from=build-seedgen /app/target/debug/wotw-seedgen /app/wotw-seedgen
 
 USER seedgen
 
-ENTRYPOINT ["/app/wotw-seedgen"]
+ENTRYPOINT ["/sbin/tini", "--", "/app/wotw-seedgen"]
