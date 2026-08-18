@@ -5,10 +5,11 @@
 Tracks your progress as you play
 By default those are bound to
 - Alt+P (general progress)
-- Alt+1 (trees and wisps)
-- Alt+2 (quests)
-- Alt+3 (teleporters)
-- Alt+4 (entrances)
+- Alt+1 (missing goals)
+- Alt+2 (trees and wisps)
+- Alt+3 (quests)
+- Alt+4 (teleporters)
+- Alt+5 (entrances)
 ")
 
 // TODO interface settings instead
@@ -121,57 +122,57 @@ on reload {
 
     set_wheel_item_data(
         "progress_helper",
-        TopRight,
+        RightTop,
         "Tree Progress",
         "[Ability1]View Progress",
         tree_progress_icon,
     )
-    set_wheel_item_all_actions("progress_helper", TopRight, {
+    set_wheel_item_all_actions("progress_helper", RightTop, {
         write_tree_progress()
         controlled_priority_message("tree_progress", get_string("tree_progress"), 4)
     })
 
     set_wheel_item_data(
         "progress_helper",
-        RightTop,
+        Right,
         "Wisp Progress",
         "[Ability1]View Progress",
         wisp_progress_icon,
     )
-    set_wheel_item_all_actions("progress_helper", RightTop, {
+    set_wheel_item_all_actions("progress_helper", Right, {
         write_wisp_progress()
         controlled_priority_message("wisp_progress", get_string("wisp_progress"), 4)
     })
 
     set_wheel_item_data(
         "progress_helper",
-        Right,
+        RightBottom,
         "Quest Progress",
         "[Ability1]View Progress",
         quest_progress_icon,
     )
-    set_wheel_item_all_actions("progress_helper", Right, show_quest_progress())
+    set_wheel_item_all_actions("progress_helper", RightBottom, show_quest_progress())
 
     set_wheel_item_data(
         "progress_helper",
-        RightBottom,
+        BottomRight,
         "Teleporter Progress",
         "[Ability1]View Progress",
         teleporter_icon,
     )
-    set_wheel_item_all_actions("progress_helper", RightBottom, show_teleporter_progress())
+    set_wheel_item_all_actions("progress_helper", BottomRight, show_teleporter_progress())
 }
 
 !if entrance_helper {
     on reload {
         set_wheel_item_data(
             "progress_helper",
-            BottomRight,
+            Bottom,
             "Entrance Progress",
             "[Ability1]View Progress",
             entrance_connections_icon,
         )
-        set_wheel_item_all_actions("progress_helper", BottomRight, show_entrance_progress())
+        set_wheel_item_all_actions("progress_helper", Bottom, show_entrance_progress())
     }
 }
 
@@ -217,16 +218,16 @@ on change player.currentMapArea {
     if player.currentMapArea >= 12 set_message_text("map_message", "")
 }
 
-on binding1 if disable_keybinds == false {
+on binding2 if disable_keybinds == false {
     write_tree_progress()
     write_wisp_progress()
     controlled_priority_message("tree_wisp_progress", get_string("tree_progress") + "\n" + get_string("wisp_progress"), 4)
 }
-on binding2 if disable_keybinds == false show_quest_progress()
-on binding3 if disable_keybinds == false show_teleporter_progress()
+on binding3 if disable_keybinds == false show_quest_progress()
+on binding4 if disable_keybinds == false show_teleporter_progress()
 
 !if entrance_helper {
-    on binding4 if disable_keybinds == false show_entrance_progress()
+    on binding5 if disable_keybinds == false show_entrance_progress()
 }
 
 fun write_tree_progress() {

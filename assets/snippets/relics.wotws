@@ -14,8 +14,8 @@
 }
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
-!include("goal_mode_core", check_goals_completed, write_goals_incomplete_message, update_goals_completed)
-!include("list_core", new_row, add_row_item, add_row)
+!include("goal_mode_core", check_goals_completed, write_missing_goals, update_goals)
+!include("list_core", new_row, add_row_item, add_row, add_current_row)
 
 !state(marsh_relic_collected, Boolean)
 !state(hollow_relic_collected, Boolean)
@@ -392,15 +392,22 @@ fun update_current_area_has_uncollected_relic() {
     if itemTracker.relicsCount < itemTracker.relicsRequired set_boolean("goals_completed", false)
 })
 
-on change itemTracker.relicsCount update_goals_completed()
-on change itemTracker.relicsRequired update_goals_completed()
+on change itemTracker.relicsCount update_goals()
+on change itemTracker.relicsRequired update_goals()
 
-!augment_fun(write_goals_incomplete_message(), {
-    if itemTracker.relicsCount < itemTracker.relicsRequired {
-        write_relics_message("@")
-        add_row(get_string("row"))
-    }
-})
+!augment_fun(write_missing_goals(), new_row("#Missing Relics (" + (itemTracker.relicsRequired - itemTracker.relicsCount) + ")#: "))
+!if marsh_relic_exists { !augment_fun(write_missing_goals(), if marsh_relic_collected == false add_row_item("Marsh")) }
+!if hollow_relic_exists { !augment_fun(write_missing_goals(), if hollow_relic_collected == false add_row_item("Hollow")) }
+!if glades_relic_exists { !augment_fun(write_missing_goals(), if glades_relic_collected == false add_row_item("Glades")) }
+!if wellspring_relic_exists { !augment_fun(write_missing_goals(), if wellspring_relic_collected == false add_row_item("Wellspring")) }
+!if woods_relic_exists { !augment_fun(write_missing_goals(), if woods_relic_collected == false add_row_item("Woods")) }
+!if reach_relic_exists { !augment_fun(write_missing_goals(), if reach_relic_collected == false add_row_item("Reach")) }
+!if depths_relic_exists { !augment_fun(write_missing_goals(), if depths_relic_collected == false add_row_item("Depths")) }
+!if pools_relic_exists { !augment_fun(write_missing_goals(), if pools_relic_collected == false add_row_item("Pools")) }
+!if wastes_relic_exists { !augment_fun(write_missing_goals(), if wastes_relic_collected == false add_row_item("Wastes")) }
+!if willow_relic_exists { !augment_fun(write_missing_goals(), if willow_relic_collected == false add_row_item("Willow")) }
+!if burrows_relic_exists { !augment_fun(write_missing_goals(), if burrows_relic_collected == false add_row_item("Burrows")) }
+!augment_fun(write_missing_goals(), add_current_row())
 
 fun write_relics_message(color: String) {
     new_row("Relics (" + color + itemTracker.relicsCount + "/" + itemTracker.relicsRequired + color + "): ")

@@ -4,15 +4,14 @@
 
 !tags("All Trees")
 
-!include("goal_mode_core", add_row_item, write_goal_progress_message, check_goals_completed, write_goals_incomplete_message, update_goals_completed)
-!include("list_core", add_row)
+!include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
+!include("list_core", new_row, add_current_row)
 
 !let(max_trees, 14)
 
-!augment_fun(write_goal_progress_message(), {
-    set_string("color", "")
-    if itemTracker.treesCount == max_trees set_string("color", "$")
-    write_trees_message(get_string("color"))
+!augment_fun(write_short_goals_row(), {
+    set_string("trees_message", "Trees: " + itemTracker.treesCount + "/" + max_trees)
+    if itemTracker.treesCount == max_trees set_string("trees_message", "$" + get_string("trees_message") + "$")
     add_row_item(get_string("trees_message"))
 })
 
@@ -106,17 +105,23 @@ on WeepingRidge.LaunchTree {
 }
 on WeepingRidge.LaunchTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
 
-on change itemTracker.treesCount update_goals_completed()
+on change itemTracker.treesCount update_goals()
 
-// TODO maybe do a fancier feedback message pointing out what exactly you are missing?
-
-!augment_fun(write_goals_incomplete_message(), {
-    if itemTracker.treesCount < max_trees {
-        write_trees_message("@")
-        add_row(get_string("trees_message"))
-    }
+!augment_fun(write_missing_goals(), if itemTracker.treesCount < max_trees {
+    new_row("#Missing Trees (" + (max_trees - itemTracker.treesCount) + ")#: ")
+    if MarshSpawn.RegenTree == false add_row_item("Regenerate")
+    if HowlsDen.SwordTree == false add_row_item("Sword")
+    if HowlsDen.DoubleJumpTree == false add_row_item("Double Jump")
+    if MarshPastOpher.BowTree == false add_row_item("Bow")
+    if WestHollow.DashTree == false add_row_item("Dash")
+    if EastHollow.BashTree == false add_row_item("Bash")
+    if InnerWellspring.GrappleTree == false add_row_item("Grapple")
+    if MarshSpawn.DamageTree == false add_row_item("Marsh Ancestral Light")
+    if GladesTown.DamageTree == false add_row_item("Glades Ancestral Light")
+    if LowerWastes.BurrowTree == false add_row_item("Burrow")
+    if UpperReach.GrenadeTree == false add_row_item("Grenade")
+    if LowerDepths.FlashTree == false add_row_item("Flash")
+    if UpperPools.WaterDashTree == false add_row_item("Water Dash")
+    if WeepingRidge.LaunchTree == false add_row_item("Launch")
+    add_current_row()
 })
-
-fun write_trees_message(color: String) {
-    set_string("trees_message", color + "Trees: " + itemTracker.treesCount + "/" + max_trees + color)
-}

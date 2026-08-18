@@ -4,16 +4,15 @@
 
 !tags("All Side Quests")
 
-!include("goal_mode_core", add_row_item, write_goal_progress_message, check_goals_completed, write_goals_incomplete_message, update_goals_completed)
-!include("list_core", add_row)
+!include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
+!include("list_core", new_row, add_current_row)
 
 !let(max_quests, 12)
 
-!augment_fun(write_goal_progress_message(), {
-    set_string("color", "")
-    if itemTracker.questsCount == max_quests set_string("color", "$")
-    write_quests_message(get_string("color"))
-    add_row_item(get_string("quest_message"))
+!augment_fun(write_short_goals_row(), {
+    set_string("quests_message", "Quests: " + itemTracker.questsCount + "/" + max_quests)
+    if itemTracker.questsCount == max_quests set_string("quests_message", "$" + get_string("quests_message") + "$")
+    add_row_item(get_string("quests_message"))
 })
 
 !augment_fun(check_goals_completed(), {
@@ -97,15 +96,21 @@ on GladesTown.RegrowTheGlades {
 }
 on GladesTown.RegrowTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 
-on change itemTracker.questsCount update_goals_completed()
+on change itemTracker.questsCount update_goals()
 
-!augment_fun(write_goals_incomplete_message(), {
-    if itemTracker.questsCount < max_quests {
-        write_quests_message("@")
-        add_row(get_string("quest_message"))
-    }
+!augment_fun(write_missing_goals(), if itemTracker.questsCount < max_quests {
+    new_row("#Missing Quests (" + (max_quests - itemTracker.questsCount) + ")#: ")
+    if MarshSpawn.TokkKeystoneQuest == false add_row_item("Missing Key")
+    if MarshSpawn.TokkTabletQuest == false add_row_item("Into Burrows")
+    if OuterWellspring.TheLostCompass == false add_row_item("Lost Compass")
+    if MarshSpawn.MokkFangQuest == false add_row_item("Little Braver")
+    if GladesTown.FamilyReunion == false add_row_item("Family Reunion")
+    if GladesTown.LastTree == false add_row_item("Tree Keeper")
+    if GladesTown.TwillenGemQuest == false add_row_item("Rough Diamond")
+    if WindtornRuins.HandToHandComplete == false add_row_item("Hand to Hand")
+    if GladesTown.MokiAcornQuest == false add_row_item("Into Darkness")
+    if EastHollow.KwolokAmuletQuest == false add_row_item("Kwolok's Wisdom")
+    if GladesTown.RebuildTheGlades == false add_row_item("Rebuilding the Glades")
+    if GladesTown.RegrowTheGlades == false add_row_item("Regrowing the Glades")
+    add_current_row()
 })
-
-fun write_quests_message(color: String) {
-    set_string("quest_message", color + "Quests: " + itemTracker.questsCount + "/" + max_quests + color)
-}

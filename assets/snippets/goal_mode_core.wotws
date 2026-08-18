@@ -1,74 +1,93 @@
 #hidden
 #name("Goal Mode Core")
-#description("Manages access to Shriek")
+#description("Manages access to Shriek and goal progress messages")
 
-!include("progress_helper", write_progress_message, update_progress_message)
+!builtin_icon(message_icon, "icons/game/message.png")
+
+!include("progress_helper", write_progress_message, update_progress_message, disable_keybinds)
 !include("list_core", new_column, new_row, add_row_item, add_current_row)
 
 !export(add_row_item)
-
-!export(write_goal_progress_message)
-fun write_goal_progress_message() {
-    new_row("")
-}
 
 !export(check_goals_completed)
 fun check_goals_completed() {
     set_boolean("goals_completed", true)
 }
 
-!export(write_goals_incomplete_message)
-fun write_goals_incomplete_message() {
-    new_column("<s_0.9><ls_0.9>Incomplete Goals:")
+!export(write_short_goals_row)
+fun write_short_goals_row() {
+    new_row("")
 }
 
-on change player.currentArea update_goals_incomplete_message() // Need this because the zone updates 1 frame delayed from the position change
-fun update_goals_incomplete_message() {
-    write_goals_incomplete_message()
-    set_message_text("goals_incomplete", get_string("column"))
+!export(write_missing_goals)
+fun write_missing_goals() {
+    new_column("")
 }
 
-on player.currentMapArea < 12 free_message_hide("goals_incomplete", false)
-on player.currentMapArea >= 12 free_message_show("goals_incomplete", true, false)
-
-!export(update_goals_completed)
-fun update_goals_completed() {
+!export(update_goals)
+fun update_goals() {
     check_goals_completed()
     store(randoState.shriekBarrier, get_boolean("goals_completed") == false)
 
     update_progress_message()
+    update_missing_goals()
 
-    if get_boolean("in_shriek_room") {
-        if get_boolean("goals_completed") {
-            destroy_message("goals_incomplete")
-        }
-        if get_boolean("goals_completed") == false {
-            update_goals_incomplete_message()
-        }
-    }
+    if get_boolean("in_shriek_room") && get_boolean("goals_completed") destroy_message("missing_goals")
 }
 
 // TODO try shrinking or graying the Trees: etc. labels to make the numbers easier to parse
 !augment_fun(write_progress_message(), {
-    write_goal_progress_message()
+    write_short_goals_row()
     add_current_row()
 })
 
+on binding1 if disable_keybinds == false show_missing_goals()
+
+fun show_missing_goals() {
+    if randoState.shriekBarrier {
+        if get_boolean("in_shriek_room") priority_message("Already at Shriek")
+        if get_boolean("in_shriek_room") == false {
+            write_missing_goals()
+            controlled_priority_message("missing_goals", get_string("column"), 6)
+        }
+    }
+    if randoState.shriekBarrier == false priority_message("All Goals completed")
+}
+
 on reload {
+    set_wheel_item_data(
+        "progress_helper",
+        TopRight,
+        "Missing Goals",
+        "[Ability1]View Missing Goals",
+        message_icon,
+    )
+    set_wheel_item_all_actions("progress_helper", TopRight, show_missing_goals())
+
     box_trigger("shriek_room", 520, -3617, 744, -3503)
     box_trigger_enter_callback("shriek_room", {
         set_boolean("in_shriek_room", true)
-        check_goals_completed()
-        if get_boolean("goals_completed") == false {
-            write_goals_incomplete_message()
-            free_message("goals_incomplete", get_string("column"))
-            set_message_vertical_anchor("goals_incomplete", Bottom)
-            set_message_position("goals_incomplete", 0.5, 0.84)
+        if randoState.shriekBarrier {
+            write_missing_goals()
+            set_string("column", "<s_0.9><ls_0.9>@" + get_string("column") + "@")
+            free_message("missing_goals", get_string("column"))
+            set_message_vertical_anchor("missing_goals", Bottom)
+            set_message_position("missing_goals", 0.5, 0.84)
         }
     })
     box_trigger_leave_callback("shriek_room", {
         set_boolean("in_shriek_room", false)
-        destroy_message("goals_incomplete")
+        destroy_message("missing_goals")
     })
-    update_goals_completed()
+    update_goals()
 }
+
+on change player.currentArea update_missing_goals() // Need this because the zone updates 1 frame delayed from the position change
+fun update_missing_goals() {
+    write_missing_goals()
+    if get_boolean("in_shriek_room") set_string("column", "<s_0.9><ls_0.9>@" + get_string("column") + "@")
+    set_message_text("missing_goals", get_string("column"))
+}
+
+on player.currentMapArea < 12 free_message_hide("missing_goals", false)
+on player.currentMapArea >= 12 free_message_show("missing_goals", true, false)

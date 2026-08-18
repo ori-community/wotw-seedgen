@@ -4,16 +4,15 @@
 
 !tags("All Wisps")
 
-!include("goal_mode_core", add_row_item, write_goal_progress_message, check_goals_completed, write_goals_incomplete_message, update_goals_completed)
-!include("list_core", add_row)
+!include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
+!include("list_core", new_row, add_current_row)
 !include("wisp_count")
 
 !let(max_wisps, 5)
 
-!augment_fun(write_goal_progress_message(), {
-    set_string("color", "")
-    if itemTracker.wispsCount == max_wisps set_string("color", "$")
-    write_wisps_message(get_string("color"))
+!augment_fun(write_short_goals_row(), {
+    set_string("wisps_message", "Wisps: " + itemTracker.wispsCount + "/" + max_wisps)
+    if itemTracker.wispsCount == max_wisps set_string("wisps_message", "$" + get_string("wisps_message") + "$")
     add_row_item(get_string("wisps_message"))
 })
 
@@ -29,15 +28,14 @@ on LowerReach.ForestsMemory create_stats_entry(Wisp, "Memory")
 on UpperDepths.ForestsEyes create_stats_entry(Wisp, "Eyes")
 on WindtornRuins.Seir create_stats_entry(Wisp, "Heart")
 
-on change itemTracker.wispsCount update_goals_completed()
+on change itemTracker.wispsCount update_goals()
 
-!augment_fun(write_goals_incomplete_message(), {
-    if itemTracker.wispsCount < max_wisps {
-        write_wisps_message("@")
-        add_row(get_string("wisps_message"))
-    }
+!augment_fun(write_missing_goals(), if itemTracker.wispsCount < max_wisps {
+    new_row("#Missing Wisps (" + (max_wisps - itemTracker.wispsCount) + ")#: ")
+    if EastHollow.ForestsVoice == false add_row_item("Voice")
+    if LowerReach.ForestsMemory == false add_row_item("Memory")
+    if UpperDepths.ForestsEyes == false add_row_item("Eyes")
+    if WestPools.ForestsStrength == false add_row_item("Strength")
+    if WindtornRuins.Seir == false add_row_item("Heart")
+    add_current_row()
 })
-
-fun write_wisps_message(color: String) {
-    set_string("wisps_message", color + "Wisps: " + itemTracker.wispsCount + "/" + max_wisps + color)
-}
