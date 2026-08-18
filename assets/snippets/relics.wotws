@@ -29,259 +29,68 @@
 !state(willow_relic_collected, Boolean)
 !state(burrows_relic_collected, Boolean)
 
-// TODO flavour messages
+!let(marsh_relic_exists, false)
+!let(hollow_relic_exists, false)
+!let(glades_relic_exists, false)
+!let(wellspring_relic_exists, false)
+!let(woods_relic_exists, false)
+!let(reach_relic_exists, false)
+!let(depths_relic_exists, false)
+!let(pools_relic_exists, false)
+!let(wastes_relic_exists, false)
+!let(willow_relic_exists, false)
+!let(burrows_relic_exists, false)
+
 !if relic_count == 0 {
     !random_float(marsh_relic, 0, 1)
-    !if marsh_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Marsh Relic")
-            item_message("@Marsh Relic@")
-            store(marsh_relic_collected, true)
-        }, Marsh)
-        !let(marsh_relic_exists, true)
-    }
-    !if marsh_relic > relic_chance {
-        !let(marsh_relic_exists, false)
-    }
+    !if marsh_relic <= relic_chance { !let(marsh_relic_exists, true) }
 
     !random_float(hollow_relic, 0, 1)
-    !if hollow_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Hollow Relic")
-            item_message("@Hollow Relic@")
-            store(hollow_relic_collected, true)
-        }, Hollow)
-        !let(hollow_relic_exists, true)
-    }
-    !if hollow_relic > relic_chance {
-        !let(hollow_relic_exists, false)
-    }
+    !if hollow_relic <= relic_chance { !let(hollow_relic_exists, true) }
 
     !random_float(glades_relic, 0, 1)
-    !if glades_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Glades Relic")
-            item_message("@Glades Relic@")
-            store(glades_relic_collected, true)
-        }, Glades)
-        !let(glades_relic_exists, true)
-    }
-    !if glades_relic > relic_chance {
-        !let(glades_relic_exists, false)
-    }
+    !if glades_relic <= relic_chance { !let(glades_relic_exists, true) }
 
     !random_float(wellspring_relic, 0, 1)
-    !if wellspring_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Wellspring Relic")
-            item_message("@Wellspring Relic@")
-            store(wellspring_relic_collected, true)
-        }, Wellspring)
-        !let(wellspring_relic_exists, true)
-    }
-    !if wellspring_relic > relic_chance {
-        !let(wellspring_relic_exists, false)
-    }
+    !if wellspring_relic <= relic_chance { !let(wellspring_relic_exists, true) }
 
     !random_float(woods_relic, 0, 1)
-    !if woods_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Woods Relic")
-            item_message("@Woods Relic@")
-            store(woods_relic_collected, true)
-        }, Woods)
-        !let(woods_relic_exists, true)
-    }
-    !if woods_relic > relic_chance {
-        !let(woods_relic_exists, false)
-    }
+    !if woods_relic <= relic_chance { !let(woods_relic_exists, true) }
 
     !random_float(reach_relic, 0, 1)
-    !if reach_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Reach Relic")
-            item_message("@Reach Relic@")
-            store(reach_relic_collected, true)
-        }, Reach)
-        !let(reach_relic_exists, true)
-    }
-    !if reach_relic > relic_chance {
-        !let(reach_relic_exists, false)
-    }
+    !if reach_relic <= relic_chance { !let(reach_relic_exists, true) }
 
     !random_float(depths_relic, 0, 1)
-    !if depths_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Depths Relic")
-            item_message("@Depths Relic@")
-            store(depths_relic_collected, true)
-        }, Depths)
-        !let(depths_relic_exists, true)
-    }
-    !if depths_relic > relic_chance {
-        !let(depths_relic_exists, false)
-    }
+    !if depths_relic <= relic_chance { !let(depths_relic_exists, true) }
 
     !random_float(pools_relic, 0, 1)
-    !if pools_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Pools Relic")
-            item_message("@Pools Relic@")
-            store(pools_relic_collected, true)
-        }, Pools)
-        !let(pools_relic_exists, true)
-    }
-    !if pools_relic > relic_chance {
-        !let(pools_relic_exists, false)
-    }
+    !if pools_relic <= relic_chance { !let(pools_relic_exists, true) }
 
     !random_float(wastes_relic, 0, 1)
-    !if wastes_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Wastes Relic")
-            item_message("@Wastes Relic@")
-            store(wastes_relic_collected, true)
-        }, Wastes)
-        !let(wastes_relic_exists, true)
-    }
-    !if wastes_relic > relic_chance {
-        !let(wastes_relic_exists, false)
-    }
+    !if wastes_relic <= relic_chance { !let(wastes_relic_exists, true) }
 
     !random_float(willow_relic, 0, 1)
-    !if willow_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Willow Relic")
-            item_message("@Willow Relic@")
-            store(willow_relic_collected, true)
-        }, Willow)
-        !let(willow_relic_exists, true)
-    }
-    !if willow_relic > relic_chance {
-        !let(willow_relic_exists, false)
-    }
+    !if willow_relic <= relic_chance { !let(willow_relic_exists, true) }
 
     !random_float(burrows_relic, 0, 1)
-    !if burrows_relic <= relic_chance {
-        !preplace({
-            create_stats_entry(MapstoneFragment, "Burrows Relic")
-            item_message("@Burrows Relic@")
-            store(burrows_relic_collected, true)
-        }, Burrows)
-        !let(burrows_relic_exists, true)
-    }
-    !if burrows_relic > relic_chance {
-        !let(burrows_relic_exists, false)
-    }
+    !if burrows_relic <= relic_chance { !let(burrows_relic_exists, true) }
 }
 !if relic_count > 0 {
     !random_pool(relics, String, ["marsh", "hollow", "glades", "wellspring", "woods", "reach", "depths", "pools", "wastes", "willow", "burrows"])
 
     !repeat relic_count {
         !random_from_pool(relic, relics)
-
-        !if relic == "marsh" {
-            !preplace({
-                item_message("@Marsh Relic@")
-                store(marsh_relic_collected, true)
-            }, Marsh)
-            !let(marsh_relic_exists, true)
-        }
-
-        !if relic == "hollow" {
-            !preplace({
-                item_message("@Hollow Relic@")
-                store(hollow_relic_collected, true)
-            }, Hollow)
-            !let(hollow_relic_exists, true)
-        }
-
-        !if relic == "glades" {
-            !preplace({
-                item_message("@Glades Relic@")
-                store(glades_relic_collected, true)
-            }, Glades)
-            !let(glades_relic_exists, true)
-        }
-
-        !if relic == "wellspring" {
-            !preplace({
-                item_message("@Wellspring Relic@")
-                store(wellspring_relic_collected, true)
-            }, Wellspring)
-            !let(wellspring_relic_exists, true)
-        }
-
-        !if relic == "woods" {
-            !preplace({
-                item_message("@Woods Relic@")
-                store(woods_relic_collected, true)
-            }, Woods)
-            !let(woods_relic_exists, true)
-        }
-
-        !if relic == "reach" {
-            !preplace({
-                item_message("@Reach Relic@")
-                store(reach_relic_collected, true)
-            }, Reach)
-            !let(reach_relic_exists, true)
-        }
-
-        !if relic == "depths" {
-            !preplace({
-                item_message("@Depths Relic@")
-                store(depths_relic_collected, true)
-            }, Depths)
-            !let(depths_relic_exists, true)
-        }
-
-        !if relic == "pools" {
-            !preplace({
-                item_message("@Pools Relic@")
-                store(pools_relic_collected, true)
-            }, Pools)
-            !let(pools_relic_exists, true)
-        }
-
-        !if relic == "wastes" {
-            !preplace({
-                item_message("@Wastes Relic@")
-                store(wastes_relic_collected, true)
-            }, Wastes)
-            !let(wastes_relic_exists, true)
-        }
-
-        !if relic == "willow" {
-            !preplace({
-                item_message("@Willow Relic@")
-                store(willow_relic_collected, true)
-            }, Willow)
-            !let(willow_relic_exists, true)
-        }
-
-        !if relic == "burrows" {
-            !preplace({
-                item_message("@Burrows Relic@")
-                store(burrows_relic_collected, true)
-            }, Burrows)
-            !let(burrows_relic_exists, true)
-        }
-    }
-
-    !repeat 11 - relic_count {
-        !random_from_pool(relic, relics)
-        !if relic == "marsh" { !let(marsh_relic_exists, false) }
-        !if relic == "hollow" { !let(hollow_relic_exists, false) }
-        !if relic == "glades" { !let(glades_relic_exists, false) }
-        !if relic == "wellspring" { !let(wellspring_relic_exists, false) }
-        !if relic == "woods" { !let(woods_relic_exists, false) }
-        !if relic == "reach" { !let(reach_relic_exists, false) }
-        !if relic == "depths" { !let(depths_relic_exists, false) }
-        !if relic == "pools" { !let(pools_relic_exists, false) }
-        !if relic == "wastes" { !let(wastes_relic_exists, false) }
-        !if relic == "willow" { !let(willow_relic_exists, false) }
-        !if relic == "burrows" { !let(burrows_relic_exists, false) }
+        !if relic == "marsh" { !let(marsh_relic_exists, true) }
+        !if relic == "hollow" { !let(hollow_relic_exists, true) }
+        !if relic == "glades" { !let(glades_relic_exists, true) }
+        !if relic == "wellspring" { !let(wellspring_relic_exists, true) }
+        !if relic == "woods" { !let(woods_relic_exists, true) }
+        !if relic == "reach" { !let(reach_relic_exists, true) }
+        !if relic == "depths" { !let(depths_relic_exists, true) }
+        !if relic == "pools" { !let(pools_relic_exists, true) }
+        !if relic == "wastes" { !let(wastes_relic_exists, true) }
+        !if relic == "willow" { !let(willow_relic_exists, true) }
+        !if relic == "burrows" { !let(burrows_relic_exists, true) }
     }
 }
 
@@ -297,6 +106,139 @@
 !if wastes_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
+
+// TODO flavour messages
+!if marsh_relic_exists {
+    fun marsh_relic() {
+        create_stats_entry(MapstoneFragment, "Marsh Relic")
+        item_message("@Marsh Relic@")
+        store(marsh_relic_collected, true)
+    }
+
+    !preplace(marsh_relic(), Marsh)
+    !item_data_name(marsh_relic(), "Marsh Relic")
+    !item_data_map_icon(marsh_relic(), MapstoneFragment)
+}
+
+!if hollow_relic_exists {
+    fun hollow_relic() {
+        create_stats_entry(MapstoneFragment, "Hollow Relic")
+        item_message("@Hollow Relic@")
+        store(hollow_relic_collected, true)
+    }
+
+    !preplace(hollow_relic(), Hollow)
+    !item_data_name(hollow_relic(), "Hollow Relic")
+    !item_data_map_icon(hollow_relic(), MapstoneFragment)
+}
+
+!if glades_relic_exists {
+    fun glades_relic() {
+        create_stats_entry(MapstoneFragment, "Glades Relic")
+        item_message("@Glades Relic@")
+        store(glades_relic_collected, true)
+    }
+
+    !preplace(glades_relic(), Glades)
+    !item_data_name(glades_relic(), "Glades Relic")
+    !item_data_map_icon(glades_relic(), MapstoneFragment)
+}
+
+!if wellspring_relic_exists {
+    fun wellspring_relic() {
+        create_stats_entry(MapstoneFragment, "Wellspring Relic")
+        item_message("@Wellspring Relic@")
+        store(wellspring_relic_collected, true)
+    }
+
+    !preplace(wellspring_relic(), Wellspring)
+    !item_data_name(wellspring_relic(), "Wellspring Relic")
+    !item_data_map_icon(wellspring_relic(), MapstoneFragment)
+}
+
+!if woods_relic_exists {
+    fun woods_relic() {
+        create_stats_entry(MapstoneFragment, "Woods Relic")
+        item_message("@Woods Relic@")
+        store(woods_relic_collected, true)
+    }
+
+    !preplace(woods_relic(), Woods)
+    !item_data_name(woods_relic(), "Woods Relic")
+    !item_data_map_icon(woods_relic(), MapstoneFragment)
+}
+
+!if reach_relic_exists {
+    fun reach_relic() {
+        create_stats_entry(MapstoneFragment, "Reach Relic")
+        item_message("@Reach Relic@")
+        store(reach_relic_collected, true)
+    }
+
+    !preplace(reach_relic(), Reach)
+    !item_data_name(reach_relic(), "Reach Relic")
+    !item_data_map_icon(reach_relic(), MapstoneFragment)
+}
+
+!if depths_relic_exists {
+    fun depths_relic() {
+        create_stats_entry(MapstoneFragment, "Depths Relic")
+        item_message("@Depths Relic@")
+        store(depths_relic_collected, true)
+    }
+
+    !preplace(depths_relic(), Depths)
+    !item_data_name(depths_relic(), "Depths Relic")
+    !item_data_map_icon(depths_relic(), MapstoneFragment)
+}
+
+!if pools_relic_exists {
+    fun pools_relic() {
+        create_stats_entry(MapstoneFragment, "Pools Relic")
+        item_message("@Pools Relic@")
+        store(pools_relic_collected, true)
+    }
+
+    !preplace(pools_relic(), Pools)
+    !item_data_name(pools_relic(), "Pools Relic")
+    !item_data_map_icon(pools_relic(), MapstoneFragment)
+}
+
+!if wastes_relic_exists {
+    fun wastes_relic() {
+        create_stats_entry(MapstoneFragment, "Wastes Relic")
+        item_message("@Wastes Relic@")
+        store(wastes_relic_collected, true)
+    }
+
+    !preplace(wastes_relic(), Wastes)
+    !item_data_name(wastes_relic(), "Wastes Relic")
+    !item_data_map_icon(wastes_relic(), MapstoneFragment)
+}
+
+!if willow_relic_exists {
+    fun willow_relic() {
+        create_stats_entry(MapstoneFragment, "Willow Relic")
+        item_message("@Willow Relic@")
+        store(willow_relic_collected, true)
+    }
+
+    !preplace(willow_relic(), Willow)
+    !item_data_name(willow_relic(), "Willow Relic")
+    !item_data_map_icon(willow_relic(), MapstoneFragment)
+}
+
+!if burrows_relic_exists {
+    fun burrows_relic() {
+        create_stats_entry(MapstoneFragment, "Burrows Relic")
+        item_message("@Burrows Relic@")
+        store(burrows_relic_collected, true)
+    }
+
+    !preplace(burrows_relic(), Burrows)
+    !item_data_name(burrows_relic(), "Burrows Relic")
+    !item_data_map_icon(burrows_relic(), MapstoneFragment)
+}
 
 on spawn store(itemTracker.relicsRequired, total_relic_count)
 
