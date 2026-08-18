@@ -1,0 +1,12 @@
+#hidden
+#name("Color Core")
+#description("Names some useful hex colors")
+
+!let(transparent, "<hex_ffffff80>")
+!export(transparent)
+
+!let(invisible, "<hex_00000000>")
+!export(invisible)
+
+!let(bright_yellow, "<hex_ffdd88ff>")
+!export(bright_yellow)

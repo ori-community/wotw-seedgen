@@ -26,7 +26,8 @@ By default those are bound to
 // !augment_fun(write_progress_message(), add_row("Fun: 10/10"))
 // !augment_fun(write_map_progress_message(), add_row("Fun: 10/10"))
 
-!include("list_core", new_column, add_row, new_colored_row, add_colored_row_item)
+!include("color_core", transparent, invisible)
+!include("list_core", new_column, add_row, next_item_first, new_colored_row, add_colored_row_item)
 !include("stats")
 
 !builtin_icon(progress_summary_icon, "icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
@@ -274,7 +275,7 @@ fun tree_string(found: Boolean) {
     if UpperPools.WaterDashTree == found add_colored_row_item("Water Dash")
     if WeepingRidge.LaunchTree == found add_colored_row_item("Launch")
 
-    if get_integer("color") == 0 set_string("row", get_string("row") + "None")
+    if get_integer("next_item") == next_item_first set_string("row", get_string("row") + "None")
 }
 
 fun write_wisp_progress() {
@@ -305,7 +306,7 @@ fun wisp_string(found: Boolean) {
     if WestPools.ForestsStrength == found add_colored_row_item("Strength")
     if WindtornRuins.Seir == found add_colored_row_item("Heart")
 
-    if get_integer("color") == 0 set_string("row", get_string("row") + "None")
+    if get_integer("next_item") == next_item_first set_string("row", get_string("row") + "None")
 }
 
 fun show_quest_progress() {
@@ -458,7 +459,7 @@ fun write_teleporter_progress() {
     if WillowsEnd.InnerTeleporterActive add_colored_row_item("Willow's End")
     if WillowsEnd.ShriekTeleporterActive add_colored_row_item("Shriek")
 
-    if get_integer("color") == 0 set_string("row", get_string("row") + "None")
+    if get_integer("next_item") == next_item_first set_string("row", get_string("row") + "None")
 }
 
 !if entrance_helper {
@@ -574,7 +575,7 @@ fun write_teleporter_progress() {
 
     fun write_entrance_progress() {
         // negative margin hack
-        set_string("entrance_progress", "<ls_-1.5><hex_00000000>.</></>\n<s_0.7><ls_0.7>")
+        set_string("entrance_progress", "<ls_-1.5>" + invisible + ".</></>\n<s_0.7><ls_0.7>")
         entrance_string_piece(moki_father_hut_outside, knownEntranceConnections.mokiFatherHutOutside, entrances.mokiFatherHutOutside)
         entrance_string_piece("\n" + moki_father_hut_inside, knownEntranceConnections.mokiFatherHutInside, entrances.mokiFatherHutInside)
         entrance_string_piece("\n" + hut_above_motay_outside, knownEntranceConnections.hutAboveMotayOutside, entrances.hutAboveMotayOutside)
@@ -615,7 +616,7 @@ fun write_teleporter_progress() {
             entrance(target)
             set_string("entrance_progress", get_string("entrance_progress") + get_string("entrance"))
         }
-        if known == false set_string("entrance_progress", get_string("entrance_progress") + " - <hex_ffffff80>Undiscovered</>")
+        if known == false set_string("entrance_progress", get_string("entrance_progress") + " - " + transparent + "Undiscovered</>")
     }
 
     fun entrance(target: Integer) {

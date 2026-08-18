@@ -6,7 +6,7 @@
 !state(collected, Integer)
 
 !include("bonus_core", update_bonus_wheel, any_collected, any_enabled, enable_all, disable_all)
-!include("bonus_progress_helper", write_bonus_items, add_colored_row_item, update_bonus_items)
+!include("bonus_progress_helper", write_bonus_items, add_bonus_item, update_bonus_items)
 
 !augment_fun(any_collected(), if collected > 0 set_boolean("any_collected", true))
 !augment_fun(any_enabled(), if collected > 0 && enabled set_boolean("any_enabled", true))
@@ -22,7 +22,9 @@ fun jumpgrade() {
 }
 !export(jumpgrade)
 
-!augment_fun(write_bonus_items(), if collected != 0 add_colored_row_item("Jumpgrade x" + collected))
+!augment_fun(write_bonus_items(relevant: Boolean), {
+    if relevant && collected != 0 add_bonus_item("Jumpgrade x" + collected)
+})
 
 !item_data(jumpgrade(),
     "#Jumpgrade#",

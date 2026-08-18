@@ -2,7 +2,8 @@
 #name("List Core")
 #description("Various helpers to create lists")
 
-!let(bright_yellow, "<hex_ffdd88ff>")
+!include("color_core", invisible, bright_yellow as default_color)
+!export(default_color)
 
 !export(new_row)
 fun new_row(front: String) {
@@ -17,22 +18,34 @@ fun add_row_item(item: String) {
     set_boolean("comma", true)
 }
 
+!let(next_item_first, 0)
+!export(next_item_first)
+!let(next_item_colored, 1)
+!export(next_item_colored)
+!let(next_item_uncolored, 2)
+!export(next_item_uncolored)
+
 !export(new_colored_row)
 fun new_colored_row(front: String) {
     set_string("row", front)
-    set_integer("color", 0) // 0 = not started, 1 = next yellow, 2 = next white
+    set_integer("next_item", next_item_first) // 0 = not started, 1 = next yellow, 2 = next white
 }
 
 !export(add_colored_row_item)
 fun add_colored_row_item(item: String) {
-    if get_integer("color") > 0 set_string("row", get_string("row") + ", ")
+    add_colored_row_item_with(item, default_color)
+}
 
-    if get_integer("color") == 1 set_string("row", get_string("row") + bright_yellow)
+!export(add_colored_row_item_with)
+fun add_colored_row_item_with(item: String, color: String) {
+    if get_integer("next_item") > next_item_first set_string("row", get_string("row") + ", ")
+
+    if get_integer("next_item") == next_item_colored set_string("row", get_string("row") + color)
     set_string("row", get_string("row") + item)
-    if get_integer("color") == 1 set_string("row", get_string("row") + "</>")
+    if get_integer("next_item") == next_item_colored set_string("row", get_string("row") + "</>")
 
-    set_integer("color", get_integer("color") + 1)
-    if get_integer("color") == 3 set_integer("color", 1)
+    set_integer("next_item", get_integer("next_item") + 1)
+    if get_integer("next_item") > next_item_uncolored set_integer("next_item", next_item_colored)
 }
 
 !export(new_column)
@@ -55,13 +68,13 @@ fun add_current_row() {
 
 !export(add_current_colored_row)
 fun add_current_colored_row() {
-    if get_integer("color") > 0 add_row(get_string("row"))
+    if get_integer("next_item") > 0 add_row(get_string("row"))
 }
 
 !export(auto_negative_margin)
 fun auto_negative_margin() {
     if get_integer("lines") > 0 {
         // negative margin hack
-        set_string("column", "<ls_-" + (get_integer("lines") - 1) * 0.1 + "><hex_00000000>.</></>\n" + get_string("column"))
+        set_string("column", "<ls_-" + (get_integer("lines") - 1) * 0.1 + ">" + invisible + ".</></>\n" + get_string("column"))
     }
 }

@@ -4,25 +4,36 @@
 
 !builtin_icon(message_icon, "icons/game/message.png")
 
-!include("list_core", new_column, add_row, add_current_colored_row, new_colored_row, add_colored_row_item, auto_negative_margin)
+!include("color_core", transparent)
+!include("list_core", default_color, new_column, add_row, add_current_colored_row, next_item_first, next_item_colored, next_item_uncolored, new_colored_row, add_colored_row_item_with, auto_negative_margin)
 !include("regeneration_core", energy_per_second, health_per_second)
 
-!export(add_colored_row_item)
-
 !export(write_bonus_items)
-fun write_bonus_items() {
-    new_colored_row("")
+fun write_bonus_items(relevant: Boolean) {}
+
+!export(add_bonus_item)
+fun add_bonus_item(item: String) {
+    add_colored_row_item_with(item, get_string("row_item_color"))
 }
 
 !export(update_bonus_items)
 fun update_bonus_items() {
-    bonus_items_string()
+    bonus_items_row()
     set_message_text("bonus_items", get_string("row"))
 }
 
-fun bonus_items_string() {
-    write_bonus_items()
-    if get_integer("color") == 0 set_string("row", "No Bonus Items")
+fun bonus_items_row() {
+    new_colored_row("")
+
+    set_string("row_item_color", default_color)
+    write_bonus_items(true)
+
+    set_string("row", get_string("row") + transparent)
+
+    set_string("row_item_color", transparent)
+    write_bonus_items(false)
+
+    if get_integer("next_item") == next_item_first set_string("row", "No Bonus Items")
 }
 
 on reload {
@@ -34,7 +45,7 @@ on reload {
         message_icon,
     )
     set_wheel_item_action("progress_helper", TopLeft, Ability1, {
-        bonus_items_string()
+        bonus_items_row()
         controlled_priority_message("bonus_items", get_string("row"), 4)
     })
     set_wheel_item_action("progress_helper", TopLeft, Ability2, show_bonus_item_effects())
@@ -104,122 +115,181 @@ fun update_bonus_item_effects() {
 fun write_bonus_item_effects() {
     new_column("")
 
-    new_colored_row("#Sword#: ")
-    multiplier_row_item(randoUpgrades.swordSpeedMultiplier, "x Speed")
-    melting_row_item(randoUpgrades.swordAsFireSource)
-    add_current_colored_row()
+    set_string("skill_color", "#")
+    set_string("row_item_color", default_color)
+    bonus_item_effects_half(true)
 
-    new_colored_row("#Bow#: ")
-    multiplier_row_item(randoUpgrades.bowCostMultiplier, "x Cost")
-    multiplier_row_item(1 / randoUpgrades.bowRapidFireIntervalDurationMultiplier, "x Quickshot Speed")
-    melting_row_item(randoUpgrades.bowAsFireSource)
-    add_current_colored_row()
+    set_string("column", get_string("column") + transparent)
 
-    new_colored_row("#Spear#: ")
-    multiplier_row_item(randoUpgrades.spearCostMultiplier, "x Cost")
-    multiplier_row_item(randoUpgrades.spearSpeedMultiplier, "x Speed")
-    melting_row_item(randoUpgrades.spearAsFireSource)
-    add_current_colored_row()
-
-    new_colored_row("#Hammer#: ")
-    multiplier_row_item(randoUpgrades.hammerSpeedMultiplier, "x Speed")
-    melting_row_item(randoUpgrades.hammerAsFireSource)
-    add_current_colored_row()
-
-    new_colored_row("#Shuriken#: ")
-    multiplier_row_item(randoUpgrades.shurikenCostMultiplier, "x Cost")
-    multiplier_row_item(randoUpgrades.shurikenDamageMultiplier, "x Damage")
-    melting_row_item(randoUpgrades.shurikenAsFireSource)
-    toggle_row_item(randoUpgrades.shurikenBashable, "Bashable")
-    extra_row_item(randoUpgrades.extraShurikens, " Max")
-    extra_row_item(randoUpgrades.shurikenMultishotCount, " Splinter")
-    add_current_colored_row()
-
-    new_colored_row("#Grenade#: ")
-    multiplier_row_item(randoUpgrades.grenadeCostMultiplier, "x Cost")
-    multiplier_row_item(1 / randoUpgrades.grenadeChargeDurationMultiplier, "x Charge Speed")
-    toggle_row_item(randoUpgrades.unchargedGrenadesBashable, "Uncharged Bashable")
-    extra_row_item(randoUpgrades.extraGrenades, " Max")
-    extra_row_item(randoUpgrades.grenadeMultishotCount, " Splinter")
-    toggle_row_item(randoUpgrades.unchargedGrenadesBashable, "Air Charge")
-    toggle_row_item(randoUpgrades.grenadesExplodeOnCollision == false, "Manual Detonation")
-    add_current_colored_row()
-
-    new_colored_row("#Regenerate#: ")
-    multiplier_row_item(randoUpgrades.regenerateCostMultiplier, "x Cost")
-    multiplier_row_item(randoUpgrades.regenerateSpeedMultiplier, "x Speed")
-    add_current_colored_row()
-
-    if randoUpgrades.flapDamage != 0 add_row("#Flap#: " + randoUpgrades.flapDamage + " Damage")
-
-    new_colored_row("#Blaze#: ")
-    multiplier_row_item(randoUpgrades.blazeCostMultiplier, "x Cost")
-    melting_row_item(randoUpgrades.blazeAsFireSource)
-    add_current_colored_row()
-
-    new_colored_row("#Flash#: ")
-    multiplier_row_item(randoUpgrades.flashCostMultiplier, "x Cost")
-    multiplier_row_item(1 / randoUpgrades.flashTickInterval, "x Speed")
-    multiplier_row_item(randoUpgrades.flashDamageMultiplier, "x Damage")
-    add_current_colored_row()
-
-    new_colored_row("#Sentry#: ")
-    multiplier_row_item(randoUpgrades.sentryCostMultiplier, "x Cost")
-    multiplier_row_item(randoUpgrades.sentryFireRateSpeed, "x Fire Rate")
-    integer_row_item(randoUpgrades.sentryShots, " Sentry Burst Shots", 3)
-    extra_row_item(randoUpgrades.extraSentries, " Max")
-    add_current_colored_row()
-
-    new_colored_row("#Jumps#: ")
-    extra_row_item(randoUpgrades.extraDoubleJumps, " Double Jumps")
-    multiplier_row_item(randoUpgrades.jumpHeightMultiplier, "x Grounded Jump Height")
-    multiplier_row_item(randoUpgrades.wallJumpHeightMultiplier, "x Wall Jump Height")
-    multiplier_row_item(randoUpgrades.doubleJumpHeightMultiplier, "x Double Jump Height")
-    add_current_colored_row()
-
-    new_colored_row("#Dash#: ")
-    extra_row_item(randoUpgrades.extraDashes, " Air Dashes")
-    multiplier_row_item(randoUpgrades.dashDistanceMultiplier, "x Distance")
-    if get_integer("color") == 0 set_string("row", "")
-    if get_integer("color") == 1 set_integer("color", 2)
-    if randoUpgrades.bashSpeedMultiplier != 1 add_colored_row_item("#Bash#: " + randoUpgrades.bashSpeedMultiplier + "x Speed")
-    add_current_colored_row()
-
-    new_colored_row("")
-    if randoUpgrades.grappleSpeedMultiplier != 1 add_colored_row_item("#Grapple#: " + randoUpgrades.grappleSpeedMultiplier + "x Speed")
-    if get_integer("color") == 1 set_integer("color", 2)
-    if randoUpgrades.launchSpeedMultiplier != 1 add_colored_row_item("#Launch#: " + randoUpgrades.launchSpeedMultiplier + "x Speed")
-    add_current_colored_row()
-
-    set_string("right_row", "")
-    new_colored_row("#Burrow#: ")
-    multiplier_row_item(randoUpgrades.burrowSpeedMultiplier, "x Speed")
-    multiplier_row_item(randoUpgrades.burrowDashSpeedMultiplier, "x Dash Speed")
-    if get_integer("color") > 0 set_string("right_row", get_string("row"))
-    new_colored_row("#Swimming#: ")
-    multiplier_row_item(randoUpgrades.swimSpeedMultiplier, "x Speed")
-    multiplier_row_item(randoUpgrades.waterDashSpeedMultiplier, "x Dash Speed")
-    if get_string("right_row") != "" {
-        if get_integer("color") == 1 set_integer("color", 2)
-        add_colored_row_item(get_string("right_row"))
-    }
-    add_current_colored_row()
-
-    new_colored_row("#Passive Regeneration#: ")
-    if energy_per_second != 0 add_colored_row_item(energy_per_second + " Energy/s")
-    if health_per_second != 0 add_colored_row_item(health_per_second + " Health/s")
-    add_current_colored_row()
-
-    // TODO remove?
-    // randoUpgrades.healthRegenerationPerMinute
-    // randoUpgrades.energyRegenerationPerMinute
+    set_string("skill_color", "")
+    set_string("row_item_color", transparent)
+    bonus_item_effects_half(false)
 
     if get_integer("lines") == 0 set_string("column", "No Bonus Item Effects")
     auto_negative_margin()
 }
 
+fun bonus_item_effects_half(relevant: Boolean) {
+    if skills.sword == relevant {
+        new_bonus_item_effect_row("Sword")
+        multiplier_row_item(randoUpgrades.swordSpeedMultiplier, "x Speed")
+        melting_row_item(randoUpgrades.swordAsFireSource)
+        add_current_colored_row()
+    }
+
+    if skills.bow == relevant {
+        new_bonus_item_effect_row("Bow")
+        multiplier_row_item(randoUpgrades.bowCostMultiplier, "x Cost")
+        multiplier_row_item(1 / randoUpgrades.bowRapidFireIntervalDurationMultiplier, "x Quickshot Speed")
+        melting_row_item(randoUpgrades.bowAsFireSource)
+        add_current_colored_row()
+    }
+
+    if skills.spear == relevant {
+        new_bonus_item_effect_row("Spear")
+        multiplier_row_item(randoUpgrades.spearCostMultiplier, "x Cost")
+        multiplier_row_item(randoUpgrades.spearSpeedMultiplier, "x Speed")
+        melting_row_item(randoUpgrades.spearAsFireSource)
+        add_current_colored_row()
+    }
+
+    if skills.hammer == relevant {
+        new_bonus_item_effect_row("Hammer")
+        multiplier_row_item(randoUpgrades.hammerSpeedMultiplier, "x Speed")
+        melting_row_item(randoUpgrades.hammerAsFireSource)
+        add_current_colored_row()
+    }
+
+    if skills.shuriken == relevant {
+        new_bonus_item_effect_row("Shuriken")
+        multiplier_row_item(randoUpgrades.shurikenCostMultiplier, "x Cost")
+        multiplier_row_item(randoUpgrades.shurikenDamageMultiplier, "x Damage")
+        melting_row_item(randoUpgrades.shurikenAsFireSource)
+        toggle_row_item(randoUpgrades.shurikenBashable, "Bashable")
+        extra_row_item(randoUpgrades.extraShurikens, " Max")
+        extra_row_item(randoUpgrades.shurikenMultishotCount, " Splinter")
+        add_current_colored_row()
+    }
+
+    if skills.grenade == relevant {
+        new_bonus_item_effect_row("Grenade")
+        multiplier_row_item(randoUpgrades.grenadeCostMultiplier, "x Cost")
+        multiplier_row_item(1 / randoUpgrades.grenadeChargeDurationMultiplier, "x Charge Speed")
+        toggle_row_item(randoUpgrades.unchargedGrenadesBashable, "Uncharged Bashable")
+        extra_row_item(randoUpgrades.extraGrenades, " Max")
+        extra_row_item(randoUpgrades.grenadeMultishotCount, " Splinter")
+        toggle_row_item(randoUpgrades.unchargedGrenadesBashable, "Air Charge")
+        toggle_row_item(randoUpgrades.grenadesExplodeOnCollision == false, "Manual Detonation")
+        add_current_colored_row()
+    }
+
+    if skills.regenerate == relevant {
+        new_bonus_item_effect_row("Regenerate")
+        multiplier_row_item(randoUpgrades.regenerateCostMultiplier, "x Cost")
+        multiplier_row_item(randoUpgrades.regenerateSpeedMultiplier, "x Speed")
+        add_current_colored_row()
+    }
+
+    if skills.flap == relevant && randoUpgrades.flapDamage != 0 {
+        add_row(get_string("skill_color") + "Flap" + get_string("skill_color") + ": " + randoUpgrades.flapDamage + " Damage")
+    }
+
+    if skills.blaze == relevant {
+        new_bonus_item_effect_row("Blaze")
+        multiplier_row_item(randoUpgrades.blazeCostMultiplier, "x Cost")
+        melting_row_item(randoUpgrades.blazeAsFireSource)
+        add_current_colored_row()
+    }
+
+    if skills.flash == relevant {
+        new_bonus_item_effect_row("Flash")
+        multiplier_row_item(randoUpgrades.flashCostMultiplier, "x Cost")
+        multiplier_row_item(1 / randoUpgrades.flashTickInterval, "x Speed")
+        multiplier_row_item(randoUpgrades.flashDamageMultiplier, "x Damage")
+        add_current_colored_row()
+    }
+
+    if skills.sentry == relevant {
+        new_bonus_item_effect_row("Sentry")
+        multiplier_row_item(randoUpgrades.sentryCostMultiplier, "x Cost")
+        multiplier_row_item(randoUpgrades.sentryFireRateSpeed, "x Fire Rate")
+        integer_row_item(randoUpgrades.sentryShots, " Sentry Burst Shots", 3)
+        extra_row_item(randoUpgrades.extraSentries, " Max")
+        add_current_colored_row()
+    }
+
+    if relevant {
+        new_colored_row("#Jumps#: ")
+        multiplier_row_item(randoUpgrades.jumpHeightMultiplier, "x Grounded Jump Height")
+        multiplier_row_item(randoUpgrades.wallJumpHeightMultiplier, "x Wall Jump Height")
+        add_current_colored_row()
+
+        if randoUpgrades.swimSpeedMultiplier != 1 add_bonus_item("#Swimming#: " + randoUpgrades.swimSpeedMultiplier + "x Speed")
+    }
+
+    set_string("left_row", "")
+
+    if skills.doubleJump == relevant {
+        new_bonus_item_effect_row("Double Jump")
+        extra_row_item(randoUpgrades.extraDoubleJumps, " Double Jumps")
+        multiplier_row_item(randoUpgrades.doubleJumpHeightMultiplier, "x Height")
+        add_current_half_row()
+    }
+
+    if skills.dash == relevant {
+        new_bonus_item_effect_row("Dash")
+        extra_row_item(randoUpgrades.extraDashes, " Air Dashes")
+        multiplier_row_item(randoUpgrades.dashDistanceMultiplier, "x Distance")
+        add_current_half_row()
+    }
+
+    if skills.bash == relevant && randoUpgrades.bashSpeedMultiplier != 1 {
+        set_string("row", get_string("skill_color") + "Bash" + get_string("skill_color") + ": " + randoUpgrades.bashSpeedMultiplier + "x Speed")
+        add_current_half_row_unchecked()
+    }
+
+    if skills.grapple == relevant && randoUpgrades.grappleSpeedMultiplier != 1 {
+        set_string("row", get_string("skill_color") + "Grapple" + get_string("skill_color") + ": " + randoUpgrades.grappleSpeedMultiplier + "x Speed")
+        add_current_half_row_unchecked()
+    }
+
+    if skills.waterDash == relevant && randoUpgrades.waterDashSpeedMultiplier != 1 {
+        set_string("row", get_string("skill_color") + "Water Dash" + get_string("skill_color") + ": " + randoUpgrades.waterDashSpeedMultiplier + "x Speed")
+        add_current_half_row_unchecked()
+    }
+
+    if skills.burrow == relevant {
+        new_bonus_item_effect_row("Burrow")
+        multiplier_row_item(randoUpgrades.burrowSpeedMultiplier, "x Speed")
+        multiplier_row_item(randoUpgrades.burrowDashSpeedMultiplier, "x Dash Speed")
+        add_current_half_row()
+    }
+
+    if skills.launch == relevant && randoUpgrades.launchSpeedMultiplier != 1 {
+        set_string("row", get_string("skill_color") + "Launch" + get_string("skill_color") + ": " + randoUpgrades.launchSpeedMultiplier + "x Speed")
+        add_current_half_row_unchecked()
+    }
+
+    if get_string("left_row") != "" add_current_colored_row()
+
+    if relevant {
+        new_colored_row("#Passive Regeneration#: ")
+        if energy_per_second != 0 add_bonus_item(energy_per_second + " Energy/s")
+        if health_per_second != 0 add_bonus_item(health_per_second + " Health/s")
+        add_current_colored_row()
+    }
+
+    // TODO remove?
+    // randoUpgrades.healthRegenerationPerMinute
+    // randoUpgrades.energyRegenerationPerMinute
+}
+
+fun new_bonus_item_effect_row(skill: String) {
+    new_colored_row(get_string("skill_color") + skill + get_string("skill_color") + ": ")
+}
+
 fun multiplier_row_item(value: Float, name: String) {
-    if value != 1 add_colored_row_item(value + name)
+    if value != 1 add_bonus_item(value + name)
 }
 
 fun melting_row_item(value: Boolean) {
@@ -227,13 +297,32 @@ fun melting_row_item(value: Boolean) {
 }
 
 fun toggle_row_item(value: Boolean, name: String) {
-    if value add_colored_row_item(name)
+    if value add_bonus_item(name)
 }
 
 fun extra_row_item(value: Integer, name: String) {
-   if value != 0 add_colored_row_item((1 + value) + name)
+   if value != 0 add_bonus_item((1 + value) + name)
 }
 
 fun integer_row_item(value: Integer, name: String, default: Integer) {
-    if value != default add_colored_row_item(value + name)
+    if value != default add_bonus_item(value + name)
+}
+
+fun add_current_half_row() {
+    if get_integer("next_item") > next_item_first add_current_half_row_unchecked()
+}
+
+fun add_current_half_row_unchecked() {
+    set_boolean("left_row_empty", get_string("left_row") == "")
+    if get_boolean("left_row_empty") set_string("left_row", get_string("row"))
+    if get_boolean("left_row_empty") == false {
+        set_string("right_row", get_string("row"))
+        set_string("row", get_string("left_row"))
+        set_string("left_row", "")
+
+        if get_integer("next_item") == next_item_colored set_integer("next_item", next_item_uncolored)
+        add_bonus_item(get_string("right_row"))
+
+        add_current_colored_row()
+    }
 }
