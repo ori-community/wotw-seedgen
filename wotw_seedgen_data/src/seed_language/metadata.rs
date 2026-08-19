@@ -3,8 +3,9 @@ use std::fmt::{self, Display};
 use crate::seed_language::ast::{
     self, get_command_arg_ref, get_command_args_ref, inspect_command_args, Handler, Traverse,
 };
+use indexmap::IndexMap;
 use ordered_float::OrderedFloat;
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -20,7 +21,8 @@ pub struct Metadata {
     /// Longer description
     pub description: Option<String>,
     /// Available configuration
-    pub config: FxHashMap<String, ConfigValue>,
+    #[schema(value_type = FxHashMap<String, ConfigValue>)]
+    pub config: IndexMap<String, ConfigValue, FxBuildHasher>,
     /// Whether this snippet requires local files, preventing it from being inlined
     ///
     /// Note that included snippets may require local files even if this one doesn't
