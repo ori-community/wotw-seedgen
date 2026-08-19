@@ -416,27 +416,37 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     }
 
     fn place_remaining_command(&mut self, command: CommandVoid, target_world_index: usize) {
-        let origin_world_index = self.choose_origin_world_for_forced_placement(target_world_index);
-        let origin_world = &mut self.worlds[origin_world_index];
-
-        if origin_world.needs_placement.len() > origin_world.spirit_light_placements_remaining {
-            let pickup = origin_world.needs_placement.pop().unwrap();
-
-            self.place_command_at(
-                command,
-                pickup,
-                origin_world_index,
-                target_world_index,
-                false,
-            );
-        } else {
-            warn!(
+        match self.choose_origin_world_for_remaining() {
+            None => warn!(
                 logger: self.log_capture,
                 "Not enough space to place {target_index}{name}, skipping since everything has been reached",
                 name = self.worlds[target_world_index].log_name(&command),
                 target_index = self.worlds[target_world_index].log_index,
-            );
+            ),
+            Some(origin_world_index) => {
+                let pickup = self.worlds[origin_world_index]
+                    .needs_placement
+                    .pop()
+                    .unwrap();
+
+                self.place_command_at(
+                    command,
+                    pickup,
+                    origin_world_index,
+                    target_world_index,
+                    false,
+                );
+            }
         }
+    }
+
+    fn choose_origin_world_for_remaining(&mut self) -> Option<usize> {
+        let mut world_indices = (0..self.worlds.len()).collect::<Vec<_>>();
+        world_indices.shuffle(&mut self.rng);
+
+        world_indices
+            .into_iter()
+            .find(|index| self.worlds[*index].non_spirit_light_placements_remaining() > 0)
     }
 
     fn place_random(&mut self) -> bool {
@@ -661,7 +671,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             // TODO we're doing some redundant work here
             // we already figure out whether we have to use the spawn slots here but later we don't use that information
             // and have to recalculate it
-            let origin_world_index = world_indices
+            world_indices
                 .iter()
                 .find(|index| self.worlds[**index].non_spawn_progression_slots() > 0)
                 .copied()
@@ -670,9 +680,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                         .into_iter()
                         .find(|index| self.worlds[*index].spawn_slots > 0)
                 })
-                .unwrap_or(target_world_index); // Overplace spawn slots if there's no other way
-
-            origin_world_index
+                .unwrap_or(target_world_index) // Overplace spawn slots if there's no other way
         }
     }
 
