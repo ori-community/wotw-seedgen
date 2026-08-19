@@ -11,19 +11,19 @@ on reload {
 }
 
 fun root() {
-    set_wheel_item_data("root", Top, "Shards", "[Ability1]View", Overcharge)
-    set_wheel_item_all_actions("root", Top, switch_wheel("shards"))
-    set_wheel_item_data("root", TopRight, "Equipment", "[Ability1]View", Hammer)
-    set_wheel_item_all_actions("root", TopRight, switch_wheel("equipment"))
-    set_wheel_item_data("root", RightTop, "Opher", "[Ability1]View", Sentry)
-    set_wheel_item_all_actions("root", RightTop, switch_wheel("opher"))
-    set_wheel_item_data("root", Right, "Lupo", "[Ability1]View", EnergyFragmentsMap)
-    set_wheel_item_all_actions("root", Right, switch_wheel("lupo"))
-    set_wheel_item_data("root", RightBottom, "Grom", "[Ability1]View", RepairTheSpiritWell)
-    set_wheel_item_all_actions("root", RightBottom, switch_wheel("grom"))
-    set_wheel_item_data("root", BottomRight, "Tuley", "[Ability1]View", SelaFlowers)
-    set_wheel_item_all_actions("root", BottomRight, switch_wheel("tuley"))
-    set_wheel_item_data("root", Bottom, "Placeholder", "", Placeholder)
+    set_wheel_item_data("root", Left, "Shards", "[Ability1]View", Overcharge)
+    set_wheel_item_all_actions("root", Left, switch_wheel("shards"))
+    set_wheel_item_data("root", LeftTop, "Equipment", "[Ability1]View", Hammer)
+    set_wheel_item_all_actions("root", LeftTop, switch_wheel("equipment"))
+    set_wheel_item_data("root", TopLeft, "Opher", "[Ability1]View", Sentry)
+    set_wheel_item_all_actions("root", TopLeft, switch_wheel("opher"))
+    set_wheel_item_data("root", Top, "Lupo", "[Ability1]View", EnergyFragmentsMap)
+    set_wheel_item_all_actions("root", Top, switch_wheel("lupo"))
+    set_wheel_item_data("root", TopRight, "Grom", "[Ability1]View", RepairTheSpiritWell)
+    set_wheel_item_all_actions("root", TopRight, switch_wheel("grom"))
+    set_wheel_item_data("root", RightTop, "Tuley", "[Ability1]View", SelaFlowers)
+    set_wheel_item_all_actions("root", RightTop, switch_wheel("tuley"))
+    set_wheel_item_data("root", Right, "Placeholder", "", Placeholder)
 }
 
 fun shards() {

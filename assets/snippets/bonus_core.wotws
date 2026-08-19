@@ -28,26 +28,26 @@ fun disable_all() {}
 !export(disable_all)
 
 on reload {
-    set_wheel_item_name("root", LeftTop, "Bonus Toggles")
-    set_wheel_item_action("root", LeftTop, Ability1, toggle_all())
-    set_wheel_item_action("root", LeftTop, Ability2, switch_wheel("bonus_upgrades"))
-    set_wheel_item_action("root", LeftTop, Ability3, switch_wheel("bonus_upgrades"))
+    set_wheel_item_name("root", TopLeft, "Bonus Toggles")
+    set_wheel_item_action("root", TopLeft, Ability1, toggle_all())
+    set_wheel_item_action("root", TopLeft, Ability2, switch_wheel("bonus_upgrades"))
+    set_wheel_item_action("root", TopLeft, Ability3, switch_wheel("bonus_upgrades"))
     update_bonus_wheel()
 }
 on respawn update_bonus_wheel()
 
 fun update_bonus_wheel() {
     any_collected()
-    if get_boolean("any_collected") set_wheel_item_description("root", LeftTop, "[Ability1]Toggle all\n[Ability2]Open menu")
-    if get_boolean("any_collected") == false set_wheel_item_description("root", LeftTop, "No Bonus Upgrades collected")
+    if get_boolean("any_collected") set_wheel_item_description("root", TopLeft, "[Ability1]Toggle all\n[Ability2]Open menu")
+    if get_boolean("any_collected") == false set_wheel_item_description("root", TopLeft, "No Bonus Upgrades collected")
     any_enabled()
     if get_boolean("any_enabled") {
-        set_wheel_item_icon("root", LeftTop, on_icon)
-        set_wheel_item_color("root", LeftTop, 255, 255, 255, 255)
+        set_wheel_item_icon("root", TopLeft, on_icon)
+        set_wheel_item_color("root", TopLeft, 255, 255, 255, 255)
     }
     if get_boolean("any_enabled") == false {
-        set_wheel_item_icon("root", LeftTop, off_icon)
-        set_wheel_item_color("root", LeftTop, 128, 128, 128, 196)
+        set_wheel_item_icon("root", TopLeft, off_icon)
+        set_wheel_item_color("root", TopLeft, 128, 128, 128, 196)
     }
 }
 

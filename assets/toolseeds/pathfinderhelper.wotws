@@ -12,60 +12,60 @@
 on reload {
     set_wheel_item_data(
         "root",
-        Top,
+        Left,
         "Toggle Clean Water",
         "[Ability1]Toggle\nShortcut: [Binding1]",
         clean_water_icon,
     )
-    set_wheel_item_all_actions("root", Top, toggle_clean_water())
+    set_wheel_item_all_actions("root", Left, toggle_clean_water())
     set_wheel_item_data(
         "root",
-        TopRight,
+        LeftTop,
         "Toggle Difficulty",
         "[Ability1]Toggle\nShortcut: [Binding2]",
         gears_icon,
     )
-    set_wheel_item_all_actions("root", TopRight, toggle_difficulty())
+    set_wheel_item_all_actions("root", LeftTop, toggle_difficulty())
     set_wheel_item_data(
         "root",
-        RightTop,
+        TopLeft,
         "Choose target for Warp to x/y",
         "[Ability1]Choose\nShortcut: [Binding3]",
         teleporter_icon,
     )
-    set_wheel_item_all_actions("root", RightTop, choose_teleport_target())
+    set_wheel_item_all_actions("root", TopLeft, choose_teleport_target())
     set_wheel_item_data(
         "root",
-        Right,
+        Top,
         "Warp to x/y",
         "[Ability1]Warp\nShortcut: [Binding3]",
         teleporter_icon,
     )
-    set_wheel_item_all_actions("root", Right, teleport())
+    set_wheel_item_all_actions("root", Top, teleport())
     set_wheel_item_data(
         "root",
-        RightBottom,
+        TopRight,
         "Save",
         "[Ability1]Save\nShortcut: [Binding4]",
         save_icon,
     )
-    set_wheel_item_all_actions("root", RightBottom, save_game())
+    set_wheel_item_all_actions("root", TopRight, save_game())
     set_wheel_item_data(
         "root",
-        BottomRight,
+        RightTop,
         "Refill",
         "[Ability1]Refill\nShortcut: [Binding4]",
         health_icon,
     )
-    set_wheel_item_all_actions("root", BottomRight, refill())
+    set_wheel_item_all_actions("root", RightTop, refill())
     set_wheel_item_data(
         "root",
-        Bottom,
+        Right,
         "World Reset",
         "[Ability1]Reset\nShortcut: [Binding5]",
         wall_icon,
     )
-    set_wheel_item_all_actions("root", Bottom, world_reset())
+    set_wheel_item_all_actions("root", Right, world_reset())
 }
 
 on spawn give_stuff()
