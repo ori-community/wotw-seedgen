@@ -70,7 +70,7 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
 
             match kind {
                 EventKind::Create(CreateKind::Any | CreateKind::File) => changed.create(paths, &self.file_access),
-                EventKind::Modify(ModifyKind::Data(DataChange::Any | DataChange::Content)) => changed.modify(paths, &self.file_access),
+                EventKind::Modify(ModifyKind::Data(DataChange::Any | DataChange::Content) | ModifyKind::Any) => changed.modify(paths, &self.file_access),
                 EventKind::Modify(ModifyKind::Name(RenameMode::To)) => changed.create(paths, &self.file_access),
                 EventKind::Modify(ModifyKind::Name(RenameMode::From)) => changed.remove(paths, &self.file_access),
                 EventKind::Modify(ModifyKind::Name(RenameMode::Both)) => changed.rename(paths, &self.file_access),
@@ -84,8 +84,7 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
                 | EventKind::Other
                 | EventKind::Create(CreateKind::Other)
                 | EventKind::Modify(
-                    ModifyKind::Any
-                    | ModifyKind::Data(DataChange::Other)
+                    ModifyKind::Data(DataChange::Other)
                     | ModifyKind::Name(RenameMode::Any | RenameMode::Other)
                     | ModifyKind::Other,
                 )
