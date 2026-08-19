@@ -1,5 +1,6 @@
 use crate::{
     assets::SnippetAccess, Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
+    DEFAULT_SPAWN,
 };
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
@@ -447,9 +448,8 @@ impl WorldPresetSettings {
             include_world_preset(settings, identifier, already_applied, file_access)?;
         }
 
-        // TODO surely there's a handy command for this
         if let Some(difficulty) = difficulty {
-            settings.difficulty = difficulty;
+            settings.difficulty = settings.difficulty.max(difficulty);
         }
 
         if let Some(tricks) = tricks {
@@ -462,7 +462,15 @@ impl WorldPresetSettings {
         }
 
         if let Some(spawn) = spawn {
-            settings.spawn = spawn;
+            let overwrite = match spawn.partial_cmp(&settings.spawn) {
+                None => matches!(&settings.spawn, Spawn::Set(set) if set == DEFAULT_SPAWN),
+                Some(Ordering::Greater) => true,
+                Some(Ordering::Less | Ordering::Equal) => false,
+            };
+
+            if overwrite {
+                settings.spawn = spawn;
+            }
         }
 
         if let Some(hard) = hard {

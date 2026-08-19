@@ -5,6 +5,7 @@
 mod slug;
 
 use std::{
+    cmp::Ordering,
     fmt::{self, Display, Write},
     iter,
     num::NonZeroU8,
@@ -303,10 +304,33 @@ pub enum Spawn {
     FullyRandom,
 }
 
+impl Spawn {
+    /// Reproduces [`std::intrinsics::discriminant_value`].
+    const fn discriminant_value(&self) -> isize {
+        match self {
+            Spawn::Set(_) => 0,
+            Spawn::Random => 1,
+            Spawn::FullyRandom => 2,
+        }
+    }
+}
+
 pub const DEFAULT_SPAWN: &str = "MarshSpawn.Main";
 impl Default for Spawn {
     fn default() -> Spawn {
         Spawn::Set(DEFAULT_SPAWN.to_string())
+    }
+}
+
+impl PartialOrd for Spawn {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match self.discriminant_value().cmp(&other.discriminant_value()) {
+            Ordering::Equal => match (self, other) {
+                (Self::Set(a), Self::Set(b)) => (a == b).then_some(Ordering::Equal),
+                _ => Some(Ordering::Equal),
+            },
+            non_equal => Some(non_equal),
+        }
     }
 }
 
