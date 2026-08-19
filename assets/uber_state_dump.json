@@ -819,6 +819,69 @@
           "value": 0.0,
           "value_type": "Boolean"
         },
+        "701": {
+          "name": "bell1",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 1.0,
+          "value_type": "Byte"
+        },
+        "702": {
+          "name": "bell2",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 2.0,
+          "value_type": "Byte"
+        },
+        "703": {
+          "name": "bell3",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 3.0,
+          "value_type": "Byte"
+        },
+        "704": {
+          "name": "bell4",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 3.0,
+          "value_type": "Byte"
+        },
+        "705": {
+          "name": "bell5",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 1.0,
+          "value_type": "Byte"
+        },
+        "706": {
+          "name": "bell6",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 2.0,
+          "value_type": "Byte"
+        },
+        "707": {
+          "name": "bell7",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 1.0,
+          "value_type": "Byte"
+        },
+        "708": {
+          "name": "bell8",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 0.0,
+          "value_type": "Byte"
+        },
+        "709": {
+          "name": "bell9",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 0.0,
+          "value_type": "Byte"
+        },
         "2000": {
           "name": "cleanWater",
           "readonly": false,
