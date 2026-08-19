@@ -2,6 +2,8 @@
 #name("No Cutscenes")
 #description("Skips several short cutscenes and dialogues")
 
+!config(autoplant, "Autoplant", "Automatically plant seeds if Tuley is in Glades", Boolean, true)
+
 !include("wisp_count")
 !include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
 
@@ -84,17 +86,19 @@ on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petr
 
 on itemTracker.wispsCount >= 4 store(windtornRuinsGroup.openedDesertRuins, true)
 
-on lightcatchers if GladesTown.TuleySpawned store(tuleyShop.lightcatchers, true)
-on sela_flowers if GladesTown.TuleySpawned store(tuleyShop.selaFlowers, true)
-on blue_moon if GladesTown.TuleySpawned store(tuleyShop.blueMoon, true)
-on sticky_grass if GladesTown.TuleySpawned store(tuleyShop.stickyGrass, true)
-on spring_plants if GladesTown.TuleySpawned store(tuleyShop.springPlants, true)
-on last_tree if GladesTown.TuleySpawned store(tuleyShop.lastTree, true)
-on GladesTown.TuleySpawned {
-    store(tuleyShop.lightcatchers, lightcatchers)
-    store(tuleyShop.selaFlowers, sela_flowers)
-    store(tuleyShop.blueMoon, blue_moon)
-    store(tuleyShop.stickyGrass, sticky_grass)
-    store(tuleyShop.springPlants, spring_plants)
-    store(tuleyShop.lastTree, last_tree)
+!if autoplant {
+    on lightcatchers if GladesTown.TuleySpawned store(tuleyShop.lightcatchers, true)
+    on sela_flowers if GladesTown.TuleySpawned store(tuleyShop.selaFlowers, true)
+    on blue_moon if GladesTown.TuleySpawned store(tuleyShop.blueMoon, true)
+    on sticky_grass if GladesTown.TuleySpawned store(tuleyShop.stickyGrass, true)
+    on spring_plants if GladesTown.TuleySpawned store(tuleyShop.springPlants, true)
+    on last_tree if GladesTown.TuleySpawned store(tuleyShop.lastTree, true)
+    on GladesTown.TuleySpawned {
+        store(tuleyShop.lightcatchers, lightcatchers)
+        store(tuleyShop.selaFlowers, sela_flowers)
+        store(tuleyShop.blueMoon, blue_moon)
+        store(tuleyShop.stickyGrass, sticky_grass)
+        store(tuleyShop.springPlants, spring_plants)
+        store(tuleyShop.lastTree, last_tree)
+    }
 }
