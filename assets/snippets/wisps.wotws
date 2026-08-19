@@ -1,41 +1,68 @@
 #category("Goals")
-#name("All Wisps")
-#description("Require visiting all Wisps before fighting Shriek")
+#name("Wisps")
+#description("Require collecting Wisps before fighting Shriek")
 
-!tags("All Wisps")
+!config(randomize, "Randomize", "Overrides all other settings with random values", Boolean, false)
+
+!config(voice, "Voice", Boolean, true)
+!config(strength, "Strength", Boolean, true)
+!config(memory, "Memory", Boolean, true)
+!config(eyes, "Eyes", Boolean, true)
+!config(heart, "Heart", Boolean, true)
 
 !include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
 !include("list_core", new_row, add_current_row)
 !include("wisp_count")
 
+!if randomize {
+    !random_boolean(voice)
+    !random_boolean(strength)
+    !random_boolean(memory)
+    !random_boolean(eyes)
+    !random_boolean(heart)
+}
+
+!let(wisps_required, 0)
+!if voice { !let(wisps_required, wisps_required + 1) }
+!if strength { !let(wisps_required, wisps_required + 1) }
+!if memory { !let(wisps_required, wisps_required + 1) }
+!if eyes { !let(wisps_required, wisps_required + 1) }
+!if heart { !let(wisps_required, wisps_required + 1) }
+
 !let(max_wisps, 5)
+!let(tag, "Wisps (" + wisps_required + "/" + max_wisps + ")")
+!if randomize { !tags("Random " + tag) }
+!if randomize == false {
+    !if wisps_required == max_wisps { !tags("All Wisps") }
+    !if wisps_required < max_wisps { !tags(tag) }
+}
+
+on spawn store(itemTracker.wispsRequired, wisps_required)
+
+!augment_fun(check_goals_completed(), {
+    if itemTracker.wispsCount < wisps_required set_boolean("goals_completed", false)
+})
 
 !augment_fun(write_short_goals_row(), {
-    set_string("wisps_message", "Wisps: " + itemTracker.wispsCount + "/" + max_wisps)
-    if itemTracker.wispsCount == max_wisps set_string("wisps_message", "$" + get_string("wisps_message") + "$")
+    set_string("wisps_message", "Wisps: " + itemTracker.wispsCount + "/" + wisps_required)
+    if itemTracker.wispsCount == wisps_required set_string("wisps_message", "$" + get_string("wisps_message") + "$")
     add_row_item(get_string("wisps_message"))
 })
 
-!augment_fun(check_goals_completed(), {
-    if itemTracker.wispsCount < max_wisps set_boolean("goals_completed", false)
-})
+!augment_fun(write_missing_goals(), if itemTracker.wispsCount < wisps_required write_missing_wisps())
 
-on spawn store(itemTracker.wispsRequired, max_wisps)
-
-on EastHollow.ForestsVoice create_stats_entry(Wisp, "Voice")
-on WestPools.ForestsStrength create_stats_entry(Wisp, "Strength")
-on LowerReach.ForestsMemory create_stats_entry(Wisp, "Memory")
-on UpperDepths.ForestsEyes create_stats_entry(Wisp, "Eyes")
-on WindtornRuins.Seir create_stats_entry(Wisp, "Heart")
+fun write_missing_wisps() { new_row("#Missing Wisps (" + (wisps_required - itemTracker.wispsCount) + ")#: ") }
+!if voice { !augment_fun(write_missing_wisps(), if EastHollow.ForestsVoice == false add_row_item("Voice")) }
+!if strength { !augment_fun(write_missing_wisps(), if LowerReach.ForestsMemory == false add_row_item("Memory")) }
+!if memory { !augment_fun(write_missing_wisps(), if UpperDepths.ForestsEyes == false add_row_item("Eyes")) }
+!if eyes { !augment_fun(write_missing_wisps(), if WestPools.ForestsStrength == false add_row_item("Strength")) }
+!if heart { !augment_fun(write_missing_wisps(), if WindtornRuins.Seir == false add_row_item("Heart")) }
+!augment_fun(write_missing_wisps(), add_current_row())
 
 on change itemTracker.wispsCount update_goals()
 
-!augment_fun(write_missing_goals(), if itemTracker.wispsCount < max_wisps {
-    new_row("#Missing Wisps (" + (max_wisps - itemTracker.wispsCount) + ")#: ")
-    if EastHollow.ForestsVoice == false add_row_item("Voice")
-    if LowerReach.ForestsMemory == false add_row_item("Memory")
-    if UpperDepths.ForestsEyes == false add_row_item("Eyes")
-    if WestPools.ForestsStrength == false add_row_item("Strength")
-    if WindtornRuins.Seir == false add_row_item("Heart")
-    add_current_row()
-})
+!if voice { on EastHollow.ForestsVoice create_stats_entry(Wisp, "Voice") }
+!if strength { on WestPools.ForestsStrength create_stats_entry(Wisp, "Strength") }
+!if memory { on LowerReach.ForestsMemory create_stats_entry(Wisp, "Memory") }
+!if eyes { on UpperDepths.ForestsEyes create_stats_entry(Wisp, "Eyes") }
+!if heart { on WindtornRuins.Seir create_stats_entry(Wisp, "Heart") }

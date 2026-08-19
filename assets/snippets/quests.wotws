@@ -1,13 +1,73 @@
 #category("Goals")
-#name("All Side Quests")
-#description("Require finishing all side quests before fighting Shriek (you poor soul...)")
+#name("Quests")
+#description("Require completing quests before fighting Shriek")
 
-!tags("All Side Quests")
+!config(randomize, "Randomize", "Overrides all other settings with random values", Boolean, false)
+
+!config(silent_teeth, "Silent Teeth", Boolean, false)
+!config(missing_key, "Missing Key",  Boolean, true)
+!config(into_burrows, "Into Burrows",  Boolean, true)
+!config(lost_compass, "Lost Compass",  Boolean, true)
+!config(little_braver, "Little Braver",  Boolean, true)
+!config(family_reunion, "Family Reunion",  Boolean, true)
+!config(tree_keeper, "Tree Keeper",  Boolean, true)
+!config(rough_diamond, "Rough Diamond",  Boolean, true)
+!config(hand_to_hand, "Hand to Hand",  Boolean, true)
+!config(into_darkness, "Into Darkness",  Boolean, true)
+!config(kwoloks_wisdom, "Kwolok's Wisdom",  Boolean, true)
+!config(rebuilding_the_glades, "Rebuilding the Glades",  Boolean, true)
+!config(regrowing_the_glades, "Regrowing the Glades",  Boolean, true)
 
 !include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
 !include("list_core", new_row, add_current_row)
 
-!let(max_quests, 12)
+!if randomize {
+    !random_boolean(silent_teeth)
+    !random_boolean(missing_key)
+    !random_boolean(into_burrows)
+    !random_boolean(lost_compass)
+    !random_boolean(little_braver)
+    !random_boolean(family_reunion)
+    !random_boolean(tree_keeper)
+    !random_boolean(rough_diamond)
+    !random_boolean(hand_to_hand)
+    !random_boolean(into_darkness)
+    !random_boolean(kwoloks_wisdom)
+    !random_boolean(rebuilding_the_glades)
+    !random_boolean(regrowing_the_glades)
+}
+
+!let(quests_required, 0)
+!if silent_teeth { !let(quests_required, quests_required + 1) }
+!if missing_key { !let(quests_required, quests_required + 1) }
+!if into_burrows { !let(quests_required, quests_required + 1) }
+!if lost_compass { !let(quests_required, quests_required + 1) }
+!if little_braver { !let(quests_required, quests_required + 1) }
+!if family_reunion { !let(quests_required, quests_required + 1) }
+!if tree_keeper { !let(quests_required, quests_required + 1) }
+!if rough_diamond { !let(quests_required, quests_required + 1) }
+!if hand_to_hand { !let(quests_required, quests_required + 1) }
+!if into_darkness { !let(quests_required, quests_required + 1) }
+!if kwoloks_wisdom { !let(quests_required, quests_required + 1) }
+!if rebuilding_the_glades { !let(quests_required, quests_required + 1) }
+!if regrowing_the_glades { !let(quests_required, quests_required + 1) }
+
+!let(max_quests, 13)
+!let(tag, "Quests (" + quests_required + "/" + max_quests + ")")
+!if randomize { !tags("Random " + tag) }
+!if randomize == false {
+    !if quests_required == max_quests { !tags("All Quests") }
+    !if quests_required < max_quests {
+        !if quests_required == max_quests - 1 && silent_teeth == false { !tags("All Side Quests") }
+        !if quests_required < max_quests - 1 || silent_teeth { !tags(tag) }
+    }
+}
+
+on spawn store(itemTracker.questsRequired, max_quests)
+
+!augment_fun(check_goals_completed(), {
+    if itemTracker.questsCount < max_quests set_boolean("goals_completed", false)
+})
 
 !augment_fun(write_short_goals_row(), {
     set_string("quests_message", "Quests: " + itemTracker.questsCount + "/" + max_quests)
@@ -15,102 +75,129 @@
     add_row_item(get_string("quests_message"))
 })
 
-!augment_fun(check_goals_completed(), {
-    if itemTracker.questsCount < max_quests set_boolean("goals_completed", false)
-})
+!augment_fun(write_missing_goals(), if itemTracker.questsCount < max_quests write_missing_quests())
 
-on spawn store(itemTracker.questsRequired, max_quests)
-
-on MarshSpawn.TokkKeystoneQuest {
-    create_stats_entry(QuestEnd, "The Missing Key")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-// TODO optimization for state > n == false?
-on MarshSpawn.TokkKeystoneQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on MarshSpawn.TokkTabletQuest {
-    create_stats_entry(QuestEnd, "Into the Burrows")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on MarshSpawn.TokkTabletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on OuterWellspring.TheLostCompass {
-    create_stats_entry(QuestEnd, "The Lost Compass")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on OuterWellspring.TheLostCompass == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on MarshSpawn.MokkFangQuest {
-    create_stats_entry(QuestEnd, "A Little Braver")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on MarshSpawn.MokkFangQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on GladesTown.FamilyReunion {
-    create_stats_entry(QuestEnd, "Family Reunion")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on GladesTown.FamilyReunion == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on GladesTown.LastTree {
-    create_stats_entry(QuestEnd, "The Tree Keeper")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on GladesTown.LastTree == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-// TODO we lack fully accurate simulation in cases where quests set multiple states.
-// This should more accurately be questUberStateGroup.desertCogQuest but paths.wotwl doesn't communicate that state
-on GladesTown.TwillenGemQuest {
-    create_stats_entry(QuestEnd, "A Diamond in the Rough")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on GladesTown.TwillenGemQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on WindtornRuins.HandToHandComplete {
-    create_stats_entry(QuestEnd, "Hand To Hand")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on WindtornRuins.HandToHandComplete == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on GladesTown.MokiAcornQuest {
-    create_stats_entry(QuestEnd, "Into the Darkness")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on GladesTown.MokiAcornQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on EastHollow.KwolokAmuletQuest {
-    create_stats_entry(QuestEnd, "Kwolok's Wisdom")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on EastHollow.KwolokAmuletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on GladesTown.RebuildTheGlades {
-    create_stats_entry(QuestEnd, "Rebuilding the Glades")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on GladesTown.RebuildTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
-
-on GladesTown.RegrowTheGlades {
-    create_stats_entry(QuestEnd, "Regrowing the Glades")
-    store(itemTracker.questsCount, itemTracker.questsCount + 1)
-}
-on GladesTown.RegrowTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+fun write_missing_quests() { new_row("#Missing Quests (" + (max_quests - itemTracker.questsCount) + ")#: ") }
+!if silent_teeth { !augment_fun(write_missing_quests(), if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 add_row_item("Silent Teeth")) }
+!if missing_key { !augment_fun(write_missing_quests(), if MarshSpawn.TokkKeystoneQuest == false add_row_item("Missing Key")) }
+!if into_burrows { !augment_fun(write_missing_quests(), if MarshSpawn.TokkTabletQuest == false add_row_item("Into Burrows")) }
+!if lost_compass { !augment_fun(write_missing_quests(), if OuterWellspring.TheLostCompass == false add_row_item("Lost Compass")) }
+!if little_braver { !augment_fun(write_missing_quests(), if MarshSpawn.MokkFangQuest == false add_row_item("Little Braver")) }
+!if family_reunion { !augment_fun(write_missing_quests(), if GladesTown.FamilyReunion == false add_row_item("Family Reunion")) }
+!if tree_keeper { !augment_fun(write_missing_quests(), if GladesTown.LastTree == false add_row_item("Tree Keeper")) }
+!if rough_diamond { !augment_fun(write_missing_quests(), if GladesTown.TwillenGemQuest == false add_row_item("Rough Diamond")) }
+!if hand_to_hand { !augment_fun(write_missing_quests(), if WindtornRuins.HandToHandComplete == false add_row_item("Hand to Hand")) }
+!if into_darkness { !augment_fun(write_missing_quests(), if GladesTown.MokiAcornQuest == false add_row_item("Into Darkness")) }
+!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwolokAmuletQuest == false add_row_item("Kwolok's Wisdom")) }
+!if rebuilding_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RebuildTheGlades == false add_row_item("Rebuilding the Glades")) }
+!if regrowing_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RegrowTheGlades == false add_row_item("Regrowing the Glades")) }
+!augment_fun(write_missing_quests(), add_current_row())
 
 on change itemTracker.questsCount update_goals()
 
-!augment_fun(write_missing_goals(), if itemTracker.questsCount < max_quests {
-    new_row("#Missing Quests (" + (max_quests - itemTracker.questsCount) + ")#: ")
-    if MarshSpawn.TokkKeystoneQuest == false add_row_item("Missing Key")
-    if MarshSpawn.TokkTabletQuest == false add_row_item("Into Burrows")
-    if OuterWellspring.TheLostCompass == false add_row_item("Lost Compass")
-    if MarshSpawn.MokkFangQuest == false add_row_item("Little Braver")
-    if GladesTown.FamilyReunion == false add_row_item("Family Reunion")
-    if GladesTown.LastTree == false add_row_item("Tree Keeper")
-    if GladesTown.TwillenGemQuest == false add_row_item("Rough Diamond")
-    if WindtornRuins.HandToHandComplete == false add_row_item("Hand to Hand")
-    if GladesTown.MokiAcornQuest == false add_row_item("Into Darkness")
-    if EastHollow.KwolokAmuletQuest == false add_row_item("Kwolok's Wisdom")
-    if GladesTown.RebuildTheGlades == false add_row_item("Rebuilding the Glades")
-    if GladesTown.RegrowTheGlades == false add_row_item("Regrowing the Glades")
-    add_current_row()
-})
+!if silent_teeth {
+    on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 4 {
+        create_stats_entry(QuestEnd, "The Silent Teeth")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if missing_key {
+    on MarshSpawn.TokkKeystoneQuest {
+        create_stats_entry(QuestEnd, "The Missing Key")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    // TODO optimization for state > n == false?
+    on MarshSpawn.TokkKeystoneQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if into_burrows {
+    on MarshSpawn.TokkTabletQuest {
+        create_stats_entry(QuestEnd, "Into the Burrows")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on MarshSpawn.TokkTabletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if lost_compass {
+    on OuterWellspring.TheLostCompass {
+        create_stats_entry(QuestEnd, "The Lost Compass")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on OuterWellspring.TheLostCompass == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if little_braver {
+    on MarshSpawn.MokkFangQuest {
+        create_stats_entry(QuestEnd, "A Little Braver")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on MarshSpawn.MokkFangQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if family_reunion {
+    on GladesTown.FamilyReunion {
+        create_stats_entry(QuestEnd, "Family Reunion")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on GladesTown.FamilyReunion == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if tree_keeper {
+    on GladesTown.LastTree {
+        create_stats_entry(QuestEnd, "The Tree Keeper")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on GladesTown.LastTree == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+// TODO we lack fully accurate simulation in cases where quests set multiple states.
+// This should more accurately be questUberStateGroup.desertCogQuest but paths.wotwl doesn't communicate that state
+!if rough_diamond {
+    on GladesTown.TwillenGemQuest {
+        create_stats_entry(QuestEnd, "A Diamond in the Rough")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on GladesTown.TwillenGemQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if hand_to_hand {
+    on WindtornRuins.HandToHandComplete {
+        create_stats_entry(QuestEnd, "Hand To Hand")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on WindtornRuins.HandToHandComplete == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if into_darkness {
+    on GladesTown.MokiAcornQuest {
+        create_stats_entry(QuestEnd, "Into the Darkness")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on GladesTown.MokiAcornQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if kwoloks_wisdom {
+    on EastHollow.KwolokAmuletQuest {
+        create_stats_entry(QuestEnd, "Kwolok's Wisdom")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on EastHollow.KwolokAmuletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if rebuilding_the_glades {
+    on GladesTown.RebuildTheGlades {
+        create_stats_entry(QuestEnd, "Rebuilding the Glades")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on GladesTown.RebuildTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}
+
+!if regrowing_the_glades {
+    on GladesTown.RegrowTheGlades {
+        create_stats_entry(QuestEnd, "Regrowing the Glades")
+        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+    }
+    on GladesTown.RegrowTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+}

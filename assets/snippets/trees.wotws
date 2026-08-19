@@ -1,127 +1,209 @@
 #category("Goals")
-#name("All Trees")
-#description("Require visiting all Trees before fighting Shriek")
+#name("Trees")
+#description("Require visiting Trees before fighting Shriek")
 
-!tags("All Trees")
+!config(randomize, "Randomize", "Overrides all other settings with random values", Boolean, false)
+
+!config(sword_tree, "Sword Tree", Boolean, true)
+!config(double_jump_tree, "Double Jump Tree", Boolean, true)
+!config(regenerate_tree, "Regenerate Tree", Boolean, true)
+!config(bow_tree, "Bow Tree", Boolean, true)
+!config(dash_tree, "Dash Tree", Boolean, true)
+!config(bash_tree, "Bash Tree", Boolean, true)
+!config(grapple_tree, "Grapple Tree", Boolean, true)
+!config(grenade_tree, "Grenade Tree", Boolean, true)
+!config(flash_tree, "Flash Tree", Boolean, true)
+!config(water_dash_tree, "Water Dash Tree", Boolean, true)
+!config(burrow_tree, "Burrow Tree", Boolean, true)
+!config(launch_tree, "Launch Tree", Boolean, true)
+!config(marsh_ancestral_light_tree, "Marsh Ancestral Light Tree", Boolean, true)
+!config(glades_ancestral_light_tree, "Glades Ancestral Light Tree", Boolean, true)
 
 !include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
 !include("list_core", new_row, add_current_row)
 
+!if randomize {
+    !random_boolean(sword_tree)
+    !random_boolean(double_jump_tree)
+    !random_boolean(regenerate_tree)
+    !random_boolean(bow_tree)
+    !random_boolean(dash_tree)
+    !random_boolean(bash_tree)
+    !random_boolean(grapple_tree)
+    !random_boolean(grenade_tree)
+    !random_boolean(flash_tree)
+    !random_boolean(water_dash_tree)
+    !random_boolean(burrow_tree)
+    !random_boolean(launch_tree)
+    !random_boolean(marsh_ancestral_light_tree)
+    !random_boolean(glades_ancestral_light_tree)
+}
+
+!let(trees_required, 0)
+!if sword_tree { !let(trees_required, trees_required + 1) }
+!if double_jump_tree { !let(trees_required, trees_required + 1) }
+!if regenerate_tree { !let(trees_required, trees_required + 1) }
+!if bow_tree { !let(trees_required, trees_required + 1) }
+!if dash_tree { !let(trees_required, trees_required + 1) }
+!if bash_tree { !let(trees_required, trees_required + 1) }
+!if grapple_tree { !let(trees_required, trees_required + 1) }
+!if grenade_tree { !let(trees_required, trees_required + 1) }
+!if flash_tree { !let(trees_required, trees_required + 1) }
+!if water_dash_tree { !let(trees_required, trees_required + 1) }
+!if burrow_tree { !let(trees_required, trees_required + 1) }
+!if launch_tree { !let(trees_required, trees_required + 1) }
+!if marsh_ancestral_light_tree { !let(trees_required, trees_required + 1) }
+!if glades_ancestral_light_tree { !let(trees_required, trees_required + 1) }
+
 !let(max_trees, 14)
+!let(tag, "Trees (" + trees_required + "/" + max_trees + ")")
+!if randomize { !tags("Random " + tag) }
+!if randomize == false {
+    !if trees_required == max_trees { !tags("All Trees") }
+    !if trees_required < max_trees { !tags(tag) }
+}
+
+on spawn store(itemTracker.treesRequired, trees_required)
+
+!augment_fun(check_goals_completed(), {
+    if itemTracker.treesCount < trees_required set_boolean("goals_completed", false)
+})
 
 !augment_fun(write_short_goals_row(), {
-    set_string("trees_message", "Trees: " + itemTracker.treesCount + "/" + max_trees)
-    if itemTracker.treesCount == max_trees set_string("trees_message", "$" + get_string("trees_message") + "$")
+    set_string("trees_message", "Trees: " + itemTracker.treesCount + "/" + trees_required)
+    if itemTracker.treesCount == trees_required set_string("trees_message", "$" + get_string("trees_message") + "$")
     add_row_item(get_string("trees_message"))
 })
 
-!augment_fun(check_goals_completed(), {
-    if itemTracker.treesCount < max_trees set_boolean("goals_completed", false)
-})
+!augment_fun(write_missing_goals(), if itemTracker.treesCount < trees_required write_missing_trees())
 
-on spawn store(itemTracker.treesRequired, max_trees)
-
-on MarshSpawn.RegenTree {
-    create_stats_entry(Skill, "Regenerate")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on MarshSpawn.RegenTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on MarshSpawn.DamageTree {
-    create_stats_entry(Skill, "Marsh Ancestral Light")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on MarshSpawn.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on HowlsDen.SwordTree {
-    create_stats_entry(Skill, "Sword")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on HowlsDen.SwordTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on HowlsDen.DoubleJumpTree {
-    create_stats_entry(Skill, "Double Jump")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on HowlsDen.DoubleJumpTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on MarshPastOpher.BowTree {
-    create_stats_entry(Skill, "Bow")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on MarshPastOpher.BowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on WestHollow.DashTree {
-    create_stats_entry(Skill, "Dash")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on WestHollow.DashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on EastHollow.BashTree {
-    create_stats_entry(Skill, "Bash")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on EastHollow.BashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on GladesTown.DamageTree {
-    create_stats_entry(Skill, "Glades Ancestral Light")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on GladesTown.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on InnerWellspring.GrappleTree {
-    create_stats_entry(Skill, "Grapple")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on InnerWellspring.GrappleTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on UpperReach.GrenadeTree {
-    create_stats_entry(Skill, "Grenade")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on UpperReach.GrenadeTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on UpperPools.WaterDashTree {
-    create_stats_entry(Skill, "Water Dash")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on UpperPools.WaterDashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on LowerDepths.FlashTree {
-    create_stats_entry(Skill, "Flash")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on LowerDepths.FlashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on LowerWastes.BurrowTree {
-    create_stats_entry(Skill, "Burrow")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on LowerWastes.BurrowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
-
-on WeepingRidge.LaunchTree {
-    create_stats_entry(Skill, "Launch")
-    store(itemTracker.treesCount, itemTracker.treesCount + 1)
-}
-on WeepingRidge.LaunchTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+fun write_missing_trees() { new_row("#Missing Trees (" + (trees_required - itemTracker.treesCount) + ")#: ") }
+!if sword_tree { !augment_fun(write_missing_trees(), if HowlsDen.SwordTree == false add_row_item("Sword")) }
+!if double_jump_tree { !augment_fun(write_missing_trees(), if HowlsDen.DoubleJumpTree == false add_row_item("Double Jump")) }
+!if regenerate_tree { !augment_fun(write_missing_trees(), if MarshSpawn.RegenTree == false add_row_item("Regenerate")) }
+!if bow_tree { !augment_fun(write_missing_trees(), if MarshPastOpher.BowTree == false add_row_item("Bow")) }
+!if dash_tree { !augment_fun(write_missing_trees(), if WestHollow.DashTree == false add_row_item("Dash")) }
+!if bash_tree { !augment_fun(write_missing_trees(), if EastHollow.BashTree == false add_row_item("Bash")) }
+!if grapple_tree { !augment_fun(write_missing_trees(), if InnerWellspring.GrappleTree == false add_row_item("Grapple")) }
+!if grenade_tree { !augment_fun(write_missing_trees(), if UpperReach.GrenadeTree == false add_row_item("Grenade")) }
+!if flash_tree { !augment_fun(write_missing_trees(), if LowerDepths.FlashTree == false add_row_item("Flash")) }
+!if water_dash_tree { !augment_fun(write_missing_trees(), if UpperPools.WaterDashTree == false add_row_item("Water Dash")) }
+!if burrow_tree { !augment_fun(write_missing_trees(), if LowerWastes.BurrowTree == false add_row_item("Burrow")) }
+!if launch_tree { !augment_fun(write_missing_trees(), if WeepingRidge.LaunchTree == false add_row_item("Launch")) }
+!if marsh_ancestral_light_tree { !augment_fun(write_missing_trees(), if MarshSpawn.DamageTree == false add_row_item("Marsh Ancestral Light")) }
+!if glades_ancestral_light_tree { !augment_fun(write_missing_trees(), if GladesTown.DamageTree == false add_row_item("Glades Ancestral Light")) }
+!augment_fun(write_missing_trees(), add_current_row())
 
 on change itemTracker.treesCount update_goals()
 
-!augment_fun(write_missing_goals(), if itemTracker.treesCount < max_trees {
-    new_row("#Missing Trees (" + (max_trees - itemTracker.treesCount) + ")#: ")
-    if MarshSpawn.RegenTree == false add_row_item("Regenerate")
-    if HowlsDen.SwordTree == false add_row_item("Sword")
-    if HowlsDen.DoubleJumpTree == false add_row_item("Double Jump")
-    if MarshPastOpher.BowTree == false add_row_item("Bow")
-    if WestHollow.DashTree == false add_row_item("Dash")
-    if EastHollow.BashTree == false add_row_item("Bash")
-    if InnerWellspring.GrappleTree == false add_row_item("Grapple")
-    if MarshSpawn.DamageTree == false add_row_item("Marsh Ancestral Light")
-    if GladesTown.DamageTree == false add_row_item("Glades Ancestral Light")
-    if LowerWastes.BurrowTree == false add_row_item("Burrow")
-    if UpperReach.GrenadeTree == false add_row_item("Grenade")
-    if LowerDepths.FlashTree == false add_row_item("Flash")
-    if UpperPools.WaterDashTree == false add_row_item("Water Dash")
-    if WeepingRidge.LaunchTree == false add_row_item("Launch")
-    add_current_row()
-})
+!if sword_tree {
+    on HowlsDen.SwordTree {
+        create_stats_entry(Skill, "Sword")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on HowlsDen.SwordTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if double_jump_tree {
+    on HowlsDen.DoubleJumpTree {
+        create_stats_entry(Skill, "Double Jump")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on HowlsDen.DoubleJumpTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if regenerate_tree {
+    on MarshSpawn.RegenTree {
+        create_stats_entry(Skill, "Regenerate")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on MarshSpawn.RegenTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if bow_tree {
+    on MarshPastOpher.BowTree {
+        create_stats_entry(Skill, "Bow")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on MarshPastOpher.BowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if dash_tree {
+    on WestHollow.DashTree {
+        create_stats_entry(Skill, "Dash")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on WestHollow.DashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if bash_tree {
+    on EastHollow.BashTree {
+        create_stats_entry(Skill, "Bash")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on EastHollow.BashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if grapple_tree {
+    on InnerWellspring.GrappleTree {
+        create_stats_entry(Skill, "Grapple")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on InnerWellspring.GrappleTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if grenade_tree {
+    on UpperReach.GrenadeTree {
+        create_stats_entry(Skill, "Grenade")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on UpperReach.GrenadeTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if flash_tree {
+    on LowerDepths.FlashTree {
+        create_stats_entry(Skill, "Flash")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on LowerDepths.FlashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if water_dash_tree {
+    on UpperPools.WaterDashTree {
+        create_stats_entry(Skill, "Water Dash")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on UpperPools.WaterDashTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if burrow_tree {
+    on LowerWastes.BurrowTree {
+        create_stats_entry(Skill, "Burrow")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on LowerWastes.BurrowTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if launch_tree {
+    on WeepingRidge.LaunchTree {
+        create_stats_entry(Skill, "Launch")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on WeepingRidge.LaunchTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if marsh_ancestral_light_tree {
+    on MarshSpawn.DamageTree {
+        create_stats_entry(Skill, "Marsh Ancestral Light")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on MarshSpawn.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}
+
+!if glades_ancestral_light_tree {
+    on GladesTown.DamageTree {
+        create_stats_entry(Skill, "Glades Ancestral Light")
+        store(itemTracker.treesCount, itemTracker.treesCount + 1)
+    }
+    on GladesTown.DamageTree == false store(itemTracker.treesCount, itemTracker.treesCount - 1)
+}

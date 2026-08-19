@@ -6,28 +6,9 @@
 !config(relic_chance, "Relic Chance", "Chance for each individual area of the game to have a relic", Float, 0.6)
 !config(relic_count, "Relic Count", "If not zero, overrides relic chance. How many relics to place", Integer, 0)
 
-!if relic_count == 0 {
-    !tags("Relics (" + to_integer(relic_chance * 100) + "%)")
-}
-!if relic_count != 0 {
-    !tags("Relics (" + relic_count + ")")
-}
-
 !include("progress_helper", write_progress_message, write_map_progress_message)
 !include("goal_mode_core", check_goals_completed, write_missing_goals, update_goals)
 !include("list_core", new_row, add_row_item, add_row, add_current_row)
-
-!state(marsh_relic_collected, Boolean)
-!state(hollow_relic_collected, Boolean)
-!state(glades_relic_collected, Boolean)
-!state(wellspring_relic_collected, Boolean)
-!state(woods_relic_collected, Boolean)
-!state(reach_relic_collected, Boolean)
-!state(depths_relic_collected, Boolean)
-!state(pools_relic_collected, Boolean)
-!state(wastes_relic_collected, Boolean)
-!state(willow_relic_collected, Boolean)
-!state(burrows_relic_collected, Boolean)
 
 !let(marsh_relic_exists, false)
 !let(hollow_relic_exists, false)
@@ -107,272 +88,178 @@
 !if willow_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 !if burrows_relic_exists { !let(total_relic_count, total_relic_count + 1) }
 
-// TODO flavour messages
-!if marsh_relic_exists {
-    fun marsh_relic() {
-        create_stats_entry(MapstoneFragment, "Marsh Relic")
-        item_message("@Marsh Relic@")
-        store(marsh_relic_collected, true)
-    }
-
-    !preplace(marsh_relic(), Marsh)
-    !item_data_name(marsh_relic(), "Marsh Relic")
-    !item_data_map_icon(marsh_relic(), MapstoneFragment)
-}
-
-!if hollow_relic_exists {
-    fun hollow_relic() {
-        create_stats_entry(MapstoneFragment, "Hollow Relic")
-        item_message("@Hollow Relic@")
-        store(hollow_relic_collected, true)
-    }
-
-    !preplace(hollow_relic(), Hollow)
-    !item_data_name(hollow_relic(), "Hollow Relic")
-    !item_data_map_icon(hollow_relic(), MapstoneFragment)
-}
-
-!if glades_relic_exists {
-    fun glades_relic() {
-        create_stats_entry(MapstoneFragment, "Glades Relic")
-        item_message("@Glades Relic@")
-        store(glades_relic_collected, true)
-    }
-
-    !preplace(glades_relic(), Glades)
-    !item_data_name(glades_relic(), "Glades Relic")
-    !item_data_map_icon(glades_relic(), MapstoneFragment)
-}
-
-!if wellspring_relic_exists {
-    fun wellspring_relic() {
-        create_stats_entry(MapstoneFragment, "Wellspring Relic")
-        item_message("@Wellspring Relic@")
-        store(wellspring_relic_collected, true)
-    }
-
-    !preplace(wellspring_relic(), Wellspring)
-    !item_data_name(wellspring_relic(), "Wellspring Relic")
-    !item_data_map_icon(wellspring_relic(), MapstoneFragment)
-}
-
-!if woods_relic_exists {
-    fun woods_relic() {
-        create_stats_entry(MapstoneFragment, "Woods Relic")
-        item_message("@Woods Relic@")
-        store(woods_relic_collected, true)
-    }
-
-    !preplace(woods_relic(), Woods)
-    !item_data_name(woods_relic(), "Woods Relic")
-    !item_data_map_icon(woods_relic(), MapstoneFragment)
-}
-
-!if reach_relic_exists {
-    fun reach_relic() {
-        create_stats_entry(MapstoneFragment, "Reach Relic")
-        item_message("@Reach Relic@")
-        store(reach_relic_collected, true)
-    }
-
-    !preplace(reach_relic(), Reach)
-    !item_data_name(reach_relic(), "Reach Relic")
-    !item_data_map_icon(reach_relic(), MapstoneFragment)
-}
-
-!if depths_relic_exists {
-    fun depths_relic() {
-        create_stats_entry(MapstoneFragment, "Depths Relic")
-        item_message("@Depths Relic@")
-        store(depths_relic_collected, true)
-    }
-
-    !preplace(depths_relic(), Depths)
-    !item_data_name(depths_relic(), "Depths Relic")
-    !item_data_map_icon(depths_relic(), MapstoneFragment)
-}
-
-!if pools_relic_exists {
-    fun pools_relic() {
-        create_stats_entry(MapstoneFragment, "Pools Relic")
-        item_message("@Pools Relic@")
-        store(pools_relic_collected, true)
-    }
-
-    !preplace(pools_relic(), Pools)
-    !item_data_name(pools_relic(), "Pools Relic")
-    !item_data_map_icon(pools_relic(), MapstoneFragment)
-}
-
-!if wastes_relic_exists {
-    fun wastes_relic() {
-        create_stats_entry(MapstoneFragment, "Wastes Relic")
-        item_message("@Wastes Relic@")
-        store(wastes_relic_collected, true)
-    }
-
-    !preplace(wastes_relic(), Wastes)
-    !item_data_name(wastes_relic(), "Wastes Relic")
-    !item_data_map_icon(wastes_relic(), MapstoneFragment)
-}
-
-!if willow_relic_exists {
-    fun willow_relic() {
-        create_stats_entry(MapstoneFragment, "Willow Relic")
-        item_message("@Willow Relic@")
-        store(willow_relic_collected, true)
-    }
-
-    !preplace(willow_relic(), Willow)
-    !item_data_name(willow_relic(), "Willow Relic")
-    !item_data_map_icon(willow_relic(), MapstoneFragment)
-}
-
-!if burrows_relic_exists {
-    fun burrows_relic() {
-        create_stats_entry(MapstoneFragment, "Burrows Relic")
-        item_message("@Burrows Relic@")
-        store(burrows_relic_collected, true)
-    }
-
-    !preplace(burrows_relic(), Burrows)
-    !item_data_name(burrows_relic(), "Burrows Relic")
-    !item_data_map_icon(burrows_relic(), MapstoneFragment)
-}
+!tags("Relics (" + total_relic_count + ")")
 
 on spawn store(itemTracker.relicsRequired, total_relic_count)
 
-on marsh_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on marsh_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on hollow_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on hollow_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on glades_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on glades_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on wellspring_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on wellspring_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on woods_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on woods_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on reach_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on reach_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on depths_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on depths_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on pools_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on pools_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on wastes_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on wastes_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on willow_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on willow_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
-on burrows_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
-on burrows_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
+!if marsh_relic_exists { !state(marsh_relic_collected, Boolean) }
+!if hollow_relic_exists { !state(hollow_relic_collected, Boolean) }
+!if glades_relic_exists { !state(glades_relic_collected, Boolean) }
+!if wellspring_relic_exists { !state(wellspring_relic_collected, Boolean) }
+!if woods_relic_exists { !state(woods_relic_collected, Boolean) }
+!if reach_relic_exists { !state(reach_relic_collected, Boolean) }
+!if depths_relic_exists { !state(depths_relic_collected, Boolean) }
+!if pools_relic_exists { !state(pools_relic_collected, Boolean) }
+!if wastes_relic_exists { !state(wastes_relic_collected, Boolean) }
+!if willow_relic_exists { !state(willow_relic_collected, Boolean) }
+!if burrows_relic_exists { !state(burrows_relic_collected, Boolean) }
 
-// TODO don't update inside reach corner in wellspring escape
-
-on reload update_current_area_has_uncollected_relic()
-on change player.currentArea update_current_area_has_uncollected_relic()
-on change itemTracker.relicsCount update_current_area_has_uncollected_relic()
-fun update_current_area_has_uncollected_relic() {
-    if current_zone() == Marsh store(itemTracker.currentAreaHasUncollectedRelic, marsh_relic_exists && marsh_relic_collected == false)
-    if current_zone() == Hollow store(itemTracker.currentAreaHasUncollectedRelic, hollow_relic_exists && hollow_relic_collected == false)
-    if current_zone() == Glades store(itemTracker.currentAreaHasUncollectedRelic, glades_relic_exists && glades_relic_collected == false)
-    if current_zone() == Wellspring store(itemTracker.currentAreaHasUncollectedRelic, wellspring_relic_exists && wellspring_relic_collected == false)
-    if current_zone() == Woods store(itemTracker.currentAreaHasUncollectedRelic, woods_relic_exists && woods_relic_collected == false)
-    if current_zone() == Reach store(itemTracker.currentAreaHasUncollectedRelic, reach_relic_exists && reach_relic_collected == false)
-    if current_zone() == Depths store(itemTracker.currentAreaHasUncollectedRelic, depths_relic_exists && depths_relic_collected == false)
-    if current_zone() == Pools store(itemTracker.currentAreaHasUncollectedRelic, pools_relic_exists && pools_relic_collected == false)
-    if current_zone() == Wastes store(itemTracker.currentAreaHasUncollectedRelic, wastes_relic_exists && wastes_relic_collected == false)
-    if current_zone() == Ruins store(itemTracker.currentAreaHasUncollectedRelic, false)
-    if current_zone() == Willow store(itemTracker.currentAreaHasUncollectedRelic, willow_relic_exists && willow_relic_collected == false)
-    if current_zone() == Burrows store(itemTracker.currentAreaHasUncollectedRelic, burrows_relic_exists && burrows_relic_collected == false)
-}
+!augment_fun(check_goals_completed(), {
+    if itemTracker.relicsCount < itemTracker.relicsRequired set_boolean("goals_completed", false)
+})
 
 !augment_fun(write_progress_message(), {
-    set_string("color", "")
-    if itemTracker.relicsCount == itemTracker.relicsRequired set_string("color", "$")
-    write_relics_message(get_string("color"))
+    new_row("Relics (" + itemTracker.relicsCount + "/" + itemTracker.relicsRequired  + "): ")
+    if itemTracker.relicsCount < itemTracker.relicsRequired write_unfinished_relic_progress()
+    if itemTracker.relicsCount == itemTracker.relicsRequired write_finished_relic_progress()
     add_row(get_string("row"))
 })
+
+fun write_unfinished_relic_progress() {}
+
+!if marsh_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Marsh, marsh_relic_collected, "Marsh")
+)}
+!if hollow_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Hollow, hollow_relic_collected, "Hollow")
+)}
+!if glades_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Glades, glades_relic_collected, "Glades")
+)}
+!if wellspring_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Wellspring, wellspring_relic_collected, "Wellspring")
+)}
+!if woods_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Woods, woods_relic_collected, "Woods")
+)}
+!if reach_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Reach, reach_relic_collected, "Reach")
+)}
+!if depths_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Depths, depths_relic_collected, "Depths")
+)}
+!if pools_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Pools, pools_relic_collected, "Pools")
+)}
+!if wastes_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Wastes, wastes_relic_collected, "Wastes")
+)}
+!if willow_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Willow, willow_relic_collected, "Willow")
+)}
+!if burrows_relic_exists { !augment_fun(write_unfinished_relic_progress(),
+    add_relic_row_item(current_zone() == Burrows, burrows_relic_collected, "Burrows")
+)}
+
+fun add_relic_row_item(current_zone: Boolean, collected: Boolean, name: String) {
+    set_string("color", "")
+    if current_zone {
+        set_string("color", "#")
+    }
+    if collected {
+        set_string("color", "$")
+    }
+    add_row_item(get_string("color") + name + get_string("color"))
+}
+
+!let(finished_relic_progress, "")
+!let(comma, false)
+!if marsh_relic_exists {
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Marsh")
+}
+!if hollow_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Hollow")
+}
+!if glades_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Glades")
+}
+!if wellspring_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Wellspring")
+}
+!if woods_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Woods")
+}
+!if reach_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Reach")
+}
+!if depths_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Depths")
+}
+!if pools_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Pools")
+}
+!if wastes_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Wastes")
+}
+!if willow_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(comma, true)
+    !let(finished_relic_progress, finished_relic_progress + "Willow")
+}
+!if burrows_relic_exists {
+    !if comma { !let(finished_relic_progress, finished_relic_progress + ", ") }
+    !let(finished_relic_progress, finished_relic_progress + "Burrows")
+}
+
+fun write_finished_relic_progress() {
+    set_string("row", "$" + get_string("row") + finished_relic_progress + "$")
+}
 
 !augment_fun(write_map_progress_message(), {
     set_boolean("exists", false)
     set_boolean("collected", false)
 })
 
-!if marsh_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Marsh {
-        set_boolean("exists", true)
-        set_boolean("collected", marsh_relic_collected)
-    })
-}
-
-!if hollow_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Hollow {
-        set_boolean("exists", true)
-        set_boolean("collected", hollow_relic_collected)
-    })
-}
-
-!if glades_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Glades {
-        set_boolean("exists", true)
-        set_boolean("collected", glades_relic_collected)
-    })
-}
-
-!if wellspring_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Wellspring {
-        set_boolean("exists", true)
-        set_boolean("collected", wellspring_relic_collected)
-    })
-}
-
-!if woods_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Woods {
-        set_boolean("exists", true)
-        set_boolean("collected", woods_relic_collected)
-    })
-}
-
-!if reach_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Reach {
-        set_boolean("exists", true)
-        set_boolean("collected", reach_relic_collected)
-    })
-}
-
-!if depths_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Depths {
-        set_boolean("exists", true)
-        set_boolean("collected", depths_relic_collected)
-    })
-}
-
-!if pools_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Pools {
-        set_boolean("exists", true)
-        set_boolean("collected", pools_relic_collected)
-    })
-}
-
-!if wastes_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Wastes {
-        set_boolean("exists", true)
-        set_boolean("collected", wastes_relic_collected)
-    })
-}
-
-!if willow_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Willow {
-        set_boolean("exists", true)
-        set_boolean("collected", willow_relic_collected)
-    })
-}
-
-!if burrows_relic_exists {
-    !augment_fun(write_map_progress_message(), if current_map_zone() == Burrows {
-        set_boolean("exists", true)
-        set_boolean("collected", burrows_relic_collected)
-    })
-}
+!if marsh_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Marsh write_map_progress_for(marsh_relic_collected)
+})}
+!if hollow_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Hollow write_map_progress_for(hollow_relic_collected)
+})}
+!if glades_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Glades write_map_progress_for(glades_relic_collected)
+})}
+!if wellspring_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Wellspring write_map_progress_for(wellspring_relic_collected)
+})}
+!if woods_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Woods write_map_progress_for(woods_relic_collected)
+})}
+!if reach_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Reach write_map_progress_for(reach_relic_collected)
+})}
+!if depths_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Depths write_map_progress_for(depths_relic_collected)
+})}
+!if pools_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Pools write_map_progress_for(pools_relic_collected)
+})}
+!if wastes_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Wastes write_map_progress_for(wastes_relic_collected)
+})}
+!if willow_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Willow write_map_progress_for(willow_relic_collected)
+})}
+!if burrows_relic_exists { !augment_fun(write_map_progress_message(), {
+    if current_map_zone() == Burrows write_map_progress_for(burrows_relic_collected)
+})}
 
 !augment_fun(write_map_progress_message(), {
     if get_boolean("exists") {
@@ -388,170 +275,268 @@ fun update_current_area_has_uncollected_relic() {
     }
 })
 
-!augment_fun(check_goals_completed(), {
-    if itemTracker.relicsCount < itemTracker.relicsRequired set_boolean("goals_completed", false)
-})
+fun write_map_progress_for(collected: Boolean) {
+    set_boolean("exists", true)
+    set_boolean("collected", collected)
+}
+
+!augment_fun(write_missing_goals(), if itemTracker.relicsCount < itemTracker.relicsRequired write_missing_relics())
+
+fun write_missing_relics() { new_row("#Missing Relics (" + (itemTracker.relicsRequired - itemTracker.relicsCount) + ")#: ") }
+!if marsh_relic_exists { !augment_fun(write_missing_relics(), if marsh_relic_collected == false add_row_item("Marsh")) }
+!if hollow_relic_exists { !augment_fun(write_missing_relics(), if hollow_relic_collected == false add_row_item("Hollow")) }
+!if glades_relic_exists { !augment_fun(write_missing_relics(), if glades_relic_collected == false add_row_item("Glades")) }
+!if wellspring_relic_exists { !augment_fun(write_missing_relics(), if wellspring_relic_collected == false add_row_item("Wellspring")) }
+!if woods_relic_exists { !augment_fun(write_missing_relics(), if woods_relic_collected == false add_row_item("Woods")) }
+!if reach_relic_exists { !augment_fun(write_missing_relics(), if reach_relic_collected == false add_row_item("Reach")) }
+!if depths_relic_exists { !augment_fun(write_missing_relics(), if depths_relic_collected == false add_row_item("Depths")) }
+!if pools_relic_exists { !augment_fun(write_missing_relics(), if pools_relic_collected == false add_row_item("Pools")) }
+!if wastes_relic_exists { !augment_fun(write_missing_relics(), if wastes_relic_collected == false add_row_item("Wastes")) }
+!if willow_relic_exists { !augment_fun(write_missing_relics(), if willow_relic_collected == false add_row_item("Willow")) }
+!if burrows_relic_exists { !augment_fun(write_missing_relics(), if burrows_relic_collected == false add_row_item("Burrows")) }
+!augment_fun(write_missing_relics(), add_current_row())
 
 on change itemTracker.relicsCount update_goals()
 on change itemTracker.relicsRequired update_goals()
 
-!augment_fun(write_missing_goals(), new_row("#Missing Relics (" + (itemTracker.relicsRequired - itemTracker.relicsCount) + ")#: "))
-!if marsh_relic_exists { !augment_fun(write_missing_goals(), if marsh_relic_collected == false add_row_item("Marsh")) }
-!if hollow_relic_exists { !augment_fun(write_missing_goals(), if hollow_relic_collected == false add_row_item("Hollow")) }
-!if glades_relic_exists { !augment_fun(write_missing_goals(), if glades_relic_collected == false add_row_item("Glades")) }
-!if wellspring_relic_exists { !augment_fun(write_missing_goals(), if wellspring_relic_collected == false add_row_item("Wellspring")) }
-!if woods_relic_exists { !augment_fun(write_missing_goals(), if woods_relic_collected == false add_row_item("Woods")) }
-!if reach_relic_exists { !augment_fun(write_missing_goals(), if reach_relic_collected == false add_row_item("Reach")) }
-!if depths_relic_exists { !augment_fun(write_missing_goals(), if depths_relic_collected == false add_row_item("Depths")) }
-!if pools_relic_exists { !augment_fun(write_missing_goals(), if pools_relic_collected == false add_row_item("Pools")) }
-!if wastes_relic_exists { !augment_fun(write_missing_goals(), if wastes_relic_collected == false add_row_item("Wastes")) }
-!if willow_relic_exists { !augment_fun(write_missing_goals(), if willow_relic_collected == false add_row_item("Willow")) }
-!if burrows_relic_exists { !augment_fun(write_missing_goals(), if burrows_relic_collected == false add_row_item("Burrows")) }
-!augment_fun(write_missing_goals(), add_current_row())
+// TODO don't update inside reach corner in wellspring escape
 
-fun write_relics_message(color: String) {
-    new_row("Relics (" + color + itemTracker.relicsCount + "/" + itemTracker.relicsRequired + color + "): ")
+on reload update_current_area_has_uncollected_relic()
+on change player.currentArea update_current_area_has_uncollected_relic()
+on change itemTracker.relicsCount update_current_area_has_uncollected_relic()
+fun update_current_area_has_uncollected_relic() {
+    if current_zone() == Ruins store(itemTracker.currentAreaHasUncollectedRelic, false)
 }
 
+!if marsh_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Marsh store(itemTracker.currentAreaHasUncollectedRelic, marsh_relic_collected == false)
+})}
+!if marsh_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Marsh store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if hollow_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Hollow store(itemTracker.currentAreaHasUncollectedRelic, hollow_relic_collected == false)
+})}
+!if hollow_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Hollow store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if glades_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Glades store(itemTracker.currentAreaHasUncollectedRelic, glades_relic_collected == false)
+})}
+!if glades_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Glades store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if wellspring_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Wellspring store(itemTracker.currentAreaHasUncollectedRelic, wellspring_relic_collected == false)
+})}
+!if wellspring_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Wellspring store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if woods_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Woods store(itemTracker.currentAreaHasUncollectedRelic, woods_relic_collected == false)
+})}
+!if woods_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Woods store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if reach_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Reach store(itemTracker.currentAreaHasUncollectedRelic, reach_relic_collected == false)
+})}
+!if reach_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Reach store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if depths_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Depths store(itemTracker.currentAreaHasUncollectedRelic, depths_relic_collected == false)
+})}
+!if depths_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Depths store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if pools_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Pools store(itemTracker.currentAreaHasUncollectedRelic, pools_relic_collected == false)
+})}
+!if pools_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Pools store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if wastes_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Wastes store(itemTracker.currentAreaHasUncollectedRelic, wastes_relic_collected == false)
+})}
+!if wastes_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Wastes store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if willow_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Willow store(itemTracker.currentAreaHasUncollectedRelic, willow_relic_collected == false)
+})}
+!if willow_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Willow store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+!if burrows_relic_exists { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Burrows store(itemTracker.currentAreaHasUncollectedRelic, burrows_relic_collected == false)
+})}
+!if burrows_relic_exists == false { !augment_fun(update_current_area_has_uncollected_relic(), {
+    if current_zone() == Burrows store(itemTracker.currentAreaHasUncollectedRelic, false)
+})}
+
+// TODO flavour messages
 !if marsh_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Marsh {
-            set_string("color", "#")
-        }
-        if marsh_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Marsh" + get_string("color"))
-    })
+    fun marsh_relic() {
+        create_stats_entry(MapstoneFragment, "Marsh Relic")
+        item_message("@Marsh Relic@")
+        store(marsh_relic_collected, true)
+    }
+
+    !preplace(marsh_relic(), Marsh)
+    !item_data_name(marsh_relic(), "Marsh Relic")
+    !item_data_map_icon(marsh_relic(), MapstoneFragment)
+
+    on marsh_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on marsh_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if hollow_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Hollow {
-            set_string("color", "#")
-        }
-        if hollow_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Hollow" + get_string("color"))
-    })
+    fun hollow_relic() {
+        create_stats_entry(MapstoneFragment, "Hollow Relic")
+        item_message("@Hollow Relic@")
+        store(hollow_relic_collected, true)
+    }
+
+    !preplace(hollow_relic(), Hollow)
+    !item_data_name(hollow_relic(), "Hollow Relic")
+    !item_data_map_icon(hollow_relic(), MapstoneFragment)
+
+    on hollow_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on hollow_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if glades_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Glades {
-            set_string("color", "#")
-        }
-        if glades_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Glades" + get_string("color"))
-    })
+    fun glades_relic() {
+        create_stats_entry(MapstoneFragment, "Glades Relic")
+        item_message("@Glades Relic@")
+        store(glades_relic_collected, true)
+    }
+
+    !preplace(glades_relic(), Glades)
+    !item_data_name(glades_relic(), "Glades Relic")
+    !item_data_map_icon(glades_relic(), MapstoneFragment)
+
+    on glades_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on glades_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if wellspring_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Wellspring {
-            set_string("color", "#")
-        }
-        if wellspring_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Wellspring" + get_string("color"))
-    })
+    fun wellspring_relic() {
+        create_stats_entry(MapstoneFragment, "Wellspring Relic")
+        item_message("@Wellspring Relic@")
+        store(wellspring_relic_collected, true)
+    }
+
+    !preplace(wellspring_relic(), Wellspring)
+    !item_data_name(wellspring_relic(), "Wellspring Relic")
+    !item_data_map_icon(wellspring_relic(), MapstoneFragment)
+
+    on wellspring_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on wellspring_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if woods_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Woods {
-            set_string("color", "#")
-        }
-        if woods_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Woods" + get_string("color"))
-    })
+    fun woods_relic() {
+        create_stats_entry(MapstoneFragment, "Woods Relic")
+        item_message("@Woods Relic@")
+        store(woods_relic_collected, true)
+    }
+
+    !preplace(woods_relic(), Woods)
+    !item_data_name(woods_relic(), "Woods Relic")
+    !item_data_map_icon(woods_relic(), MapstoneFragment)
+
+    on woods_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on woods_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if reach_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Reach {
-            set_string("color", "#")
-        }
-        if reach_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Reach" + get_string("color"))
-    })
+    fun reach_relic() {
+        create_stats_entry(MapstoneFragment, "Reach Relic")
+        item_message("@Reach Relic@")
+        store(reach_relic_collected, true)
+    }
+
+    !preplace(reach_relic(), Reach)
+    !item_data_name(reach_relic(), "Reach Relic")
+    !item_data_map_icon(reach_relic(), MapstoneFragment)
+
+    on reach_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on reach_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if depths_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Depths {
-            set_string("color", "#")
-        }
-        if depths_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Depths" + get_string("color"))
-    })
+    fun depths_relic() {
+        create_stats_entry(MapstoneFragment, "Depths Relic")
+        item_message("@Depths Relic@")
+        store(depths_relic_collected, true)
+    }
+
+    !preplace(depths_relic(), Depths)
+    !item_data_name(depths_relic(), "Depths Relic")
+    !item_data_map_icon(depths_relic(), MapstoneFragment)
+
+    on depths_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on depths_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if pools_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Pools {
-            set_string("color", "#")
-        }
-        if pools_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Pools" + get_string("color"))
-    })
+    fun pools_relic() {
+        create_stats_entry(MapstoneFragment, "Pools Relic")
+        item_message("@Pools Relic@")
+        store(pools_relic_collected, true)
+    }
+
+    !preplace(pools_relic(), Pools)
+    !item_data_name(pools_relic(), "Pools Relic")
+    !item_data_map_icon(pools_relic(), MapstoneFragment)
+
+    on pools_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on pools_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if wastes_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Wastes {
-            set_string("color", "#")
-        }
-        if wastes_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Wastes" + get_string("color"))
-    })
+    fun wastes_relic() {
+        create_stats_entry(MapstoneFragment, "Wastes Relic")
+        item_message("@Wastes Relic@")
+        store(wastes_relic_collected, true)
+    }
+
+    !preplace(wastes_relic(), Wastes)
+    !item_data_name(wastes_relic(), "Wastes Relic")
+    !item_data_map_icon(wastes_relic(), MapstoneFragment)
+
+    on wastes_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on wastes_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if willow_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Willow {
-            set_string("color", "#")
-        }
-        if willow_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Willow" + get_string("color"))
-    })
+    fun willow_relic() {
+        create_stats_entry(MapstoneFragment, "Willow Relic")
+        item_message("@Willow Relic@")
+        store(willow_relic_collected, true)
+    }
+
+    !preplace(willow_relic(), Willow)
+    !item_data_name(willow_relic(), "Willow Relic")
+    !item_data_map_icon(willow_relic(), MapstoneFragment)
+
+    on willow_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on willow_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
 
 !if burrows_relic_exists {
-    !augment_fun(write_relics_message(color: String), {
-        set_string("color", "")
-        if current_zone() == Burrows {
-            set_string("color", "#")
-        }
-        if burrows_relic_collected {
-            set_string("color", "$")
-        }
-        add_row_item(get_string("color") + "Burrows" + get_string("color"))
-    })
+    fun burrows_relic() {
+        create_stats_entry(MapstoneFragment, "Burrows Relic")
+        item_message("@Burrows Relic@")
+        store(burrows_relic_collected, true)
+    }
+
+    !preplace(burrows_relic(), Burrows)
+    !item_data_name(burrows_relic(), "Burrows Relic")
+    !item_data_map_icon(burrows_relic(), MapstoneFragment)
+
+    on burrows_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
+    on burrows_relic_collected == false store(itemTracker.relicsCount, itemTracker.relicsCount - 1)
 }
