@@ -8,6 +8,7 @@ use ordered_float::OrderedFloat;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use serde::Serialize;
 use utoipa::ToSchema;
+use wotw_seedgen_parse::{Identifier, Spanned, SpannedOption, Symbol};
 
 /// Metadata about a snippet
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, ToSchema)]
@@ -21,8 +22,8 @@ pub struct Metadata {
     /// Longer description
     pub description: Option<String>,
     /// Available configuration
-    #[schema(value_type = FxHashMap<String, ConfigValue>)]
-    pub config: IndexMap<String, ConfigValue, FxBuildHasher>,
+    #[schema(value_type = FxHashMap<String, ConfigArg>)]
+    pub config: IndexMap<String, ConfigArg, FxBuildHasher>,
     /// Whether this snippet requires local files, preventing it from being inlined
     ///
     /// Note that included snippets may require local files even if this one doesn't
@@ -30,27 +31,58 @@ pub struct Metadata {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-pub struct ConfigValue {
+pub struct ConfigArg {
     pub name: String,
     pub description: Option<String>,
-    pub default: ConfigDefault,
+    pub value: ConfigValue,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-#[serde(tag = "type", content = "value")]
-pub enum ConfigDefault {
-    Boolean(bool),
-    Integer(i32),
-    #[schema(value_type = f32)]
-    Float(OrderedFloat<f32>),
+#[serde(tag = "type")]
+pub enum ConfigValue {
+    Boolean {
+        default: bool,
+    },
+    Integer {
+        default: i32,
+    },
+    IntegerRange {
+        default: i32,
+        min: i32,
+        max: i32,
+    },
+    Float {
+        #[schema(value_type = f32)]
+        default: OrderedFloat<f32>,
+    },
+    FloatRange {
+        #[schema(value_type = f32)]
+        default: OrderedFloat<f32>,
+        #[schema(value_type = f32)]
+        min: OrderedFloat<f32>,
+        #[schema(value_type = f32)]
+        max: OrderedFloat<f32>,
+    },
 }
 
-impl Display for ConfigDefault {
+impl ConfigValue {
+    pub fn display_default(&self) -> DisplayDefault<'_> {
+        DisplayDefault { value: self }
+    }
+}
+
+pub struct DisplayDefault<'a> {
+    value: &'a ConfigValue,
+}
+
+impl Display for DisplayDefault<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Boolean(value) => value.fmt(f),
-            Self::Integer(value) => value.fmt(f),
-            Self::Float(value) => value.fmt(f),
+        match self.value {
+            ConfigValue::Boolean { default } => default.fmt(f),
+            ConfigValue::Integer { default } => default.fmt(f),
+            ConfigValue::IntegerRange { default, .. } => default.fmt(f),
+            ConfigValue::Float { default } => default.fmt(f),
+            ConfigValue::FloatRange { default, .. } => default.fmt(f),
         }
     }
 }
@@ -69,31 +101,106 @@ impl Metadata {
         metadata
     }
 
-    fn config(&mut self, config: &ast::ConfigArgs) {
-        let (Some(name), Some(default)) = (
-            get_command_arg_ref(&config.name),
-            get_command_arg_ref(&config.default),
-        ) else {
+    fn config_boolean(&mut self, args: &ast::CommandArgs<ast::ConfigBooleanArgs>) {
+        let Some(args) = get_command_args_ref(args) else {
             return;
         };
 
-        let default = match default.data {
-            ast::Literal::Boolean(value) => ConfigDefault::Boolean(value),
-            ast::Literal::Integer(value) => ConfigDefault::Integer(value),
-            ast::Literal::Float(value) => ConfigDefault::Float(value),
-            _ => return,
+        let Some(default) = get_config_boolean(&args.0.default) else {
+            return;
         };
 
-        let description = config.description.as_ref().map(|d| &d.1);
+        self.config(&args.0, ConfigValue::Boolean { default });
+    }
 
-        let value = ConfigValue {
-            name: name.data.to_string(),
-            description: description.map(|d| d.data.to_string()),
-            default,
+    fn config_integer(&mut self, args: &ast::CommandArgs<ast::ConfigIntegerArgs>) {
+        let Some(args) = get_command_args_ref(args) else {
+            return;
         };
 
-        self.config
-            .insert(config.identifier.data.to_string(), value);
+        let Some(default) = get_config_integer(&args.0.default) else {
+            return;
+        };
+
+        self.config(&args.0, ConfigValue::Integer { default });
+    }
+
+    fn config_integer_range(&mut self, args: &ast::CommandArgs<Box<ast::ConfigIntegerRangeArgs>>) {
+        let Some(args) = get_command_args_ref(args) else {
+            return;
+        };
+
+        let default = get_config_integer(&args.0.default);
+        let min = get_config_integer(&args.0.min);
+        let max = get_config_integer(&args.0.max);
+
+        let (Some(default), Some(min), Some(max)) = (default, min, max) else {
+            return;
+        };
+
+        self.config_range(&args.0, ConfigValue::IntegerRange { default, min, max });
+    }
+
+    fn config_float(&mut self, args: &ast::CommandArgs<ast::ConfigFloatArgs>) {
+        let Some(args) = get_command_args_ref(args) else {
+            return;
+        };
+
+        let Some(default) = get_config_float(&args.0.default) else {
+            return;
+        };
+
+        self.config(&args.0, ConfigValue::Float { default });
+    }
+
+    fn config_float_range(&mut self, args: &ast::CommandArgs<Box<ast::ConfigFloatRangeArgs>>) {
+        let Some(args) = get_command_args_ref(args) else {
+            return;
+        };
+
+        let default = get_config_float(&args.0.default);
+        let min = get_config_float(&args.0.min);
+        let max = get_config_float(&args.0.max);
+
+        let (Some(default), Some(min), Some(max)) = (default, min, max) else {
+            return;
+        };
+
+        self.config_range(&args.0, ConfigValue::FloatRange { default, min, max });
+    }
+
+    fn config(&mut self, args: &ast::ConfigArgs, value: ConfigValue) {
+        self.insert_config(&args.identifier, &args.name, &args.description, value);
+    }
+
+    fn config_range(&mut self, args: &ast::ConfigRangeArgs, value: ConfigValue) {
+        self.insert_config(&args.identifier, &args.name, &args.description, value);
+    }
+
+    fn insert_config(
+        &mut self,
+        identifier: &Spanned<Identifier>,
+        name: &ast::CommandArg<Spanned<&str>>,
+        description: &SpannedOption<(Symbol<','>, Spanned<&str>)>,
+        value: ConfigValue,
+    ) {
+        let Some(name) = get_command_arg_ref(name) else {
+            return;
+        };
+
+        let name = name.data.to_string();
+        let description = description
+            .as_option()
+            .map(|(_, description)| description.data.to_string());
+
+        self.config.insert(
+            identifier.data.0.to_string(),
+            ConfigArg {
+                name,
+                description,
+                value,
+            },
+        );
     }
 }
 
@@ -101,11 +208,11 @@ impl Handler for Metadata {
     fn command(&mut self, command: &ast::Command) {
         match command {
             ast::Command::IncludeIcon(..) => self.requires_local_files = true,
-            ast::Command::Config(_, args) => {
-                if let Some(config) = get_command_args_ref(args) {
-                    self.config(config);
-                }
-            }
+            ast::Command::ConfigBoolean(_, args) => self.config_boolean(args),
+            ast::Command::ConfigInteger(_, args) => self.config_integer(args),
+            ast::Command::ConfigIntegerRange(_, args) => self.config_integer_range(args),
+            ast::Command::ConfigFloat(_, args) => self.config_float(args),
+            ast::Command::ConfigFloatRange(_, args) => self.config_float_range(args),
             _ => {}
         }
     }
@@ -123,5 +230,32 @@ impl Handler for Metadata {
                 self.description = Some(description.data.to_string());
             }),
         }
+    }
+}
+
+fn get_config_boolean(literal: &ast::CommandArg<Spanned<ast::Literal>>) -> Option<bool> {
+    let literal = get_command_arg_ref(literal)?;
+
+    match literal.data {
+        ast::Literal::Boolean(value) => Some(value),
+        _ => None,
+    }
+}
+
+fn get_config_integer(literal: &ast::CommandArg<Spanned<ast::Literal>>) -> Option<i32> {
+    let literal = get_command_arg_ref(literal)?;
+
+    match literal.data {
+        ast::Literal::Integer(value) => Some(value),
+        _ => None,
+    }
+}
+
+fn get_config_float(literal: &ast::CommandArg<Spanned<ast::Literal>>) -> Option<OrderedFloat<f32>> {
+    let literal = get_command_arg_ref(literal)?;
+
+    match literal.data {
+        ast::Literal::Float(value) => Some(value),
+        _ => None,
     }
 }

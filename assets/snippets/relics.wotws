@@ -3,8 +3,8 @@
 #description("You have to find Relics randomly scattered throughout Niwen before fighting Shriek")
 
 // TODO how define the constraints? Some kind of range type?
-!config(relic_chance, "Relic Chance", "Chance for each individual area of the game to have a relic", Float, 0.6)
-!config(relic_count, "Relic Count", "If not zero, overrides relic chance. How many relics to place", Integer, 0)
+!config_float_range(relic_chance, 0.6, 0., 1., "Relic Chance", "Chance for each individual area of the game to have a relic")
+!config_integer_range(relic_count, 0, 0, 11, "Relic Count", "If not zero, overrides relic chance. How many relics to place")
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
 !include("goal_mode_core", check_goals_completed, write_missing_goals, update_goals)

@@ -2,7 +2,7 @@
 #name("Jumpgrades")
 #description("Adds Jumpgrades into the item pool that make you jump higher")
 
-!config(count, "How many Jumpgrades to shuffle in", Integer, 3)
+!config_integer(count, 3, "How many Jumpgrades to shuffle in")
 
 !include("jumpgrade_core", jumpgrade)
 

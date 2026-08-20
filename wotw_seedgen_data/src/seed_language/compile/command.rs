@@ -5,18 +5,19 @@ use crate::{
     assets::UberStateAlias,
     seed_language::{
         ast::{self, get_command_arg, UberStateType},
-        compile::{self, ids::IdMap, FunctionSignature},
+        compile::{self, error::type_error, ids::IdMap, FunctionSignature},
         output::{
             CommandBoolean, CommandVoid, ContainedWrites, Event, ItemMetadataEntry, Literal,
             StringOrPlaceholder, VariableValue,
         },
+        types::Type,
     },
     Position, UberIdentifier, Zone,
 };
 use ordered_float::OrderedFloat;
 use rand::Rng;
-use std::{iter, mem, ops::Range};
-use wotw_seedgen_parse::{Error, Identifier, Span, SpanEnd, SpanStart, SpannedOption};
+use std::{fmt::Display, iter, mem, ops::Range, str::FromStr};
+use wotw_seedgen_parse::{Error, Identifier, Span, SpanEnd, SpanStart, Spanned, SpannedOption};
 
 impl<'source> Compile<'source> for ast::Command<'source> {
     type Output = ();
@@ -44,7 +45,19 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Tags(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::Config(_, command) => {
+            ast::Command::ConfigBoolean(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::ConfigInteger(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::ConfigIntegerRange(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::ConfigFloat(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::ConfigFloatRange(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::SetConfig(_, command) => {
@@ -422,50 +435,226 @@ impl<'source> Compile<'source> for ast::TagsArg<'source> {
     }
 }
 
-impl<'source> Compile<'source> for ast::ConfigArgs<'source> {
+impl<'source> Compile<'source> for ast::ConfigBooleanArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        let ty = get_command_arg(self.ty);
-        let default = get_command_arg(self.default);
-
-        let (Some(ty), Some(default)) = (ty, default) else {
+        let Some(default) = compile_config_boolean(self.0.default, compiler) else {
             return;
         };
 
-        if default.data.ty() != ty.data.into() {
+        compile_config(self.0.identifier, default, Type::Boolean, compiler);
+    }
+}
+
+impl<'source> Compile<'source> for ast::ConfigIntegerArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let Some(default) = compile_config_integer(self.0.default, compiler) else {
+            return;
+        };
+
+        compile_config(self.0.identifier, default, Type::Integer, compiler);
+    }
+}
+
+impl<'source> Compile<'source> for ast::ConfigIntegerRangeArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let default = compile_config_integer(self.0.default, compiler);
+        let min = compile_config_integer(self.0.min, compiler);
+        let max = compile_config_integer(self.0.max, compiler);
+
+        let (Some(default), Some(min), Some(max)) = (default, min, max) else {
+            return;
+        };
+
+        compile_config_range(
+            self.0.identifier,
+            default,
+            min,
+            max,
+            Type::Integer,
+            compiler,
+        );
+    }
+}
+
+impl<'source> Compile<'source> for ast::ConfigFloatArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let Some(default) = compile_config_float(self.0.default, compiler) else {
+            return;
+        };
+
+        compile_config(self.0.identifier, default, Type::Float, compiler);
+    }
+}
+
+impl<'source> Compile<'source> for ast::ConfigFloatRangeArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let default = compile_config_float(self.0.default, compiler);
+        let min = compile_config_float(self.0.min, compiler);
+        let max = compile_config_float(self.0.max, compiler);
+
+        let (Some(default), Some(min), Some(max)) = (default, min, max) else {
+            return;
+        };
+
+        compile_config_range(self.0.identifier, default, min, max, Type::Float, compiler);
+    }
+}
+
+fn compile_config<'source, T>(
+    identifier: Spanned<Identifier<'source>>,
+    default: Spanned<T>,
+    expected: Type,
+    compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
+) where
+    T: FromStr + Into<Literal>,
+{
+    compile_config_with_check(identifier, default, expected, |_, _| {}, compiler)
+}
+
+fn compile_config_range<'source, T>(
+    identifier: Spanned<Identifier<'source>>,
+    default: Spanned<T>,
+    min: Spanned<T>,
+    max: Spanned<T>,
+    expected: Type,
+    compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
+) where
+    T: FromStr + Display + Into<Literal> + PartialOrd,
+{
+    if default.data < min.data {
+        compiler.errors.push(Error::error(
+            "default is lower than min".to_string(),
+            default.span.start..min.span.end,
+        ));
+    } else if default.data > max.data {
+        compiler.errors.push(Error::error(
+            "default is greater than max".to_string(),
+            default.span.start..max.span.end,
+        ));
+    }
+
+    compile_config_with_check(
+        identifier,
+        default,
+        expected,
+        move |t, compiler| {
+            if t < &min.data {
+                compiler.errors.push(Error::error(
+                    format!("provided configuration value \"{t}\" is lower than min"),
+                    min.span,
+                ));
+            } else if t > &max.data {
+                compiler.errors.push(Error::error(
+                    format!("provided configuration value \"{t}\" is greater than max"),
+                    max.span,
+                ));
+            }
+        },
+        compiler,
+    )
+}
+
+fn compile_config_with_check<'source, T, F>(
+    identifier: Spanned<Identifier<'source>>,
+    default: Spanned<T>,
+    expected: Type,
+    check: F,
+    compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>,
+) where
+    T: FromStr + Into<Literal>,
+    F: FnOnce(&T, &mut SnippetCompiler<'source, '_, '_, '_, '_>),
+{
+    let config = compiler
+        .global
+        .config
+        .get(&compiler.identifier)
+        .and_then(|config| config.get(identifier.data.0));
+
+    let value = match config {
+        None => Some(default.data.into()),
+        Some(value) => match value.parse() {
+            Ok(parsed) => {
+                check(&parsed, compiler);
+                Some(parsed.into())
+            }
+            Err(_) => {
+                compiler.errors.push(Error::error(
+                    format!(
+                        "failed to parse provided configuration value \"{value}\" as {expected}"
+                    ),
+                    identifier.span,
+                ));
+
+                None
+            }
+        },
+    };
+
+    if let Some(value) = value {
+        compiler.define_variable(identifier.data, value);
+    }
+}
+
+fn compile_config_boolean(
+    literal: ast::CommandArg<Spanned<ast::Literal>>,
+    compiler: &mut SnippetCompiler,
+) -> Option<Spanned<bool>> {
+    let literal = get_command_arg(literal)?;
+
+    match literal.data {
+        ast::Literal::Boolean(value) => Some(Spanned::new(value, literal.span)),
+        other => {
             compiler
                 .errors
-                .push(Error::error(format!("expected {}", ty.data), default.span));
+                .push(type_error(other.ty(), Type::Boolean, literal.span));
+
+            None
         }
+    }
+}
 
-        let config = compiler
-            .global
-            .config
-            .get(&compiler.identifier)
-            .and_then(|config| config.get(self.identifier.data.0));
+fn compile_config_integer(
+    literal: ast::CommandArg<Spanned<ast::Literal>>,
+    compiler: &mut SnippetCompiler,
+) -> Option<Spanned<i32>> {
+    let literal = get_command_arg(literal)?;
 
-        let value = match config {
-            None => default.data.compile(compiler),
-            Some(value) => {
-                let parsed = match ty.data {
-                    ast::ConfigType::Boolean => value.parse().ok().map(Literal::Boolean),
-                    ast::ConfigType::Integer => value.parse().ok().map(Literal::Integer),
-                    ast::ConfigType::Float => value.parse().ok().map(Literal::Float),
-                };
+    match literal.data {
+        ast::Literal::Integer(value) => Some(Spanned::new(value, literal.span)),
+        other => {
+            compiler
+                .errors
+                .push(type_error(other.ty(), Type::Integer, literal.span));
 
-                if parsed.is_none() {
-                    compiler.errors.push(Error::error(
-                        format!("failed to parse provided configuration value \"{}\" as a {}, which is the required type for this configuration parameter", value, ty.data),
-                        ty.span,
-                    ));
-                }
+            None
+        }
+    }
+}
 
-                parsed
-            }
-        };
-        if let Some(value) = value {
-            compiler.define_variable(self.identifier.data, value);
+fn compile_config_float(
+    literal: ast::CommandArg<Spanned<ast::Literal>>,
+    compiler: &mut SnippetCompiler,
+) -> Option<Spanned<OrderedFloat<f32>>> {
+    let literal = get_command_arg(literal)?;
+
+    match literal.data {
+        ast::Literal::Float(value) => Some(Spanned::new(value, literal.span)),
+        other => {
+            compiler
+                .errors
+                .push(type_error(other.ty(), Type::Float, literal.span));
+
+            None
         }
     }
 }

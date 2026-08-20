@@ -2,7 +2,7 @@
 #name("Skill Velocity")
 #description("Adds Skill Velocity pickups into the item pool that make you more speedy")
 
-!config(count, "Count", "How many Skill Velocities to shuffle in", Integer, 3)
+!config_integer(count, 3, "Count", "How many Skill Velocities to shuffle in")
 
 !include("skill_velocity_core", skill_velocity)
 

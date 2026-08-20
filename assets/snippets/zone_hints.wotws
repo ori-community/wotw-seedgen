@@ -4,8 +4,8 @@
 
 !tags("Zone Hints")
 
-!config(skill_hints, "Skill Hints", "Lupo reveals the amount of skills in an area", Boolean, true)
-!config(teleporter_hints, "Teleporter Hints", "Lupo reveals the amount of teleporters in an area", Boolean, true)
+!config_boolean(skill_hints, true, "Skill Hints", "Lupo reveals the amount of skills in an area")
+!config_boolean(teleporter_hints, true, "Teleporter Hints", "Lupo reveals the amount of teleporters in an area")
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
 !include("list_core", add_row)

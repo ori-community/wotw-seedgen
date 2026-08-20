@@ -11,15 +11,16 @@ use wotw_seedgen_data::{
         ast::{
             Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
             ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandRepeat,
-            ConfigArgs, ConfigType, ConstantDiscriminants, Content, CountInZoneArgs,
-            CountInZoneBinding, Event, Expression, ExpressionValue, FunctionCall,
-            FunctionDefinition, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
-            ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-            LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
-            RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
-            RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
-            StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
-            UberIdentifierNumeric, UberStateType, ZoneOfArgs,
+            ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs, ConfigFloatRangeArgs,
+            ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, ConfigType,
+            ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
+            ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs,
+            ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
+            ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation,
+            PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
+            RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SeparatedNonEmpty,
+            SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg, Trigger, TriggerBinding,
+            UberIdentifier, UberIdentifierName, UberIdentifierNumeric, UberStateType, ZoneOfArgs,
         },
         compile::FunctionIdentifier,
         types::Type,
@@ -808,7 +809,19 @@ impl CompletionInSpan for Command<'_> {
             Command::Tags(tags, args) => {
                 args.span_checked_completion((tags, args).span(), index, cache)
             }
-            Command::Config(config, args) => {
+            Command::ConfigBoolean(config, args) => {
+                args.span_checked_completion((config, args).span(), index, cache)
+            }
+            Command::ConfigInteger(config, args) => {
+                args.span_checked_completion((config, args).span(), index, cache)
+            }
+            Command::ConfigIntegerRange(config, args) => {
+                args.span_checked_completion((config, args).span(), index, cache)
+            }
+            Command::ConfigFloat(config, args) => {
+                args.span_checked_completion((config, args).span(), index, cache)
+            }
+            Command::ConfigFloatRange(config, args) => {
                 args.span_checked_completion((config, args).span(), index, cache)
             }
             Command::SetConfig(set_config, args) => {
@@ -937,23 +950,91 @@ impl ErrCompletion for TagsArg<'_> {
 }
 
 // TODO identifier completions in lots of places, just search for identifier in the ast...
-impl CompletionInSpan for ConfigArgs<'_> {
-    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        self.ty.completion(index, cache).or_else(|| {
-            self.default.value.as_option().and_then(|(_, default)| {
-                default
-                    .value
-                    .as_option()
-                    .and_then(|literal| literal_completion(literal, index, cache))
-            })
-        })
+impl Completion for ConfigBooleanArgs<'_> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 
-impl ErrCompletion for ConfigArgs<'_> {
+impl ErrCompletion for ConfigBooleanArgs<'_> {
     fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
+}
+
+impl Completion for ConfigIntegerArgs<'_> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for ConfigIntegerArgs<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        vec![]
+    }
+}
+
+impl Completion for ConfigIntegerRangeArgs<'_> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for ConfigIntegerRangeArgs<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        vec![]
+    }
+}
+
+impl Completion for ConfigFloatArgs<'_> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for ConfigFloatArgs<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        vec![]
+    }
+}
+
+impl Completion for ConfigFloatRangeArgs<'_> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for ConfigFloatRangeArgs<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        vec![]
+    }
+}
+
+impl CompletionInSpan for ConfigArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        config_literal_completion(&self.default, index, cache)
+    }
+}
+
+impl CompletionInSpan for ConfigRangeArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        config_literal_completion(&self.default, index, cache)
+            .or_else(|| config_literal_completion(&self.min, index, cache))
+            .or_else(|| config_literal_completion(&self.max, index, cache))
+    }
+}
+
+fn config_literal_completion(
+    literal: &CommandArg<Spanned<Literal>>,
+    index: usize,
+    cache: &CacheValues,
+) -> Option<Vec<CompletionItem>> {
+    literal.value.as_option().and_then(|(_, literal)| {
+        literal
+            .value
+            .as_option()
+            .and_then(|literal| literal_completion(literal, index, cache))
+    })
 }
 
 static CONFIG_TYPE_COMPLETION: LazyLock<Vec<CompletionItem>> =

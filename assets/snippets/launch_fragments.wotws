@@ -2,8 +2,8 @@
 #name("Launch Fragments")
 #description("Launch is split up into fragments you have to find. This puts Launch more into the lategame.")
 
-!config(total, "Total", "How many Launch Fragments to shuffle in", Integer, 5)
-!config(required, "Required", "How many Launch Fragments are required to get Launch", Integer, 3)
+!config_integer(total, 5, "Total", "How many Launch Fragments to shuffle in")
+!config_integer(required, 3, "Required", "How many Launch Fragments are required to get Launch")
 !tags("Launch Fragments (" + required + "/" + total + ")")
 
 !include("launch_fragments_core", launch_fragment)

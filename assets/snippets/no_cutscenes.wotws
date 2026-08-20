@@ -2,7 +2,7 @@
 #name("No Cutscenes")
 #description("Skips several short cutscenes and dialogues")
 
-!config(autoplant, "Autoplant", "Automatically plant seeds if Tuley is in Glades", Boolean, true)
+!config_boolean(autoplant, true, "Autoplant", "Automatically plant seeds if Tuley is in Glades")
 
 !include("wisp_count")
 !include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)

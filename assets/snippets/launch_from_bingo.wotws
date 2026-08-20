@@ -2,7 +2,7 @@
 #name("Launch from Bingo")
 #description("Grants launch on completing bingo lines")
 
-!config(lines, "Lines", "How many lines you need for Launch", Integer, 2)
+!config_integer(lines, 2, "Lines", "How many lines you need for Launch")
 
 !tags("Launch from Bingo")
 

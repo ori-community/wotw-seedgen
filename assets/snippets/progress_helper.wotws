@@ -13,7 +13,7 @@ By default those are bound to
 ")
 
 // TODO interface settings instead
-!config(entrance_helper, "Entrance Helper", "Documents entrance connections", Boolean, true)
+!config_boolean(entrance_helper, true, "Entrance Helper", "Documents entrance connections")
 
 // TODO there's a regression here because previously progress messages were in a consistent order
 

@@ -17,7 +17,7 @@ use wotw_seedgen::data::{
         DefaultFileAccess, PresetAccess, PresetGroup, Tricks, UniversePresetSettings,
         WorldPresetSettings,
     },
-    seed_language::metadata::{ConfigDefault, ConfigValue},
+    seed_language::metadata::{ConfigArg, ConfigValue},
     Difficulty, GreaterOneU8, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
 
@@ -548,7 +548,7 @@ fn select_snippet_config_value(
 
     let mut current_values = config
         .iter()
-        .map(|(identifier, value)| {
+        .map(|(identifier, arg)| {
             settings
                 .snippet_config
                 .as_ref()
@@ -564,7 +564,7 @@ fn select_snippet_config_value(
                         .and_then(|snippet_config| snippet_config.get(*identifier))
                 })
                 .cloned()
-                .unwrap_or_else(|| value.default.to_string())
+                .unwrap_or_else(|| arg.value.display_default().to_string())
         })
         .collect::<Vec<_>>();
 
@@ -603,12 +603,12 @@ fn select_snippet_config_value(
             break;
         }
 
-        let value = &config[index - 1];
+        let config_arg = config[index - 1];
         choose_snippet_config_value(
             prefix,
             settings,
             &snippet.identifier,
-            value,
+            config_arg,
             &mut current_values[index - 1],
         )?;
     }
@@ -620,31 +620,42 @@ fn choose_snippet_config_value(
     prefix: &str,
     settings: &mut WorldPresetSettings,
     snippet: &str,
-    value: &(&String, &ConfigValue),
+    (identifier, arg): (&String, &ConfigArg),
     current: &mut String,
 ) -> Result<(), Error> {
-    let prompt = format!(
-        "{prefix}Choose a value for {identifier} ({name}{description})",
-        identifier = value.0,
-        name = value.1.name,
-        description = match &value.1.description {
-            None => String::new(),
-            Some(description) => format!("; {description}"),
-        }
-    );
+    let mut prompt = format!("{prefix}Choose a value");
 
-    let choice = match &value.1.default {
-        ConfigDefault::Boolean(_) => Select::new()
-            .with_prompt(prompt)
-            .items(&[true, false])
-            .default(usize::from(current == "false"))
-            .interact_opt()?
-            .map(|choice| (choice == 0).to_string())
-            .unwrap_or_default(),
-        _ => Input::new()
-            .with_prompt(prompt)
-            .allow_empty(true)
-            .interact_text()?,
+    match &arg.value {
+        ConfigValue::IntegerRange { min, max, .. } => {
+            let _ = write!(
+                &mut prompt,
+                " between {literal}{min}{reset} and {literal}{max}{reset}",
+                literal = LITERAL.render(),
+                reset = Reset.render(),
+            );
+        }
+        ConfigValue::FloatRange { min, max, .. } => {
+            let _ = write!(
+                &mut prompt,
+                " between {literal}{min}{reset} and {literal}{max}{reset}",
+                literal = LITERAL.render(),
+                reset = Reset.render(),
+            );
+        }
+        _ => {}
+    }
+
+    let _ = write!(&mut prompt, " for {identifier} ({name}", name = arg.name);
+
+    if let Some(description) = &arg.description {
+        let _ = write!(&mut prompt, "; {description}");
+    }
+
+    prompt.push(')');
+
+    let choice = match &arg.value {
+        ConfigValue::Boolean { .. } => select_boolean(prompt, current == "false")?,
+        _ => input_number(prompt)?,
     };
 
     if !choice.is_empty() {
@@ -655,10 +666,27 @@ fn choose_snippet_config_value(
             .get_or_insert_with(FxHashMap::default)
             .entry(snippet.to_string())
             .or_default()
-            .insert(value.0.clone(), choice);
+            .insert(identifier.clone(), choice);
     }
 
     Ok(())
+}
+
+fn select_boolean(prompt: String, default: bool) -> dialoguer::Result<String> {
+    Ok(Select::new()
+        .with_prompt(prompt)
+        .items(&[true, false])
+        .default(usize::from(default))
+        .interact_opt()?
+        .map(|choice| (choice == 0).to_string())
+        .unwrap_or_default())
+}
+
+fn input_number(prompt: String) -> dialoguer::Result<String> {
+    Input::new()
+        .with_prompt(prompt)
+        .allow_empty(true)
+        .interact_text()
 }
 
 fn sanitize_items<I, T>(items: I) -> Vec<String>

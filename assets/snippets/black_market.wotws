@@ -4,8 +4,8 @@
 "Opher and Twillen sell Keystones and Gorlek Ore respectively. These items are never required to beat the seed.
 Supply lasts indefinitely, but the price grows with the demand.")
 
-!config(keystones, "Keystones", "Let Opher sell Keystones", Boolean, true)
-!config(ores, "Gorlek Ore", "Let Twillen sell Gorlek Ore", Boolean, true)
+!config_boolean(keystones, true, "Keystones", "Let Opher sell Keystones")
+!config_boolean(ores, true, "Gorlek Ore", "Let Twillen sell Gorlek Ore")
 
 !builtin_icon(keystone_icon, "icons/game/keystone.png")
 !builtin_icon(ore_icon, "icons/game/gorlekore.png")

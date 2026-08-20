@@ -2,13 +2,13 @@
 #name("Wisps")
 #description("Require collecting Wisps before fighting Shriek")
 
-!config(randomize, "Randomize", "Overrides all other settings with random values", Boolean, false)
+!config_boolean(randomize, false, "Randomize", "Overrides all other settings with random values")
 
-!config(voice, "Voice", Boolean, true)
-!config(strength, "Strength", Boolean, true)
-!config(memory, "Memory", Boolean, true)
-!config(eyes, "Eyes", Boolean, true)
-!config(heart, "Heart", Boolean, true)
+!config_boolean(voice, true, "Voice")
+!config_boolean(strength, true, "Strength")
+!config_boolean(memory, true, "Memory")
+!config_boolean(eyes, true, "Eyes")
+!config_boolean(heart, true, "Heart")
 
 !include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
 !include("list_core", new_row, add_current_row)

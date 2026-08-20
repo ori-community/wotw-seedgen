@@ -23,12 +23,12 @@ use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{Display, EnumDiscriminants, VariantArray, VariantNames};
 use utoipa::ToSchema;
-use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, ErrorMode, ParseResult, SpannedOption};
+use wotw_seedgen_parse::{parse_ast, Error, ErrorKind, ErrorMode, ParseResult};
 
 use crate::icon::GenericIcon;
 pub use wotw_seedgen_parse::{
     Ast, Identifier, NoTrailingInput, Once, Parser, Recover, Recoverable, Result, Separated,
-    SeparatedNonEmpty, Span, Spanned, Symbol,
+    SeparatedNonEmpty, Span, Spanned, SpannedOption, Symbol,
 };
 
 pub type Delimited<const OPEN: char, Content, const CLOSE: char> =
@@ -500,7 +500,23 @@ pub enum Command<'source> {
         Spanned<Tags>,
         CommandArgsCollection<SeparatedNonEmpty<TagsArg<'source>, Symbol<','>>>,
     ),
-    Config(Spanned<Config>, CommandArgs<ConfigArgs<'source>>),
+    ConfigBoolean(
+        Spanned<ConfigBoolean>,
+        CommandArgs<ConfigBooleanArgs<'source>>,
+    ),
+    ConfigInteger(
+        Spanned<ConfigInteger>,
+        CommandArgs<ConfigIntegerArgs<'source>>,
+    ),
+    ConfigIntegerRange(
+        Spanned<ConfigIntegerRange>,
+        CommandArgs<Box<ConfigIntegerRangeArgs<'source>>>,
+    ),
+    ConfigFloat(Spanned<ConfigFloat>, CommandArgs<ConfigFloatArgs<'source>>),
+    ConfigFloatRange(
+        Spanned<ConfigFloatRange>,
+        CommandArgs<Box<ConfigFloatRangeArgs<'source>>>,
+    ),
     SetConfig(Spanned<SetConfig>, CommandArgs<SetConfigArgs<'source>>),
     State(Spanned<State>, CommandArgs<StateArgs<'source>>),
     Timer(Spanned<Timer>, CommandArgs<TimerArgs<'source>>),
@@ -658,15 +674,55 @@ pub struct TagsArg<'source>(pub Expression<'source>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct Config;
+pub struct ConfigBoolean;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct ConfigBooleanArgs<'source>(pub ConfigArgs<'source>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct ConfigInteger;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct ConfigIntegerArgs<'source>(pub ConfigArgs<'source>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct ConfigIntegerRange;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct ConfigIntegerRangeArgs<'source>(pub ConfigRangeArgs<'source>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct ConfigFloat;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct ConfigFloatArgs<'source>(pub ConfigArgs<'source>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct ConfigFloatRange;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct ConfigFloatRangeArgs<'source>(pub ConfigRangeArgs<'source>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ConfigArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub name: CommandArg<Spanned<&'source str>>,
-    pub description: Option<(Symbol<','>, Spanned<&'source str>)>,
-    pub ty: CommandArg<Spanned<ConfigType>>,
     pub default: CommandArg<Spanned<Literal<'source>>>,
+    pub name: CommandArg<Spanned<&'source str>>,
+    pub description: SpannedOption<(Symbol<','>, Spanned<&'source str>)>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct ConfigRangeArgs<'source> {
+    pub identifier: Spanned<Identifier<'source>>,
+    pub default: CommandArg<Spanned<Literal<'source>>>,
+    pub min: CommandArg<Spanned<Literal<'source>>>,
+    pub max: CommandArg<Spanned<Literal<'source>>>,
+    pub name: CommandArg<Spanned<&'source str>>,
+    pub description: SpannedOption<(Symbol<','>, Spanned<&'source str>)>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ast, Display, VariantArray)]

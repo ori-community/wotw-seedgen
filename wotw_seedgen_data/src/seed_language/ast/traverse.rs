@@ -7,14 +7,16 @@ use wotw_seedgen_parse::{
 use crate::seed_language::ast::{
     Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
     BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandArgs, CommandIf,
-    CommandRepeat, ConfigArgs, Content, CountInZoneArgs, CountInZoneBinding, Event, ExportArgs,
-    Expression, ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs,
-    ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
-    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
-    RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs,
-    RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs,
-    SetLogicStateArgs, Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
-    UberIdentifier, ZoneOfArgs,
+    CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs, ConfigFloatRangeArgs,
+    ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, Content, CountInZoneArgs,
+    CountInZoneBinding, Event, ExportArgs, Expression, ExpressionValue, FunctionCall,
+    FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs, ItemDataDescriptionArgs,
+    ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
+    LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs, RandomBooleanArgs,
+    RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
+    RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs,
+    Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
+    ZoneOfArgs,
 };
 
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
@@ -320,7 +322,23 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
-            Self::Config(keyword, args) => {
+            Self::ConfigBoolean(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
+            Self::ConfigInteger(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
+            Self::ConfigIntegerRange(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
+            Self::ConfigFloat(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
+            Self::ConfigFloatRange(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
@@ -502,16 +520,59 @@ impl<H: Handler> Traverse<H> for TagsArg<'_> {
     }
 }
 
+impl<H: Handler> Traverse<H> for ConfigBooleanArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for ConfigIntegerArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for ConfigIntegerRangeArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for ConfigFloatArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for ConfigFloatRangeArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
+    }
+}
+
 impl<H: Handler> Traverse<H> for ConfigArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.identifier_def(&self.identifier);
 
-        if let Some(description) = &self.description {
+        inspect_command_arg(&self.default, |default| default.traverse(handler));
+
+        if let SpannedOption::Some(description) = &self.description {
             handler.string(&description.1.span);
         }
+    }
+}
 
-        inspect_command_arg(&self.ty, |ty| handler.ty(&ty.span));
+impl<H: Handler> Traverse<H> for ConfigRangeArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        handler.identifier_def(&self.identifier);
+
         inspect_command_arg(&self.default, |default| default.traverse(handler));
+        inspect_command_arg(&self.min, |min| min.traverse(handler));
+        inspect_command_arg(&self.max, |max| max.traverse(handler));
+
+        if let SpannedOption::Some(description) = &self.description {
+            handler.string(&description.1.span);
+        }
     }
 }
 

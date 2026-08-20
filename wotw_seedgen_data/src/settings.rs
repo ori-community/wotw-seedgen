@@ -16,7 +16,7 @@ use std::{
 
 use heck::ToTitleCase;
 use itertools::Itertools;
-use rand::{distributions::Bernoulli, seq::SliceRandom, Rng};
+use rand::{distributions::Open01, seq::SliceRandom, Rng};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumMessage, EnumString, VariantArray, VariantNames};
@@ -28,7 +28,7 @@ use utoipa::{
 use crate::{
     assets::{InlineSnippets, SnippetAccess},
     parse::Source,
-    seed_language::metadata::{ConfigDefault, Metadata},
+    seed_language::metadata::{ConfigValue, Metadata},
 };
 
 /// A representation of all the relevant settings when generating a seed
@@ -198,13 +198,23 @@ impl WorldSettings {
     }
 
     pub fn random_with_metadata<R: Rng>(rng: &mut R, snippets: &[(String, Metadata)]) -> Self {
-        let difficulty = *<Difficulty as VariantArray>::VARIANTS.choose(rng).unwrap();
+        fn filter_default<T>(identifier: &str, value: T, default: T) -> Option<(String, String)>
+        where
+            T: PartialEq + ToString,
+        {
+            (value != default).then(|| (identifier.to_string(), value.to_string()))
+        }
 
-        let distr_50 = Bernoulli::new(0.5).unwrap();
+        fn gen_config_deviation<R: Rng>(rng: &mut R) -> f32 {
+            // Irwin-Hall distribution
+            rng.sample_iter::<f32, _>(Open01).take(12).sum::<f32>() - 6.
+        }
+
+        let difficulty = *<Difficulty as VariantArray>::VARIANTS.choose(rng).unwrap();
 
         let tricks = <Trick as VariantArray>::VARIANTS
             .iter()
-            .filter(|trick| difficulty >= trick.min_difficulty() && rng.sample(distr_50))
+            .filter(|trick| difficulty >= trick.min_difficulty() && rng.gen())
             .copied()
             .collect();
 
@@ -218,7 +228,7 @@ impl WorldSettings {
         let snippets = snippets
             .iter()
             .filter_map(|(identifier, metadata)| {
-                if metadata.hidden || rng.sample(distr_50) {
+                if metadata.hidden || rng.gen() {
                     return None;
                 }
 
@@ -227,11 +237,26 @@ impl WorldSettings {
                     metadata
                         .config
                         .iter()
-                        .filter_map(|(identifier, value)| match value.default {
-                            ConfigDefault::Boolean(value) if rng.sample(distr_50) => {
-                                Some((identifier.clone(), (!value).to_string()))
+                        .filter_map(|(identifier, arg)| match arg.value {
+                            ConfigValue::Boolean { default } => rng
+                                .gen::<bool>()
+                                .then(|| (identifier.clone(), (!default).to_string())),
+                            ConfigValue::Integer { default } => {
+                                let value = i32::max(default + gen_config_deviation(rng) as i32, 0);
+                                filter_default(identifier, value, default)
                             }
-                            _ => None,
+                            ConfigValue::IntegerRange { default, min, max } => {
+                                let value = (min <= max).then(|| rng.gen_range(min..=max))?;
+                                filter_default(identifier, value, default)
+                            }
+                            ConfigValue::Float { default } => {
+                                let value = default + gen_config_deviation(rng);
+                                filter_default(identifier, value, default)
+                            }
+                            ConfigValue::FloatRange { default, min, max } => {
+                                let value = (min <= max).then(|| rng.gen_range(*min..=*max))?;
+                                filter_default(identifier, value, *default)
+                            }
                         })
                         .collect(),
                 );

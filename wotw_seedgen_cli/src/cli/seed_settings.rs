@@ -434,7 +434,7 @@ fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
                         None => String::new(),
                         Some(description) => format!("; {description}"),
                     },
-                    default = config_value.default,
+                    default = config_value.value.display_default(),
                 );
             }
         }
