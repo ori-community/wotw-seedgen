@@ -208,6 +208,11 @@ impl WorldSettings {
             .copied()
             .collect();
 
+        let randomize_entrances = rng.gen::<bool>().then(|| {
+            let loop_size = if rng.gen() { 2 } else { rng.gen_range(3..=32) };
+            GreaterOneU8::new(loop_size).unwrap()
+        });
+
         let mut snippet_config = FxHashMap::default();
 
         let snippets = snippets
@@ -240,9 +245,7 @@ impl WorldSettings {
             difficulty,
             tricks,
             hard: rng.gen_bool(0.25),
-            randomize_entrances: rng
-                .sample(distr_50)
-                .then_some(GreaterOneU8::new(2).unwrap()),
+            randomize_entrances,
             snippets,
             inline_snippets: InlineSnippets::default(),
             snippet_config,
