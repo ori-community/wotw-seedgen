@@ -110,6 +110,7 @@ impl LogConfig {
         if let Some(targets) = verbose {
             if targets.is_empty() {
                 config.trace_placement = LevelFilter::Trace;
+                config.trace_spawn = LevelFilter::Trace;
             } else {
                 for target in targets {
                     config[target] = LevelFilter::Trace;

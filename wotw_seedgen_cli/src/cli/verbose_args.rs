@@ -15,7 +15,7 @@ pub struct VerboseArgs {
         num_args = 0..,
         help = VERBOSE_HELP,
         long_help = format!(
-            "{VERBOSE_HELP}.\nOne or more targets can be provided for additional logging.\n'{literal}-v{reset}' without any arguments defaults to '{literal}-v placement{reset}'",
+            "{VERBOSE_HELP}.\nOne or more targets can be provided for additional logging.\n'{literal}-v{reset}' without any arguments defaults to '{literal}-v placement spawn{reset}'",
             literal = LITERAL.render(),
             reset = Reset.render()
         )
