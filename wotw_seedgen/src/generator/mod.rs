@@ -12,9 +12,10 @@ use crate::{generator::spoiler::SeedSpoiler, perf_data::PerfData, world::World};
 use log::{info, trace, warn};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
-use std::iter;
+use std::{iter, sync::LazyLock};
 use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
+    env_or,
     logic_language::output::Graph,
     seed_language::{compile::Compiler, output::IntermediateOutput, simulate::UberStates},
     UniverseSettings, WorldSettings,
@@ -22,7 +23,11 @@ use wotw_seedgen_data::{
 use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
 use wotw_seedgen_seed::Seed;
 
-const RETRIES: u16 = 10; // How many retries to allow when generating a seed
+/// How many retries to allow when generating a seed
+///
+/// Retries are mostly expected when using items that seedgen cannot force-place such as launch fragments.
+static RETRIES: LazyLock<u32> = LazyLock::new(|| env_or("RETRIES", 10));
+
 const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
 
 pub struct Generator<'graph, 'loc_data, 'uber_state_data, 'access, 'settings, 'perf, 'log, A> {
@@ -109,7 +114,8 @@ where
             })
             .collect::<Result<Vec<_>, String>>()?;
 
-        for attempt in 1..=RETRIES {
+        let retries = *RETRIES;
+        for attempt in 1..=retries {
             trace!(logger: self.log_capture, "Attempt #{attempt} to generate");
 
             let worlds = snippet_outputs
@@ -143,7 +149,7 @@ where
                         info!(
                             logger: self.log_capture,
                             "Generated seed after {attempt} attempts{}",
-                            if attempt <= RETRIES / 2 {
+                            if attempt <= retries / 2 {
                                 ""
                             } else {
                                 " (phew)"
@@ -158,7 +164,7 @@ where
         }
 
         Err(format!(
-            "All {RETRIES} attempts to generate a seed failed :("
+            "All {retries} attempts to generate a seed failed :("
         ))
     }
 }
