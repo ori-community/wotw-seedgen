@@ -375,6 +375,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 .item_pool
                 .find_remove_amount(&keystone, missing_keystones)
             {
+                // TODO but this breaks the expected spirit light placements...
                 warn!(logger: self.log_capture, "Not enough keystones in the item pool for forced keystone progression, placing anyway");
             }
 

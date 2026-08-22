@@ -169,11 +169,12 @@ impl LogConfig {
 
             match trace_uber_states {
                 None => {
-                    file_dispatch =
-                        file_dispatch.filter(|metadata| !uber_states_level_filter(metadata));
+                    file_dispatch = file_dispatch.filter(|metadata| {
+                        !metadata.target().starts_with(UBER_STATES_TARGET_PREFIX)
+                    });
                 }
                 Some(uber_states) if uber_states.is_empty() => {
-                    file_dispatch = file_dispatch.filter(uber_states_level_filter);
+                    // let through
                 }
                 Some(uber_states) => {
                     let filter = FilterUberStates { uber_states };
@@ -204,8 +205,4 @@ impl FilterUberStates {
         let uber_identifier = uber_identifier.parse().unwrap();
         self.uber_states.contains(&uber_identifier)
     }
-}
-
-fn uber_states_level_filter(metadata: &Metadata) -> bool {
-    metadata.target().starts_with(UBER_STATES_TARGET_PREFIX)
 }
