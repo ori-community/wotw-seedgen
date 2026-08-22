@@ -13,3 +13,5 @@ on spawn store(itemTracker.launchFragmentsRequired, required)
 !add_item(launch_fragment(), total)
 
 !remove_item(skill(Launch), 1)
+
+!only_simulation { on spawn store(itemTracker.launchFragmentsRequired, total) }

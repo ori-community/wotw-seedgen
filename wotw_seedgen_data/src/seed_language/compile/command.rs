@@ -117,6 +117,9 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::SetLogicState(_, command) => {
                 command.compile(compiler);
             }
+            ast::Command::OnlySimulation(_, command) => {
+                command.compile(compiler);
+            }
             ast::Command::Preplace(_, command) => {
                 command.compile(compiler);
             }
@@ -1140,6 +1143,23 @@ impl<'source> Compile<'source> for ast::SetLogicStateArgs<'source> {
             .modifiers
             .logical_state_sets
             .insert(self.0.data.to_string());
+    }
+}
+
+impl<'source> Compile<'source> for ast::CommandOnlySimulation<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let only_simulation_events_start = compiler.global.output.commands.events.len();
+
+        self.0.compile(compiler);
+
+        compiler
+            .global
+            .output
+            .modifiers
+            .only_simulation_events
+            .push(only_simulation_events_start..compiler.global.output.commands.events.len());
     }
 }
 

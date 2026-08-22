@@ -10,8 +10,8 @@ use wotw_seedgen_data::{
     seed_language::{
         ast::{
             Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
-            ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandRepeat,
-            ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs, ConfigFloatRangeArgs,
+            ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandOnlySimulation,
+            CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs, ConfigFloatRangeArgs,
             ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, ConfigType,
             ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
             ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs,
@@ -877,6 +877,9 @@ impl CompletionInSpan for Command<'_> {
                 args.span_checked_completion((location, args).span(), index, cache)
             }
             Command::SetLogicState(_, _) => None,
+            Command::OnlySimulation(only_simulation, args) => {
+                args.span_checked_completion((only_simulation, args).span(), index, cache)
+            }
             Command::Preplace(preplace, args) => {
                 args.span_checked_completion((preplace, args).span(), index, cache)
             }
@@ -1304,6 +1307,12 @@ impl CompletionInSpan for LocationSlotsArgs<'_> {
 impl ErrCompletion for LocationSlotsArgs<'_> {
     fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         Expression::err_completion(cache)
+    }
+}
+
+impl CompletionInSpan for CommandOnlySimulation<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.0.completion(index, cache)
     }
 }
 

@@ -41,6 +41,8 @@ impl Seed {
         placeholder_map: PlaceholderMap,
         debug: bool,
     ) -> Self {
+        output.purge_only_simulation();
+
         let mut context = CompileContext::new(placeholder_map);
 
         context.compile_lookup(output.commands.lookup);

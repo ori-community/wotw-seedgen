@@ -566,6 +566,7 @@ pub enum Command<'source> {
         Spanned<SetLogicState>,
         CommandArgs<SetLogicStateArgs<'source>>,
     ),
+    OnlySimulation(Spanned<OnlySimulation>, CommandOnlySimulation<'source>),
     Preplace(Spanned<Preplace>, CommandArgs<PreplaceArgs<'source>>),
     ZoneOf(Spanned<ZoneOf>, CommandArgs<ZoneOfArgs<'source>>),
     ItemOn(Spanned<ItemOn>, CommandArgs<ItemOnArgs<'source>>),
@@ -784,8 +785,11 @@ pub struct LetArgs<'source> {
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct CommandIf<'source> {
     pub condition: Expression<'source>,
-    pub contents: Delimited<'{', Vec<Recoverable<Content<'source>, RecoverContent>>, '}'>,
+    pub contents: NestedContent<'source>,
 }
+
+pub type NestedContent<'source> =
+    Delimited<'{', Vec<Recoverable<Content<'source>, RecoverContent>>, '}'>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
@@ -794,7 +798,7 @@ pub struct Repeat;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct CommandRepeat<'source> {
     pub amount: Expression<'source>,
-    pub contents: Delimited<'{', Vec<Recoverable<Content<'source>, RecoverContent>>, '}'>,
+    pub contents: NestedContent<'source>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
@@ -920,6 +924,13 @@ pub struct SetLogicState;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct SetLogicStateArgs<'source>(pub Spanned<&'source str>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct OnlySimulation;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct CommandOnlySimulation<'source>(pub NestedContent<'source>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]

@@ -29,7 +29,7 @@ use utoipa::ToSchema;
 use crate::{Icon, Position, UberIdentifier, Zone};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
-use std::hash::Hash;
+use std::{hash::Hash, ops::Range};
 
 // TODO check all the public derives
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -51,6 +51,12 @@ impl<'log> IntermediateOutput<'log> {
 
     pub fn disable_debug(&mut self) {
         self.assets.disable_debug();
+    }
+
+    pub fn purge_only_simulation(&mut self) {
+        for range in self.modifiers.only_simulation_events.drain(..).rev() {
+            self.commands.events.drain(range);
+        }
     }
 }
 
@@ -81,6 +87,7 @@ pub struct GenerationModifiers<'log> {
     pub removed_locations: FxHashSet<CommandBoolean>,
     pub location_slots: FxHashMap<CommandBoolean, u32>,
     pub logical_state_sets: FxHashSet<String>,
+    pub only_simulation_events: Vec<Range<usize>>,
     pub preplacements: Vec<(CommandVoid, Zone)>,
 }
 

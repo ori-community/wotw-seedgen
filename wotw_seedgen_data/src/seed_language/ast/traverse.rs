@@ -7,16 +7,16 @@ use wotw_seedgen_parse::{
 use crate::seed_language::ast::{
     Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
     BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandArgs, CommandIf,
-    CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs, ConfigFloatRangeArgs,
-    ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, Content, CountInZoneArgs,
-    CountInZoneBinding, Event, ExportArgs, Expression, ExpressionValue, FunctionCall,
-    FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs, ItemDataDescriptionArgs,
-    ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
-    LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs, RandomBooleanArgs,
-    RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-    RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs,
-    Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
-    ZoneOfArgs,
+    CommandOnlySimulation, CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs,
+    ConfigFloatRangeArgs, ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, Content,
+    CountInZoneArgs, CountInZoneBinding, Event, ExportArgs, Expression, ExpressionValue,
+    FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
+    ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
+    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
+    RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs,
+    RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs,
+    SetLogicStateArgs, Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
+    UberIdentifier, ZoneOfArgs,
 };
 
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
@@ -418,6 +418,10 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
+            Self::OnlySimulation(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
             Self::Preplace(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
@@ -720,6 +724,12 @@ impl<H: Handler> Traverse<H> for LocationSlotsArgs<'_> {
 impl<H: Handler> Traverse<H> for SetLogicStateArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.string(&self.0.span);
+    }
+}
+
+impl<H: Handler> Traverse<H> for CommandOnlySimulation<'_> {
+    fn traverse(&self, handler: &mut H) {
+        self.0.traverse(handler);
     }
 }
 

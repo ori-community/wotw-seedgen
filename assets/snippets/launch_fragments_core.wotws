@@ -37,4 +37,3 @@ fun launch_fragment() {
 )
 
 on itemTracker.launchFragmentsCount == itemTracker.launchFragmentsRequired skill(Launch)
-// TODO how do logical launch later

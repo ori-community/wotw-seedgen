@@ -44,6 +44,9 @@ pub fn postprocess(
     } = postprocessor;
 
     for (output, extra_events) in worlds.iter_mut().zip(extra_events) {
+        // Although this also happens in Seed::new, we have to do it before breaking the event indices
+        output.purge_only_simulation();
+
         // TODO merge events with identical triggers where it doesn't break order?
 
         loc_data_triggers.generate_message_origins(&mut output.commands.events);
