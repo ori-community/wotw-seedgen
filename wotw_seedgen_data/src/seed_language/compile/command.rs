@@ -7,8 +7,8 @@ use crate::{
         ast::{self, get_command_arg, UberStateType},
         compile::{self, error::type_error, ids::IdMap, FunctionSignature},
         output::{
-            CommandBoolean, CommandVoid, ContainedWrites, Event, ItemMetadataEntry, Literal,
-            StringOrPlaceholder, VariableValue,
+            CommandBoolean, CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder,
+            VariableValue,
         },
         types::Type,
     },
@@ -1200,11 +1200,9 @@ impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
             .and_then(|command| command.expect_void(compiler, span));
 
         if let Some(item) = item {
-            let write_identifiers = item.contained_write_identifiers().collect();
-
             compiler.define_variable(
                 self.identifier.data,
-                Literal::String(StringOrPlaceholder::ZoneOfPlaceholder(write_identifiers)),
+                Literal::String(StringOrPlaceholder::ZoneOfPlaceholder(Box::new(item))),
             );
         }
     }
@@ -1241,25 +1239,23 @@ impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
             return;
         };
 
-        let items = items.content.into_iter().flatten().filter_map(|action| {
-            let span = action.span();
-            action
-                .compile(compiler)
-                .and_then(|command| command.expect_void(compiler, span))
-        });
-
-        let mut write_identifiers = vec![];
-        for item in items {
-            for uber_identifier in item.contained_write_identifiers() {
-                write_identifiers.push(uber_identifier);
-            }
-        }
+        let items = items
+            .content
+            .into_iter()
+            .flatten()
+            .filter_map(|action| {
+                let span = action.span();
+                action
+                    .compile(compiler)
+                    .and_then(|command| command.expect_void(compiler, span))
+            })
+            .collect::<Vec<_>>();
 
         for (identifier, zone) in zone_bindings {
             compiler.define_variable(
                 identifier,
                 Literal::String(StringOrPlaceholder::CountInZonePlaceholder(
-                    write_identifiers.clone(),
+                    items.clone(),
                     zone,
                 )),
             );

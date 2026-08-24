@@ -42,32 +42,37 @@ macro_rules! test {
 
 #[test]
 fn zone_of() {
-    let placeholder = StringOrPlaceholder::ZoneOfPlaceholder(vec![UberIdentifier::CLEAN_WATER]);
+    for command in [clean_water(), test_call_function()] {
+        let placeholder = StringOrPlaceholder::ZoneOfPlaceholder(Box::new(command.clone()));
 
-    test!(
-        [test_output(vec![
-            placeholder_event(placeholder.clone()),
-            on_marsh_clean_water(),
-        ])],
-        [FxHashMap::from_iter([(
-            placeholder.clone(),
-            Zone::Marsh.to_string().into()
-        )])],
-    );
-
-    test!(
-        [
-            test_output(vec![
+        test!(
+            [test_output(vec![
                 placeholder_event(placeholder.clone()),
-                on_multiworld_clean_water(),
-            ]),
-            test_output(vec![on_marsh_multiworld()]),
-        ],
-        [
-            FxHashMap::from_iter([(placeholder, format!("<world>1</>'s {}", Zone::Marsh).into())]),
-            FxHashMap::default(),
-        ],
-    );
+                on_marsh(command.clone()),
+            ])],
+            [FxHashMap::from_iter([(
+                placeholder.clone(),
+                Zone::Marsh.to_string().into()
+            )])],
+        );
+
+        test!(
+            [
+                test_output(vec![
+                    placeholder_event(placeholder.clone()),
+                    on_multiworld(command),
+                ]),
+                test_output(vec![on_marsh_multiworld()]),
+            ],
+            [
+                FxHashMap::from_iter([(
+                    placeholder,
+                    format!("<world>1</>'s {}", Zone::Marsh).into()
+                )]),
+                FxHashMap::default(),
+            ],
+        );
+    }
 }
 
 #[test]
@@ -77,7 +82,7 @@ fn item_on() {
     test!(
         [test_output(vec![
             placeholder_event(placeholder.clone()),
-            on_marsh_clean_water(),
+            on_marsh(clean_water()),
         ])],
         [FxHashMap::from_iter([(
             placeholder.clone(),
@@ -91,48 +96,50 @@ fn item_on() {
 
 #[test]
 fn count_in_zone() {
-    let placeholder =
-        StringOrPlaceholder::CountInZonePlaceholder(vec![UberIdentifier::CLEAN_WATER], Zone::Marsh);
+    for command in [clean_water(), test_call_function()] {
+        let placeholder =
+            StringOrPlaceholder::CountInZonePlaceholder(vec![command.clone()], Zone::Marsh);
 
-    test!(
-        [test_output(vec![
-            placeholder_event(placeholder.clone()),
-            on_marsh_clean_water(),
-        ])],
-        [FxHashMap::from_iter([(
-            placeholder.clone(),
-            count_in_zone_message(
-                vec![(
-                    &on_marsh_clean_water(),
-                    TEST_ASSETS.loc_data().entries.first().unwrap(),
-                )],
-                &ItemMetadata::new(),
-            )
-        )])],
-    );
-
-    test!(
-        [
-            test_output(vec![
+        test!(
+            [test_output(vec![
                 placeholder_event(placeholder.clone()),
-                on_marsh_multiworld(),
-            ]),
-            test_output(vec![on_multiworld_clean_water()]),
-        ],
-        [
-            FxHashMap::from_iter([(
-                placeholder,
+                on_marsh(command.clone()),
+            ])],
+            [FxHashMap::from_iter([(
+                placeholder.clone(),
                 count_in_zone_message(
                     vec![(
-                        &on_marsh_multiworld(),
+                        &on_marsh(command.clone()),
                         TEST_ASSETS.loc_data().entries.first().unwrap(),
                     )],
                     &ItemMetadata::new(),
                 )
-            )]),
-            FxHashMap::default(),
-        ],
-    );
+            )])],
+        );
+
+        test!(
+            [
+                test_output(vec![
+                    placeholder_event(placeholder.clone()),
+                    on_marsh_multiworld(),
+                ]),
+                test_output(vec![on_multiworld(command)]),
+            ],
+            [
+                FxHashMap::from_iter([(
+                    placeholder,
+                    count_in_zone_message(
+                        vec![(
+                            &on_marsh_multiworld(),
+                            TEST_ASSETS.loc_data().entries.first().unwrap(),
+                        )],
+                        &ItemMetadata::new(),
+                    )
+                )]),
+                FxHashMap::default(),
+            ],
+        );
+    }
 }
 
 fn test_postprocess<const N: usize>(commands: [CommandsOutput; N]) -> Vec<PlaceholderMap> {
@@ -153,6 +160,16 @@ fn test_output(events: Vec<Event>) -> CommandsOutput {
     }
 }
 
+fn test_call_function() -> CommandVoid {
+    CommandVoid::CallFunction {
+        booleans: vec![],
+        integers: vec![],
+        floats: vec![],
+        strings: vec![],
+        index: 0,
+    }
+}
+
 fn placeholder_event(placeholder: StringOrPlaceholder) -> Event {
     Event {
         trigger: Trigger::ClientEvent(ClientEvent::Spawn),
@@ -166,17 +183,17 @@ fn debug_log<S: Into<CommandString>>(message: S) -> CommandVoid {
     }
 }
 
-fn on_marsh_clean_water() -> Event {
+fn on_marsh(command: CommandVoid) -> Event {
     Event {
         trigger: MARSH_TRIGGER.clone(),
-        command: clean_water(),
+        command,
     }
 }
 
-fn on_multiworld_clean_water() -> Event {
+fn on_multiworld(command: CommandVoid) -> Event {
     Event {
         trigger: Trigger::multiworld(0),
-        command: clean_water(),
+        command,
     }
 }
 

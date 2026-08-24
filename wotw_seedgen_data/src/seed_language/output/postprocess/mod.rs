@@ -132,11 +132,17 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
             .map(move |world| self.generate_defaults_for(world, &price_noise, rng))
     }
 
-    fn resolve_zone_of(
-        &self,
-        uber_identifiers: &[UberIdentifier],
-        target_world_index: usize,
-    ) -> CommandString {
+    fn resolve_zone_of(&self, item: &CommandVoid, target_world_index: usize) -> CommandString {
+        fn command_contains(command: &CommandVoid, item: &CommandVoid) -> bool {
+            item == command
+                || match command {
+                    CommandVoid::Multi { commands } => commands
+                        .iter()
+                        .any(|command| command_contains(command, item)),
+                    _ => false,
+                }
+        }
+
         let target_world = &self.worlds[target_world_index];
 
         let mut matches = target_world
@@ -144,12 +150,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
             .commands
             .events
             .iter()
-            .filter(|event| {
-                event
-                    .command
-                    .contained_write_identifiers()
-                    .any(|uber_identifier| uber_identifiers.contains(&uber_identifier))
-            })
+            .filter(|event| command_contains(&event.command, item))
             .filter_map(|event| self.zone_of_trigger(&event.trigger, target_world_index))
             .map(|(origin_world_index, zone)| ZoneOfMatch {
                 origin_world_index,
@@ -203,7 +204,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
 
     fn resolve_count_in_zone(
         &self,
-        uber_identifiers: &[UberIdentifier],
+        items: &[CommandVoid],
         zone: Zone,
         origin_world_index: usize,
     ) -> CommandString {
@@ -217,7 +218,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
             .flat_map(|(entry, events)| {
                 events
                     .iter()
-                    .filter(|event| self.command_writes_any(&event.command, uber_identifiers))
+                    .filter(|event| self.command_contains_any(&event.command, items))
                     .map(move |event| (*event, entry))
             })
             .collect::<Vec<_>>();
@@ -225,22 +226,24 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
         count_in_zone_message(matches, &origin_world.output.modifiers.item_metadata)
     }
 
-    fn command_writes_any(
-        &self,
-        command: &CommandVoid,
-        uber_identifiers: &[UberIdentifier],
-    ) -> bool {
-        command
-            .contained_write_identifiers()
-            .any(|uber_identifier| match uber_identifier.as_multiworld() {
-                None => uber_identifiers.contains(&uber_identifier),
-                Some(id) => self
-                    .multiworld_lookup
-                    .get(&id)
+    fn command_contains_any(&self, command: &CommandVoid, items: &[CommandVoid]) -> bool {
+        items.contains(command)
+            || match command {
+                CommandVoid::Multi { commands } => commands
+                    .iter()
+                    .any(|command| self.command_contains_any(command, items)),
+                CommandVoid::StoreBoolean {
+                    uber_identifier,
+                    value: CommandBoolean::Constant { value: true },
+                    trigger_events: true,
+                } => uber_identifier
+                    .as_multiworld()
+                    .and_then(|id| self.multiworld_lookup.get(&id))
                     .is_some_and(|multiworld_event| {
-                        self.command_writes_any(multiworld_event.target_command, uber_identifiers)
+                        self.command_contains_any(multiworld_event.target_command, items)
                     }),
-            })
+                _ => false,
+            }
     }
 
     fn generate_defaults_for(
@@ -780,15 +783,15 @@ impl ResolvePlaceholders for CommandString {
 
                 let resolved = match value {
                     StringOrPlaceholder::Value(_) => return,
-                    StringOrPlaceholder::ZoneOfPlaceholder(uber_identifiers) => context
+                    StringOrPlaceholder::ZoneOfPlaceholder(item) => context
                         .postprocessor
-                        .resolve_zone_of(uber_identifiers, context.world_index),
+                        .resolve_zone_of(item, context.world_index),
                     StringOrPlaceholder::ItemOnPlaceholder(trigger) => context
                         .postprocessor
                         .resolve_item_on(trigger, context.world_index),
-                    StringOrPlaceholder::CountInZonePlaceholder(uber_identifiers, zone) => context
+                    StringOrPlaceholder::CountInZonePlaceholder(items, zone) => context
                         .postprocessor
-                        .resolve_count_in_zone(uber_identifiers, *zone, context.world_index),
+                        .resolve_count_in_zone(items, *zone, context.world_index),
                 };
 
                 context

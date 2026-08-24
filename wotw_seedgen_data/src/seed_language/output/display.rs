@@ -30,16 +30,12 @@ impl Display for StringOrPlaceholder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             StringOrPlaceholder::Value(string) => write!(f, "\"{string}\""),
-            StringOrPlaceholder::ZoneOfPlaceholder(uber_identifiers) => {
-                write!(f, "zone_of({})", uber_identifiers.iter().format(", "))
+            StringOrPlaceholder::ZoneOfPlaceholder(item) => {
+                write!(f, "zone_of({item})")
             }
             StringOrPlaceholder::ItemOnPlaceholder(trigger) => write!(f, "item_on({trigger})"),
-            StringOrPlaceholder::CountInZonePlaceholder(uber_identifiers, zone) => {
-                write!(
-                    f,
-                    "count_in_zone({zone}, [{uber_identifiers}])",
-                    uber_identifiers = uber_identifiers.iter().format(", ")
-                )
+            StringOrPlaceholder::CountInZonePlaceholder(items, zone) => {
+                write!(f, "count_in_zone({zone}, [{}])", items.iter().format(", "))
             }
         }
     }

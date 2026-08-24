@@ -26,7 +26,7 @@ pub use operation::{
 pub use postprocess::{postprocess, PlaceholderMap, UniversePostprocessor};
 use utoipa::ToSchema;
 
-use crate::{Icon, Position, UberIdentifier, Zone};
+use crate::{Icon, Position, Zone};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use std::{hash::Hash, ops::Range};
@@ -127,10 +127,10 @@ pub struct SnippetDebugOutput {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum StringOrPlaceholder {
     Value(String),
-    ZoneOfPlaceholder(Vec<UberIdentifier>),
+    ZoneOfPlaceholder(Box<CommandVoid>),
     #[schema(no_recursion)]
     ItemOnPlaceholder(Box<Trigger>),
-    CountInZonePlaceholder(Vec<UberIdentifier>, Zone),
+    CountInZonePlaceholder(Vec<CommandVoid>, Zone),
 }
 
 impl From<String> for StringOrPlaceholder {
