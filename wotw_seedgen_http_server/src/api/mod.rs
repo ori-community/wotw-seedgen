@@ -178,3 +178,9 @@ impl From<LogLevelFilter> for log::LevelFilter {
         }
     }
 }
+
+#[cfg(test)]
+#[test]
+fn openapi() {
+    Docs::openapi_no_operation_ids();
+}

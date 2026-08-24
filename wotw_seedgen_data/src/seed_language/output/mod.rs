@@ -127,10 +127,11 @@ pub struct SnippetDebugOutput {
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum StringOrPlaceholder {
     Value(String),
+    #[schema(no_recursion)]
     ZoneOfPlaceholder(Box<CommandVoid>),
     #[schema(no_recursion)]
     ItemOnPlaceholder(Box<Trigger>),
-    CountInZonePlaceholder(Vec<CommandVoid>, Zone),
+    CountInZonePlaceholder(#[schema(no_recursion)] Vec<CommandVoid>, Zone),
 }
 
 impl From<String> for StringOrPlaceholder {
