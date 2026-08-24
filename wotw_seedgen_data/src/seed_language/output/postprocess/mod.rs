@@ -1,4 +1,6 @@
 mod price_noise;
+#[cfg(test)]
+mod tests;
 
 use std::{
     collections::hash_map::Entry,
@@ -58,7 +60,7 @@ pub fn postprocess(
 }
 
 // TODO maybe zone_of should be a typed zone placeholder?
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct PlaceholderMap {
     pub strings: FxHashMap<StringOrPlaceholder, CommandString>,
 }
@@ -1072,6 +1074,8 @@ fn count_in_zone_message(
     if matches.is_empty() {
         return "$0/0$".into();
     }
+
+    // TODO optimization for 1 match?
 
     const MESSAGE: usize = 2;
     const COUNT: usize = 2;

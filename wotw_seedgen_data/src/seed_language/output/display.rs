@@ -561,7 +561,7 @@ fn multi<T: Display>(f: &mut fmt::Formatter, commands: &[CommandVoid], last: T) 
     write!(f, "{{ ")?;
 
     for command in commands {
-        write!(f, "{command}, ")?;
+        write!(f, "{command} ")?;
     }
 
     write!(f, "{last} }}")
