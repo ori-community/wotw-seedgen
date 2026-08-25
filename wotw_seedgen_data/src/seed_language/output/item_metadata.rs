@@ -148,10 +148,14 @@ impl ItemMetadataRef<'_, '_, '_> {
     /// on the item's contents. May return `None` for unrecognized items.
     pub fn try_force_icon(&self) -> Option<Icon> {
         self.icon().or_else(|| {
-            self.command
+            let mut icons = self
+                .command
                 .contained_common_write_identifiers()
-                .next()
-                .and_then(CommonUberIdentifier::icon)
+                .filter_map(CommonUberIdentifier::icon);
+
+            let first = icons.next()?;
+            let unambiguous = icons.all(|other| first == other);
+            unambiguous.then_some(first)
         })
     }
 
@@ -166,10 +170,14 @@ impl ItemMetadataRef<'_, '_, '_> {
     /// on the item's contents.
     pub fn try_force_map_icon(&self) -> Option<MapIcon> {
         self.map_icon().or_else(|| {
-            self.command
+            let mut common_write_identifiers = self
+                .command
                 .contained_common_write_identifiers()
-                .next()
-                .map(CommonUberIdentifier::map_icon)
+                .map(CommonUberIdentifier::map_icon);
+
+            let first = common_write_identifiers.next()?;
+            let unambiguous = common_write_identifiers.all(|other| first == other);
+            unambiguous.then_some(first)
         })
     }
 
