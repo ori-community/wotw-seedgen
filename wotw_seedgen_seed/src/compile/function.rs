@@ -60,9 +60,11 @@ impl<'ctx> FunctionCompiler<'ctx> {
         let mut commands = vec![];
 
         let (pre_push_args, mut memory_used) = self.pre_push_args.finish();
+        memory_used.combine(self.post_push_args.memory_used.clone());
 
         for pre_push_arg in pre_push_args {
-            let needs_intermediate_copy = pre_push_arg.needs_intermediate_copy();
+            let needs_intermediate_copy =
+                pre_push_arg.needs_intermediate_copy(&self.post_push_args.memory_used);
 
             commands.extend(pre_push_arg.commands);
 
@@ -93,8 +95,6 @@ impl<'ctx> FunctionCompiler<'ctx> {
 
             commands.extend(arg);
         }
-
-        memory_used.combine(self.post_push_args.memory_used);
 
         commands.extend([Command::Execute(index), Command::StackPop]);
 
@@ -177,8 +177,9 @@ impl PrePushArg {
         }
     }
 
-    fn needs_intermediate_copy(&self) -> bool {
+    fn needs_intermediate_copy(&self, post_push_memory_used: &MemoryUsed) -> bool {
         !self.gets_overwritten_by.is_empty()
+            || self.destination.gets_overwritten_by(post_push_memory_used)
     }
 }
 
