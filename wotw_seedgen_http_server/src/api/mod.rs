@@ -1,3 +1,4 @@
+use axum::extract::DefaultBodyLimit;
 use axum::response::IntoResponse;
 use axum::{
     Json, Router,
@@ -38,6 +39,7 @@ pub fn router(cache: RouterState) -> Router {
         .nest(plando::PLANDO, plando::router())
         .nest(spoilers::SPOILERS, spoilers::router())
         .layer(cors)
+        .layer(DefaultBodyLimit::disable())
         .merge(SwaggerUi::new("/docs").url(
             "/docs/wotw-seedgen-openapi.json",
             Docs::openapi_no_operation_ids(),
