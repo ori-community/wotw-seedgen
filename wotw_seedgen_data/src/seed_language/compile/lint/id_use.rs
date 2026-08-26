@@ -10,7 +10,7 @@ pub struct IdUse {
     pub float: IdUseMap,
     pub string: IdUseMap,
     pub message: IdUseMap,
-    pub box_trigger: IdUseMap,
+    pub position_trigger: IdUseMap,
     pub warp_icon: IdUseMap,
 }
 
@@ -22,7 +22,7 @@ impl IdUse {
             float,
             string,
             message,
-            box_trigger,
+            position_trigger,
             warp_icon,
         } = self;
 
@@ -31,7 +31,7 @@ impl IdUse {
         float.finish_snippet(identifier);
         string.finish_snippet(identifier);
         message.finish_snippet(identifier);
-        box_trigger.finish_snippet(identifier);
+        position_trigger.finish_snippet(identifier);
         warp_icon.finish_snippet(identifier);
     }
 
@@ -42,7 +42,7 @@ impl IdUse {
             float,
             string,
             message,
-            box_trigger,
+            position_trigger,
             warp_icon,
         } = self;
 
@@ -51,7 +51,7 @@ impl IdUse {
         float.finish(errors);
         string.finish(errors);
         message.finish(errors);
-        box_trigger.finish(errors);
+        position_trigger.finish(errors);
         warp_icon.finish(errors);
     }
 }

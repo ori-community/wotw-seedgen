@@ -733,7 +733,8 @@ impl ResolvePlaceholders for CommandBoolean {
             | Self::FunctionArgument { .. }
             | Self::FetchBoolean { .. }
             | Self::GetBoolean { .. }
-            | Self::IsInBox { .. } => {}
+            | Self::IsInCircle { .. }
+            | Self::IsInRectangle { .. } => {}
         }
     }
 }
@@ -876,7 +877,12 @@ impl ResolvePlaceholders for CommandVoid {
             Self::SetInteger { value, .. } => value.resolve(context),
             Self::SetFloat { value, .. } => value.resolve(context),
             Self::SetString { value, .. } => value.resolve(context),
-            Self::BoxTrigger { x1, y1, x2, y2, .. } => {
+            Self::PositionTriggerCircle { x, y, r, .. } => {
+                x.resolve(context);
+                y.resolve(context);
+                r.resolve(context);
+            }
+            Self::PositionTriggerRectangle { x1, y1, x2, y2, .. } => {
                 x1.resolve(context);
                 y1.resolve(context);
                 x2.resolve(context);
@@ -937,9 +943,9 @@ impl ResolvePlaceholders for CommandVoid {
             | Self::FreeMessageVerticalAnchor { .. }
             | Self::FreeMessageBoxWidth { .. }
             | Self::FreeMessageCoordinateSystem { .. }
-            | Self::BoxTriggerDestroy { .. }
-            | Self::BoxTriggerEnterCallback { .. }
-            | Self::BoxTriggerLeaveCallback { .. }
+            | Self::PositionTriggerDestroy { .. }
+            | Self::PositionTriggerEnterCallback { .. }
+            | Self::PositionTriggerLeaveCallback { .. }
             | Self::Save { .. }
             | Self::Equip { .. }
             | Self::Unequip { .. }

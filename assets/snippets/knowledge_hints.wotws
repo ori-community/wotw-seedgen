@@ -10,19 +10,19 @@
 
 !if gate_hints {
     on reload {
-        box_trigger("depths_entrance", 127, -4306, 183, -4268)
-        box_trigger_enter_callback("depths_entrance", if EastHollow.DepthsOpen == false && skills.glide == false
+        position_trigger_rectangle("depths_entrance", 127, -4306, 183, -4268)
+        position_trigger_enter_callback("depths_entrance", if EastHollow.DepthsOpen == false && skills.glide == false
             item_message("#Motay's Note#\nThe moki will only open the entrance once you find " + skill_string(Glide))
         )
 
-        box_trigger("baurs_sleep", -527, -4033, -461, -4018)
-        box_trigger_enter_callback("baurs_sleep", if LowerReach.BearSneezed == false && skills.flap == false
+        position_trigger_rectangle("baurs_sleep", -527, -4033, -461, -4018)
+        position_trigger_enter_callback("baurs_sleep", if LowerReach.BearSneezed == false && skills.flap == false
             item_message("#Motay's Note#\nThe bear will only wake if you use " + skill_string(Flap))
         )
 
-        box_trigger("voice_door", -102, -4200, -41, -4250)
-        box_trigger_enter_callback("voice_door", {
-            if EastHollow.ForestsVoice == false && is_in_box(-60, -4218, -41, -4200) == false 
+        position_trigger_rectangle("voice_door", -102, -4200, -41, -4250)
+        position_trigger_enter_callback("voice_door", {
+            if EastHollow.ForestsVoice == false && is_in_rectangle(-60, -4218, -41, -4200) == false
                 item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok")
         })
     }
@@ -42,7 +42,7 @@
         || current_zone() == Ruins
         || current_zone() == Willow
     )
-    && is_in_box(-486, -3773, -476, -3763) == false
+    && is_in_rectangle(-486, -3773, -476, -3763) == false
     && skills.regenerate == false {
         store(regen_message_shown, true)
     }

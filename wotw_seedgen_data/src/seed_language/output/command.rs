@@ -86,8 +86,14 @@ pub enum CommandBoolean {
     /// Get the value stored under `id`
     GetBoolean { id: usize },
     // TODO some kind of lint if things like this appear in trigger conditions
-    /// Check if Ori is in box `id`
-    IsInBox {
+    /// Check if Ori is in box defined by the circle center (x, y) and radius r
+    IsInCircle {
+        x: Box<CommandFloat>,
+        y: Box<CommandFloat>,
+        r: Box<CommandFloat>,
+    },
+    /// Check if Ori is in box defined by the rectangle (x1, y1) and (x2, y2)
+    IsInRectangle {
         x1: Box<CommandFloat>,
         y1: Box<CommandFloat>,
         x2: Box<CommandFloat>,
@@ -571,8 +577,15 @@ pub enum CommandVoid {
         id: usize,
         value: CommandString,
     },
-    /// Create a new box defined by (`x1`, `y1`) and (`x2`, `y2`)
-    BoxTrigger {
+    /// Create a new circular position defined by center (`x`, `y`) and radius `r`
+    PositionTriggerCircle {
+        id: usize,
+        x: Box<CommandFloat>,
+        y: Box<CommandFloat>,
+        r: Box<CommandFloat>,
+    },
+    /// Create a new rectangular position trigger defined by (`x1`, `y1`) and (`x2`, `y2`)
+    PositionTriggerRectangle {
         id: usize,
         x1: Box<CommandFloat>,
         y1: Box<CommandFloat>,
@@ -580,16 +593,16 @@ pub enum CommandVoid {
         y2: Box<CommandFloat>,
     },
     /// DESTROY box `id`
-    BoxTriggerDestroy {
+    PositionTriggerDestroy {
         id: usize,
     },
     /// Register `action` to trigger when Ori enters box `id`
-    BoxTriggerEnterCallback {
+    PositionTriggerEnterCallback {
         id: usize,
         action: usize,
     },
     /// Register `action` to trigger when Ori leaves box `id`
-    BoxTriggerLeaveCallback {
+    PositionTriggerLeaveCallback {
         id: usize,
         action: usize,
     },

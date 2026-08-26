@@ -136,7 +136,7 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
                 simulation.fetch(*uber_identifier).as_boolean()
             }
             CommandBoolean::GetBoolean { id } => simulation.heap().get_boolean(*id),
-            CommandBoolean::IsInBox { .. } => false,
+            CommandBoolean::IsInCircle { .. } | CommandBoolean::IsInRectangle { .. } => false,
         }
     }
 }
@@ -349,10 +349,11 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::FreeMessageHide { .. }
             | CommandVoid::CreateWarpIcon { .. }
             | CommandVoid::DestroyWarpIcon { .. }
-            | CommandVoid::BoxTrigger { .. }
-            | CommandVoid::BoxTriggerDestroy { .. }
-            | CommandVoid::BoxTriggerEnterCallback { .. }
-            | CommandVoid::BoxTriggerLeaveCallback { .. }
+            | CommandVoid::PositionTriggerCircle { .. }
+            | CommandVoid::PositionTriggerRectangle { .. }
+            | CommandVoid::PositionTriggerDestroy { .. }
+            | CommandVoid::PositionTriggerEnterCallback { .. }
+            | CommandVoid::PositionTriggerLeaveCallback { .. }
             | CommandVoid::Save { .. }
             | CommandVoid::SaveAt { .. }
             | CommandVoid::Warp { .. }

@@ -64,8 +64,8 @@ on reload {
     )
     set_wheel_item_all_actions("progress_helper", TopRight, show_missing_goals())
 
-    box_trigger("shriek_room", 520, -3617, 744, -3503)
-    box_trigger_enter_callback("shriek_room", {
+    position_trigger_rectangle("shriek_room", 520, -3617, 744, -3503)
+    position_trigger_enter_callback("shriek_room", {
         set_boolean("in_shriek_room", true)
         if randoState.shriekBarrier {
             write_missing_goals()
@@ -75,7 +75,7 @@ on reload {
             set_message_position("missing_goals", 0.5, 0.84)
         }
     })
-    box_trigger_leave_callback("shriek_room", {
+    position_trigger_leave_callback("shriek_room", {
         set_boolean("in_shriek_room", false)
         destroy_message("missing_goals")
     })

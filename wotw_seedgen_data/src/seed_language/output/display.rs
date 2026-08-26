@@ -98,8 +98,11 @@ impl Display for CommandBoolean {
                 write!(f, "fetch({uber_identifier})")
             }
             CommandBoolean::GetBoolean { id } => write!(f, "get_boolean({id})"),
-            CommandBoolean::IsInBox { x1, y1, x2, y2 } => {
-                write!(f, "is_in_box({x1}, {y1}, {x2}, {y2})")
+            CommandBoolean::IsInCircle { x, y, r } => {
+                write!(f, "is_in_circle({x}, {y}, {r})")
+            }
+            CommandBoolean::IsInRectangle { x1, y1, x2, y2 } => {
+                write!(f, "is_in_rectangle({x1}, {y1}, {x2}, {y2})")
             }
         }
     }
@@ -308,17 +311,23 @@ impl Display for CommandVoid {
             CommandVoid::SetInteger { id, value } => write!(f, "set_integer({id}, {value})"),
             CommandVoid::SetFloat { id, value } => write!(f, "set_float({id}, {value})"),
             CommandVoid::SetString { id, value } => write!(f, "set_string({id}, {value})"),
-            CommandVoid::BoxTrigger { id, x1, y1, x2, y2 } => {
-                write!(f, "box_trigger({id}, {x1}, {y1}, {x2}, {y2})")
+            CommandVoid::PositionTriggerCircle { id, x, y, r } => {
+                write!(f, "position_trigger_circle({id}, {x}, {y}, {r})")
             }
-            CommandVoid::BoxTriggerDestroy { id } => {
-                write!(f, "box_trigger_destroy({id})")
+            CommandVoid::PositionTriggerRectangle { id, x1, y1, x2, y2 } => {
+                write!(
+                    f,
+                    "position_trigger_rectangle({id}, {x1}, {y1}, {x2}, {y2})"
+                )
             }
-            CommandVoid::BoxTriggerEnterCallback { id, action } => {
-                write!(f, "box_trigger_enter_callback({id}, {action})")
+            CommandVoid::PositionTriggerDestroy { id } => {
+                write!(f, "position_trigger_destroy({id})")
             }
-            CommandVoid::BoxTriggerLeaveCallback { id, action } => {
-                write!(f, "box_trigger_leave_callback({id}, {action})")
+            CommandVoid::PositionTriggerEnterCallback { id, action } => {
+                write!(f, "position_trigger_enter_callback({id}, {action})")
+            }
+            CommandVoid::PositionTriggerLeaveCallback { id, action } => {
+                write!(f, "position_trigger_leave_callback({id}, {action})")
             }
             CommandVoid::Save { to_disk } => write!(f, "save{}()", save_suffix(*to_disk)),
             CommandVoid::SaveAt { to_disk, x, y } => {

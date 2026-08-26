@@ -188,16 +188,20 @@ pub enum Command {
         /*coordinate_system*/ CoordinateSystem,
     ),
     // TODO missing SetSideMapMessage
-    /// Create a new box defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3)
-    BoxTrigger(/*id*/ usize),
+    /// Create a new circle defined by (Float Memory 0, Float Memory 1) and radius(Float Memory 2
+    PositionTriggerCircle(/*id*/ usize),
+    /// Create a new rectangle defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3)
+    PositionTriggerRectangle(/*id*/ usize),
     /// DESTROY, OBLITERATE and ANNIHILATE box `id`
-    BoxTriggerDestroy(/*id*/ usize),
+    PositionTriggerDestroy(/*id*/ usize),
     /// Register `action` to trigger when Ori enters box `id`
-    BoxTriggerEnterCallback(/*id*/ usize, /*action*/ usize),
+    PositionTriggerEnterCallback(/*id*/ usize, /*action*/ usize),
     /// Register `action` to trigger when Ori leaves box `id`
-    BoxTriggerLeaveCallback(/*id*/ usize, /*action*/ usize),
+    PositionTriggerLeaveCallback(/*id*/ usize, /*action*/ usize),
+    /// Check if Ori is in the circle defined by (Float Memory 0, Float Memory 1) and radius Float Memory 2 and store the result in Boolean Memory 0
+    IsInCircle,
     /// Check if Ori is in the hitbox defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3) and store the result in Boolean Memory 0
-    IsInBox,
+    IsInRectangle,
     /// Save the game. Only save to disk if Boolean Memory 0 is `true`.
     Save,
     /// Save the game, but with the position set to (Float Memory 0, Float Memory 1). Only save to disk if Boolean Memory 0 is `true`.

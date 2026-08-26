@@ -75,7 +75,8 @@ impl ContainedReads for CommandBoolean {
             CommandBoolean::Constant { .. }
             | CommandBoolean::FunctionArgument { .. }
             | CommandBoolean::GetBoolean { .. }
-            | CommandBoolean::IsInBox { .. } => none(),
+            | CommandBoolean::IsInCircle { .. }
+            | CommandBoolean::IsInRectangle { .. } => none(),
         }
     }
 }

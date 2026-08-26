@@ -223,13 +223,13 @@ fn write_message_id(context: &mut ArgContext) -> Option<usize> {
     string_literal(context).map(|id| context.compiler.global.write_message_id(id))
 }
 
-fn read_box_trigger_id(context: &mut ArgContext) -> Option<usize> {
+fn read_position_trigger_id(context: &mut ArgContext) -> Option<usize> {
     spanned_string_literal(context)
-        .map(|(id, span)| context.compiler.global.read_box_trigger_id(id, span))
+        .map(|(id, span)| context.compiler.global.read_position_trigger_id(id, span))
 }
 
-fn write_box_trigger_id(context: &mut ArgContext) -> Option<usize> {
-    string_literal(context).map(|id| context.compiler.global.write_box_trigger_id(id))
+fn write_position_trigger_id(context: &mut ArgContext) -> Option<usize> {
+    string_literal(context).map(|id| context.compiler.global.write_position_trigger_id(id))
 }
 
 fn read_warp_icon_id(context: &mut ArgContext) -> Option<usize> {
@@ -253,7 +253,8 @@ fn wheel_id(context: &mut ArgContext) -> Option<usize> {
 pub enum FunctionIdentifier {
     Fetch,
     GetBoolean,
-    IsInBox,
+    IsInCircle,
+    IsInRectangle,
     GetInteger,
     ToInteger,
     StringLength,
@@ -335,10 +336,11 @@ pub enum FunctionIdentifier {
     SetInteger,
     SetFloat,
     SetString,
-    BoxTrigger,
-    BoxTriggerDestroy,
-    BoxTriggerEnterCallback,
-    BoxTriggerLeaveCallback,
+    PositionTriggerCircle,
+    PositionTriggerRectangle,
+    PositionTriggerDestroy,
+    PositionTriggerEnterCallback,
+    PositionTriggerLeaveCallback,
     Save,
     SaveToMemory,
     SaveAt,
@@ -427,7 +429,8 @@ impl FunctionIdentifier {
             self,
             Fetch(uber_identifier: UberIdentifier) -> UberStateValue,
             GetBoolean(id: String) -> Boolean,
-            IsInBox(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
+            IsInCircle(x: Float, y: Float, r: Float) -> Boolean,
+            IsInRectangle(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
             GetInteger(id: String) -> Integer,
             ToInteger(float: Float) -> Integer,
             StringLength(string: String) -> Integer,
@@ -509,10 +512,11 @@ impl FunctionIdentifier {
             SetInteger(id: String, value: Integer),
             SetFloat(id: String, value: Float),
             SetString(id: String, value: String),
-            BoxTrigger(id: String, x1: Float, y1: Float, x2: Float, y2: Float),
-            BoxTriggerDestroy(id: String),
-            BoxTriggerEnterCallback(id: String, action: Action),
-            BoxTriggerLeaveCallback(id: String, action: Action),
+            PositionTriggerCircle(id: String, x: Float, y: Float, r: Float),
+            PositionTriggerRectangle(id: String, x1: Float, y1: Float, x2: Float, y2: Float),
+            PositionTriggerDestroy(id: String),
+            PositionTriggerEnterCallback(id: String, action: Action),
+            PositionTriggerLeaveCallback(id: String, action: Action),
             Save(),
             SaveToMemory(),
             SaveAt(x: Float, y: Float),
@@ -735,7 +739,12 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::GetBoolean => Command::Boolean(CommandBoolean::GetBoolean {
                 id: read_boolean_id(&mut context)?,
             }),
-            FunctionIdentifier::IsInBox => Command::Boolean(CommandBoolean::IsInBox {
+            FunctionIdentifier::IsInCircle => Command::Boolean(CommandBoolean::IsInCircle {
+                x: boxed_arg(&mut context)?,
+                y: boxed_arg(&mut context)?,
+                r: boxed_arg(&mut context)?,
+            }),
+            FunctionIdentifier::IsInRectangle => Command::Boolean(CommandBoolean::IsInRectangle {
                 x1: boxed_arg(&mut context)?,
                 y1: boxed_arg(&mut context)?,
                 x2: boxed_arg(&mut context)?,
@@ -1298,27 +1307,33 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 value: arg(&mut context)?,
             }),
 
-            FunctionIdentifier::BoxTrigger => Command::Void(CommandVoid::BoxTrigger {
-                id: write_box_trigger_id(&mut context)?,
+            FunctionIdentifier::PositionTriggerCircle => Command::Void(CommandVoid::PositionTriggerCircle {
+                id: write_position_trigger_id(&mut context)?,
+                x: boxed_arg(&mut context)?,
+                y: boxed_arg(&mut context)?,
+                r: boxed_arg(&mut context)?,
+            }),
+            FunctionIdentifier::PositionTriggerRectangle => Command::Void(CommandVoid::PositionTriggerRectangle {
+                id: write_position_trigger_id(&mut context)?,
                 x1: boxed_arg(&mut context)?,
                 y1: boxed_arg(&mut context)?,
                 x2: boxed_arg(&mut context)?,
                 y2: boxed_arg(&mut context)?,
             }),
-            FunctionIdentifier::BoxTriggerDestroy => {
-                Command::Void(CommandVoid::BoxTriggerDestroy {
-                    id: read_box_trigger_id(&mut context)?,
+            FunctionIdentifier::PositionTriggerDestroy => {
+                Command::Void(CommandVoid::PositionTriggerDestroy {
+                    id: read_position_trigger_id(&mut context)?,
                 })
             }
-            FunctionIdentifier::BoxTriggerEnterCallback => {
-                Command::Void(CommandVoid::BoxTriggerEnterCallback {
-                    id: read_box_trigger_id(&mut context)?,
+            FunctionIdentifier::PositionTriggerEnterCallback => {
+                Command::Void(CommandVoid::PositionTriggerEnterCallback {
+                    id: read_position_trigger_id(&mut context)?,
                     action: arg(&mut context)?,
                 })
             }
-            FunctionIdentifier::BoxTriggerLeaveCallback => {
-                Command::Void(CommandVoid::BoxTriggerLeaveCallback {
-                    id: read_box_trigger_id(&mut context)?,
+            FunctionIdentifier::PositionTriggerLeaveCallback => {
+                Command::Void(CommandVoid::PositionTriggerLeaveCallback {
+                    id: read_position_trigger_id(&mut context)?,
                     action: arg(&mut context)?,
                 })
             }

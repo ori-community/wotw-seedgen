@@ -98,20 +98,20 @@ impl GlobalCompilerData<'_, '_, '_> {
         self.id_resolver.ids.message.id(id)
     }
 
-    pub fn read_box_trigger_id(&mut self, id: String, span: Range<usize>) -> usize {
+    pub fn read_position_trigger_id(&mut self, id: String, span: Range<usize>) -> usize {
         if let Some(lint_data) = &mut self.lint_data {
-            lint_data.id_use.box_trigger.read(id.clone(), span);
+            lint_data.id_use.position_trigger.read(id.clone(), span);
         }
 
-        self.id_resolver.ids.box_trigger.id(id)
+        self.id_resolver.ids.position_trigger.id(id)
     }
 
-    pub fn write_box_trigger_id(&mut self, id: String) -> usize {
+    pub fn write_position_trigger_id(&mut self, id: String) -> usize {
         if let Some(lint_data) = &mut self.lint_data {
-            lint_data.id_use.box_trigger.write(id.clone());
+            lint_data.id_use.position_trigger.write(id.clone());
         }
 
-        self.id_resolver.ids.box_trigger.id(id)
+        self.id_resolver.ids.position_trigger.id(id)
     }
 
     pub fn read_warp_icon_id(&mut self, id: String, span: Range<usize>) -> usize {
@@ -227,7 +227,7 @@ pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     message: IdMap<0>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    box_trigger: IdMap<0>,
+    position_trigger: IdMap<0>,
     // never empty
     // 9000 is the first rando-reserved wheel (aside from root)
     pub wheel: IdMap<0, 9000, IdMapWheel>,
@@ -246,7 +246,7 @@ impl Ids {
             integer_state,
             float_state,
             message,
-            box_trigger,
+            position_trigger,
             wheel,
             warp_icon,
         } = self;
@@ -259,7 +259,7 @@ impl Ids {
         integer_state.purge_unused();
         float_state.purge_unused();
         message.purge_unused();
-        box_trigger.purge_unused();
+        position_trigger.purge_unused();
         wheel.purge_unused();
         warp_icon.purge_unused();
     }
