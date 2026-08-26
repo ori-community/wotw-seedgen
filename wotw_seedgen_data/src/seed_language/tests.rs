@@ -1,5 +1,7 @@
 use crate::{
-    assets::{AssetCacheValues, InlineSnippets, SnippetAccess, SnippetFileAccess, TEST_ASSETS},
+    assets::{
+        AssetCacheValues, InlineSnippets, SnippetAccess, SnippetFileAccess, TestAccess, TEST_ASSETS,
+    },
     seed_language::{
         ast::{
             parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
@@ -141,28 +143,6 @@ fn function_call() {
     };
     let function_call = parse_seed_ast::<FunctionCall>(source).parsed;
     assert_eq!(function_call, Some(expected));
-}
-
-// works while debugging, but doesn't work to jump into code from errors
-// static WORKDIR: LazyLock<&Path> =
-//     LazyLock::new(|| Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap());
-
-// works to jump into code from errors, but doesn't work while debugging
-static WORKDIR: LazyLock<&Path> = LazyLock::new(|| Path::new(".."));
-
-struct TestFileAccess;
-
-impl SnippetFileAccess for TestFileAccess {
-    type Folders = array::IntoIter<Self::Path, 2>;
-    type Path = PathBuf;
-
-    fn snippet_folders(&self) -> Self::Folders {
-        [
-            WORKDIR.join("assets/snippets"),
-            WORKDIR.join("assets/toolseeds"),
-        ]
-        .into_iter()
-    }
 }
 
 fn test_compiler<F: SnippetAccess>(snippet_access: &F) -> Compiler<'_, 'static, 'static> {
@@ -318,22 +298,42 @@ fn operator_precedence() {
     test_precedence("4 / (2 + 2)", 1);
 }
 
+// works while debugging, but doesn't work to jump into code from errors
+// static WORKDIR: LazyLock<&Path> =
+//     LazyLock::new(|| Path::new(concat!(env!("CARGO_MANIFEST_DIR"), "/../assets")));
+
+// works to jump into code from errors, but doesn't work while debugging
+static WORKDIR: LazyLock<&Path> = LazyLock::new(|| Path::new(".."));
+
+struct SnippetAndToolseedAccess;
+
+impl SnippetFileAccess for SnippetAndToolseedAccess {
+    type Folders = array::IntoIter<Self::Path, 2>;
+    type Path = PathBuf;
+
+    fn snippet_folders(&self) -> Self::Folders {
+        [
+            WORKDIR.join("assets/snippets"),
+            WORKDIR.join("assets/toolseeds"),
+        ]
+        .into_iter()
+    }
+}
+
 #[test]
 fn snippets() {
-    let snippets = TestFileAccess.available_snippets();
+    let mut compiler = test_compiler(&TestAccess);
 
-    let mut compiler = test_compiler(&TestFileAccess);
-
-    for identifier in &snippets {
-        compiler.compile_snippet(identifier).unwrap();
+    for identifier in TestAccess.available_snippets() {
+        compiler.compile_snippet(&identifier).unwrap();
     }
 
     compiler.finish().eprint_errors().unwrap();
 
-    for identifier in &snippets {
-        let mut compiler = test_compiler(&TestFileAccess);
+    for identifier in SnippetAndToolseedAccess.available_snippets() {
+        let mut compiler = test_compiler(&SnippetAndToolseedAccess);
 
-        compiler.compile_snippet(identifier).unwrap();
+        compiler.compile_snippet(&identifier).unwrap();
 
         compiler.finish().eprint_errors().unwrap();
     }
@@ -348,7 +348,7 @@ fn snippets() {
     .collect::<FxHashMap<_, _>>();
 
     for identifier in test_with_config.keys() {
-        let mut compiler = test_compiler_with_config(&TestFileAccess, test_with_config.clone());
+        let mut compiler = test_compiler_with_config(&TestAccess, test_with_config.clone());
 
         compiler.compile_snippet(identifier).unwrap();
 
