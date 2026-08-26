@@ -21,7 +21,11 @@ impl Seed {
         )?;
 
         if let Some(seedgen_info) = &self.seedgen_info {
-            package.append("seedgen_info.json", serde_json::to_vec(seedgen_info)?)?;
+            f(
+                &mut package,
+                "seedgen_info.json",
+                serde_json::to_vec(seedgen_info)?,
+            )?;
         }
 
         for (path, data) in &self.assets {
