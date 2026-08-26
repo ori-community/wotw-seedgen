@@ -384,7 +384,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(marsh_relic(), Marsh)
-    !item_data_name(marsh_relic(), "Marsh Relic")
+    !item_data_name(marsh_relic(), "@Marsh Relic@")
     !item_data_map_icon(marsh_relic(), MapstoneFragment)
 
     on marsh_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -399,7 +399,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(hollow_relic(), Hollow)
-    !item_data_name(hollow_relic(), "Hollow Relic")
+    !item_data_name(hollow_relic(), "@Hollow Relic@")
     !item_data_map_icon(hollow_relic(), MapstoneFragment)
 
     on hollow_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -414,7 +414,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(glades_relic(), Glades)
-    !item_data_name(glades_relic(), "Glades Relic")
+    !item_data_name(glades_relic(), "@Glades Relic@")
     !item_data_map_icon(glades_relic(), MapstoneFragment)
 
     on glades_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -429,7 +429,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(wellspring_relic(), Wellspring)
-    !item_data_name(wellspring_relic(), "Wellspring Relic")
+    !item_data_name(wellspring_relic(), "@Wellspring Relic@")
     !item_data_map_icon(wellspring_relic(), MapstoneFragment)
 
     on wellspring_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -444,7 +444,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(woods_relic(), Woods)
-    !item_data_name(woods_relic(), "Woods Relic")
+    !item_data_name(woods_relic(), "@Woods Relic@")
     !item_data_map_icon(woods_relic(), MapstoneFragment)
 
     on woods_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -459,7 +459,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(reach_relic(), Reach)
-    !item_data_name(reach_relic(), "Reach Relic")
+    !item_data_name(reach_relic(), "@Reach Relic@")
     !item_data_map_icon(reach_relic(), MapstoneFragment)
 
     on reach_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -474,7 +474,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(depths_relic(), Depths)
-    !item_data_name(depths_relic(), "Depths Relic")
+    !item_data_name(depths_relic(), "@Depths Relic@")
     !item_data_map_icon(depths_relic(), MapstoneFragment)
 
     on depths_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -489,7 +489,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(pools_relic(), Pools)
-    !item_data_name(pools_relic(), "Pools Relic")
+    !item_data_name(pools_relic(), "@Pools Relic@")
     !item_data_map_icon(pools_relic(), MapstoneFragment)
 
     on pools_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -504,7 +504,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(wastes_relic(), Wastes)
-    !item_data_name(wastes_relic(), "Wastes Relic")
+    !item_data_name(wastes_relic(), "@Wastes Relic@")
     !item_data_map_icon(wastes_relic(), MapstoneFragment)
 
     on wastes_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -519,7 +519,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(willow_relic(), Willow)
-    !item_data_name(willow_relic(), "Willow Relic")
+    !item_data_name(willow_relic(), "@Willow Relic@")
     !item_data_map_icon(willow_relic(), MapstoneFragment)
 
     on willow_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
@@ -534,7 +534,7 @@ fun update_current_area_has_uncollected_relic() {
     }
 
     !preplace(burrows_relic(), Burrows)
-    !item_data_name(burrows_relic(), "Burrows Relic")
+    !item_data_name(burrows_relic(), "@Burrows Relic@")
     !item_data_map_icon(burrows_relic(), MapstoneFragment)
 
     on burrows_relic_collected store(itemTracker.relicsCount, itemTracker.relicsCount + 1)
