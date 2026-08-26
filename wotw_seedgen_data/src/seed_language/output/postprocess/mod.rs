@@ -734,6 +734,7 @@ impl ResolvePlaceholders for CommandBoolean {
             | Self::FetchBoolean { .. }
             | Self::GetBoolean { .. }
             | Self::IsInCircle { .. }
+            | Self::IsInPositionTrigger { .. }
             | Self::IsInRectangle { .. } => {}
         }
     }

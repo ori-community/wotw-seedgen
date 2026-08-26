@@ -136,7 +136,9 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
                 simulation.fetch(*uber_identifier).as_boolean()
             }
             CommandBoolean::GetBoolean { id } => simulation.heap().get_boolean(*id),
-            CommandBoolean::IsInCircle { .. } | CommandBoolean::IsInRectangle { .. } => false,
+            CommandBoolean::IsInCircle { .. }
+            | CommandBoolean::IsInPositionTrigger { .. }
+            | CommandBoolean::IsInRectangle { .. } => false,
         }
     }
 }

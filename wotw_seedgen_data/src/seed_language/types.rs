@@ -166,6 +166,7 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
                 .map(Type::from)?,
             FunctionIdentifier::GetBoolean
             | FunctionIdentifier::IsInCircle
+            | FunctionIdentifier::IsInPositionTrigger
             | FunctionIdentifier::IsInRectangle => Type::Boolean,
             FunctionIdentifier::GetInteger
             | FunctionIdentifier::ToInteger

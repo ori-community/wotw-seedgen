@@ -200,6 +200,8 @@ pub enum Command {
     PositionTriggerLeaveCallback(/*id*/ usize, /*action*/ usize),
     /// Check if Ori is in the circle defined by (Float Memory 0, Float Memory 1) and radius Float Memory 2 and store the result in Boolean Memory 0
     IsInCircle,
+    /// Check if Ori is in a position trigger
+    IsInPositionTrigger(/*id*/ usize),
     /// Check if Ori is in the hitbox defined by (Float Memory 0, Float Memory 1) and (Float Memory 2, Float Memory 3) and store the result in Boolean Memory 0
     IsInRectangle,
     /// Save the game. Only save to disk if Boolean Memory 0 is `true`.

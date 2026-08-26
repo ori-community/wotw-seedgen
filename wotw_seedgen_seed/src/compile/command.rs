@@ -145,6 +145,10 @@ impl Compile for input::CommandBoolean {
                 .float(1, *y)
                 .float(2, *r)
                 .call(Command::IsInRectangle, MemoryUsed::ONE_BOOLEAN),
+            Self::IsInPositionTrigger { id } => (
+                vec![Command::IsInPositionTrigger(id)],
+                MemoryUsed::ONE_BOOLEAN,
+            ),
             Self::IsInRectangle { x1, y1, x2, y2 } => Args::new(context)
                 .float(0, *x1)
                 .float(1, *y1)

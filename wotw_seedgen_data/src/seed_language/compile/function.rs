@@ -254,6 +254,7 @@ pub enum FunctionIdentifier {
     Fetch,
     GetBoolean,
     IsInCircle,
+    IsInPositionTrigger,
     IsInRectangle,
     GetInteger,
     ToInteger,
@@ -430,6 +431,7 @@ impl FunctionIdentifier {
             Fetch(uber_identifier: UberIdentifier) -> UberStateValue,
             GetBoolean(id: String) -> Boolean,
             IsInCircle(x: Float, y: Float, r: Float) -> Boolean,
+            IsInPositionTrigger(id: String) -> Boolean,
             IsInRectangle(x1: Float, y1: Float, x2: Float, y2: Float) -> Boolean,
             GetInteger(id: String) -> Integer,
             ToInteger(float: Float) -> Integer,
@@ -743,6 +745,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 x: boxed_arg(&mut context)?,
                 y: boxed_arg(&mut context)?,
                 r: boxed_arg(&mut context)?,
+            }),
+            FunctionIdentifier::IsInPositionTrigger => Command::Boolean(CommandBoolean::IsInPositionTrigger {
+                id: read_position_trigger_id(&mut context)?,
             }),
             FunctionIdentifier::IsInRectangle => Command::Boolean(CommandBoolean::IsInRectangle {
                 x1: boxed_arg(&mut context)?,

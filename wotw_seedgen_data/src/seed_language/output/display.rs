@@ -101,6 +101,9 @@ impl Display for CommandBoolean {
             CommandBoolean::IsInCircle { x, y, r } => {
                 write!(f, "is_in_circle({x}, {y}, {r})")
             }
+            CommandBoolean::IsInPositionTrigger { id } => {
+                write!(f, "is_in_position_trigger({id})")
+            }
             CommandBoolean::IsInRectangle { x1, y1, x2, y2 } => {
                 write!(f, "is_in_rectangle({x1}, {y1}, {x2}, {y2})")
             }
