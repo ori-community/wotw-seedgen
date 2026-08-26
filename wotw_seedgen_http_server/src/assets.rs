@@ -217,10 +217,15 @@ impl AssetInfo for SnippetInfo {
     type Asset = Source;
 
     fn new(asset: &Self::Asset) -> Self {
+        // TODO cache asts?
+        let metadata = Metadata::from_source(&asset.content);
+        // corrected later when the full tree is available
+        let tree_requires_local_files = metadata.requires_local_files;
+
         Self {
             origin: AssetOrigin::ExecutableDir,
-            // TODO cache asts?
-            metadata: Metadata::from_source(&asset.content),
+            metadata,
+            tree_requires_local_files,
         }
     }
 
@@ -291,7 +296,32 @@ fn data_dir_assets(folder: &str, extension: &str) -> impl Iterator<Item = PathBu
 }
 
 fn snippet_info(snippets: &FxHashMap<String, Source>) -> FxHashMap<String, SnippetInfo> {
-    asset_info(snippets, "snippets", "wotws")
+    let mut snippet_info_map = asset_info::<_, SnippetInfo>(snippets, "snippets", "wotws");
+
+    for identifier in snippets.keys() {
+        let mut includes = snippet_info_map[identifier]
+            .metadata
+            .includes
+            .iter()
+            .collect::<Vec<_>>();
+
+        while let Some(included_identifier) = includes.pop() {
+            let included_info = &snippet_info_map[included_identifier];
+
+            if included_info.tree_requires_local_files {
+                snippet_info_map
+                    .get_mut(identifier)
+                    .unwrap()
+                    .tree_requires_local_files = true;
+
+                break;
+            }
+
+            includes.extend(included_info.metadata.includes.iter());
+        }
+    }
+
+    snippet_info_map
 }
 
 fn universe_preset_info(

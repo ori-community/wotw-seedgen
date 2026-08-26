@@ -12,6 +12,7 @@ use wotw_seedgen_parse::{Identifier, Spanned, SpannedOption, Symbol};
 
 /// Metadata about a snippet
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Metadata {
     /// Whether the snippet should be hidden from the options when generating seeds
     pub hidden: bool,
@@ -21,6 +22,8 @@ pub struct Metadata {
     pub category: Option<String>,
     /// Longer description
     pub description: Option<String>,
+    /// Included snippets
+    pub includes: Vec<String>,
     /// Available configuration
     #[schema(value_type = FxHashMap<String, ConfigArg>)]
     pub config: IndexMap<String, ConfigArg, FxBuildHasher>,
@@ -99,6 +102,14 @@ impl Metadata {
         let mut metadata = Self::default();
         ast.traverse(&mut metadata);
         metadata
+    }
+
+    fn include(&mut self, args: &ast::CommandArgs<ast::IncludeArgs>) {
+        let Some(args) = get_command_args_ref(args) else {
+            return;
+        };
+
+        self.includes.push(args.path.data.to_string());
     }
 
     fn config_boolean(&mut self, args: &ast::CommandArgs<ast::ConfigBooleanArgs>) {
@@ -207,6 +218,7 @@ impl Metadata {
 impl Handler for Metadata {
     fn command(&mut self, command: &ast::Command) {
         match command {
+            ast::Command::Include(_, args) => self.include(args),
             ast::Command::IncludeIcon(..) => self.requires_local_files = true,
             ast::Command::ConfigBoolean(_, args) => self.config_boolean(args),
             ast::Command::ConfigInteger(_, args) => self.config_integer(args),

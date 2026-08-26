@@ -38,4 +38,6 @@ pub struct SnippetInfo {
     pub origin: AssetOrigin,
     /// Metadata about the snippet
     pub metadata: Metadata,
+    /// Whether this snippet or anything in its include tree requires local files
+    pub tree_requires_local_files: bool,
 }
