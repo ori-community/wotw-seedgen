@@ -503,7 +503,7 @@ impl Compile for input::CommandVoid {
                 .float(0, *x)
                 .float(1, *y)
                 .float(2, *r)
-                .call(Command::PositionTriggerRectangle(id), MemoryUsed::ZERO),
+                .call(Command::PositionTriggerCircle(id), MemoryUsed::ZERO),
             Self::PositionTriggerRectangle { id, x1, y1, x2, y2 } => Args::new(context)
                 .float(0, *x1)
                 .float(1, *y1)
