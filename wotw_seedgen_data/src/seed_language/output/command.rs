@@ -93,9 +93,7 @@ pub enum CommandBoolean {
         r: Box<CommandFloat>,
     },
     /// Check if Ori is in a position trigger with the given id
-    IsInPositionTrigger {
-        id: usize,
-    },
+    IsInPositionTrigger { id: usize },
     /// Check if Ori is in box defined by the rectangle (x1, y1) and (x2, y2)
     IsInRectangle {
         x1: Box<CommandFloat>,

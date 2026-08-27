@@ -746,9 +746,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 y: boxed_arg(&mut context)?,
                 r: boxed_arg(&mut context)?,
             }),
-            FunctionIdentifier::IsInPositionTrigger => Command::Boolean(CommandBoolean::IsInPositionTrigger {
-                id: read_position_trigger_id(&mut context)?,
-            }),
+            FunctionIdentifier::IsInPositionTrigger => {
+                Command::Boolean(CommandBoolean::IsInPositionTrigger {
+                    id: read_position_trigger_id(&mut context)?,
+                })
+            }
             FunctionIdentifier::IsInRectangle => Command::Boolean(CommandBoolean::IsInRectangle {
                 x1: boxed_arg(&mut context)?,
                 y1: boxed_arg(&mut context)?,
@@ -1312,19 +1314,23 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 value: arg(&mut context)?,
             }),
 
-            FunctionIdentifier::PositionTriggerCircle => Command::Void(CommandVoid::PositionTriggerCircle {
-                id: write_position_trigger_id(&mut context)?,
-                x: boxed_arg(&mut context)?,
-                y: boxed_arg(&mut context)?,
-                r: boxed_arg(&mut context)?,
-            }),
-            FunctionIdentifier::PositionTriggerRectangle => Command::Void(CommandVoid::PositionTriggerRectangle {
-                id: write_position_trigger_id(&mut context)?,
-                x1: boxed_arg(&mut context)?,
-                y1: boxed_arg(&mut context)?,
-                x2: boxed_arg(&mut context)?,
-                y2: boxed_arg(&mut context)?,
-            }),
+            FunctionIdentifier::PositionTriggerCircle => {
+                Command::Void(CommandVoid::PositionTriggerCircle {
+                    id: write_position_trigger_id(&mut context)?,
+                    x: boxed_arg(&mut context)?,
+                    y: boxed_arg(&mut context)?,
+                    r: boxed_arg(&mut context)?,
+                })
+            }
+            FunctionIdentifier::PositionTriggerRectangle => {
+                Command::Void(CommandVoid::PositionTriggerRectangle {
+                    id: write_position_trigger_id(&mut context)?,
+                    x1: boxed_arg(&mut context)?,
+                    y1: boxed_arg(&mut context)?,
+                    x2: boxed_arg(&mut context)?,
+                    y2: boxed_arg(&mut context)?,
+                })
+            }
             FunctionIdentifier::PositionTriggerDestroy => {
                 Command::Void(CommandVoid::PositionTriggerDestroy {
                     id: read_position_trigger_id(&mut context)?,
