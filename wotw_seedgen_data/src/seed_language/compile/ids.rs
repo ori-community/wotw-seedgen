@@ -1,5 +1,5 @@
 use std::{
-    fs::File,
+    fs::{self, File},
     marker::PhantomData,
     ops::{ControlFlow, Deref, DerefMut, Range},
     path::PathBuf,
@@ -192,23 +192,27 @@ impl DerefMut for IdResolver<'_> {
 impl Drop for IdResolver<'_> {
     fn drop(&mut self) {
         if let Some(lockfile_path) = &self.lockfile {
-            match file_create(lockfile_path) {
-                Ok(lockfile) => {
-                    self.ids.purge_unused();
+            if self.ids == Ids::default() {
+                let _ = fs::remove_file(lockfile_path);
+            } else {
+                match file_create(lockfile_path) {
+                    Ok(lockfile) => {
+                        self.ids.purge_unused();
 
-                    if let Err(err) = serde_json::to_writer(lockfile, &self.ids) {
-                        warn!(logger: self.log_capture, "{}", file_err("write id lockfile", lockfile_path, err));
+                        if let Err(err) = serde_json::to_writer(lockfile, &self.ids) {
+                            warn!(logger: self.log_capture, "{}", file_err("write id lockfile", lockfile_path, err));
+                        }
                     }
-                }
-                Err(err) => {
-                    warn!(logger: self.log_capture, "{err}");
+                    Err(err) => {
+                        warn!(logger: self.log_capture, "{err}");
+                    }
                 }
             }
         }
     }
 }
 
-#[derive(Debug, Default, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     boolean: IdMap<FREE_MEMORY_START>,
@@ -266,7 +270,7 @@ impl Ids {
 }
 
 #[derive(Derivative, Serialize, Deserialize)]
-#[derivative(Debug(bound = ""))]
+#[derivative(Debug(bound = ""), PartialEq(bound = ""), Eq(bound = ""))]
 pub struct IdMap<const OFFSET: usize, const LIMIT: usize = { usize::MAX }, S = IdMapEmpty> {
     /// Ids which have become unused and may be reassigned
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
@@ -286,7 +290,7 @@ impl<const OFFSET: usize, S> IdMap<OFFSET, { usize::MAX }, S> {
 
 impl<const LIMIT: usize, SD> IdMap<0, LIMIT, SD> {
     pub fn try_id<S: Span>(&mut self, id: String, errors: &mut Vec<Error>, span: S) -> usize {
-        self.id_impl(id, move |next| 
+        self.id_impl(id, move |next|
             if next >= LIMIT {
                 errors.push(Error::error(
                     format!(
@@ -306,7 +310,10 @@ impl<const OFFSET: usize, const LIMIT: usize, S> IdMap<OFFSET, LIMIT, S> {
         self.ids.is_empty()
     }
 
-    fn id_impl<F: FnOnce(usize) -> ControlFlow<usize, usize>>(&mut self, id: String, new: F) -> usize {
+    fn id_impl<F>(&mut self, id: String, new: F) -> usize
+    where
+        F: FnOnce(usize) -> ControlFlow<usize, usize>,
+    {
         match self.ids.get_mut(&id) {
             None => {
                 let value = match self.gaps.pop() {
@@ -413,3 +420,11 @@ impl Id {
         Self { value, used: true }
     }
 }
+
+impl PartialEq for Id {
+    fn eq(&self, other: &Self) -> bool {
+        self.value == other.value
+    }
+}
+
+impl Eq for Id {}
