@@ -63,21 +63,21 @@
     }
 }
 
-on spawn store(itemTracker.questsRequired, max_quests)
+on spawn store(itemTracker.questsRequired, quests_required)
 
 !augment_fun(check_goals_completed(), {
-    if itemTracker.questsCount < max_quests set_boolean("goals_completed", false)
+    if itemTracker.questsCount < quests_required set_boolean("goals_completed", false)
 })
 
 !augment_fun(write_short_goals_row(), {
-    set_string("quests_message", "Quests: " + itemTracker.questsCount + "/" + max_quests)
-    if itemTracker.questsCount == max_quests set_string("quests_message", "$" + get_string("quests_message") + "$")
+    set_string("quests_message", "Quests: " + itemTracker.questsCount + "/" + quests_required)
+    if itemTracker.questsCount == quests_required set_string("quests_message", "$" + get_string("quests_message") + "$")
     add_row_item(get_string("quests_message"))
 })
 
-!augment_fun(write_missing_goals(), if itemTracker.questsCount < max_quests write_missing_quests())
+!augment_fun(write_missing_goals(), if itemTracker.questsCount < quests_required write_missing_quests())
 
-fun write_missing_quests() { new_row("#Missing Quests (" + (max_quests - itemTracker.questsCount) + ")#: ") }
+fun write_missing_quests() { new_row("#Missing Quests (" + (quests_required - itemTracker.questsCount) + ")#: ") }
 !if silent_teeth { !augment_fun(write_missing_quests(), if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 add_row_item("Silent Teeth")) }
 !if missing_key { !augment_fun(write_missing_quests(), if MarshSpawn.TokkKeystoneQuest == false add_row_item("Missing Key")) }
 !if into_burrows { !augment_fun(write_missing_quests(), if MarshSpawn.TokkTabletQuest == false add_row_item("Into Burrows")) }
