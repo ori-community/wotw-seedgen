@@ -11,7 +11,7 @@
 mod tests;
 mod weight;
 
-pub(crate) use weight::{solution_weights, Cost};
+pub(crate) use weight::{cost_from_iter, solution_weights, Cost};
 
 use arrayvec::ArrayVec;
 use indexmap::IndexMap;
@@ -34,9 +34,7 @@ use wotw_seedgen_data::{
     env_or,
     logic_language::output::{Connection, Graph, Node, Requirement},
     seed_language::{
-        output::{
-            CommandVoid, CommandsOutput, CommonWriteCommand, ContainedWrites, UberStateWrite,
-        },
+        output::{CommandVoid, CommandsOutput, CommonWriteCommand, UberStateWrite},
         simulate::{Simulate, Simulation, Snapshot},
     },
     Difficulty, EqIgnore, Shard, Skill, UberIdentifier,
@@ -1307,8 +1305,9 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         let Some(index) = solution.remaining_items.iter().copied().find(|index| {
             // TODO only consider positive writes, this would break for instance when shuffling remove skills into the item pool
             self.item_pool[*index]
-                .contained_write_identifiers()
-                .contains(&uber_identifier)
+                .writes()
+                .iter()
+                .any(|write| write.uber_identifier == uber_identifier)
         }) else {
             // TODO can we remember pointless paths that we know end in this branch?
             trace!(
@@ -1386,7 +1385,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         amount: OrderedFloat<f32>,
         simulate: bool,
     ) -> ControlFlow<(), PartialSolution<'graph>> {
-        fn convert(write: &UberStateWrite) -> Option<OrderedFloat<f32>> {
+        fn convert(write: UberStateWrite) -> Option<OrderedFloat<f32>> {
             match CommonWriteCommand::from_write(write) {
                 Some(CommonWriteCommand::AddFloat(amount)) => Some(amount),
                 _ => None,
@@ -1415,7 +1414,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
     where
         A: Copy + PartialOrd + Sub<Output = A> + Display,
         FA: FnMut(A) -> bool,
-        FW: FnMut(&UberStateWrite<'pool>) -> Option<A>,
+        FW: FnMut(UberStateWrite<'pool>) -> Option<A>,
     {
         self.has_free_slot(&solution)?;
 
@@ -1425,14 +1424,15 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         'outer: for index in solution.remaining_items.iter().copied() {
             let mut item_helps = false;
 
+            // TODO positive writes etc.
             for write in self.item_pool[index]
-                // TODO positive writes etc.
-                .contained_writes()
+                .writes()
+                .iter()
                 .filter(|write| write.uber_identifier == uber_identifier)
             {
                 item_helps = true;
 
-                match amount_from_write(&write) {
+                match amount_from_write(write.as_ref()) {
                     None => {
                         trace!(
                             logger: self.item_pool.log_capture,
@@ -1694,7 +1694,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
     }
 }
 
-fn convert_integer_write(write: &UberStateWrite) -> Option<i32> {
+fn convert_integer_write(write: UberStateWrite) -> Option<i32> {
     match CommonWriteCommand::from_write(write) {
         Some(CommonWriteCommand::AddInteger(amount)) => Some(amount),
         _ => None,

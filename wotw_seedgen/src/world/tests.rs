@@ -51,7 +51,7 @@ fn full_reach_check() {
     let settings = WorldSettings::difficulty_default(Difficulty::Gorlek);
     let mut world = test_world(&TEST_ASSETS.graphs.gorlek, &settings, DEFAULT_SPAWN);
 
-    let mut pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0)).finish();
+    let mut pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0), &CommandsOutput::NONE).finish();
     for item in pool.take() {
         world.simulate(&item, &CommandsOutput::NONE);
     }

@@ -2,7 +2,7 @@ use super::Analyzer;
 use rustc_hash::FxHashSet;
 use wotw_seedgen::{
     data::{
-        seed_language::output::{CommonItem, ContainedWrites},
+        seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
         Skill,
     },
     spoiler::SeedSpoiler,
@@ -32,7 +32,13 @@ impl Analyzer for EarlySkillsStats {
             .iter()
             .flat_map(|group| group.placements.iter())
             .filter(|placement| first_reachables.contains(&&placement.location.identifier))
-            .flat_map(|placement| placement.item.command.contained_common_items())
+            .flat_map(|placement| {
+                placement
+                    .item
+                    .command
+                    .direct_contained_writes(&[])
+                    .common_items()
+            })
             .filter(|item| match item {
                 CommonItem::Skill(Skill::GladesAncestralLight | Skill::MarshAncestralLight) => {
                     false

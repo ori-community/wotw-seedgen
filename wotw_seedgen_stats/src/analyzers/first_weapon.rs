@@ -1,7 +1,7 @@
 use super::Analyzer;
 use wotw_seedgen::{
     data::{
-        seed_language::output::{CommonItem, ContainedWrites},
+        seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
         Skill,
     },
     spoiler::SeedSpoiler,
@@ -19,21 +19,26 @@ impl Analyzer for FirstWeaponStats {
             .iter()
             .flat_map(|group| &group.placements)
             .find(|placement| {
-                placement.item.command.contained_common_items().any(|item| {
-                    matches!(
-                        item,
-                        CommonItem::Skill(
-                            Skill::Grenade
-                                | Skill::Spear
-                                | Skill::Bow
-                                | Skill::Hammer
-                                | Skill::Sword
-                                | Skill::Shuriken
-                                | Skill::Blaze
-                                | Skill::Sentry
+                placement
+                    .item
+                    .command
+                    .direct_contained_writes(&[])
+                    .common_items()
+                    .any(|item| {
+                        matches!(
+                            item,
+                            CommonItem::Skill(
+                                Skill::Grenade
+                                    | Skill::Spear
+                                    | Skill::Bow
+                                    | Skill::Hammer
+                                    | Skill::Sword
+                                    | Skill::Shuriken
+                                    | Skill::Blaze
+                                    | Skill::Sentry
+                            )
                         )
-                    )
-                })
+                    })
             })
             .map(|placement| placement.item.name.clone())
             .into_iter()

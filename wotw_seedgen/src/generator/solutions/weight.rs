@@ -5,7 +5,8 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
     env_or,
     seed_language::output::{
-        CommonUberStateWrite, CommonWriteCommand, ContainedWrites, UberStateWriteOwned,
+        CommonUberStateWrite, CommonWriteCommand, ContainedWritesExt, UberStateWrite,
+        UberStateWriteOwned,
     },
     CommonUberIdentifier, Skill, Teleporter,
 };
@@ -143,22 +144,16 @@ impl<'pool, 'log> WeightContext<'pool, 'log> {
 
 const DEFAULT_COST: f32 = 200.;
 
-pub(crate) trait Cost {
-    fn cost(&self) -> f32;
+pub(crate) fn cost_from_iter<'a, I: IntoIterator<Item = UberStateWrite<'a>>>(iter: I) -> f32 {
+    match iter.common().map(|write| write.cost()).sum() {
+        // empty sum is -0.0
+        -0.0 => DEFAULT_COST,
+        other => other,
+    }
 }
 
-impl Cost for Vec<UberStateWriteOwned> {
-    fn cost(&self) -> f32 {
-        match self
-            .contained_common_writes()
-            .map(|write| write.cost())
-            .sum()
-        {
-            // empty sum is -0.0
-            -0.0 => DEFAULT_COST,
-            other => other,
-        }
-    }
+pub(crate) trait Cost {
+    fn cost(&self) -> f32;
 }
 
 impl Cost for CommonUberStateWrite {

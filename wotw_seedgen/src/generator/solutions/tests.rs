@@ -17,7 +17,7 @@ use wotw_seedgen_data::{
     parse::SpannedOption,
     seed_language::{
         compile::{clean_water, energy_fragment, health_fragment, keystone, shard, skill},
-        output::{CommandVoid, CommandsOutput, CommonItem, ContainedWrites},
+        output::{CommandVoid, CommandsOutput, CommonItem, ContainedWrites, ContainedWritesExt},
         simulate::{Simulate, Simulation, UberStates},
     },
     test_logger, Difficulty,
@@ -104,7 +104,13 @@ fn sort_test_solutions(solutions: &mut Vec<Vec<(CommandVoid, u32)>>) {
 }
 
 fn solution_sort_key((item, amount): &(CommandVoid, u32)) -> (CommonItem, u32) {
-    (item.contained_common_items().next().unwrap(), *amount)
+    (
+        item.direct_contained_writes(&[])
+            .common_items()
+            .next()
+            .unwrap(),
+        *amount,
+    )
 }
 
 fn display_test_solutions(solutions: &[Vec<(CommandVoid, u32)>]) -> DisplayTestSolutions<'_> {
@@ -179,9 +185,12 @@ fn mock_solutions() {
 
     let mut settings = WorldSettings::default();
 
-    let mut item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0xcafef00dd15ea5e5));
-    item_pool.add_amount(health_fragment(), 99);
-    item_pool.add_amount(energy_fragment(), 99);
+    let mut item_pool = ItemPoolBuilder::new(
+        &mut Pcg64Mcg::new(0xcafef00dd15ea5e5),
+        &CommandsOutput::NONE,
+    );
+    item_pool.add_amount(health_fragment(), 99, &CommandsOutput::NONE);
+    item_pool.add_amount(energy_fragment(), 99, &CommandsOutput::NONE);
     item_pool.remove(&shard(Energy));
     item_pool.remove(&shard(Vitality));
     let item_pool = item_pool.finish();
@@ -1177,7 +1186,7 @@ static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
 });
 
 static ITEM_POOL: LazyLock<ItemPool> = LazyLock::new(|| {
-    let mut builder = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0));
+    let mut builder = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0), &CommandsOutput::NONE);
     // for simplicity
     builder.remove(&shard(Vitality));
     builder.remove(&shard(Resilience));

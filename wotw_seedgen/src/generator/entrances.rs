@@ -100,17 +100,17 @@ pub fn generate_entrances(
             ];
 
             // enable itemTracker.showVisitedEntranceCount
-            output.events.push(Event {
+            output.push_event(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                 command: store_boolean(UberIdentifier::item_tracker(200), true),
             });
             // enable randoConfig.showSmallEntrances
-            output.events.push(Event {
+            output.push_event(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                 command: store_boolean(UberIdentifier::rando_config(200), true),
             });
             // mark entrance connections as unknown
-            output.events.extend((1..=32).map(|entrance_id| Event {
+            output.extend_events((1..=32).map(|entrance_id| Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                 command: store_boolean(
                     UberIdentifier::known_entrance_connections(entrance_id),
@@ -134,7 +134,7 @@ pub fn generate_entrances(
 
         world.store_integer(uber_identifier, target_entrance_id, output);
 
-        output.events.push(Event {
+        output.push_event(Event {
             trigger: Trigger::ClientEvent(ClientEvent::Spawn),
             command: store_integer(uber_identifier, target_entrance_id),
         });
@@ -142,7 +142,7 @@ pub fn generate_entrances(
         // If the target entrance is known to connect back to this entrance, mark
         // the target entrance as visited too once we went through this entrance
         if loop_size == 2 {
-            output.events.push(Event {
+            output.push_event(Event {
                 trigger: Trigger::Condition(TriggerCondition::new(CommandBoolean::FetchBoolean {
                     uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
                 })),

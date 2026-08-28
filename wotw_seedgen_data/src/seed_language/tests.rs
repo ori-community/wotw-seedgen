@@ -284,7 +284,7 @@ fn operator_precedence() {
         let source = format!("on spawn set_integer(\"oriLurk\", {term})");
         let output = test_str(source);
         assert_eq!(
-            output.commands.events[0].command,
+            output.commands.events()[0].command,
             CommandVoid::SetInteger {
                 id: FREE_MEMORY_START,
                 value: value.into()

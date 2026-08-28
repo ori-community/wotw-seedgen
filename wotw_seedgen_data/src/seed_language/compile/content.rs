@@ -43,8 +43,7 @@ impl<'source> Compile<'source> for ast::Event<'source> {
                     .global
                     .output
                     .commands
-                    .events
-                    .push(Event { trigger, command });
+                    .push_event(Event { trigger, command });
             }
         }
     }

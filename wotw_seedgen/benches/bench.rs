@@ -56,7 +56,7 @@ fn solutions(c: &mut Criterion) {
     // let mut world_settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
     // world_settings.tricks.extend(Trick::VARIANTS);
     let graph = TEST_ASSETS.graph(slice::from_ref(&world_settings));
-    let item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0)).finish();
+    let item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0), &CommandsOutput::NONE).finish();
 
     const SPAWNS: [(&str, &str); 14] = [
         ("marsh", "MarshSpawn.Main"),
@@ -111,7 +111,7 @@ fn reach_check(c: &mut Criterion) {
         })
     });
 
-    let item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0)).finish();
+    let item_pool = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0), &CommandsOutput::NONE).finish();
 
     group.bench_function("long", |b| {
         b.iter(|| {

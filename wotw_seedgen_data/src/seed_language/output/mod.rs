@@ -12,8 +12,9 @@ pub use command::{
     CommandZone, IntoConstant,
 };
 pub use contained_uber_identifiers::{
-    CommonItem, CommonUberStateWrite, CommonWriteCommand, ContainedReads, ContainedWrites,
-    UberStateWrite, UberStateWriteGeneric, UberStateWriteOwned, WriteCommand, WriteCommandOwned,
+    CommandVoidWrites, CommonItem, CommonUberStateWrite, CommonWriteCommand, ContainedWrites,
+    ContainedWritesExt, ContainedWritesIter, UberStateWrite, UberStateWriteGeneric,
+    UberStateWriteOwned, WriteCommand, WriteCommandOwned,
 };
 pub use event::{ClientEvent, Event, Trigger, TriggerCondition};
 pub use intermediate::{Constant, Literal, Reference, VariableValue};
@@ -26,8 +27,8 @@ pub use operation::{
 pub use postprocess::{postprocess, PlaceholderMap, UniversePostprocessor};
 use utoipa::ToSchema;
 
-use crate::{Icon, Position, Zone};
-use rustc_hash::{FxHashMap, FxHashSet};
+use crate::{Icon, Position, UberIdentifier, Zone};
+use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use std::{hash::Hash, ops::Range};
 
@@ -68,15 +69,58 @@ pub struct PreloadOutput {
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct CommandsOutput {
-    pub events: Vec<Event>,
+    events: Vec<Event>,
     pub lookup: Vec<CommandVoid>,
+    trigger_map: FxHashMap<UberIdentifier, Vec<usize>>,
 }
 
 impl CommandsOutput {
     pub const NONE: Self = Self {
         events: Vec::new(),
         lookup: Vec::new(),
+        trigger_map: FxHashMap::with_hasher(FxBuildHasher),
     };
+
+    pub fn events(&self) -> &Vec<Event> {
+        &self.events
+    }
+
+    pub fn events_mut(&mut self) -> &mut [Event] {
+        &mut self.events
+    }
+
+    pub fn push_event(&mut self, event: Event) {
+        for read in event.trigger.contained_reads() {
+            self.trigger_map
+                .entry(read)
+                .or_default()
+                .push(self.events.len());
+        }
+
+        self.events.push(event);
+    }
+
+    pub fn push_event_without_registering_trigger(&mut self, event: Event) {
+        self.events.push(event);
+    }
+
+    pub fn extend_events<I: IntoIterator<Item = Event>>(&mut self, iter: I) {
+        self.events.extend(
+            iter.into_iter()
+                .zip(self.events.len()..)
+                .map(|(event, index)| {
+                    for read in event.trigger.contained_reads() {
+                        self.trigger_map.entry(read).or_default().push(index);
+                    }
+
+                    event
+                }),
+        );
+    }
+
+    pub fn into_inner(self) -> (Vec<Event>, Vec<CommandVoid>) {
+        (self.events, self.lookup)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]

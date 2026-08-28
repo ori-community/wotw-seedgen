@@ -1,4 +1,4 @@
-use crate::generator::solutions::Cost;
+use crate::generator::solutions::{cost_from_iter, Cost};
 
 use super::SEED_FAILED_MESSAGE;
 use derivative::Derivative;
@@ -16,7 +16,9 @@ use strum::VariantArray;
 use wotw_seedgen_data::{
     seed_language::{
         compile,
-        output::{CommandVoid, ContainedWrites, UberStateWrite, UberStateWriteOwned},
+        output::{
+            CommandVoid, CommandsOutput, ContainedWrites, ContainedWritesExt, UberStateWriteOwned,
+        },
     },
     Shard, Skill, WeaponUpgrade,
 };
@@ -27,7 +29,7 @@ pub struct ItemPoolBuilder<'log> {
 }
 
 impl ItemPoolBuilder<'static> {
-    pub fn new(rng: &mut Pcg64Mcg) -> Self {
+    pub fn new(rng: &mut Pcg64Mcg, commands: &CommandsOutput) -> Self {
         const GORLEK_ORE_AMOUNT: usize = 40;
         const KEYSTONE_AMOUNT: usize = 34;
         const SHARD_SLOT_AMOUNT: usize = 5;
@@ -106,20 +108,20 @@ impl ItemPoolBuilder<'static> {
         let item_pool = ItemPool::new(rng, items);
         let mut builder = Self { item_pool };
 
-        builder.add_amount(compile::gorlek_ore(), GORLEK_ORE_AMOUNT);
-        builder.add_amount(compile::keystone(), KEYSTONE_AMOUNT);
-        builder.add_amount(compile::shard_slot(), SHARD_SLOT_AMOUNT);
-        builder.add_amount(compile::health_fragment(), HEALTH_FRAGMENT_AMOUNT);
-        builder.add_amount(compile::energy_fragment(), ENERGY_FRAGMENT_AMOUNT);
+        builder.add_amount(compile::gorlek_ore(), GORLEK_ORE_AMOUNT, commands);
+        builder.add_amount(compile::keystone(), KEYSTONE_AMOUNT, commands);
+        builder.add_amount(compile::shard_slot(), SHARD_SLOT_AMOUNT, commands);
+        builder.add_amount(compile::health_fragment(), HEALTH_FRAGMENT_AMOUNT, commands);
+        builder.add_amount(compile::energy_fragment(), ENERGY_FRAGMENT_AMOUNT, commands);
         for skill in SKILLS {
-            builder.add(compile::skill(skill));
+            builder.add(compile::skill(skill), commands);
         }
-        builder.add(compile::clean_water());
+        builder.add(compile::clean_water(), commands);
         for shard in SHARDS {
-            builder.add(compile::shard(shard));
+            builder.add(compile::shard(shard), commands);
         }
         for weapon_upgrade in WeaponUpgrade::VARIANTS {
-            builder.add(compile::weapon_upgrade(*weapon_upgrade));
+            builder.add(compile::weapon_upgrade(*weapon_upgrade), commands);
         }
 
         builder
@@ -132,14 +134,14 @@ impl<'log> ItemPoolBuilder<'log> {
         self
     }
 
-    pub fn add(&mut self, item: CommandVoid) {
-        self.item_pool.items.push(Item::new(item));
+    pub fn add(&mut self, item: CommandVoid, commands: &CommandsOutput) {
+        self.item_pool.items.push(Item::new(item, commands));
     }
 
-    pub fn add_amount(&mut self, item: CommandVoid, amount: usize) {
+    pub fn add_amount(&mut self, item: CommandVoid, amount: usize, commands: &CommandsOutput) {
         self.item_pool
             .items
-            .extend(iter::repeat_n(Item::new(item), amount));
+            .extend(iter::repeat_n(Item::new(item, commands), amount));
     }
 
     pub fn remove(&mut self, item: &CommandVoid) {
@@ -173,9 +175,13 @@ pub struct Item {
 }
 
 impl Item {
-    fn new(command: CommandVoid) -> Self {
-        let writes = command.contained_writes_owned().collect::<Vec<_>>();
-        let cost = writes.cost();
+    fn new(command: CommandVoid, commands: &CommandsOutput) -> Self {
+        let writes = command
+            .contained_writes(commands)
+            .owned()
+            .collect::<Vec<_>>();
+        let cost = cost_from_iter(writes.iter().map(UberStateWriteOwned::as_ref));
+
         Self {
             command,
             writes,
@@ -193,12 +199,6 @@ impl Deref for Item {
 
     fn deref(&self) -> &Self::Target {
         &self.command
-    }
-}
-
-impl ContainedWrites for Item {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
-        self.writes.contained_writes()
     }
 }
 
@@ -270,10 +270,8 @@ impl<'log> ItemPool<'log> {
         self.items
             .iter()
             .rposition(|item| {
-                let cost = item.writes.cost();
-
-                cost <= 10000. || {
-                    let choose = self.rng.gen_bool(10000. / f64::from(cost));
+                item.cost <= 10000. || {
+                    let choose = self.rng.gen_bool(10000. / f64::from(item.cost));
 
                     if !choose {
                         trace!(

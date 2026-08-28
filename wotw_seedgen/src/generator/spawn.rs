@@ -190,7 +190,7 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
         match spawn_node.identifier() {
             "EastPools.Teleporter" => {
                 // Lower the water at the pools teleporter if we spawn there
-                self.output.commands.events.push(Event {
+                self.output.commands.push_event(Event {
                     trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                     command: store_boolean(UberIdentifier::new(5377, 63173), true),
                 });
@@ -214,7 +214,7 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
             | "WillowsEnd.ShriekArena" => {}
             _ => {
                 if let Some(spawn_position) = spawn_node.position() {
-                    self.output.commands.events.push(Event {
+                    self.output.commands.push_event(Event {
                         trigger: Trigger::ClientEvent(ClientEvent::Spawn),
                         command: CommandVoid::CreateWarpIcon {
                             id: 0,

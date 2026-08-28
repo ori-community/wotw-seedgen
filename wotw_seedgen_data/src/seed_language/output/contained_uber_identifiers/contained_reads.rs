@@ -1,143 +1,133 @@
+use std::iter;
+
 use crate::{
     seed_language::output::{
-        CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid, CommandZone,
-        Operation, Trigger, TriggerCondition,
+        CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone, Operation,
+        Trigger, TriggerCondition,
     },
     UberIdentifier,
 };
 
-use super::{none, some};
-
-fn nested<'a, T>(nested: &'a T) -> Box<dyn Iterator<Item = UberIdentifier> + 'a>
-where
-    T: ContainedReads,
-{
-    Box::new(nested.contained_reads())
+fn none<'a, T: 'a>() -> Box<dyn Iterator<Item = T> + 'a> {
+    Box::new(iter::empty())
 }
 
-fn chain<'a, T1, T2>(left: &'a T1, right: &'a T2) -> Box<dyn Iterator<Item = UberIdentifier> + 'a>
-where
-    T1: ContainedReads,
-    T2: ContainedReads,
-{
-    Box::new(left.contained_reads().chain(right.contained_reads()))
+fn one<'a, T: 'a>(t: T) -> Box<dyn Iterator<Item = T> + 'a> {
+    Box::new(iter::once(t))
 }
 
-pub trait ContainedReads {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier>;
-}
-
-impl<T: ContainedReads> ContainedReads for Box<T> {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
-        (**self).contained_reads()
-    }
-}
-
-impl<T: ContainedReads> ContainedReads for Vec<T> {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
-        self.iter().flat_map(T::contained_reads)
-    }
-}
-
-impl<Item: ContainedReads, Operator> ContainedReads for Operation<Item, Operator> {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
-        chain(&self.left, &self.right)
-    }
-}
-
-impl ContainedReads for Trigger {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
+impl Trigger {
+    pub fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> + '_ {
         match self {
-            Trigger::ClientEvent(_) => none(),
-            Trigger::Binding(uber_identifier) => some(*uber_identifier),
-            Trigger::Condition(condition) => nested(condition),
+            Self::ClientEvent(_) => none(),
+            Self::Binding(uber_identifier) => one(*uber_identifier),
+            Self::Condition(condition) => condition.contained_reads(),
         }
     }
 }
 
+trait ContainedReads {
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_>;
+}
+
+impl<Item: ContainedReads, Operator> ContainedReads for Operation<Item, Operator> {
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
+        Box::new(
+            self.left
+                .contained_reads()
+                .chain(self.right.contained_reads()),
+        )
+    }
+}
+
 impl ContainedReads for TriggerCondition {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
         self.condition.contained_reads()
     }
 }
 
 impl ContainedReads for CommandBoolean {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
+        debug_assert!(!matches!(self, Self::Multi { .. }));
+
         match self {
-            CommandBoolean::Multi { commands, last } => chain(commands, last),
-            CommandBoolean::CompareBoolean { operation } => nested(operation),
-            CommandBoolean::CompareInteger { operation } => nested(operation),
-            CommandBoolean::CompareFloat { operation } => nested(operation),
-            CommandBoolean::CompareString { operation } => nested(operation),
-            CommandBoolean::CompareZone { operation } => nested(operation),
-            CommandBoolean::LogicOperation { operation } => nested(operation),
-            CommandBoolean::FetchBoolean { uber_identifier } => some(*uber_identifier),
-            CommandBoolean::Constant { .. }
-            | CommandBoolean::FunctionArgument { .. }
-            | CommandBoolean::GetBoolean { .. }
-            | CommandBoolean::IsInCircle { .. }
-            | CommandBoolean::IsInPositionTrigger { .. }
-            | CommandBoolean::IsInRectangle { .. } => none(),
+            Self::CompareBoolean { operation } => operation.contained_reads(),
+            Self::CompareInteger { operation } => operation.contained_reads(),
+            Self::CompareFloat { operation } => operation.contained_reads(),
+            Self::CompareString { operation } => operation.contained_reads(),
+            Self::CompareZone { operation } => operation.contained_reads(),
+            Self::LogicOperation { operation } => operation.contained_reads(),
+            Self::FetchBoolean { uber_identifier } => one(*uber_identifier),
+            Self::Constant { .. }
+            | Self::Multi { .. }
+            | Self::FunctionArgument { .. }
+            | Self::GetBoolean { .. }
+            | Self::IsInCircle { .. }
+            | Self::IsInPositionTrigger { .. }
+            | Self::IsInRectangle { .. } => none(),
         }
     }
 }
 
 impl ContainedReads for CommandInteger {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
+        debug_assert!(!matches!(self, Self::Multi { .. }));
+
         match self {
-            CommandInteger::Multi { commands, last } => chain(commands, last),
-            CommandInteger::Arithmetic { operation } => nested(operation),
-            CommandInteger::FetchInteger { uber_identifier } => some(*uber_identifier),
-            CommandInteger::FromFloat { float } => nested(float),
-            CommandInteger::StringLength { string } => nested(string),
-            CommandInteger::Constant { .. }
-            | CommandInteger::FunctionArgument { .. }
-            | CommandInteger::GetInteger { .. } => none(),
+            Self::Arithmetic { operation } => operation.contained_reads(),
+            Self::FetchInteger { uber_identifier } => one(*uber_identifier),
+            Self::FromFloat { float } => float.contained_reads(),
+            Self::StringLength { string } => string.contained_reads(),
+            Self::Constant { .. }
+            | Self::Multi { .. }
+            | Self::FunctionArgument { .. }
+            | Self::GetInteger { .. } => none(),
         }
     }
 }
 
 impl ContainedReads for CommandFloat {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
+        debug_assert!(!matches!(self, Self::Multi { .. }));
+
         match self {
-            CommandFloat::Multi { commands, last } => chain(commands, last),
-            CommandFloat::Arithmetic { operation } => nested(operation),
-            CommandFloat::FetchFloat { uber_identifier } => some(*uber_identifier),
-            CommandFloat::FromInteger { integer } => nested(integer),
-            CommandFloat::Constant { .. }
-            | CommandFloat::FunctionArgument { .. }
-            | CommandFloat::GetFloat { .. } => none(),
+            Self::Arithmetic { operation } => operation.contained_reads(),
+            Self::FetchFloat { uber_identifier } => one(*uber_identifier),
+            Self::FromInteger { integer } => integer.contained_reads(),
+            Self::Constant { .. }
+            | Self::Multi { .. }
+            | Self::FunctionArgument { .. }
+            | Self::GetFloat { .. } => none(),
         }
     }
 }
 
 impl ContainedReads for CommandString {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
+        debug_assert!(!matches!(self, Self::Multi { .. }));
+
         match self {
-            CommandString::Multi { commands, last } => chain(commands, last),
-            CommandString::Concatenate { operation } => nested(operation),
-            CommandString::FromBoolean { boolean } => nested(boolean),
-            CommandString::FromInteger { integer } => nested(integer),
-            CommandString::FromFloat { float } => nested(float),
-            CommandString::Constant { .. }
-            | CommandString::FunctionArgument { .. }
-            | CommandString::GetString { .. }
-            | CommandString::WorldName { .. } => none(),
+            Self::Concatenate { operation } => operation.contained_reads(),
+            Self::FromBoolean { boolean } => boolean.contained_reads(),
+            Self::FromInteger { integer } => integer.contained_reads(),
+            Self::FromFloat { float } => float.contained_reads(),
+            Self::Constant { .. }
+            | Self::Multi { .. }
+            | Self::FunctionArgument { .. }
+            | Self::GetString { .. }
+            | Self::WorldName { .. } => none(),
         }
     }
 }
 
 impl ContainedReads for CommandZone {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
-        // None of the variants contain any reads
-        none()
-    }
-}
+    fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
+        debug_assert!(!matches!(self, Self::Multi { .. }));
 
-impl ContainedReads for CommandVoid {
-    fn contained_reads(&self) -> impl Iterator<Item = UberIdentifier> {
-        // If it doesn't return anything, you can't build a condition out of it
-        // TODO set commands might be relevant?
-        none()
+        match self {
+            Self::CurrentZone {} => one(UberIdentifier::CURRENT_ZONE),
+            Self::CurrentMapZone {} => one(UberIdentifier::CURRENT_MAP_ZONE),
+            Self::Constant { .. } | Self::Multi { .. } => none(),
+        }
     }
 }

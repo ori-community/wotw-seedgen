@@ -42,6 +42,8 @@ pub trait IntoConstant: Sized {
     fn into_constant(self) -> Result<Self::Output, Self>;
 }
 
+// TODO are the typed multis actually used anywhere?
+
 /// Command which returns [`bool`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 pub enum CommandBoolean {

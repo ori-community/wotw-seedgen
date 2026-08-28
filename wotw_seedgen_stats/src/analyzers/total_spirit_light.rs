@@ -1,7 +1,7 @@
 use super::Analyzer;
 use std::{cmp::Ordering, num::NonZeroUsize};
 use wotw_seedgen::{
-    data::seed_language::output::{CommonItem, ContainedWrites},
+    data::seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
     spoiler::SeedSpoiler,
 };
 
@@ -22,7 +22,13 @@ impl Analyzer for TotalSpiritLightStats {
             .preplacements
             .iter()
             .chain(seed.groups.iter().flat_map(|group| group.placements.iter()))
-            .flat_map(|placement| placement.item.command.contained_common_items())
+            .flat_map(|placement| {
+                placement
+                    .item
+                    .command
+                    .direct_contained_writes(&[])
+                    .common_items()
+            })
             .filter_map(|common_item| match common_item {
                 CommonItem::SpiritLight(amount) => Some(amount),
                 _ => None,

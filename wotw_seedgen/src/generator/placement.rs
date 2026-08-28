@@ -34,8 +34,8 @@ use wotw_seedgen_data::{
         compile,
         output::{
             postprocess, AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid,
-            CommandsOutput, Concatenator, ContainedWrites, Event, IntermediateOutput, IntoConstant,
-            Operation, Trigger, TriggerCondition,
+            CommandsOutput, Concatenator, ContainedWrites, ContainedWritesExt, Event,
+            IntermediateOutput, IntoConstant, Operation, Trigger, TriggerCondition,
         },
         simulate::{Simulate, Simulation},
     },
@@ -299,14 +299,17 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             self.spoiler.groups[self.step - 1]
                 .placements
                 .sort_unstable_by(|a, b| {
-                    match (
-                        a.item.command.contained_common_items().next(),
-                        b.item.command.contained_common_items().next(),
-                    ) {
+                    let a_commands = &self.worlds[a.target_world_index].output.commands;
+                    let mut a_common_items =
+                        a.item.command.contained_writes(a_commands).common_items();
+                    let b_commands = &self.worlds[b.target_world_index].output.commands;
+                    let mut b_common_items =
+                        b.item.command.contained_writes(b_commands).common_items();
+
+                    match (a_common_items.next(), b_common_items.next()) {
                         (None, None) => b.item.name.cmp(&a.item.name),
                         (Some(_), None) => Ordering::Greater,
                         (None, Some(_)) => Ordering::Less,
-                        // TODO spirit light amount ordering
                         (Some(a), Some(b)) => b.cmp(&a),
                     }
                 });
@@ -870,11 +873,12 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
         let log_capture = world.log_capture;
 
-        let mut item_pool = ItemPoolBuilder::new(&mut rng).with_log_capture(log_capture);
+        let mut item_pool =
+            ItemPoolBuilder::new(&mut rng, &output.commands).with_log_capture(log_capture);
 
         for (command, amount) in mem::take(&mut output.modifiers.item_pool_changes) {
             if amount >= 0 {
-                item_pool.add_amount(command.clone(), amount as usize);
+                item_pool.add_amount(command.clone(), amount as usize, &output.commands);
             } else {
                 item_pool.remove_amount(&command, (-amount) as usize);
             }
@@ -1019,10 +1023,10 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             command.simulate(&mut self.world, &self.output.commands);
         } else {
             self.world
-                .register_trigger(&mut trigger, self.output.commands.events.len());
+                .register_trigger(&mut trigger, self.output.commands.events().len());
         }
 
-        self.output.commands.events.push(Event { trigger, command });
+        self.output.commands.push_event(Event { trigger, command });
     }
 
     fn update_reached(&mut self) {
@@ -1493,7 +1497,9 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     {
         simulate(&command, &mut self.world, &self.output.commands);
 
-        self.output.commands.events.push(Event { trigger, command });
+        self.output
+            .commands
+            .push_event_without_registering_trigger(Event { trigger, command });
     }
 
     fn push_command(&mut self, trigger: Trigger, command: CommandVoid) {

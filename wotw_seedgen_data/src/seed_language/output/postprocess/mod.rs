@@ -19,10 +19,10 @@ use crate::{
     assets::{LocData, LocDataEntry},
     seed_language::output::{
         display::strip_invisible_characters,
-        item_metadata::{random_shop_description, DEFAULT_SHOP_PRICE},
+        item_metadata::{random_shop_description, single_item, DEFAULT_SHOP_PRICE},
         postprocess::price_noise::PriceNoise,
-        ClientEvent, CommandsOutput, ContainedWrites, IntoConstant, ItemMetadataRef,
-        TriggerCondition,
+        AsConstant, ClientEvent, CommandsOutput, ContainedWrites, ContainedWritesExt, IntoConstant,
+        ItemMetadataRef, TriggerCondition,
     },
     Position, ShopKind, UberIdentifier, Zone,
 };
@@ -276,13 +276,13 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
                 continue;
             }
 
-            let (name, matches) = self.find_metadata(events, world);
+            let matches = self.find_metadata(events, world);
 
             if let Some(uber_identifier) = shop_identifier {
                 self.generate_shop_defaults(
                     uber_identifier,
-                    name.clone(),
                     &matches,
+                    &world.output.commands,
                     price_noise,
                     rng,
                     &mut extra_events,
@@ -294,8 +294,8 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
                     next_spoiler_icon_id,
                     trigger,
                     map_position,
-                    name,
                     &matches,
+                    &world.output.commands,
                     &mut extra_events,
                 );
                 next_spoiler_icon_id += 1;
@@ -309,7 +309,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
         &self,
         events: &[&'output Event],
         origin_world: &WorldPostprocessor<'output, 'log>,
-    ) -> (CommandString, Vec<ItemMetadataRef<'output, 'output, 'log>>) {
+    ) -> MetadataMatches<'output, 'log> {
         let mut matches = vec![];
 
         let names = events.iter().filter_map(|event| {
@@ -326,7 +326,8 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
             matches.extend(
                 event
                     .command
-                    .contained_write_identifiers()
+                    .direct_contained_writes(&origin_world.output.commands.lookup)
+                    .identifiers()
                     .filter_map(UberIdentifier::as_multiworld)
                     .filter_map(|id| self.multiworld_lookup.get(&id))
                     .map(|multiworld_event| {
@@ -343,60 +344,55 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
 
         let name = multi_name(names);
 
-        (name, matches)
+        MetadataMatches { name, matches }
     }
 
     fn generate_shop_defaults(
         &self,
         uber_identifier: UberIdentifier,
-        name: CommandString,
-        matches: &[ItemMetadataRef<'_, '_, '_>],
+        matches: &MetadataMatches,
+        commands: &CommandsOutput,
         price_noise: &PriceNoise,
         rng: &mut Pcg64Mcg,
         extra_events: &mut Vec<Event>,
     ) {
-        if matches!(
-            uber_identifier.shop_kind(),
-            ShopKind::Opherlike | ShopKind::Map
-        ) {
-            let prices = matches
-                .iter()
-                .filter_map(ItemMetadataRef::try_force_shop_price);
+        let MetadataMatches { name, matches } = matches;
 
-            let mut price = multi_price(prices);
-            price_noise.add_noise(&mut price, rng);
+        let prices = matches
+            .iter()
+            .filter_map(|item_metadata| item_metadata.try_force_shop_price(commands));
 
-            extra_events.push(Event::on_spawn(CommandVoid::SetShopItemPrice {
+        let mut price = multi_price(prices);
+        price_noise.add_noise(&mut price, rng);
+
+        extra_events.push(Event::on_spawn(CommandVoid::SetShopItemPrice {
+            uber_identifier,
+            price,
+        }));
+
+        if uber_identifier.shop_kind() == ShopKind::Opherlike {
+            extra_events.push(Event::on_spawn(CommandVoid::SetShopItemName {
                 uber_identifier,
-                price,
+                name: name.clone(),
             }));
 
-            if uber_identifier.shop_kind() == ShopKind::Opherlike {
-                extra_events.push(Event::on_spawn(CommandVoid::SetShopItemName {
+            let description = single_item(matches.iter().filter_map(ItemMetadataRef::description))
+                .unwrap_or_else(|| random_shop_description(rng).into());
+
+            extra_events.push(Event::on_spawn(CommandVoid::SetShopItemDescription {
+                uber_identifier,
+                description,
+            }));
+
+            if let Some(icon) = single_item(
+                matches
+                    .iter()
+                    .filter_map(|item_metadata| item_metadata.try_force_icon(commands)),
+            ) {
+                extra_events.push(Event::on_spawn(CommandVoid::SetShopItemIcon {
                     uber_identifier,
-                    name,
+                    icon,
                 }));
-
-                let mut descriptions = matches.iter().filter_map(ItemMetadataRef::description);
-
-                let description = match (descriptions.next(), descriptions.next()) {
-                    (Some(description), None) => description,
-                    _ => random_shop_description(rng).into(),
-                };
-
-                extra_events.push(Event::on_spawn(CommandVoid::SetShopItemDescription {
-                    uber_identifier,
-                    description,
-                }));
-
-                let icon = matches.iter().find_map(ItemMetadataRef::try_force_icon);
-
-                if let Some(icon) = icon {
-                    extra_events.push(Event::on_spawn(CommandVoid::SetShopItemIcon {
-                        uber_identifier,
-                        icon,
-                    }));
-                }
             }
         }
     }
@@ -406,18 +402,22 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
         spoiler_icon_id: usize,
         trigger: &Trigger,
         map_position: Position,
-        name: CommandString,
-        matches: &[ItemMetadataRef<'_, '_, '_>],
+        matches: &MetadataMatches,
+        commands: &CommandsOutput,
         extra_events: &mut Vec<Event>,
     ) {
-        let icon = matches
-            .iter()
-            .find_map(ItemMetadataRef::try_force_map_icon)
-            .unwrap_or_default();
+        let MetadataMatches { name, matches } = matches;
 
-        let label = match name.into_constant() {
-            Ok(name) => strip_invisible_characters(&name).into(),
-            Err(name) => name,
+        let icon = single_item(
+            matches
+                .iter()
+                .filter_map(|item_metadata| item_metadata.try_force_map_icon(commands)),
+        )
+        .unwrap_or_default();
+
+        let label = match name.as_constant() {
+            Some(name) => strip_invisible_characters(name).into(),
+            None => name.clone(),
         };
 
         extra_events.push(Event::on_reload(CommandVoid::CreateSpoilerMapIcon {
@@ -564,7 +564,8 @@ impl<'output> MultiworldLookup<'output> {
                 } else {
                     for id in event
                         .command
-                        .contained_write_identifiers()
+                        .direct_contained_writes(&output.commands.lookup)
+                        .identifiers()
                         .filter_map(UberIdentifier::as_multiworld)
                     {
                         match unmatched_commands.entry(id) {
@@ -618,6 +619,11 @@ impl<'output> Deref for MultiworldLookup<'output> {
     fn deref(&self) -> &Self::Target {
         &self.inner
     }
+}
+
+struct MetadataMatches<'output, 'log> {
+    name: CommandString,
+    matches: Vec<ItemMetadataRef<'output, 'output, 'log>>,
 }
 
 // TODO maybe this adds stats tracking?

@@ -45,8 +45,9 @@ impl Seed {
 
         let mut context = CompileContext::new(placeholder_map);
 
-        context.compile_lookup(output.commands.lookup);
-        let events = context.compile_events(output.commands.events);
+        let (events, lookup) = output.commands.into_inner();
+        context.compile_lookup(lookup);
+        let events = context.compile_events(events);
 
         output.preload.tags.sort_unstable();
 

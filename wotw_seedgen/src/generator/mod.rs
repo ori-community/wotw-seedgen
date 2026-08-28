@@ -134,7 +134,7 @@ where
                         0,
                         world_settings,
                         uber_states,
-                        &mut output.commands.events,
+                        output.commands.events_mut(),
                     )
                     .with_perf_data(self.perf_data)
                     .with_log_capture(self.log_capture);

@@ -184,7 +184,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # let mut output = CommandsOutput::NONE;
     /// let mut world_settings = WorldSettings::default();
     /// world_settings.difficulty = Difficulty::Gorlek;
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, output.events_mut());
     /// world.store_shard(Shard::Vitality, true, &output);
     ///
     /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
@@ -219,7 +219,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, output.events_mut());
     /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
     /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
     ///
@@ -257,7 +257,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
-    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, &mut output.events);
+    /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, output.events_mut());
     /// assert_eq!(world.health_plant_drops(), 1.0);
     ///
     /// world.add_base_max_health(40, &output);

@@ -715,8 +715,7 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
             .global
             .output
             .commands
-            .events
-            .push(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
+            .push_event(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
 
         compiler.define_variable(self.toggle_identifier.data, UberStateAlias::regular(toggle));
         compiler.define_variable(timer_identifier.data, UberStateAlias::regular(timer));
@@ -1150,7 +1149,7 @@ impl<'source> Compile<'source> for ast::CommandOnlySimulation<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        let only_simulation_events_start = compiler.global.output.commands.events.len();
+        let only_simulation_events_start = compiler.global.output.commands.events().len();
 
         self.0.compile(compiler);
 
@@ -1159,7 +1158,7 @@ impl<'source> Compile<'source> for ast::CommandOnlySimulation<'source> {
             .output
             .modifiers
             .only_simulation_events
-            .push(only_simulation_events_start..compiler.global.output.commands.events.len());
+            .push(only_simulation_events_start..compiler.global.output.commands.events().len());
     }
 }
 

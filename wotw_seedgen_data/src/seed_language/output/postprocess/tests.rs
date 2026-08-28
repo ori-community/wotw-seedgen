@@ -156,7 +156,10 @@ fn test_postprocess<const N: usize>(commands: [CommandsOutput; N]) -> Vec<Placeh
 fn test_output(events: Vec<Event>) -> CommandsOutput {
     CommandsOutput {
         events,
-        lookup: vec![],
+        lookup: vec![CommandVoid::Multi {
+            commands: Vec::new(),
+        }],
+        ..CommandsOutput::NONE
     }
 }
 

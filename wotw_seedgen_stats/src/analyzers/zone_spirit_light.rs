@@ -2,7 +2,7 @@ use super::Analyzer;
 use std::num::NonZeroUsize;
 use wotw_seedgen::{
     data::{
-        seed_language::output::{CommonItem, ContainedWrites},
+        seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
         Zone,
     },
     spoiler::SeedSpoiler,
@@ -26,7 +26,13 @@ impl Analyzer for ZoneSpiritLightStats {
             .iter()
             .flat_map(|group| group.placements.iter())
             .filter(|placement| placement.location.zone == self.zone)
-            .flat_map(|placement| placement.item.command.contained_common_items())
+            .flat_map(|placement| {
+                placement
+                    .item
+                    .command
+                    .direct_contained_writes(&[])
+                    .common_items()
+            })
             .filter_map(|item| match item {
                 CommonItem::SpiritLight(amount) => Some(amount),
                 _ => None,

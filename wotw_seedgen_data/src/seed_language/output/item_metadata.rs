@@ -2,7 +2,7 @@ use crate::{
     seed_language::{
         output::{
             display::strip_invisible_characters, CommandInteger, CommandString, CommandVoid,
-            CommandsOutput, ContainedWrites, StringOrPlaceholder,
+            CommandsOutput, ContainedWrites, ContainedWritesExt, StringOrPlaceholder,
         },
         simulate::{Simulate, Simulation},
     },
@@ -71,7 +71,7 @@ impl ItemMetadataRef<'_, '_, '_> {
     pub fn try_force_name(&self) -> Option<CommandString> {
         self.name()
             .map(CommandString::from)
-            .or_else(|| self.command.contained_messages().next().cloned())
+            .or_else(|| single_item(self.command.contained_messages()).cloned())
     }
 
     /// Force some kind of name for the item.
@@ -104,11 +104,12 @@ impl ItemMetadataRef<'_, '_, '_> {
     ///
     /// If nothing is given by [`Self::shop_price`], tries to estimate the item's
     /// value based on its contents.
-    pub fn try_force_shop_price(&self) -> Option<CommandInteger> {
+    pub fn try_force_shop_price(&self, commands: &CommandsOutput) -> Option<CommandInteger> {
         self.shop_price().or_else(|| {
             let price = self
                 .command
-                .contained_common_write_identifiers()
+                .contained_writes(commands)
+                .common_identifiers()
                 .map(CommonUberIdentifier::shop_price)
                 .sum::<i32>();
 
@@ -146,16 +147,14 @@ impl ItemMetadataRef<'_, '_, '_> {
     ///
     /// If nothing is given by [`Self::icon`], tries to assign an icon based
     /// on the item's contents. May return `None` for unrecognized items.
-    pub fn try_force_icon(&self) -> Option<Icon> {
+    pub fn try_force_icon(&self, commands: &CommandsOutput) -> Option<Icon> {
         self.icon().or_else(|| {
-            let mut icons = self
-                .command
-                .contained_common_write_identifiers()
-                .filter_map(CommonUberIdentifier::icon);
-
-            let first = icons.next()?;
-            let unambiguous = icons.all(|other| first == other);
-            unambiguous.then_some(first)
+            single_item(
+                self.command
+                    .contained_writes(commands)
+                    .common_identifiers()
+                    .filter_map(CommonUberIdentifier::icon),
+            )
         })
     }
 
@@ -168,25 +167,26 @@ impl ItemMetadataRef<'_, '_, '_> {
     ///
     /// If nothing is given by [`Self::map_icon`], tries to assign a map icon based
     /// on the item's contents.
-    pub fn try_force_map_icon(&self) -> Option<MapIcon> {
+    pub fn try_force_map_icon(&self, commands: &CommandsOutput) -> Option<MapIcon> {
         self.map_icon().or_else(|| {
-            let mut common_write_identifiers = self
-                .command
-                .contained_common_write_identifiers()
-                .map(CommonUberIdentifier::map_icon);
-
-            let first = common_write_identifiers.next()?;
-            let unambiguous = common_write_identifiers.all(|other| first == other);
-            unambiguous.then_some(first)
+            single_item(
+                self.command
+                    .contained_writes(commands)
+                    .common_identifiers()
+                    .map(CommonUberIdentifier::map_icon),
+            )
         })
     }
+}
 
-    /// Force a map icon out of the item.
-    ///
-    /// If nothing is given by [`Self::try_force_map_icon`], returns [`MapIcon::default`]
-    pub fn force_map_icon(&self) -> MapIcon {
-        self.try_force_map_icon().unwrap_or_default()
-    }
+pub(crate) fn single_item<I, T>(mut iter: I) -> Option<T>
+where
+    I: Iterator<Item = T>,
+    T: PartialEq,
+{
+    let first = iter.next()?;
+    let unambiguous = iter.all(|other| first == other);
+    unambiguous.then_some(first)
 }
 
 // TODO cache computed metadata

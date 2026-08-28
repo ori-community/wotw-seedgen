@@ -1,49 +1,223 @@
-use std::fmt::{self, Display};
+use std::{
+    fmt::{self, Display},
+    slice,
+};
 
 use crate::{
     seed_language::output::{
-        ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid, Operation,
+        ArithmeticOperator, CommandBoolean, CommandFloat, CommandInteger, CommandVoid,
+        CommandsOutput, Operation,
     },
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
 use ordered_float::OrderedFloat;
+use rustc_hash::{FxBuildHasher, FxHashSet};
 use strum::EnumTryAs;
 
-use super::{none, some};
+pub trait ContainedWrites {
+    type Iter<'a>: Iterator<Item = UberStateWrite<'a>>
+    where
+        Self: 'a;
 
-fn nested<'a, T>(nested: &'a T) -> Box<dyn Iterator<Item = UberStateWrite<'a>> + 'a>
-where
-    T: ContainedWrites,
-{
-    Box::new(nested.contained_writes())
+    fn direct_contained_writes<'a>(&'a self, lookup: &'a [CommandVoid]) -> Self::Iter<'a>;
+
+    fn contained_writes<'a>(
+        &'a self,
+        commands: &'a CommandsOutput,
+    ) -> ContainedWritesIter<'a, Self::Iter<'a>> {
+        ContainedWritesIter::new(self.direct_contained_writes(&commands.lookup), commands)
+    }
 }
 
-pub trait ContainedWrites {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>>;
+impl ContainedWrites for CommandVoid {
+    type Iter<'a> = CommandVoidWrites<'a>;
 
-    fn contained_writes_owned(&self) -> impl Iterator<Item = UberStateWriteOwned> {
-        self.contained_writes().map(UberStateWriteOwned::new)
+    fn direct_contained_writes<'a>(&'a self, lookup: &'a [CommandVoid]) -> Self::Iter<'a> {
+        CommandVoidWrites::new(self, lookup)
+    }
+}
+
+pub struct CommandVoidWrites<'a> {
+    state: Vec<CommandVoidWritesState<'a>>,
+    lookup: &'a [CommandVoid],
+    visited_functions: FxHashSet<usize>,
+}
+
+impl<'a> CommandVoidWrites<'a> {
+    fn new(command: &'a CommandVoid, lookup: &'a [CommandVoid]) -> Self {
+        let mut visited_functions = FxHashSet::with_hasher(FxBuildHasher);
+        let state = CommandVoidWritesState::new(command, lookup, &mut visited_functions);
+
+        Self {
+            state: state.into_iter().collect(),
+            lookup,
+            visited_functions,
+        }
+    }
+}
+
+impl<'a> Iterator for CommandVoidWrites<'a> {
+    type Item = UberStateWrite<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            match self.state.last_mut()? {
+                CommandVoidWritesState::One(write) => {
+                    let write = write.clone();
+                    self.state.pop();
+                    return Some(write);
+                }
+                CommandVoidWritesState::Multi(nested) => {
+                    match nested.find_map(|command| {
+                        CommandVoidWritesState::new(
+                            command,
+                            self.lookup,
+                            &mut self.visited_functions,
+                        )
+                    }) {
+                        None => {
+                            self.state.pop();
+                        }
+                        Some(state) => self.state.push(state),
+                    }
+                }
+            }
+        }
+    }
+}
+
+enum CommandVoidWritesState<'a> {
+    One(UberStateWrite<'a>),
+    Multi(slice::Iter<'a, CommandVoid>),
+}
+
+impl<'a> CommandVoidWritesState<'a> {
+    fn new(
+        command: &'a CommandVoid,
+        lookup: &'a [CommandVoid],
+        visited_functions: &mut FxHashSet<usize>,
+    ) -> Option<Self> {
+        match command {
+            CommandVoid::Multi { commands } => Some(Self::Multi(commands.iter())),
+            CommandVoid::CallFunction { index, .. } => {
+                if visited_functions.insert(*index) {
+                    Self::new(&lookup[*index], lookup, visited_functions)
+                } else {
+                    None
+                }
+            }
+            CommandVoid::If { command, .. } => Self::new(command, lookup, visited_functions),
+            // TODO this might be fine for the current use case, but an exhaustive list would be safer
+            CommandVoid::StoreBoolean {
+                uber_identifier,
+                value,
+                ..
+            } => Some(Self::One(UberStateWrite {
+                uber_identifier: *uber_identifier,
+                command: WriteCommand::Boolean(value),
+            })),
+            CommandVoid::StoreInteger {
+                uber_identifier,
+                value,
+                ..
+            } => Some(Self::One(UberStateWrite {
+                uber_identifier: *uber_identifier,
+                command: WriteCommand::Integer(value),
+            })),
+            CommandVoid::StoreFloat {
+                uber_identifier,
+                value,
+                ..
+            } => Some(Self::One(UberStateWrite {
+                uber_identifier: *uber_identifier,
+                command: WriteCommand::Float(value),
+            })),
+            _ => None,
+        }
+    }
+}
+
+pub struct ContainedWritesIter<'a, I> {
+    inner: I,
+    in_progress: Vec<CommandVoidWrites<'a>>,
+    visited_events: FxHashSet<usize>,
+    commands: &'a CommandsOutput,
+}
+
+impl<'a, I> ContainedWritesIter<'a, I>
+where
+    I: Iterator<Item = UberStateWrite<'a>>,
+{
+    fn new(inner: I, commands: &'a CommandsOutput) -> Self {
+        Self {
+            inner,
+            in_progress: Vec::new(),
+            visited_events: FxHashSet::with_hasher(FxBuildHasher),
+            commands,
+        }
+    }
+}
+
+impl<'a, I> Iterator for ContainedWritesIter<'a, I>
+where
+    I: Iterator<Item = UberStateWrite<'a>>,
+{
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let next = loop {
+            match self.in_progress.last_mut() {
+                None => break self.inner.next()?,
+                Some(in_progress) => match in_progress.next() {
+                    None => {
+                        self.in_progress.pop();
+                    }
+                    Some(in_progress_next) => break in_progress_next,
+                },
+            }
+        };
+
+        if let Some(triggers) = self.commands.trigger_map.get(&next.uber_identifier) {
+            for &index in triggers {
+                if self.visited_events.insert(index) {
+                    self.in_progress.push(
+                        self.commands.events[index]
+                            .command
+                            .direct_contained_writes(&self.commands.lookup),
+                    );
+                }
+            }
+        }
+
+        Some(next)
+    }
+}
+
+pub trait ContainedWritesExt<'a>: Sized + IntoIterator<Item = UberStateWrite<'a>> {
+    fn owned(self) -> impl Iterator<Item = UberStateWriteOwned> {
+        self.into_iter().map(UberStateWriteOwned::new)
     }
 
-    fn contained_write_identifiers(&self) -> impl Iterator<Item = UberIdentifier> {
-        self.contained_writes().map(|write| write.uber_identifier)
+    fn identifiers(self) -> impl Iterator<Item = UberIdentifier> {
+        self.into_iter().map(|write| write.uber_identifier)
     }
 
-    fn contained_common_writes(&self) -> impl Iterator<Item = CommonUberStateWrite> {
-        self.contained_writes()
+    fn common(self) -> impl Iterator<Item = CommonUberStateWrite> {
+        self.into_iter()
             .filter_map(CommonUberStateWrite::from_write)
     }
 
-    fn contained_common_write_identifiers(&self) -> impl Iterator<Item = CommonUberIdentifier> {
-        self.contained_write_identifiers()
+    fn common_identifiers(self) -> impl Iterator<Item = CommonUberIdentifier> {
+        self.identifiers()
             .filter_map(CommonUberIdentifier::from_uber_identifier)
     }
 
-    fn contained_common_items(&self) -> impl Iterator<Item = CommonItem> {
-        self.contained_common_writes()
-            .filter_map(CommonItem::from_common_write)
+    fn common_items(self) -> impl Iterator<Item = CommonItem> {
+        self.common().filter_map(CommonItem::from_common_write)
     }
 }
+
+impl<'a, I> ContainedWritesExt<'a> for I where I: IntoIterator<Item = UberStateWrite<'a>> {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UberStateWriteGeneric<U, C> {
@@ -147,57 +321,10 @@ pub enum CommonItem {
     CleanWater,
 }
 
-impl<T: ContainedWrites> ContainedWrites for Vec<T> {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
-        self.iter().flat_map(T::contained_writes)
-    }
-}
-
-impl ContainedWrites for Vec<UberStateWriteOwned> {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
-        self.iter().map(UberStateWriteOwned::as_ref)
-    }
-}
-
-impl ContainedWrites for CommandVoid {
-    fn contained_writes(&self) -> impl Iterator<Item = UberStateWrite<'_>> {
-        match self {
-            CommandVoid::Multi { commands } => nested(commands),
-            // TODO Lookup could be relevant both here and in reads
-            // TODO this might be fine for the current use case, but an exhaustive list would be safer
-            CommandVoid::StoreBoolean {
-                uber_identifier,
-                value,
-                ..
-            } => some(UberStateWrite {
-                uber_identifier: *uber_identifier,
-                command: WriteCommand::Boolean(value),
-            }),
-            CommandVoid::StoreInteger {
-                uber_identifier,
-                value,
-                ..
-            } => some(UberStateWrite {
-                uber_identifier: *uber_identifier,
-                command: WriteCommand::Integer(value),
-            }),
-            CommandVoid::StoreFloat {
-                uber_identifier,
-                value,
-                ..
-            } => some(UberStateWrite {
-                uber_identifier: *uber_identifier,
-                command: WriteCommand::Float(value),
-            }),
-            _ => none(),
-        }
-    }
-}
-
 impl CommonUberStateWrite {
     pub fn from_write(write: UberStateWrite) -> Option<Self> {
         let uber_identifier = CommonUberIdentifier::from_uber_identifier(write.uber_identifier)?;
-        let command = CommonWriteCommand::from_write(&write)?;
+        let command = CommonWriteCommand::from_write(write)?;
 
         Some(Self {
             uber_identifier,
@@ -207,7 +334,7 @@ impl CommonUberStateWrite {
 }
 
 impl CommonWriteCommand {
-    pub fn from_write(write: &UberStateWrite) -> Option<Self> {
+    pub fn from_write(write: UberStateWrite) -> Option<Self> {
         match write.command {
             WriteCommand::Boolean(CommandBoolean::Constant { value: true }) => {
                 Some(CommonWriteCommand::SetBooleanTrue)

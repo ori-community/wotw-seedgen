@@ -52,7 +52,7 @@ impl<S: Simulation> Simulate<S> for ClientEvent {
 
     fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         output
-            .events
+            .events()
             .iter()
             .filter(|event| event.trigger == Trigger::ClientEvent(*self))
             .for_each(|event| {
@@ -431,7 +431,7 @@ fn process_triggers<S: Simulation>(
     // triggered commands modify states relevant to the conditions.
     let triggered_events = triggers
         .into_iter()
-        .map(|index| &output.events[index])
+        .map(|index| &output.events()[index])
         .filter(|event| match &event.trigger {
             Trigger::ClientEvent(_) => false,
             Trigger::Binding(_) => true,
