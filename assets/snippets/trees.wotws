@@ -71,7 +71,7 @@ on spawn store(itemTracker.treesRequired, trees_required)
 
 !augment_fun(write_short_goals_row(), {
     set_string("trees_message", "Trees: " + itemTracker.treesCount + "/" + trees_required)
-    if itemTracker.treesCount == trees_required set_string("trees_message", "$" + get_string("trees_message") + "$")
+    if itemTracker.treesCount >= trees_required set_string("trees_message", "$" + get_string("trees_message") + "$")
     add_row_item(get_string("trees_message"))
 })
 

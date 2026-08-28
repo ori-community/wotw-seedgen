@@ -45,7 +45,7 @@ on spawn store(itemTracker.wispsRequired, wisps_required)
 
 !augment_fun(write_short_goals_row(), {
     set_string("wisps_message", "Wisps: " + itemTracker.wispsCount + "/" + wisps_required)
-    if itemTracker.wispsCount == wisps_required set_string("wisps_message", "$" + get_string("wisps_message") + "$")
+    if itemTracker.wispsCount >= wisps_required set_string("wisps_message", "$" + get_string("wisps_message") + "$")
     add_row_item(get_string("wisps_message"))
 })
 

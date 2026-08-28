@@ -111,7 +111,7 @@ on spawn store(itemTracker.relicsRequired, total_relic_count)
 !augment_fun(write_progress_message(), {
     new_row("Relics (" + itemTracker.relicsCount + "/" + itemTracker.relicsRequired  + "): ")
     if itemTracker.relicsCount < itemTracker.relicsRequired write_unfinished_relic_progress()
-    if itemTracker.relicsCount == itemTracker.relicsRequired write_finished_relic_progress()
+    if itemTracker.relicsCount >= itemTracker.relicsRequired write_finished_relic_progress()
     add_row(get_string("row"))
 })
 

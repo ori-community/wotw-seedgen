@@ -71,7 +71,7 @@ on spawn store(itemTracker.questsRequired, quests_required)
 
 !augment_fun(write_short_goals_row(), {
     set_string("quests_message", "Quests: " + itemTracker.questsCount + "/" + quests_required)
-    if itemTracker.questsCount == quests_required set_string("quests_message", "$" + get_string("quests_message") + "$")
+    if itemTracker.questsCount >= quests_required set_string("quests_message", "$" + get_string("quests_message") + "$")
     add_row_item(get_string("quests_message"))
 })
 
