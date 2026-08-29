@@ -25,7 +25,7 @@ pub struct Metadata {
     /// Included snippets
     pub includes: Vec<String>,
     /// Available configuration
-    #[schema(value_type = FxHashMap<String, ConfigArg>)]
+    #[schema(value_type = FxHashMap<String, ConfigArg>, default = <FxHashMap<String, ConfigArg>>::default)]
     pub config: IndexMap<String, ConfigArg, FxBuildHasher>,
     /// Whether this snippet requires local files, preventing it from being inlined
     ///

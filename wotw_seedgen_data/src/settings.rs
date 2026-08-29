@@ -56,6 +56,9 @@ pub struct UniverseSettings {
     ///
     /// This should never be empty
     pub world_settings: Vec<WorldSettings>,
+    /// Additional inline snippets that don't exist on the filesystem
+    #[schema(value_type = FxHashMap<String, Source>, default = <FxHashMap<String, Source>>::default)]
+    pub inline_snippets: InlineSnippets,
 }
 
 impl UniverseSettings {
@@ -63,6 +66,7 @@ impl UniverseSettings {
         Self {
             seed,
             world_settings: vec![WorldSettings::default()],
+            inline_snippets: InlineSnippets::default(),
         }
     }
 
@@ -177,9 +181,6 @@ pub struct WorldSettings {
     pub randomize_entrances: Option<GreaterOneU8>,
     /// Names of snippets to use
     pub snippets: Vec<String>,
-    /// Additional inline snippets that don't exist on the filesystem
-    #[schema(value_type = FxHashMap<String, Source>)]
-    pub inline_snippets: InlineSnippets,
     /// Configuration to pass to snippets
     pub snippet_config: FxHashMap<String, FxHashMap<String, String>>,
 }
@@ -272,7 +273,6 @@ impl WorldSettings {
             hard: rng.gen_bool(0.25),
             randomize_entrances,
             snippets,
-            inline_snippets: InlineSnippets::default(),
             snippet_config,
         }
     }

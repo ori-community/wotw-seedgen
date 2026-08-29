@@ -8,7 +8,7 @@ use serde::Deserialize;
 use utoipa::{IntoParams, OpenApi};
 use wotw_seedgen::data::UniverseSettings;
 
-use crate::{RouterState, error::Result, settings::inline_universe_snippets};
+use crate::{RouterState, api::snippets, error::Result, settings::inline_universe_snippets};
 
 pub const TAG: &str = "universe";
 pub const UNIVERSE: &str = concat!("/", TAG);
@@ -46,6 +46,7 @@ pub struct NewQuery {
 #[utoipa::path(
     post,
     path = INLINE_SNIPPETS,
+    tag = snippets::TAG,
     responses(
         (status = OK, body = UniverseSettings),
         (status = UNPROCESSABLE_ENTITY, body = String),

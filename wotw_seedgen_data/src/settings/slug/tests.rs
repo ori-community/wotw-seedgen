@@ -4,7 +4,7 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 
 use crate::{
-    assets::{SnippetAccess, TEST_ASSETS},
+    assets::{InlineSnippets, SnippetAccess, TEST_ASSETS},
     UniverseSettings, WorldSettings,
 };
 
@@ -15,6 +15,7 @@ fn slugification() {
     let mut universe_settings = UniverseSettings {
         seed: String::new(),
         world_settings: Vec::with_capacity(1),
+        inline_snippets: InlineSnippets::default(),
     };
 
     let snippets = TEST_ASSETS.available_snippets_metadata();

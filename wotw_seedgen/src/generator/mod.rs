@@ -12,7 +12,7 @@ use crate::{generator::spoiler::SeedSpoiler, perf_data::PerfData, world::World};
 use log::{info, trace, warn};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
-use std::{iter, sync::LazyLock};
+use std::sync::LazyLock;
 use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
     env_or,
@@ -94,7 +94,7 @@ where
             .iter()
             .map(|world_settings| {
                 let snippet_access =
-                    ChainedSnippetAccess::new(&world_settings.inline_snippets, self.snippet_access);
+                    ChainedSnippetAccess::new(&self.settings.inline_snippets, self.snippet_access);
 
                 let compiler = Compiler::new(
                     &mut rng,
@@ -181,13 +181,10 @@ fn parse_snippets<'log>(
     world_settings: &WorldSettings,
     mut compiler: Compiler<'_, '_, 'log>,
 ) -> Result<IntermediateOutput<'log>, String> {
-    for identifier in iter::once("seed_core")
-        .chain(world_settings.inline_snippets.keys().map(String::as_str))
-        .chain(world_settings.snippets.iter().map(String::as_str))
-    {
-        compiler
-            .compile_snippet(identifier)
-            .map_err(|err| format!("Failed to read snippet \"{identifier}\": {err}"))?;
+    compiler.compile_snippet("seed_core")?;
+
+    for identifier in &world_settings.snippets {
+        compiler.compile_snippet(identifier)?;
     }
 
     compiler

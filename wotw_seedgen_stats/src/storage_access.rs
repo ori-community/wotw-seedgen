@@ -1,7 +1,7 @@
 use crate::Result;
 use wotw_seedgen::{
     data::{
-        assets::{self, SEEDGEN_USER_DATA_DIR},
+        assets::{self, InlineSnippets, SEEDGEN_USER_DATA_DIR},
         UniverseSettings,
     },
     spoiler::SeedSpoiler,
@@ -72,6 +72,7 @@ impl SeedStorageAccess for FileAccess {
                 let settings = UniverseSettings {
                     seed,
                     world_settings: settings.world_settings.clone(),
+                    inline_snippets: InlineSnippets::default(),
                 };
 
                 let current = f(&settings);
