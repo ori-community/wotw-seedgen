@@ -1,31 +1,31 @@
 use crate::{Result, Seed, FORMAT_VERSION};
-use std::io::{Cursor, Seek, Write};
+use std::{
+    io::{Cursor, Seek, Write},
+    sync::LazyLock,
+};
+use wotw_seedgen_data::env_or;
 use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
-impl Seed {
-    pub fn package<W: Write + Seek>(&self, obj: &mut W, compress: bool) -> Result<()> {
-        let f = if compress {
-            Package::append_compressed
-        } else {
-            Package::append
-        };
+/// Zstd compression level up to 22
+///
+/// Some candidates from testing on It's Dangerous to go Alone:
+/// - level 22 takes ~1.53s
+/// - level 19 takes ~0.60s but adds ~0.8% assembly size
+/// - level 15 takes ~0.09s but adds ~8.3% assembly size
+/// - level 9 takes ~0.017s but adds ~15% assembly size
+/// - level 4 takes ~0.004s but adds ~47% assembly size
+static WOTWS_COMPRESSION_LEVEL: LazyLock<i64> =
+    LazyLock::new(|| env_or("WOTWS_COMPRESSION_LEVEL", 9));
 
+impl Seed {
+    pub fn package<W: Write + Seek>(&self, obj: &mut W) -> Result<()> {
         let mut package = Package::new(obj)?;
 
-        package.append("preload.json", serde_json::to_vec(&self.preload)?)?;
-
-        f(
-            &mut package,
-            "assembly.json",
-            serde_json::to_vec(&self.assembly)?,
-        )?;
+        package.append_compressed("preload.json", serde_json::to_vec(&self.preload)?)?;
+        package.append_compressed("assembly.json", serde_json::to_vec(&self.assembly)?)?;
 
         if let Some(seedgen_info) = &self.seedgen_info {
-            f(
-                &mut package,
-                "seedgen_info.json",
-                serde_json::to_vec(seedgen_info)?,
-            )?;
+            package.append_compressed("seedgen_info.json", serde_json::to_vec(seedgen_info)?)?;
         }
 
         for (path, data) in &self.assets {
@@ -36,10 +36,10 @@ impl Seed {
         Ok(())
     }
 
-    pub fn package_into_bytes(&self, compress: bool) -> Vec<u8> {
+    pub fn package_into_bytes(&self) -> Vec<u8> {
         let mut bytes = Cursor::new(Vec::new());
         // Write into bytes shouldn't fail
-        self.package(&mut bytes, compress).unwrap();
+        self.package(&mut bytes).unwrap();
         bytes.into_inner()
     }
 }
@@ -54,13 +54,7 @@ impl<W: Write + Seek> Package<'_, W> {
         let zip = ZipWriter::new(obj);
         let options = FileOptions::default()
             .compression_method(CompressionMethod::Zstd)
-            // Some candidates from testing on It's Dangerous to go Alone:
-            // - level 22 (max) takes ~1.53s
-            // - level 19 takes ~0.60s but adds ~0.8% assembly size
-            // - level 15 takes ~0.09s but adds ~8.3% assembly size
-            // - level 9 takes ~0.017s but adds ~15% assembly size
-            // - level 4 takes ~0.004s but adds ~47% assembly size
-            .compression_level(Some(9));
+            .compression_level(Some(*WOTWS_COMPRESSION_LEVEL));
 
         let mut package = Self { zip, options };
         package.append("format_version.txt", FORMAT_VERSION)?;

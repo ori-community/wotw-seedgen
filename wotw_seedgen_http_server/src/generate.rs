@@ -36,7 +36,7 @@ pub fn generate(
     let worlds = universe
         .worlds
         .into_iter()
-        .map(|seed| Ok(ciborium::Value::Bytes(seed.package_into_bytes(true))))
+        .map(|seed| Ok(ciborium::Value::Bytes(seed.package_into_bytes())))
         .collect::<Result<Vec<_>>>()?;
 
     let json_spoiler = json_spoiler

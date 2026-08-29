@@ -54,7 +54,7 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let path = write_seed(seed_universe, name, generation_args)?;
 
     eprintln!(
-        "Generated seed in {:.1}s to \"{}\"",
+        "Generated seed in {:.2}s to \"{}\"",
         start.elapsed().as_secs_f32(),
         path.display()
     );
@@ -91,7 +91,10 @@ pub fn write_seed(
 ) -> Result<PathBuf, Error> {
     let GenerationArgs {
         json_spoiler,
-        compile_args: CompileArgs { debug, launch_args },
+        compile_args: CompileArgs {
+            debug: _,
+            launch_args,
+        },
     } = generation_args;
 
     let seeds_dir = SEEDGEN_USER_DATA_DIR.join("seeds");
@@ -101,7 +104,7 @@ pub fn write_seed(
         let (mut file, path) = create_unique_file(seeds_dir, name, ".wotwr")?;
         let seed = seed_universe.worlds.into_iter().next().unwrap();
         // TODO BufWriter needed on packages to file?
-        seed.package(&mut file, !debug)?;
+        seed.package(&mut file)?;
 
         launch_seed(&path, launch_args)?;
 
@@ -118,7 +121,7 @@ pub fn write_seed(
         for (index, seed) in seed_universe.worlds.into_iter().enumerate() {
             let path = path.join(format!("world_{index}.wotwr"));
             let mut file = assets::file_create(&path)?;
-            seed.package(&mut file, !debug)?;
+            seed.package(&mut file)?;
         }
 
         write_spoiler(path.join("spoiler"), seed_universe.spoiler, json_spoiler)?;

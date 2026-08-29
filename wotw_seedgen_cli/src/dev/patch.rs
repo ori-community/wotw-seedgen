@@ -41,7 +41,7 @@ pub fn patch(args: PatchArgs) -> Result<(), Error> {
         let seed = seed_universe.worlds.into_iter().next().unwrap();
         // TODO BufWriter needed on packages to file?
         let mut file = assets::file_create(&path)?;
-        seed.package(&mut file, !debug)?;
+        seed.package(&mut file)?;
 
         launch_seed(&path, launch_args)?;
     } else {
@@ -50,7 +50,7 @@ pub fn patch(args: PatchArgs) -> Result<(), Error> {
         for (index, seed) in seed_universe.worlds.into_iter().enumerate() {
             let path = parent.join(format!("world_{index}.wotwr"));
             let mut file = assets::file_create(&path)?;
-            seed.package(&mut file, !debug)?;
+            seed.package(&mut file)?;
         }
     }
 

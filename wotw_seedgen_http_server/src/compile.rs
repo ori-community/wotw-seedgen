@@ -91,7 +91,7 @@ pub fn compile(
         let seed = Seed::new(output, placeholder_map, debug);
 
         let output = CompileOutput {
-            seed: ciborium::Value::Bytes(seed.package_into_bytes(!debug)),
+            seed: ciborium::Value::Bytes(seed.package_into_bytes()),
             logs: log_capture.finish(),
         };
 

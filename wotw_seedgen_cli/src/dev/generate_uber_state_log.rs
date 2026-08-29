@@ -67,7 +67,7 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
 
     let out = SEEDGEN_USER_DATA_DIR.join("uber_state_log.wotwr");
     let mut file = assets::file_create(&out)?;
-    seed.package(&mut file, true)?;
+    seed.package(&mut file)?;
 
     launch_seed(&out, args)?;
 

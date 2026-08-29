@@ -53,7 +53,7 @@ pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
         None
     };
 
-    eprint!("Regenerated seed in {:.1}s", start.elapsed().as_secs_f32());
+    eprint!("Regenerated seed in {:.2}s", start.elapsed().as_secs_f32());
 
     if let Some(path) = path {
         eprint!(" to \"{}\"", path.display());

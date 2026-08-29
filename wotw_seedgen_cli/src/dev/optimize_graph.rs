@@ -19,7 +19,7 @@ pub fn optimize_graph(args: OptimizeGraphArgs) -> Result<(), Error> {
 
     println!("{}", graph.decompile());
 
-    eprintln!("Optimized graph in {:.1}s", start.elapsed().as_secs_f32());
+    eprintln!("Optimized graph in {:.2}s", start.elapsed().as_secs_f32());
 
     Ok(())
 }

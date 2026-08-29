@@ -142,7 +142,7 @@ fn compile(
     let seed = Seed::new(output, placeholder_map, debug);
 
     let mut file = assets::file_create(out)?;
-    seed.package(&mut file, !debug)?;
+    seed.package(&mut file)?;
 
     eprintln!(
         "compiled in {:.2}s to \"{}\"",
