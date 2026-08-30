@@ -57,6 +57,7 @@ pub struct UniverseSettings {
     /// This should never be empty
     pub world_settings: Vec<WorldSettings>,
     /// Additional inline snippets that don't exist on the filesystem
+    #[serde(default, skip_serializing_if = "FxHashMap::is_empty")]
     #[schema(value_type = FxHashMap<String, Source>, default = <FxHashMap<String, Source>>::default)]
     pub inline_snippets: InlineSnippets,
 }
