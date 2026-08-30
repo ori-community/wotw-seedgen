@@ -4731,7 +4731,7 @@ anchor GladesTown.BuiltMotayHut at -394, -4135: # In front of the house hovering
       GladesTown.BlueMoon, Grapple, DoubleJump, TripleJump
 
   conn GladesTown.MotayHutDoor:
-    GladesTown.BuildHuts
+    moki: GladesTown.BuildHuts
   conn GladesTown.West:
     moki: GladesTown.BuildHuts OR GladesTown.Lightcatchers # either the hut platform or the platform from the hanging lantern below
     unsafe: free
@@ -15638,6 +15638,7 @@ anchor UpperWastes.OuterRuinsTP at 2044, -3679:  # Left of the teleporter, on to
   refill Full
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
+  conn Teleporters: free
 
   quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
     gorlek:
