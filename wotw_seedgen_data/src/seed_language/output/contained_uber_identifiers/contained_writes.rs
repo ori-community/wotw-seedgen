@@ -414,4 +414,30 @@ impl CommonItem {
             _ => None,
         }
     }
+
+    pub fn log_name(&self) -> CommonItemLogName<'_> {
+        CommonItemLogName { inner: self }
+    }
+}
+
+pub struct CommonItemLogName<'a> {
+    inner: &'a CommonItem,
+}
+
+impl Display for CommonItemLogName<'_> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.inner {
+            CommonItem::SpiritLight(amount) => write!(f, "{amount} Spirit Light"),
+            CommonItem::HealthFragment => f.write_str("Health Fragment"),
+            CommonItem::EnergyFragment => f.write_str("Energy Fragment"),
+            CommonItem::GorlekOre => f.write_str("Gorlek Ore"),
+            CommonItem::Keystone => f.write_str("Keystone"),
+            CommonItem::ShardSlot => f.write_str("Shard Slot"),
+            CommonItem::WeaponUpgrade(weapon_upgrade) => weapon_upgrade.fmt(f),
+            CommonItem::Shard(shard) => shard.fmt(f),
+            CommonItem::Teleporter(teleporter) => teleporter.display::<true>().fmt(f),
+            CommonItem::Skill(skill) => skill.fmt(f),
+            CommonItem::CleanWater => f.write_str("Clean Water"),
+        }
+    }
 }

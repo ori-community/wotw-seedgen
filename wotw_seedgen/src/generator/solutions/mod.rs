@@ -34,7 +34,9 @@ use wotw_seedgen_data::{
     env_or,
     logic_language::output::{Connection, Graph, Node, Requirement},
     seed_language::{
-        output::{CommandVoid, CommandsOutput, CommonWriteCommand, UberStateWrite},
+        output::{
+            CommandVoid, CommandsOutput, CommonWriteCommand, IntermediateOutput, UberStateWrite,
+        },
         simulate::{Simulate, Simulation, Snapshot},
     },
     Difficulty, EqIgnore, Shard, Skill, UberIdentifier,
@@ -140,6 +142,14 @@ impl<'graph> Solution<'graph> {
         }
     }
 
+    pub fn display<'pool, 'output, 'solution, 'log>(
+        &'solution self,
+        item_pool: &'pool ItemPool<'log>,
+        output: &'output IntermediateOutput<'log>,
+    ) -> DisplaySolution<'graph, 'pool, 'output, 'solution, 'log> {
+        DisplaySolution::new(self, item_pool, output, None)
+    }
+
     /// Dissolves the solutions into its items and spirit light, preventing later continuation
     pub fn into_inner(self) -> (SolutionItems, i32) {
         (self.inner.used_items, self.inner.spirit_light)
@@ -171,12 +181,13 @@ pub trait SolutionLike<'graph> {
             && other.spirit_light() <= self.spirit_light()
     }
 
-    fn display<'pool, 'solution, 'log>(
+    fn display<'pool, 'output, 'solution, 'log>(
         &'solution self,
         item_pool: &'pool ItemPool<'log>,
-        graph: Option<&'graph Graph>,
-    ) -> DisplaySolution<'graph, 'pool, 'solution, 'log> {
-        DisplaySolution::new(self, item_pool, graph)
+        output: &'output IntermediateOutput<'log>,
+        graph: &'graph Graph,
+    ) -> DisplaySolution<'graph, 'pool, 'output, 'solution, 'log> {
+        DisplaySolution::new(self, item_pool, output, Some(graph))
     }
 }
 
@@ -194,17 +205,21 @@ impl<'graph> SolutionLike<'graph> for Solution<'_> {
     }
 }
 
-pub struct DisplaySolution<'graph, 'pool, 'solution, 'log> {
+pub struct DisplaySolution<'graph, 'pool, 'output, 'solution, 'log> {
     connection: Option<(&'solution ConnectionIndex<'graph>, &'graph Graph)>,
     items: &'solution SolutionItems,
     spirit_light: i32,
     item_pool: &'pool ItemPool<'log>,
+    output: &'output IntermediateOutput<'log>,
 }
 
-impl<'graph, 'pool, 'solution, 'log> DisplaySolution<'graph, 'pool, 'solution, 'log> {
+impl<'graph, 'pool, 'output, 'solution, 'log>
+    DisplaySolution<'graph, 'pool, 'output, 'solution, 'log>
+{
     fn new<S: SolutionLike<'graph> + ?Sized>(
         solution: &'solution S,
         item_pool: &'pool ItemPool<'log>,
+        output: &'output IntermediateOutput<'log>,
         graph: Option<&'graph Graph>,
     ) -> Self {
         Self {
@@ -212,11 +227,12 @@ impl<'graph, 'pool, 'solution, 'log> DisplaySolution<'graph, 'pool, 'solution, '
             items: solution.items(),
             spirit_light: solution.spirit_light(),
             item_pool,
+            output,
         }
     }
 }
 
-impl Display for DisplaySolution<'_, '_, '_, '_> {
+impl Display for DisplaySolution<'_, '_, '_, '_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some((connection, graph)) = &self.connection {
             write!(f, "{} / ", connection.display(graph))?;
@@ -248,7 +264,12 @@ impl Display for DisplaySolution<'_, '_, '_, '_> {
                     f(&format_args!("{count} "))?;
                 }
 
-                f(&item.log_display())
+                f(&self
+                    .output
+                    .modifiers
+                    .item_metadata
+                    .get(item)
+                    .log_name(&self.output.commands))
             })
             .fmt(f)
     }
@@ -259,7 +280,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         &mut self,
         item_pool: &ItemPool<'log>,
         available_spirit_light: i32,
-        output: &CommandsOutput,
+        output: &IntermediateOutput<'log>,
         slots: usize,
         spirit_light_slots: usize,
         search_radius: Option<u8>,
@@ -299,7 +320,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
                     "insufficient solution max items {solution_max_items}, needed at least {min_max_items} for {min_solution}",
                     solution_max_items = *SOLUTION_MAX_ITEMS,
                     min_max_items = min_solution.inner.used_items.len(),
-                    min_solution = min_solution.display(item_pool, None)
+                    min_solution = min_solution.display(item_pool, output)
                 );
             }
         }
@@ -311,7 +332,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         &mut self,
         item_pool: &ItemPool<'log>,
         available_spirit_light: i32,
-        output: &CommandsOutput,
+        output: &IntermediateOutput<'log>,
         slots: usize,
         spirit_light_slots: usize,
         search_radius: Option<u8>,
@@ -360,7 +381,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         mut solution: Solution<'graph>,
         item_pool: &ItemPool<'log>,
         available_spirit_light: i32,
-        output: &CommandsOutput,
+        output: &IntermediateOutput<'log>,
         slots: usize,
         spirit_light_slots: usize,
     ) -> Vec<Solution<'graph>> {
@@ -518,7 +539,7 @@ impl Commitments {
 
 struct SolutionContext<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log> {
     world: &'world mut World<'graph, 'settings, 'perf, 'log>,
-    output: &'output CommandsOutput,
+    output: &'output IntermediateOutput<'log>,
     item_pool: &'pool ItemPool<'log>,
     available_spirit_light: i32,
     slots: usize,
@@ -536,7 +557,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
 {
     fn new(
         world: &'world mut World<'graph, 'settings, 'perf, 'log>,
-        output: &'output CommandsOutput,
+        output: &'output IntermediateOutput<'log>,
         item_pool: &'pool ItemPool<'log>,
         available_spirit_light: i32,
         slots: usize,
@@ -568,7 +589,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "starting solve for {}",
-            self.display_solution(&solution)
+            self.display_partial_solution(&solution)
         );
 
         self.world.snapshot();
@@ -582,13 +603,13 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "resuming solve for {}",
-            self.display_solution(&solution)
+            self.display_partial_solution(&solution)
         );
 
         self.world.snapshot();
 
         self.world
-            .simulate_solution(&solution, self.item_pool, self.output);
+            .simulate_solution(&solution, self.item_pool, &self.output.commands);
 
         trace!(
             logger: self.item_pool.log_capture,
@@ -629,7 +650,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "solving connection {solution}",
-            solution = self.display_solution(&solution)
+            solution = self.display_partial_solution(&solution)
         );
 
         if self.world.has_reached(connection.to) {
@@ -693,15 +714,33 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         );
 
         self.solutions.retain(|solution| {
-            !trace_is_redundant_with(solution, &finished, self.world.graph, self.item_pool)
+            !trace_is_redundant_with(
+                solution,
+                &finished,
+                self.world.graph,
+                self.item_pool,
+                self.output,
+            )
         });
 
         self.aborted.retain(|other| {
-            !trace_is_redundant_with(other, &finished, self.world.graph, self.item_pool)
+            !trace_is_redundant_with(
+                other,
+                &finished,
+                self.world.graph,
+                self.item_pool,
+                self.output,
+            )
         });
 
         self.finished.retain(|other| {
-            !trace_is_redundant_with(other, &finished, self.world.graph, self.item_pool)
+            !trace_is_redundant_with(
+                other,
+                &finished,
+                self.world.graph,
+                self.item_pool,
+                self.output,
+            )
         });
 
         self.finished.push(finished);
@@ -716,16 +755,26 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             aborted = self.display_solution(&aborted),
         );
 
-        if self
-            .aborted
-            .iter()
-            .any(|other| trace_is_redundant_with(&aborted, other, self.world.graph, self.item_pool))
-        {
+        if self.aborted.iter().any(|other| {
+            trace_is_redundant_with(
+                &aborted,
+                other,
+                self.world.graph,
+                self.item_pool,
+                self.output,
+            )
+        }) {
             return;
         }
 
         self.aborted.retain(|other| {
-            !trace_is_redundant_with(other, &aborted, self.world.graph, self.item_pool)
+            !trace_is_redundant_with(
+                other,
+                &aborted,
+                self.world.graph,
+                self.item_pool,
+                self.output,
+            )
         });
 
         self.aborted.push(aborted);
@@ -745,7 +794,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "continuing solution {}",
-            self.display_solution(&solution)
+            self.display_partial_solution(&solution)
         );
 
         let mut new_solutions =
@@ -857,7 +906,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "pausing solution {}",
-            self.display_solution(&solution)
+            self.display_partial_solution(&solution)
         );
 
         self.solutions.push_back(solution);
@@ -872,7 +921,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "solving {missing} for {solution}",
-            solution = self.display_solution(&solution)
+            solution = self.display_partial_solution(&solution)
         );
 
         match missing {
@@ -1332,7 +1381,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "progressed {uber_identifier} for {solution}",
-            solution = self.display_solution(&solution),
+            solution = self.display_partial_solution(&solution),
         );
 
         ControlFlow::Continue(solution)
@@ -1351,7 +1400,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         solution.remaining_items.remove(&index);
 
         if simulate {
-            self.item_pool[index].simulate(self.world, self.output);
+            self.item_pool[index].simulate(self.world, &self.output.commands);
         }
 
         ControlFlow::Continue(())
@@ -1485,7 +1534,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "progressed {uber_identifier} for {solution}",
-            solution = self.display_solution(&solution),
+            solution = self.display_partial_solution(&solution),
         );
 
         ControlFlow::Continue(solution)
@@ -1508,7 +1557,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         if simulate {
             // TODO maybe queue up changes to have fewer reach refreshes?
             for index in items {
-                self.item_pool[index].simulate(self.world, self.output);
+                self.item_pool[index].simulate(self.world, &self.output.commands);
             }
         }
 
@@ -1622,7 +1671,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         self.check_redundancy(solution)?;
 
         if simulate {
-            self.world.add_spirit_light(amount, self.output);
+            self.world.add_spirit_light(amount, &self.output.commands);
         }
 
         ControlFlow::Continue(())
@@ -1630,7 +1679,13 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
 
     fn check_redundancy(&self, solution: &PartialSolution) -> ControlFlow<()> {
         if self.finished.iter().any(|finished| {
-            trace_is_redundant_with(solution, finished, self.world.graph, self.item_pool)
+            trace_is_redundant_with(
+                solution,
+                finished,
+                self.world.graph,
+                self.item_pool,
+                self.output,
+            )
         }) {
             ControlFlow::Break(())
         } else {
@@ -1648,11 +1703,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
                 trace!(
                     logger: self.item_pool.log_capture,
                     "verifying solution {solution}",
-                    solution = solution.display(self.item_pool, None)
+                    solution = solution.display(self.item_pool, self.output)
                 );
 
                 self.world
-                    .simulate_solution(solution, self.item_pool, self.output);
+                    .simulate_solution(solution, self.item_pool, &self.output.commands);
 
                 let new_reached = self.world.reached_pickup_count() - self.initial_pickup_count;
 
@@ -1661,7 +1716,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
                 assert_eq!(
                     new_reached, solution.new_reached,
                     "solution {solution} reported {solution_new_reached} new reached but actually reaches {new_reached} for world with {world}",
-                    solution = solution.display(self.item_pool, None),
+                    solution = solution.display(self.item_pool, self.output),
                     solution_new_reached = solution.new_reached,
                     world = self.world.inventory_display(),
                 );
@@ -1686,11 +1741,18 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         self.finished
     }
 
-    fn display_solution<'context, 'solution, S: SolutionLike<'graph>>(
+    fn display_solution<'context, 'solution>(
         &'context self,
-        solution: &'solution S,
-    ) -> DisplaySolution<'graph, 'pool, 'solution, 'log> {
-        solution.display(self.item_pool, Some(self.world.graph))
+        solution: &'solution Solution<'graph>,
+    ) -> DisplaySolution<'graph, 'pool, 'output, 'solution, 'log> {
+        solution.display(self.item_pool, self.output)
+    }
+
+    fn display_partial_solution<'context, 'solution>(
+        &'context self,
+        solution: &'solution PartialSolution<'graph>,
+    ) -> DisplaySolution<'graph, 'pool, 'output, 'solution, 'log> {
+        solution.display(self.item_pool, self.output, self.world.graph)
     }
 }
 
@@ -1706,6 +1768,7 @@ fn trace_is_redundant_with<'graph, S: SolutionLike<'graph>, O: SolutionLike<'gra
     other: &O,
     graph: &'graph Graph,
     item_pool: &ItemPool,
+    output: &IntermediateOutput,
 ) -> bool {
     let is_redundant = solution.is_redundant_with(other);
 
@@ -1713,8 +1776,8 @@ fn trace_is_redundant_with<'graph, S: SolutionLike<'graph>, O: SolutionLike<'gra
         trace!(
             logger: item_pool.log_capture,
             "{solution} is redundant with {other}",
-            solution = solution.display(item_pool, Some(graph)),
-            other = other.display(item_pool, Some(graph)),
+            solution = solution.display(item_pool, output, graph),
+            other = other.display(item_pool, output, graph),
         );
     }
 

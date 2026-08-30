@@ -1,4 +1,4 @@
-use crate::seed_language::output::{AsConstant, TriggerCondition};
+use crate::seed_language::output::TriggerCondition;
 
 use super::{
     intermediate::Literal, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
@@ -464,10 +464,6 @@ impl Display for CommandVoid {
 }
 
 impl CommandVoid {
-    pub fn log_display(&self) -> CommandVoidLogDisplay<'_> {
-        CommandVoidLogDisplay { command: self }
-    }
-
     pub fn contained_messages(&self) -> Box<dyn Iterator<Item = &CommandString> + '_> {
         match self {
             CommandVoid::Multi { commands } => {
@@ -488,34 +484,6 @@ impl CommandVoid {
             CommandVoid::QueuedMessage { message, .. }
             | CommandVoid::FreeMessage { message, .. } => Box::new(iter::once(message)),
             _ => Box::new(iter::empty()),
-        }
-    }
-}
-
-pub struct CommandVoidLogDisplay<'s> {
-    command: &'s CommandVoid,
-}
-
-impl Display for CommandVoidLogDisplay<'_> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mut messages = self
-            .command
-            .contained_messages()
-            .filter_map(CommandString::as_constant)
-            .map(String::as_str)
-            .map(strip_invisible_characters);
-
-        match messages.next() {
-            None => self.command.fmt(f),
-            Some(first) => {
-                first.fmt(f)?;
-
-                for message in messages {
-                    write!(f, ", {message}")?;
-                }
-
-                Ok(())
-            }
         }
     }
 }

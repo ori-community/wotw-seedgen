@@ -4,7 +4,7 @@ use super::{
 use crate::{
     generator::{
         entrances::generate_entrances,
-        solutions::{solution_weights, Solution, SolutionLike, SOLUTION_MAX_ITEMS},
+        solutions::{solution_weights, Solution, SOLUTION_MAX_ITEMS},
         spawn,
     },
     item_pool::ItemPoolBuilder,
@@ -13,10 +13,7 @@ use crate::{
     Generator, World,
 };
 use itertools::Itertools;
-use log::{
-    log_enabled, trace, warn,
-    Level::{Trace, Warn},
-};
+use log::{log_enabled, trace, warn, Level::Trace};
 use rand::{
     distributions::{Uniform, WeightedIndex},
     prelude::Distribution,
@@ -372,12 +369,14 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 world_context.log_index
             );
 
+            let world_context = &mut self.worlds[world_index];
             let keystone = compile::keystone();
 
-            if !self.worlds[world_index]
-                .item_pool
-                .find_remove_amount(&keystone, missing_keystones)
-            {
+            if !world_context.item_pool.find_remove_amount(
+                &keystone,
+                missing_keystones,
+                &world_context.output,
+            ) {
                 // TODO but this breaks the expected spirit light placements...
                 warn!(logger: self.log_capture, "Not enough keystones in the item pool for forced keystone progression, placing anyway");
             }
@@ -504,7 +503,10 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
         let item = target_world
             .item_pool
-            .choose_random()
+            .choose_random(
+                &target_world.output.modifiers.item_metadata,
+                &target_world.output.commands,
+            )
             .unwrap_or_else(|| target_world.backup_gorlek_ore());
 
         self.place_command_at(item, pickup, origin_world_index, target_world_index, false);
@@ -722,9 +724,9 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     ) {
         trace!(
             logger: self.log_capture,
-            "Placing {forced}{target_index}{log_name} at {origin_index}{pickup}",
+            "Placing {forced}{target_index}{name} at {origin_index}{pickup}",
             forced = if mark_forced { "forced " } else { "" },
-            log_name = self.worlds[target_world_index].log_name(&command),
+            name = self.worlds[target_world_index].log_name(&command),
             target_index = self.worlds[target_world_index].log_index,
             origin_index = self.worlds[origin_world_index].log_index,
             pickup = pickup.identifier,
@@ -880,7 +882,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             if amount >= 0 {
                 item_pool.add_amount(command.clone(), amount as usize, &output.commands);
             } else {
-                item_pool.remove_amount(&command, (-amount) as usize);
+                item_pool.remove_amount(&command, (-amount) as usize, &output);
             }
         }
 
@@ -959,14 +961,12 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             });
 
             let Some(pickup_index) = pickup_indices.pop() else {
-                if log_enabled!(logger: self.item_pool.log_capture, Warn) {
-                    let name = self.log_name(&command);
-                    warn!(
-                        logger: self.item_pool.log_capture,
-                        "{}Failed to preplace {name} in {zone} since no free placement location was available",
-                        self.log_index
-                    );
-                }
+                warn!(
+                    logger: self.item_pool.log_capture,
+                    "{index}Failed to preplace {name} in {zone} since no free placement location was available",
+                    index = self.log_index,
+                    name = self.log_name(&command),
+                );
 
                 continue;
             };
@@ -980,17 +980,12 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         let command = compile::spirit_light(1.into(), &mut self.rng);
 
         match self.needs_placement.pop() {
-            None => {
-                if log_enabled!(logger: self.item_pool.log_capture, Warn) {
-                    let name = self.log_name(&command);
-
-                    warn!(
-                        logger: self.item_pool.log_capture,
-                        "{}Failed to preplace {name} since no free placement location was available",
-                        self.log_index
-                    );
-                }
-            }
+            None => warn!(
+                logger: self.item_pool.log_capture,
+                "{index}Failed to preplace {name} since no free placement location was available",
+                index = self.log_index,
+                name = self.log_name(&command),
+            ),
             Some(pickup) => self.preplace(pickup, command, preplacement_spoiler),
         }
     }
@@ -1001,16 +996,13 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         command: CommandVoid,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
-        if log_enabled!(logger: self.item_pool.log_capture, Trace) {
-            let name = self.log_name(&command);
-
-            trace!(
-                logger: self.item_pool.log_capture,
-                "{index}Preplacing {name} at {pickup}",
-                index = self.log_index,
-                pickup = pickup.identifier,
-            );
-        }
+        trace!(
+            logger: self.item_pool.log_capture,
+            "{index}Preplacing {name} at {pickup}",
+            index = self.log_index,
+            name = self.log_name(&command),
+            pickup = pickup.identifier,
+        );
 
         self.write_placement_spoiler(pickup, &command, placement_spoiler);
 
@@ -1153,7 +1145,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         let progressions = self.world.find_solutions(
             &self.item_pool,
             self.spirit_light_provider.remaining(),
-            &self.output.commands,
+            &self.output,
             slots,
             spirit_light_slots,
             None,
@@ -1189,7 +1181,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 progression.clone(),
                 &self.item_pool,
                 self.spirit_light_provider.remaining(),
-                &self.output.commands,
+                &self.output,
                 slots,
                 spirit_light_slots,
             );
@@ -1211,8 +1203,13 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         progressions: Vec<Solution<'graph>>,
         slots: usize,
     ) -> Vec<(Solution<'graph>, f32)> {
-        let mut with_weights =
-            solution_weights(progressions, &self.item_pool, slots, self.spawn_slots);
+        let mut with_weights = solution_weights(
+            progressions,
+            &self.item_pool,
+            &self.output,
+            slots,
+            self.spawn_slots,
+        );
 
         // The order returned by find_solutions is not portable, so we have to sort before our weighted choice.
         // The weights are a good pick for primary key because they are fast to compare and quite unique;
@@ -1246,7 +1243,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                         "- {chance:.2}% (reaches {new_reached}): {items}",
                         chance = (weight / total_weight) * 100.,
                         new_reached = solution.new_reached,
-                        items = solution.display(&self.item_pool, None), // TODO this was able to use log_name before
+                        items = solution.display(&self.item_pool, &self.output),
                     ))
                 })
         );
@@ -1339,12 +1336,12 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             .force_name()
     }
 
-    fn log_name(&mut self, command: &CommandVoid) -> String {
+    fn log_name(&self, command: &CommandVoid) -> String {
         self.output
             .modifiers
             .item_metadata
             .get(command)
-            .log_name(&mut self.world, &self.output.commands)
+            .log_name(&self.output.commands)
     }
 
     fn prepare_remaining_placements(&mut self) {
@@ -1421,15 +1418,12 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         // TODO try to avoid
         let command = compile::gorlek_ore();
 
-        if log_enabled!(logger: self.item_pool.log_capture, Trace) {
-            let name = self.log_name(&command);
-
-            warn!(
-                logger: self.item_pool.log_capture,
-                "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
-                index = self.log_index,
-            );
-        }
+        warn!(
+            logger: self.item_pool.log_capture,
+            "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
+            index = self.log_index,
+            name = self.log_name(&command),
+        );
 
         command
     }
@@ -1443,16 +1437,13 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     ) where
         F: FnOnce(&CommandVoid, &mut World<'graph, 'settings, 'perf, 'log>, &CommandsOutput),
     {
-        if log_enabled!(logger: self.item_pool.log_capture, Trace) {
-            let name = self.log_name(&command);
-
-            trace!(
-                logger: self.item_pool.log_capture,
-                "{index}Placing {name} at {pickup}",
-                index = self.log_index,
-                pickup = pickup.identifier,
-            );
-        }
+        trace!(
+            logger: self.item_pool.log_capture,
+            "{index}Placing {name} at {pickup}",
+            index = self.log_index,
+            name = self.log_name(&command),
+            pickup = pickup.identifier,
+        );
 
         self.write_placement_spoiler(pickup, &command, placement_spoiler);
 

@@ -17,7 +17,8 @@ use wotw_seedgen_data::{
     seed_language::{
         compile,
         output::{
-            CommandVoid, CommandsOutput, ContainedWrites, ContainedWritesExt, UberStateWriteOwned,
+            CommandVoid, CommandsOutput, ContainedWrites, ContainedWritesExt, IntermediateOutput,
+            ItemMetadata, UberStateWriteOwned,
         },
     },
     Shard, Skill, WeaponUpgrade,
@@ -28,7 +29,7 @@ pub struct ItemPoolBuilder<'log> {
     item_pool: ItemPool<'log>,
 }
 
-impl ItemPoolBuilder<'static> {
+impl<'log> ItemPoolBuilder<'log> {
     pub fn new(rng: &mut Pcg64Mcg, commands: &CommandsOutput) -> Self {
         const GORLEK_ORE_AMOUNT: usize = 40;
         const KEYSTONE_AMOUNT: usize = 34;
@@ -144,12 +145,17 @@ impl<'log> ItemPoolBuilder<'log> {
             .extend(iter::repeat_n(Item::new(item, commands), amount));
     }
 
-    pub fn remove(&mut self, item: &CommandVoid) {
-        self.item_pool.find_remove(item);
+    pub fn remove(&mut self, item: &CommandVoid, output: &IntermediateOutput) {
+        self.item_pool.find_remove(item, output);
     }
 
-    pub fn remove_amount(&mut self, item: &CommandVoid, amount: usize) {
-        self.item_pool.find_remove_amount(item, amount);
+    pub fn remove_amount(
+        &mut self,
+        item: &CommandVoid,
+        amount: usize,
+        output: &IntermediateOutput,
+    ) {
+        self.item_pool.find_remove_amount(item, amount, output);
     }
 
     pub fn finish(mut self) -> ItemPool<'log> {
@@ -219,10 +225,10 @@ impl ItemPool<'static> {
 }
 
 impl<'log> ItemPool<'log> {
-    pub fn find_remove(&mut self, item: &CommandVoid) -> bool {
+    pub fn find_remove(&mut self, item: &CommandVoid, output: &IntermediateOutput) -> bool {
         match self.items.iter().position(|i| &i.command == item) {
             None => {
-                self.log_find_remove_failed(item);
+                self.log_find_remove_failed(item, output);
                 false
             }
             Some(index) => {
@@ -232,7 +238,12 @@ impl<'log> ItemPool<'log> {
         }
     }
 
-    pub fn find_remove_amount(&mut self, item: &CommandVoid, amount: usize) -> bool {
+    pub fn find_remove_amount(
+        &mut self,
+        item: &CommandVoid,
+        amount: usize,
+        output: &IntermediateOutput,
+    ) -> bool {
         let mut last_index = 0;
 
         for _ in 0..amount {
@@ -240,7 +251,7 @@ impl<'log> ItemPool<'log> {
                 .iter()
                 .position(|i| &i.command == item)
             else {
-                self.log_find_remove_failed(item);
+                self.log_find_remove_failed(item, output);
                 return false;
             };
 
@@ -252,11 +263,11 @@ impl<'log> ItemPool<'log> {
         true
     }
 
-    fn log_find_remove_failed(&self, item: &CommandVoid) {
+    fn log_find_remove_failed(&self, item: &CommandVoid, output: &IntermediateOutput) {
         warn!(
             logger: self.log_capture,
             "Attempted to remove {item} from the item pool, but it didn't exist",
-            item = item.log_display()
+            item = output.modifiers.item_metadata.get(item).log_name(&output.commands)
         );
         trace!(logger: self.log_capture, "Current item pool: {self}");
     }
@@ -265,7 +276,11 @@ impl<'log> ItemPool<'log> {
         self.items.swap_remove(index).command
     }
 
-    pub fn choose_random(&mut self) -> Option<CommandVoid> {
+    pub fn choose_random(
+        &mut self,
+        item_metadata: &ItemMetadata,
+        commands: &CommandsOutput,
+    ) -> Option<CommandVoid> {
         // TODO also precompute reroll chance?
         self.items
             .iter()
@@ -276,8 +291,8 @@ impl<'log> ItemPool<'log> {
                     if !choose {
                         trace!(
                             logger: self.log_capture,
-                            "Rerolling random placement {}",
-                            item.command.log_display()
+                            "Rerolling random placement {item}",
+                            item = item_metadata.get(&item.command).log_name(commands),
                         );
                     }
 

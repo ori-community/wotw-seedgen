@@ -17,7 +17,10 @@ use wotw_seedgen_data::{
     parse::SpannedOption,
     seed_language::{
         compile::{clean_water, energy_fragment, health_fragment, keystone, shard, skill},
-        output::{CommandVoid, CommandsOutput, CommonItem, ContainedWrites, ContainedWritesExt},
+        output::{
+            CommandVoid, CommandsOutput, CommonItem, ContainedWrites, ContainedWritesExt,
+            IntermediateOutput, ItemMetadata,
+        },
         simulate::{Simulate, Simulation, UberStates},
     },
     test_logger, Difficulty,
@@ -55,7 +58,7 @@ fn find_test_solutions<'log>(
             .find_solutions_no_max_items(
                 item_pool,
                 i32::MAX,
-                &CommandsOutput::NONE,
+                &IntermediateOutput::default(),
                 slots,
                 0,
                 Some(u8::MAX),
@@ -135,7 +138,9 @@ impl Display for DisplayTestSolutions<'_> {
                         .iter()
                         .format_with(", ", |(item, amount), f| f(&format_args!(
                             "({item}, {amount})",
-                            item = item.log_display()
+                            item = ItemMetadata::default()
+                                .get(item)
+                                .log_name(&CommandsOutput::NONE)
                         )))
                 )))
         )
@@ -191,8 +196,8 @@ fn mock_solutions() {
     );
     item_pool.add_amount(health_fragment(), 99, &CommandsOutput::NONE);
     item_pool.add_amount(energy_fragment(), 99, &CommandsOutput::NONE);
-    item_pool.remove(&shard(Energy));
-    item_pool.remove(&shard(Vitality));
+    item_pool.remove(&shard(Energy), &IntermediateOutput::default());
+    item_pool.remove(&shard(Vitality), &IntermediateOutput::default());
     let item_pool = item_pool.finish();
 
     macro_rules! test {
@@ -1188,9 +1193,9 @@ static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
 static ITEM_POOL: LazyLock<ItemPool> = LazyLock::new(|| {
     let mut builder = ItemPoolBuilder::new(&mut Pcg64Mcg::new(0), &CommandsOutput::NONE);
     // for simplicity
-    builder.remove(&shard(Vitality));
-    builder.remove(&shard(Resilience));
-    builder.remove(&shard(Energy));
+    builder.remove(&shard(Vitality), &IntermediateOutput::default());
+    builder.remove(&shard(Resilience), &IntermediateOutput::default());
+    builder.remove(&shard(Energy), &IntermediateOutput::default());
     builder.finish()
 });
 

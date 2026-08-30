@@ -9,7 +9,7 @@ use wotw_seedgen_data::{
     assets::{AssetCacheValues, PresetAccess, WorldPreset, WorldPresetSettings, TEST_ASSETS},
     logic_language::output::{Enemy, Graph, Requirement},
     seed_language::{
-        output::CommandsOutput,
+        output::{CommandsOutput, IntermediateOutput},
         simulate::{Simulation, Snapshot},
     },
     Difficulty, Skill, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
@@ -76,11 +76,12 @@ fn solutions(c: &mut Criterion) {
     ];
 
     for (id, spawn) in SPAWNS {
+        let output = IntermediateOutput::default();
         let mut world = world(&graph, &world_settings, spawn);
         world.traverse_spawn(&CommandsOutput::NONE);
 
         group.bench_function(id, |b| {
-            b.iter(|| world.find_solutions(&item_pool, i32::MAX, &CommandsOutput::NONE, 7, 7, None))
+            b.iter(|| world.find_solutions(&item_pool, i32::MAX, &output, 7, 7, None))
         });
     }
 

@@ -5,8 +5,8 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
     env_or,
     seed_language::output::{
-        CommonUberStateWrite, CommonWriteCommand, ContainedWritesExt, UberStateWrite,
-        UberStateWriteOwned,
+        CommonUberStateWrite, CommonWriteCommand, ContainedWritesExt, IntermediateOutput,
+        UberStateWrite, UberStateWriteOwned,
     },
     CommonUberIdentifier, Skill, Teleporter,
 };
@@ -28,13 +28,14 @@ static HAPPY_SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| {
     happy_spawn_slots
 });
 
-pub fn solution_weights<'graph>(
+pub fn solution_weights<'graph, 'log>(
     solutions: Vec<Solution<'graph>>,
-    item_pool: &ItemPool,
+    item_pool: &ItemPool<'log>,
+    output: &IntermediateOutput<'log>,
     slots: usize,
     spawn_slots: usize,
 ) -> Vec<(Solution<'graph>, f32)> {
-    let weight_context = WeightContext::new(item_pool, &solutions, slots, spawn_slots);
+    let weight_context = WeightContext::new(item_pool, output, &solutions, slots, spawn_slots);
 
     solutions
         .into_iter()
@@ -48,8 +49,9 @@ pub fn solution_weights<'graph>(
 
 /// Generator for solution weights, taking into account how frequently the same items
 /// appear across solutions to counterweight similar but non-redundant variants
-struct WeightContext<'pool, 'log> {
+struct WeightContext<'pool, 'output, 'log> {
     item_pool: &'pool ItemPool<'log>,
+    output: &'output IntermediateOutput<'log>,
     solution_data: Vec<SolutionData<'pool>>,
     write_counts: FxHashMap<&'pool Vec<UberStateWriteOwned>, f32>,
     slots: usize,
@@ -61,9 +63,10 @@ struct SolutionData<'pool> {
     items: FxHashSet<&'pool Vec<UberStateWriteOwned>>,
 }
 
-impl<'pool, 'log> WeightContext<'pool, 'log> {
+impl<'pool, 'output, 'log> WeightContext<'pool, 'output, 'log> {
     fn new(
         item_pool: &'pool ItemPool<'log>,
+        output: &'output IntermediateOutput<'log>,
         solutions: &[Solution],
         slots: usize,
         spawn_slots: usize,
@@ -97,6 +100,7 @@ impl<'pool, 'log> WeightContext<'pool, 'log> {
 
         Self {
             item_pool,
+            output,
             solution_data,
             write_counts,
             slots,
@@ -133,7 +137,7 @@ impl<'pool, 'log> WeightContext<'pool, 'log> {
             "Weight for {items}: {weight} = (1 + max(non_spawn_slots: {non_spawn_slots} - used_slots: {used_slots}, 0)) * (1 + new_reached: {new_reached}) * (0.3 ^ sad_spawn_slots: {sad_spawn_slots}) / (cost: {cost} * similarity: {similarity})",
             non_spawn_slots = self.slots - self.spawn_slots,
             new_reached = solution.new_reached,
-            items = solution.display(self.item_pool, None),
+            items = solution.display(self.item_pool, self.output),
         );
 
         debug_assert!(weight.is_finite());

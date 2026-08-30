@@ -1,10 +1,7 @@
 use crate::{
-    seed_language::{
-        output::{
-            display::strip_invisible_characters, CommandInteger, CommandString, CommandVoid,
-            CommandsOutput, ContainedWrites, ContainedWritesExt, StringOrPlaceholder,
-        },
-        simulate::{Simulate, Simulation},
+    seed_language::output::{
+        display::strip_invisible_characters, CommandInteger, CommandString, CommandVoid,
+        CommandsOutput, ContainedWrites, ContainedWritesExt, IntoConstant, StringOrPlaceholder,
     },
     CommonUberIdentifier, Icon, MapIcon,
 };
@@ -89,10 +86,17 @@ impl ItemMetadataRef<'_, '_, '_> {
     ///
     /// Similar to [`Self::force_name`], but simulates the result to get a `String`
     /// and removes characters that wouldn't be rendered in an in-game message
-    pub fn log_name<S: Simulation>(&self, simulation: &mut S, output: &CommandsOutput) -> String {
-        let name = self.force_name().simulate(simulation, output);
-
-        strip_invisible_characters(&name)
+    pub fn log_name(&self, commands: &CommandsOutput) -> String {
+        match self
+            .try_force_name()
+            .and_then(|name| name.into_constant().ok())
+        {
+            None => match single_item(self.command.contained_writes(commands).common_items()) {
+                None => self.command.to_string(),
+                Some(common_item) => common_item.log_name().to_string(),
+            },
+            Some(name) => strip_invisible_characters(&name),
+        }
     }
 
     /// Base price used when placed in a shop
