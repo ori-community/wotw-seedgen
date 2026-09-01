@@ -778,12 +778,16 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             // Append 'from <world>' to all messages
             for message in command.contained_messages_mut() {
                 *message = match message.as_constant() {
-                    Some(value) => format!("{value} from <world>{origin_world_index}</>").into(),
+                    Some(value) => format!(
+                        "{value}{separator}from <world>{origin_world_index}</>",
+                        separator = if value.contains("\\n") { "\\n" } else { " " }
+                    )
+                    .into(),
                     _ => CommandString::Concatenate {
                         operation: Box::new(Operation {
                             left: message.clone(),
                             operator: Concatenator::Concat,
-                            right: format!("from <world>{origin_world_index}</>").into(),
+                            right: format!(" from <world>{origin_world_index}</>").into(),
                         }),
                     },
                 }
