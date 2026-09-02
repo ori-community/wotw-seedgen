@@ -53,9 +53,9 @@ on spawn store(itemTracker.wispsRequired, wisps_required)
 
 fun write_missing_wisps() { new_row("#Missing Wisps (" + (wisps_required - itemTracker.wispsCount) + ")#: ") }
 !if voice { !augment_fun(write_missing_wisps(), if EastHollow.ForestsVoice == false add_row_item("Voice")) }
-!if strength { !augment_fun(write_missing_wisps(), if LowerReach.ForestsMemory == false add_row_item("Memory")) }
-!if memory { !augment_fun(write_missing_wisps(), if UpperDepths.ForestsEyes == false add_row_item("Eyes")) }
-!if eyes { !augment_fun(write_missing_wisps(), if WestPools.ForestsStrength == false add_row_item("Strength")) }
+!if strength { !augment_fun(write_missing_wisps(), if WestPools.ForestsStrength == false add_row_item("Strength")) }
+!if memory { !augment_fun(write_missing_wisps(), if LowerReach.ForestsMemory == false add_row_item("Memory")) }
+!if eyes { !augment_fun(write_missing_wisps(), if UpperDepths.ForestsEyes == false add_row_item("Eyes")) }
 !if heart { !augment_fun(write_missing_wisps(), if WindtornRuins.Seir == false add_row_item("Heart")) }
 !augment_fun(write_missing_wisps(), add_current_row())
 
