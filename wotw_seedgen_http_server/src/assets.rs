@@ -17,11 +17,14 @@ use wotw_seedgen::{
     log_capture::{LogCapture, Record},
 };
 
-use crate::api::{
-    assets::AssetOrigin,
-    logic::{MapIcons, RelevantUberStates, SpawnAnchors},
-    presets::{universe::UniversePresetInfo, world::WorldPresetInfo},
-    snippets::SnippetInfo,
+use crate::{
+    api::{
+        assets::AssetOrigin,
+        logic::{MapIcons, RelevantUberStates, SpawnAnchors},
+        presets::{universe::UniversePresetInfo, world::WorldPresetInfo},
+        snippets::SnippetInfo,
+    },
+    generate::{GenerateError, GenerateResult},
 };
 
 pub type Cache = AssetCache<DefaultFileAccess, CacheValues>;
@@ -45,10 +48,10 @@ impl CacheValues {
         &self,
         settings: &UniverseSettings,
         log_level: log::LevelFilter,
-    ) -> Result<(SeedUniverse, Vec<Record>), String> {
+    ) -> GenerateResult<(SeedUniverse, Vec<Record>)> {
         let log_capture = LogCapture::new().with_max_level(log_level);
 
-        let seed = Generator::new(
+        let result = Generator::new(
             &self.graph,
             &self.base.loc_data,
             &self.base.uber_state_data,
@@ -56,9 +59,13 @@ impl CacheValues {
             settings,
         )
         .with_log_capture(&log_capture)
-        .generate()?;
+        .generate();
+        let logs = log_capture.finish();
 
-        Ok((seed, log_capture.finish()))
+        match result {
+            Ok(seed) => Ok((seed, logs)),
+            Err(message) => Err(GenerateError::new(message, logs)),
+        }
     }
 }
 

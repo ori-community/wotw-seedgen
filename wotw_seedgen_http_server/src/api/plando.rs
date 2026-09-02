@@ -12,7 +12,7 @@ use wotw_seedgen::data::parse::Source;
 use crate::{
     RouterState,
     api::LogLevelFilter,
-    compile::{self, CompileResult},
+    compile::{self, CompileError, CompileResult},
 };
 
 pub const TAG: &str = "plando";
@@ -51,7 +51,7 @@ pub struct Docs;
     params(CompileQuery),
     responses(
         (status = OK, body = Vec<u8>),
-        (status = UNPROCESSABLE_ENTITY, body = Vec<String>)
+        (status = UNPROCESSABLE_ENTITY, body = CompileError)
     ),
 )]
 async fn compile(

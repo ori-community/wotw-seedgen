@@ -1,12 +1,14 @@
+use axum::{
+    Json,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 use serde::Serialize;
 use tokio::sync::RwLockReadGuard;
+use utoipa::ToSchema;
 use wotw_seedgen::{data::UniverseSettings, log_capture::Record};
 
-use crate::{
-    api::GenerateQuery,
-    assets::Cache,
-    error::{Error, Result},
-};
+use crate::{api::GenerateQuery, assets::Cache};
 
 #[derive(Serialize)]
 pub struct Universe {
@@ -20,7 +22,7 @@ pub fn generate(
     query: GenerateQuery,
     settings: &UniverseSettings,
     cache: RwLockReadGuard<Cache>,
-) -> Result<Vec<u8>> {
+) -> GenerateResult<Vec<u8>> {
     let GenerateQuery {
         json_spoiler,
         text_spoiler,
@@ -29,15 +31,13 @@ pub fn generate(
 
     let max_log_level = max_log_level.unwrap_or_default().into();
 
-    let (universe, logs) = cache
-        .generate(settings, max_log_level)
-        .map_err(Error::Generate)?;
+    let (universe, logs) = cache.generate(settings, max_log_level)?;
 
     let worlds = universe
         .worlds
         .into_iter()
-        .map(|seed| Ok(ciborium::Value::Bytes(seed.package_into_bytes())))
-        .collect::<Result<Vec<_>>>()?;
+        .map(|seed| ciborium::Value::Bytes(seed.package_into_bytes()))
+        .collect::<Vec<_>>();
 
     let json_spoiler = json_spoiler
         .unwrap_or_default()
@@ -57,4 +57,24 @@ pub fn generate(
     ciborium::into_writer(&universe, &mut bytes).unwrap();
 
     Ok(bytes)
+}
+
+pub type GenerateResult<T> = Result<T, GenerateError>;
+
+#[derive(Serialize, ToSchema)]
+pub struct GenerateError {
+    pub message: String,
+    pub logs: Vec<Record>,
+}
+
+impl GenerateError {
+    pub fn new(message: String, logs: Vec<Record>) -> Self {
+        Self { message, logs }
+    }
+}
+
+impl IntoResponse for GenerateError {
+    fn into_response(self) -> Response {
+        (StatusCode::INTERNAL_SERVER_ERROR, Json(self)).into_response()
+    }
 }

@@ -12,7 +12,8 @@ use utoipa_swagger_ui::SwaggerUi;
 use wotw_seedgen::data::UniverseSettings;
 use wotw_seedgen::data::seed_language::output::{CommandZone, Trigger};
 
-use crate::{RouterState, error::Result, generate};
+use crate::generate::{GenerateError, GenerateResult};
+use crate::{RouterState, generate};
 
 pub mod assets;
 pub mod logic;
@@ -132,14 +133,14 @@ impl Docs {
     params(GenerateQuery),
     responses(
         (status = OK, body = Vec<u8>),
-        (status = INTERNAL_SERVER_ERROR, body = String),
+        (status = INTERNAL_SERVER_ERROR, body = GenerateError),
     ),
 )]
 async fn generate(
     State(cache): State<RouterState>,
     Query(query): Query<GenerateQuery>,
     Json(body): Json<UniverseSettings>,
-) -> Result<impl IntoResponse> {
+) -> GenerateResult<impl IntoResponse> {
     let cache = cache.read().await;
 
     Ok((

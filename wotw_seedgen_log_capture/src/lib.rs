@@ -1,5 +1,6 @@
 pub use log::Level;
 use serde::Serialize;
+use utoipa::ToSchema;
 
 use std::sync::Mutex;
 
@@ -77,8 +78,9 @@ impl Log for LogCapture {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub struct Record {
+    #[schema(value_type = LevelSchema)]
     pub level: Level,
     pub message: String,
 }
@@ -87,4 +89,15 @@ impl Record {
     fn new(level: Level, message: String) -> Self {
         Self { level, message }
     }
+}
+
+#[derive(ToSchema)]
+#[serde(rename_all = "UPPERCASE")]
+#[allow(unused)]
+enum LevelSchema {
+    Error,
+    Warn,
+    Info,
+    Debug,
+    Trace,
 }

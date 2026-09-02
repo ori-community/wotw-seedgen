@@ -7,6 +7,7 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
 use tokio::sync::RwLockReadGuard;
+use utoipa::ToSchema;
 use wotw_seedgen::{
     data::{
         assets::{ChainedSnippetAccess, InlineSnippets},
@@ -24,11 +25,15 @@ use crate::{api::plando::CompileQuery, assets::Cache};
 
 pub type CompileResult = Result<Vec<u8>, CompileError>;
 
-pub struct CompileError(Vec<String>);
+#[derive(Serialize, ToSchema)]
+pub struct CompileError {
+    pub errors: Vec<String>,
+    pub logs: Vec<Record>,
+}
 
 impl IntoResponse for CompileError {
     fn into_response(self) -> Response {
-        (StatusCode::UNPROCESSABLE_ENTITY, Json(self.0)).into_response()
+        (StatusCode::UNPROCESSABLE_ENTITY, Json(self)).into_response()
     }
 }
 
@@ -67,9 +72,8 @@ pub fn compile(
     .with_log_capture(&log_capture);
 
     for identifier in inline_snippets.keys() {
-        compiler
-            .compile_snippet(identifier)
-            .map_err(|err| CompileError(vec![err]))?;
+        // Cannot fail: identifier comes from inline_snippets and cyclic includes get written into the compiler errors and return Ok here
+        compiler.compile_snippet(identifier).unwrap();
     }
 
     let compile::CompileResult { mut output, errors } = compiler.finish();
@@ -100,6 +104,9 @@ pub fn compile(
 
         Ok(bytes)
     } else {
-        Err(CompileError(errors))
+        Err(CompileError {
+            errors,
+            logs: log_capture.finish(),
+        })
     }
 }
