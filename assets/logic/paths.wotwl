@@ -460,7 +460,7 @@ anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the 
       Damage=10, Glide OR Sword OR Hammer
     kii: free
 
-anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4436:  # the waypoint between pools, burrows and marsh
+anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between pools, burrows and marsh
   refill Checkpoint
   refill Energy=1:
     kii: BreakCrystal  # on the ground on the way to Burrows
@@ -1051,8 +1051,7 @@ anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkSL
     unsafe: MarshSpawn.HowlBurnt  # precise wjump above the spikes from the lower platform
 
 anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where you exit the loop with right hc
-  refill Checkpoint:
-    moki: HowlsDen.UpperLoopExitBarrier
+  refill Checkpoint  # use the checkpoint at -372, -4435 instead of the one in the wall
   refill Health=1
 
   state HowlsDen.UpperLoopExitBarrier:
@@ -1300,7 +1299,7 @@ anchor HowlsDen.MidwayBottomLoop at -492, -4459:  # At the Health refill behind 
       GrenadeJump  # GrenadeCancel to pass above the spikes
       GlideJump
 
-anchor HowlsDen.SecretRoom at -515, -4479:  # The hidden room holding left hc
+anchor HowlsDen.SecretRoom at -510, -4479:  # The hidden room holding left hc
   refill Checkpoint
 
   state HowlsDen.SecretRoomWall:  # No paths outside of unsafe because of how weird breaking that wall is
@@ -3084,7 +3083,7 @@ anchor WestHollow.HollowDrainLower at -216, -4329:  # Next to the jumppad left o
       DoubleJump, Bow=1, Dash, Combat=2xSkeeto OR Bash
       DoubleJump, Bow=1, Launch
     gorlek, WestHollow.FullyDrained: Bow=1, Dash OR Launch
-    kii, WestHollow.FullyDrained: Bow=1, WaterDash
+    kii, WestHollow.FullyDrained: Bow=1, WaterDash, Water OR Damage=20
     unsafe, WestHollow.FullyDrained: Bow=1  # bait the first crusher, use it as an elevator to the eye then bait it again and jump from it to the left
   pickup WestHollow.SwimEF:
     moki: Water
@@ -3632,7 +3631,7 @@ anchor EastHollow.OutsideGlades at -152, -4164:  # Outside Grom's Wall
     unsafe: GladesTown.GromsWall, GladesTown.TuleySpawned, Unpopular, Bash  # Very precise mortar projectile redirects
   conn EastHollow.MapMoki: free
 
-anchor EastHollow.AfterBeetleFight at -41, -4231:  # At the breakable floor to Bash tree
+anchor EastHollow.AfterBeetleFight at -27, -4233:  # At the breakable floor to Bash tree
   # before writing any paths that use the (right) mantis, please remember it only spawns when the player has grapple
   # before writing any paths that use the (left) mantis or the skeeto, please remember they only spawn when the player has bash
   refill Checkpoint
@@ -8429,6 +8428,9 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
     unsafe:
       DoubleJump, TripleJump  # tjump on the wall above
       Bash OR Glide OR Launch OR AerialHammerJump OR GrenadeJump
+      Shuriken=2, Damage=15
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
+        Damage=30
   pickup WoodsMain.BelowKeystonesSL:  # Make sure it's not redundant with WallOreLedge->BelowKeystonesSL
     gorlek:
       Launch
@@ -15449,7 +15451,7 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow  # land on the right platform, burrow the sandbag from there
   pickup UpperWastes.TurmoilShard:
-    moki, Burrow: Bash, Launch  # intended path omitted in moki
+    moki, Burrow: Bash, Launch
     gorlek, Burrow:
       Bash, DoubleJump, Dash OR TripleJump
       Launch, DoubleJump
