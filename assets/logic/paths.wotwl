@@ -655,7 +655,7 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
     gorlek: Bash
 
   quest MarshSpawn.TokkTabletQuest:
-    moki: MidnightBurrows.TabletQI
+    moki: MidnightBurrows.TabletQICollected
 
   pickup MarshSpawn.DamageTree:
     moki: MarshSpawn.DamageTreeOpen
@@ -2298,8 +2298,10 @@ anchor MidnightBurrows.TabletRoom at -824, -4531:  # Before the four keystone do
 
   state MidnightBurrows.KeystoneDoor:
     moki: Keystone=4
+  state MidnightBurrows.TabletQICollected:  # Quest state progression
+    moki: MidnightBurrows.TabletQI
 
-  quest MidnightBurrows.TabletQI:
+  quest MidnightBurrows.TabletQI:  # Only a pickup now
     moki: MidnightBurrows.KeystoneDoor
 
   conn MidnightBurrows.Central: free
