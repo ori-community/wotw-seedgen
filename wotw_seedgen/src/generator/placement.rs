@@ -1523,6 +1523,23 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             "custom icons in seedgen aren't supported"
         );
 
+        match self.world.graph.find_node("WillowsEnd.ShriekArena") {
+            Ok(shriek_arena) => {
+                if !self.world.has_reached(shriek_arena) {
+                    warn!(
+                        logger: self.item_pool.log_capture,
+                        "{log_index}Cannot reach Shriek on these settings!",
+                        log_index = self.log_index,
+                    );
+                }
+            }
+            Err(err) => warn!(
+                logger: self.item_pool.log_capture,
+                "{log_index}Cannot check whether Shriek is reachable: {err}",
+                log_index = self.log_index,
+            ),
+        }
+
         if self.world.fetch_boolean(UberIdentifier::SHRIEK_BARRIER) {
             warn!(
                 logger: self.item_pool.log_capture,
