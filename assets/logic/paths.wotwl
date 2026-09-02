@@ -15675,6 +15675,7 @@ anchor UpperWastes.OuterRuinsTP at 2044, -3679:  # Left of the teleporter, on to
       Bash, Grenade=3, DoubleJump, Glide OR Sentry=2  # 1.b + 2.b
       Bash, Grenade=4, DoubleJump  # 1.b (bashnade near the spikes) + 2.b
 
+  conn Teleporters: free
   conn UpperWastes.OutsideRuins:
     moki:
       Bash, Launch
