@@ -1,7 +1,7 @@
 use arrayvec::ArrayVec;
 use indexmap::IndexSet;
 use itertools::Itertools;
-use log::trace;
+use log::{trace, warn};
 use rand::prelude::IteratorRandom;
 use rand::seq::SliceRandom;
 use rand_pcg::Pcg64Mcg;
@@ -19,6 +19,8 @@ use wotw_seedgen_data::{
 use wotw_seedgen_log_capture::LogCapture;
 
 use crate::World;
+
+const RETRIES: u8 = 10;
 
 type EntranceGroups = [ArrayVec<EntranceId, 15>; 16];
 
@@ -164,32 +166,39 @@ fn generate_entrance_connections(
     rng: &mut Pcg64Mcg,
     log_capture: &LogCapture,
 ) -> Result<FxHashMap<EntranceId, EntranceId>, String> {
-    let initial_entrance = *config.entrance_groups.iter().flatten().choose(rng).unwrap();
-    let initial_entrance_group = config.group_index_by_entrance_id[&initial_entrance];
+    for _ in 0..RETRIES {
+        let initial_entrance = *config.entrance_groups.iter().flatten().choose(rng).unwrap();
+        let initial_entrance_group = config.group_index_by_entrance_id[&initial_entrance];
 
-    let initial_state = EntranceRandomizerState {
-        next_entrance_id: initial_entrance,
-        entrances_without_incoming_connection: IndexSet::from_iter(
-            config
-                .entrance_groups
+        let initial_state = EntranceRandomizerState {
+            next_entrance_id: initial_entrance,
+            entrances_without_incoming_connection: IndexSet::from_iter(
+                config
+                    .entrance_groups
+                    .iter()
+                    .flatten()
+                    .copied()
+                    .collect_vec(),
+            ),
+            reachable_entrances: config.entrance_groups[initial_entrance_group]
                 .iter()
-                .flatten()
                 .copied()
-                .collect_vec(),
-        ),
-        reachable_entrances: config.entrance_groups[initial_entrance_group]
-            .iter()
-            .copied()
-            .collect(),
-        remaining_groups: (0..config.entrance_groups.len())
-            .filter(|g| *g != initial_entrance_group)
-            .collect(),
-        ..EntranceRandomizerState::default()
-    };
+                .collect(),
+            remaining_groups: (0..config.entrance_groups.len())
+                .filter(|g| *g != initial_entrance_group)
+                .collect(),
+            ..EntranceRandomizerState::default()
+        };
 
-    let final_state =
-        generate_entrance_connections_recursively(&initial_state, config, rng, log_capture)?;
-    Ok(final_state.connections)
+        match generate_entrance_connections_recursively(&initial_state, config, rng, log_capture) {
+            Ok(final_state) => return Ok(final_state.connections),
+            Err(err) => warn!(logger: log_capture, "{err}"),
+        }
+    }
+
+    Err(format!(
+        "All {RETRIES} attempts to connect entrances failed"
+    ))
 }
 
 fn generate_entrance_connections_recursively(
