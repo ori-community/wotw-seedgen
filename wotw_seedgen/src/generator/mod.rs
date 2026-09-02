@@ -8,7 +8,11 @@ mod solutions;
 mod spawn;
 mod spirit_light;
 
-use crate::{generator::spoiler::SeedSpoiler, perf_data::PerfData, world::World};
+use crate::{
+    generator::{placement::Context, spoiler::SeedSpoiler},
+    perf_data::PerfData,
+    world::World,
+};
 use log::{info, trace, warn};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
@@ -128,7 +132,6 @@ where
                     let mut output = output.clone();
                     let uber_states = UberStates::new(self.uber_state_data);
 
-                    // TODO technically we shouldn't have to change our spawn choice between attempts anymore?
                     let world = World::new(
                         self.graph,
                         0,
@@ -143,7 +146,9 @@ where
                 })
                 .collect::<Result<Vec<_>, String>>()?;
 
-            match self.generate_placements(&mut rng, worlds) {
+            let context = Context::new(&mut rng, worlds, self.settings, self.log_capture)?;
+
+            match context.attempt_placements(self.loc_data, self.debug) {
                 Ok(seed) => {
                     if attempt > 1 {
                         info!(

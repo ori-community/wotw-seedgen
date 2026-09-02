@@ -10,7 +10,7 @@ use crate::{
     item_pool::ItemPoolBuilder,
     logical_difficulty::LogicalDifficulty,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
-    Generator, World,
+    World,
 };
 use itertools::Itertools;
 use log::{log_enabled, trace, warn, Level::Trace};
@@ -50,49 +50,9 @@ const MIN_PLACEHOLDERS: usize = 3;
 static MAX_PLACEHOLDERS: LazyLock<usize> =
     LazyLock::new(|| 10 + SOLUTION_MAX_ITEMS.saturating_mul(2));
 
-impl<A> Generator<'_, '_, '_, '_, '_, '_, '_, A> {
-    pub(crate) fn generate_placements(
-        &self,
-        rng: &mut Pcg64Mcg,
-        worlds: Vec<(World, IntermediateOutput)>,
-    ) -> Result<SeedUniverse, String> {
-        assert!(
-            !worlds.is_empty(),
-            "Need at least one world to generate a seed"
-        );
-        let mut context = Context::new(rng, worlds, self.settings, self.log_capture)?;
-
-        context.preplacements();
-
-        loop {
-            context.next_step();
-            context.update_reached();
-
-            if context.is_everything_reached() {
-                context.place_remaining();
-                context.sort_spoiler_placements();
-
-                break;
-            }
-
-            if context.force_keystones() {
-                continue;
-            }
-
-            if !context.place_random() {
-                if let Some((target_world_index, progression)) = context.choose_progression()? {
-                    context.place_forced(target_world_index, progression);
-                }
-            }
-        }
-
-        Ok(context.finish(self.loc_data, self.debug, rng))
-    }
-}
-
 pub struct Context<'graph, 'settings, 'perf, 'log> {
-    pub rng: Pcg64Mcg,
-    pub worlds: Vec<WorldContext<'graph, 'settings, 'perf, 'log>>,
+    rng: Pcg64Mcg,
+    worlds: Vec<WorldContext<'graph, 'settings, 'perf, 'log>>,
     settings: &'settings UniverseSettings,
     /// Distribution for random orderings
     ordering_distribution: OrderingDistribution,
@@ -106,9 +66,9 @@ pub struct Context<'graph, 'settings, 'perf, 'log> {
 }
 
 pub struct WorldContext<'graph, 'settings, 'perf, 'log> {
-    pub rng: Pcg64Mcg,
-    pub world: World<'graph, 'settings, 'perf, 'log>,
-    pub output: IntermediateOutput<'log>,
+    rng: Pcg64Mcg,
+    world: World<'graph, 'settings, 'perf, 'log>,
+    output: IntermediateOutput<'log>,
     /// world index of this world
     index: usize,
     /// ready-made string for referencing this world in the log
@@ -141,7 +101,7 @@ pub struct WorldContext<'graph, 'settings, 'perf, 'log> {
 }
 
 impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
-    fn new(
+    pub fn new(
         rng: &mut Pcg64Mcg,
         worlds: Vec<(
             World<'graph, 'settings, 'perf, 'log>,
@@ -274,6 +234,38 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             spoiler,
             log_capture,
         })
+    }
+
+    pub fn attempt_placements(
+        mut self,
+        loc_data: &LocData,
+        debug: bool,
+    ) -> Result<SeedUniverse, String> {
+        self.preplacements();
+
+        loop {
+            self.next_step();
+            self.update_reached();
+
+            if self.is_everything_reached() {
+                self.place_remaining();
+                self.sort_spoiler_placements();
+
+                break;
+            }
+
+            if self.force_keystones() {
+                continue;
+            }
+
+            if !self.place_random() {
+                if let Some((target_world_index, progression)) = self.choose_progression()? {
+                    self.place_forced(target_world_index, progression);
+                }
+            }
+        }
+
+        Ok(self.finish(loc_data, debug))
     }
 
     fn preplacements(&mut self) {
@@ -837,14 +829,14 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         }
     }
 
-    fn finish(mut self, loc_data: &LocData, debug: bool, rng: &mut Pcg64Mcg) -> SeedUniverse {
+    fn finish(mut self, loc_data: &LocData, debug: bool) -> SeedUniverse {
         let mut output = self
             .worlds
             .iter_mut()
             .map(|world| &mut world.output)
             .collect::<Vec<_>>();
 
-        let placeholder_maps = postprocess(&mut output, loc_data, rng);
+        let placeholder_maps = postprocess(&mut output, loc_data, &mut self.rng);
 
         SeedUniverse {
             worlds: self
