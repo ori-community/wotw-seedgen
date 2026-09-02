@@ -31,11 +31,21 @@ struct EntranceRandomizerConfig {
 }
 
 impl EntranceRandomizerConfig {
-    pub fn new(max_loop_size: u8, entrance_groups: EntranceGroups) -> Result<Self, String> {
-        if max_loop_size < 2 {
-            return Err(
-                "Max loop size for entrance randomization has to be 2 or higher".to_string(),
-            );
+    pub fn new(
+        max_loop_size: u8,
+        entrance_groups: EntranceGroups,
+        log_capture: &LogCapture,
+    ) -> Result<Self, String> {
+        match max_loop_size {
+            ..=1 => {
+                return Err(
+                    "Max loop size for entrance randomization has to be 2 or higher".to_string(),
+                )
+            }
+            2..=3 => {}
+            4.. => {
+                warn!(logger: log_capture, "Max loop size {max_loop_size} may create unreachable entrances")
+            }
         }
 
         let mut group_index_by_entrance_id: FxHashMap<EntranceId, usize> = FxHashMap::default();
@@ -120,7 +130,8 @@ pub fn generate_entrances(
                 ),
             }));
 
-            let config = EntranceRandomizerConfig::new(loop_size.get(), entrance_groups)?;
+            let config =
+                EntranceRandomizerConfig::new(loop_size.get(), entrance_groups, log_capture)?;
             let connections = generate_entrance_connections(&config, rng, log_capture)?;
             (connections, loop_size.get())
         }
