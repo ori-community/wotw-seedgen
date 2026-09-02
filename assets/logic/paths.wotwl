@@ -14865,7 +14865,10 @@ anchor LowerWastes.Shovel at 1635, -3981:  # On the ground to the left of the Sa
       Bash, Grenade=1
     kii: BreakCrystal
 
-  quest LowerWastes.EerieGemQI:
+  state LowerWastes.GemQICollected:  # Quest state progression
+    moki: LowerWastes.EerieGemQI
+
+  quest LowerWastes.EerieGemQI:  # Only a pickup now
     moki: Burrow
 
   pickup LowerWastes.SandBridgeOre: free
@@ -17420,8 +17423,10 @@ anchor Tokk:  # Tokk's talks
     moki: EastHollow.HandToHandMap
 
 anchor TwillenShop:
-  quest GladesTown.TwillenGemQuest:
-    moki: LowerWastes.EerieGemQI
+  state GladesTown.DiamondInTheRoughCompleted:  # Quest state progression
+    moki: GladesTown.SecretShard
+  quest GladesTown.SecretShard:  # Only a pickup now
+    moki: LowerWastes.GemQICollected
 
   pickup TwillenShop.Slot1:
     moki: SpiritLight=1200

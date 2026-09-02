@@ -51,6 +51,7 @@ GladesTown.SelaFlowers, 21, 16254,
 GladesTown.SpringPlants, 21, 38393,
 GladesTown.StickyGrass, 21, 64583,
 GladesTown.FamilyReunion, 14019, 27804, 4
+GladesTown.DiamondInTheRoughCompleted, 14019, 61011, 5
 WestGlades.CombatShrineCompleted, 44310, 58796,
 MidnightBurrows.TeleporterActive, 24922, 42531,
 MidnightBurrows.KeystoneDoor, 18793, 3171,
@@ -132,6 +133,7 @@ UpperPools.BubbleSpamLever, 5377, 6398,
 UpperPools.BubbleSpamWall, 5377, 65413,
 WestPools.TeleporterActive, 945, 1370,
 LowerWastes.FeedingGroundsTeleporterActive, 58674, 10029,
+LowerWastes.GemQICollected, 14019, 61011, 4
 LowerWastes.SandPlatformLever, 20120, 48009,
 LowerWastes.TrialActivation, 44964, 30767, 1
 LowerWastes.CentralTeleporterActive, 20120, 49994,

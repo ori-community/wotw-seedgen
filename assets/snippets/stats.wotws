@@ -598,7 +598,7 @@ on GladesTown.RebuildTheGlades {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on GladesTown.TwillenGemQuest {
+on GladesTown.SecretShard {
     store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }

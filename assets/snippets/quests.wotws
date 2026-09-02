@@ -85,7 +85,7 @@ fun write_missing_quests() { new_row("#Missing Quests (" + (quests_required - it
 !if little_braver { !augment_fun(write_missing_quests(), if MarshSpawn.MokkFangQuest == false add_row_item("Little Braver")) }
 !if family_reunion { !augment_fun(write_missing_quests(), if GladesTown.FamilyReunion == false add_row_item("Family Reunion")) }
 !if tree_keeper { !augment_fun(write_missing_quests(), if GladesTown.LastTree == false add_row_item("Tree Keeper")) }
-!if rough_diamond { !augment_fun(write_missing_quests(), if GladesTown.TwillenGemQuest == false add_row_item("Rough Diamond")) }
+!if rough_diamond { !augment_fun(write_missing_quests(), if questUberStateGroup.desertCogQuest < 5 add_row_item("Rough Diamond")) }
 !if hand_to_hand { !augment_fun(write_missing_quests(), if WindtornRuins.HandToHandComplete == false add_row_item("Hand to Hand")) }
 !if into_darkness { !augment_fun(write_missing_quests(), if GladesTown.MokiAcornQuest == false add_row_item("Into Darkness")) }
 !if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwolokAmuletQuest == false add_row_item("Kwolok's Wisdom")) }
@@ -153,13 +153,12 @@ on change itemTracker.questsCount update_goals()
 }
 
 // TODO we lack fully accurate simulation in cases where quests set multiple states.
-// This should more accurately be questUberStateGroup.desertCogQuest but paths.wotwl doesn't communicate that state
 !if rough_diamond {
-    on GladesTown.TwillenGemQuest {
+    on questUberStateGroup.desertCogQuest >= 5 {
         create_stats_entry(QuestEnd, "A Diamond in the Rough")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on GladesTown.TwillenGemQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on questUberStateGroup.desertCogQuest < 5 store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if hand_to_hand {

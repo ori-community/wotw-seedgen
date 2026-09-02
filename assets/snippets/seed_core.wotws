@@ -97,7 +97,7 @@ on HowlsDen.SwordTree store(randoState.rainLiftedInMarsh, true)
 // Hollow, which is usually not possible in vanilla, and then walk into Glades, that cutscene would play otherwise.
 on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneState == 2 {
     store(hubUberStateGroup.craftCutsceneState, 3)
-    store(GladesTown.TwillenGemQuest, true)
+    store(GladesTown.SecretShard, true)
 }
 // This probably does something important to prevent the quest from softlocking, but who knows.
 on InnerWellspring.WaterEscape store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 3)

@@ -125,7 +125,7 @@ GladesTown.UpdraftCeilingSL, Glades, SpiritLight, 50, 42178, 63404, , -239.6, -4
 GladesTown.LeafPileSL, Glades, SpiritLight, 50, 42178, 44748, , -160.6, -4098.2, -160.66998, -4096.58
 GladesTown.DamageTree, Glades, Skill, AncestralLight, 0, 120, , -368, -4158, -368.17413, -4153.7295
 GladesTown.RebuildTheGlades, Glades, QuestItem, 1000 SpiritLight, 14019, 44578, 2, -322, -4153, -328.5, -4150.1
-GladesTown.TwillenGemQuest, Glades, QuestItem, Shard, 23987, 14832, , -408, -4162, -406, -4158.9
+GladesTown.SecretShard, Glades, QuestItem, Shard, 23987, 14832, , -408, -4162, -406, -4158.9
 GladesTown.RegrowTheGlades, Glades, QuestItem, 1000 SpiritLight, 14019, 26394, 2, -173, -4139, -176, -4134.7
 WestGlades.GrappleSL, Glades, SpiritLight, 100, 53632, 12019, , -515.3, -4102.5, -515.32, -4102.47
 WestGlades.AboveTentacleSL, Glades, SpiritLight, 100, 937, 31036, , -586.1, -4090.3, -586.0541, -4090.2927
