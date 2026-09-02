@@ -1,6 +1,8 @@
 use std::process::Command;
 
 pub fn main() {
+    println!("cargo::rerun-if-changed=../.git/HEAD");
+
     set_env_with_command("GIT_HEAD", "git", ["rev-parse", "HEAD"]);
     set_env_with_command("GIT_STATUS", "git", ["status", "--porcelain"]);
 }
