@@ -882,7 +882,7 @@ anchor MarshSpawn.HowlApproach at -500, -4395:  # right of regen tree
 anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but outside the bridge if Howl is still lurking
 
   state MarshSpawn.HowlBurnt: free
-  state MarshSpawn.MokkTalkedTo:  # First step of the "A little braver" quest. This is relevant because it can be used to complete the quest without picking up the fang (e.g. in a snippet)
+  state MarshSpawn.MokkTalkedTo:  # First step of the "A little braver" quest. Required to progress the quest to step 2.
     moki: MarshSpawn.HowlBurnt
 
   quest MarshSpawn.MokkFangQuest:
