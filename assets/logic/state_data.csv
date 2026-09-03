@@ -1,6 +1,8 @@
 NodeIdentifier, UberGroup, UberId, UberStateValue
 MarshSpawn.TeleporterActive, 21786, 10185,
 MarshSpawn.HowlBurnt, 21786, 40322,
+MarshSpawn.MokkTalkedTo, 14019, 15983, 1
+MarshSpawn.FangQICollected, 14019, 15983, 2
 MarshSpawn.KeystoneDoor, 21786, 42309,
 MarshSpawn.LogBroken, 21786, 59922,
 MarshSpawn.BurrowsOpen, 24922, 13349,

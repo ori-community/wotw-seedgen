@@ -882,9 +882,11 @@ anchor MarshSpawn.HowlApproach at -500, -4395:  # right of regen tree
 anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but outside the bridge if Howl is still lurking
 
   state MarshSpawn.HowlBurnt: free
+  state MarshSpawn.MokkTalkedTo:  # First step of the "A little braver" quest. This is relevant because it can be used to complete the quest without picking up the fang (e.g. in a snippet)
+    moki: MarshSpawn.HowlBurnt
 
   quest MarshSpawn.MokkFangQuest:
-    moki: MarshSpawn.HowlBurnt, MarshSpawn.FangQI
+    moki: MarshSpawn.HowlBurnt, MarshSpawn.FangQI OR MarshSpawn.FangQICollected  # This is the only situation where the quest can be completed by either holding the QI or having progressed to the previous step
 
   pickup MarshSpawn.RecklessShard:  #Make sure it's not redundant with MarshSpawn.MokkTheBrave->MarshSpawn.HowlApproach->MarshSpawn.RecklessShard
     moki, MarshSpawn.HowlBurnt, BreakWall=10:
@@ -980,7 +982,10 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
 anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
   refill Health=1
 
-  quest MarshSpawn.FangQI: free
+  state MarshSpawn.FangQICollected:  # Quest progression state. This is relevant because it can be used to complete the quest without picking up the fang (e.g. in a snippet)
+    moki: MarshSpawn.MokkTalkedTo, MarshSpawn.FangQI
+  
+  quest MarshSpawn.FangQI: free  # Only a pickup now
 
   pickup MarshSpawn.FangEF:  #Make sure it's not redundant with MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena->MarshSpawn.FangEF
     gorlek:
