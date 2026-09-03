@@ -17424,7 +17424,7 @@ anchor Tokk:  # Tokk's talks
 
 anchor TwillenShop:
   state GladesTown.DiamondInTheRoughCompleted:  # Quest state progression
-    moki: GladesTown.SecretShard
+    moki: LowerWastes.GemQICollected
   quest GladesTown.SecretShard:  # Only a pickup now
     moki: LowerWastes.GemQICollected
 
