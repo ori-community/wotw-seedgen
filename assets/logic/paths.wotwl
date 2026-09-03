@@ -4702,8 +4702,10 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
   # refill Checkpoint:
   #   unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
 
+  state GladesTown.AcornMokiTalkedTo: free  # This starts the "Into the Darkness" quest
+  
   quest GladesTown.MokiAcornQuest:
-    moki: GladesTown.AcornQI
+    moki: GladesTown.AcornQICollected
 
   pickup GladesTown.AboveCaveSL:
     moki:
@@ -4745,7 +4747,10 @@ anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at 
   refill Energy=4:
     moki: BreakCrystal
 
-  quest GladesTown.AcornQI:
+  state GladesTown.AcornQICollected:  # Quest state progression 
+    moki: GladesTown.AcornQI
+
+  quest GladesTown.AcornQI:  # Only a pickup now
   # Flash=3 do the swim / Flash=2 go above the entrance
     moki:
       Flash=3:
