@@ -22,7 +22,7 @@
     splinter_shuriken,
     bashable_shuriken,
     ultra_flap,
-    extra_launch,
+    extra_launch
 )
 !include("rapid_hammer_core", rapid_hammer)
 !include("rapid_sword_core", rapid_sword)
