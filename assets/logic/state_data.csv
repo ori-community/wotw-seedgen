@@ -9,6 +9,8 @@ MarshSpawn.BurrowsOpen, 24922, 13349,
 MarshSpawn.DamageTreeOpen, 24922, 59146,
 MarshSpawn.ToOpherBarrier, 21786, 23177,
 MarshSpawn.TokkBarrier, 21786, 35166,
+MarshSpawn.MissingKeyTokkTalkedTo, 48248, 51645, 1
+MarshSpawn.MissingKeyQICollected, 48248, 51645, 2
 MarshSpawn.CaveFight, 21786, 35598,
 MarshSpawn.BurrowArena, 9593, 59418,
 MarshPastOpher.PoolsPathFloor, 9593, 17659,

@@ -327,8 +327,13 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     unsafe: HammerBreak OR SpearBreak OR SentryBreak=16
   state MarshSpawn.CaveFight:
     moki: Combat=3xLizard  # at day there's two extra lizards
+  state MarshSpawn.MissingKeyTokkTalkedTo: free
+  # This state is only required if you want to TokkAnywhere the quest reward. Connection to Tokk is free from this anchor, so this state is mostly redundant here.
+  # Order is relevant to progress the quest and set up TokkAnywhere, but the keystone itself can be turned in for free at this Tokk.
+  state MarshSpawn.MissingKeyQICollected:
+    moki: MarshSpawn.MissingKeyTokkTalkedTo, MarshSpawn.CaveKS
 
-  quest MarshSpawn.CaveKS:
+  quest MarshSpawn.CaveKS:  # If you move this pickup to a different anchor please update the quest requirements as well
     moki:
       DoubleJump, Dash OR Grapple
       Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
@@ -340,7 +345,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       # GlideJump
       # GrenadeJump=1, Glide
     unsafe: GlideJump OR GrenadeJump
-  quest MarshSpawn.TokkKeystoneQuest:
+  quest MarshSpawn.TokkKeystoneQuest:  # This quest can be completed with just the QI on this specific Tokk
     moki: MarshSpawn.CaveKS
 
   pickup MarshSpawn.LeftTokkSL:
@@ -17434,6 +17439,8 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
 
 
 anchor Tokk:  # Tokk's talks
+  quest MarshSpawn.TokkKeystoneQuest:  # This quest requires step 2 if you want to TokkAnywhere the reward
+    moki: MarshSpawn.MissingKeyQICollected
   quest GladesTown.HandToHandPouch:
     moki: EastHollow.HandToHandMap
 
