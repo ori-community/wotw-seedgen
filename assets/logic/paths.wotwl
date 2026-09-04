@@ -793,7 +793,7 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       # GrenadeJump=1, Hammer, Sentry=2
       # SwordSJump=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # sword hover as well. Possible without the sjump but then you need to start the path at a specific time to avoid getting hit by a projectile while hovering.
     unsafe:
-      Bash OR Dash OR Sword OR FlashSwap OR BlazeSwap=1 OR SentrySwap=1 OR PauseFloat  # Use friendly spikes in front of turret
+      Bash OR Dash OR Sword OR AbilitySwap=1 OR PauseFloat  # Use friendly spikes in front of turret
       DoubleJump OR Glide OR Hammer OR Shuriken=2 OR Sentry=2 OR Damage=10 # Use frendly spikes in front of turret then wjump on friendly spikes bellow the pickup. Shuriken path requires you to angle the shuriken forwards for quicker catching.
 
   conn PoolsApproach.OnTopOfWheel:
@@ -1202,11 +1202,13 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     # kii:
       # Glitched
       # HammerSJump=2, DoubleJump
-      # AerialHammerJump, DoubleJump, TripleJump
+      # AerialHammerJump, TripleJump OR Dash OR Glide OR Sword
+      # AerialHammerJump, Bash, Grenade=1 OR HowlsDen.RainLifted
     unsafe:
       DoubleJump, TripleJump  # Door skip
       HowlsDen.RainLifted, DoubleJump, Sword
-      HowlsDen.RainLifted, DoubleJumpBashChain  # Bash chain
+      HowlsDen.RainLifted, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel OR PauseFloat  # https://youtu.be/sG_B2jd-ics
+      Bash, DoubleJump, Grenade=1
       GrenadeJump, DoubleJump
       SentryJump=2  # Sword sjump can go up to HowlsDen.AboveBoneBridge but landing here and doing the loop also solves the connection to AboveBoneBridge
       HammerSJump=1, DoubleJump
@@ -1501,8 +1503,8 @@ anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
 
   pickup HowlsDen.DoubleJumpTree: free
   pickup HowlsDen.StickyShard: free  # origlow
-  pickup HowlsDen.DoubleJumpSL:
-    kii: Dash, DoubleJump, TripleJump  # From Sticky shard. Reset your dash onto the ceiling
+  # pickup HowlsDen.DoubleJumpSL:
+  #   unsafe: Dash, DoubleJump, TripleJump  # From Sticky shard. Reset your dash onto the ceiling. Redundant in unsafe
 
   conn HowlsDen.DoubleJumpTreeLedge:
     moki:
