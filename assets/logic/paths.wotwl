@@ -4474,16 +4474,19 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
     id: 9
     target: GladesTown.KeyMokiHutInside
     enter:
-      moki: GladesTown.BuildHuts, GladesTown.FamilyReunion
+      moki: GladesTown.BuildHuts, GladesTown.FatherMokiGone
   refill Checkpoint
+
+  state GladesTown.FamilyReunionMokiTalkedTo: free  # Start of the quest "Family Reunion"
+  state GladesTown.FatherMokiGone:
+    moki: WoodsEntry.FamilyReunionDollQICollected
+  state GladesTown.FamilyReunion:
+    moki: WoodsEntry.FamilyReunionDollQICollected
 
   quest GladesTown.HandToHandLantern:
     moki: LowerReach.HandToHandHat
-  quest GladesTown.FamilyReunionKey:
+  quest GladesTown.FamilyReunionKey:  # Both state and pickup
     moki: GladesTown.BuildHuts
-
-  state GladesTown.FamilyReunion:
-    moki: GladesTown.FamilyReunionKey, WoodsEntry.DollQI
 
   pickup GladesTown.TwillenOre:
     moki, Hammer OR Spear=1:
@@ -8110,10 +8113,15 @@ anchor WoodsEntry.FamilyHut at 469, -4179: # infront of family reunion hut door
     id: 25
     target: WoodsEntry.FamilyHutInside
     enter:
-      moki: GladesTown.FamilyReunionKey
+      moki: WoodsEntry.MokiFatherHutDoorOpen
   # This refill does not work in entrance randomizer
   # refill Checkpoint:
-  #   unsafe: GladesTown.FamilyReunionKey
+  #   unsafe: WoodsEntry.MokiFatherHutDoorOpen
+
+  state WoodsEntry.MokiFatherHutDoorOpen:  # Whether the door is actually open
+    moki: WoodsEntry.CanOpenMokiFatherHut
+  state WoodsEntry.CanOpenMokiFatherHut:  # Rando-specific config to allow opening the door
+    moki: GladesTown.FamilyReunionKey  # Requirement defined by seed_core
 
   conn WoodsEntry.BellowHut: free
   conn WoodsEntry.ShriekMeet:
@@ -8143,7 +8151,10 @@ anchor WoodsEntry.FamilyHutInside at 445, -4118: # inside of family reunion hut
     target: WoodsEntry.FamilyHut
     enter: free
 
-  quest WoodsEntry.DollQI:
+  state WoodsEntry.FamilyReunionDollQICollected:  # Quest state progression
+    moki: WoodsEntry.DollQI
+
+  quest WoodsEntry.DollQI:  # Only a pickup now
     moki: free
 
 anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone door
