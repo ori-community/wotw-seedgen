@@ -382,6 +382,13 @@
           "value": 0.0,
           "value_type": "Byte"
         },
+		"39": {
+          "name": "extraLaunches",
+          "readonly": false,
+          "type": "SerializedByteUberState",
+          "value": 0.0,
+          "value_type": "Byte"
+        },
         "40": {
           "name": "extraGrenades",
           "readonly": false,

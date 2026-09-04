@@ -9,6 +9,7 @@
 !builtin_icon(health_regeneration_icon, "icons/bonus/healthregeneration.png")
 !builtin_icon(extra_double_jump_icon, "icons/bonus/extradoublejump.png")
 !builtin_icon(extra_air_dash_icon, "icons/bonus/extraairdash.png")
+!builtin_icon(extra_launch_icon, "icons/bonus/extralaunch.png")
 !builtin_icon(blaze_efficiency_icon, "icons/bonus/blazeefficiency.png")
 !builtin_icon(spear_efficiency_icon, "icons/bonus/spearefficiency.png")
 !builtin_icon(shuriken_efficiency_icon, "icons/bonus/shurikenefficiency.png")
@@ -108,6 +109,24 @@ fun extra_air_dash() {
     BonusItem
 )
 !export(extra_air_dash)
+
+fun extra_launch() {
+    store(randoUpgrades.extraLaunches, randoUpgrades.extraLaunches + 1)
+    item_message("#Extra Launch x" + randoUpgrades.extraLaunches + "#")
+    update_bonus_items()
+}
+!augment_fun(write_bonus_items(relevant: Boolean), {
+    if skills.launch == relevant && randoUpgrades.extraLaunches != 0 add_bonus_item("Extra Launch x" + randoUpgrades.extraLaunches)
+})
+
+!item_data(extra_launch(),
+    "#Extra Launch#",
+    500,
+    "If you have " + skill_string(Launch) + ", get an additional launch in the air",
+    extra_launch_icon,
+    BonusItem
+)
+!export(extra_launch)
 
 !state(blaze_efficiencies, Integer)
 !export(blaze_efficiencies)

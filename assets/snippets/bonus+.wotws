@@ -21,7 +21,8 @@
     extra_shuriken,
     splinter_shuriken,
     bashable_shuriken,
-    ultra_flap
+    ultra_flap,
+    extra_launch,
 )
 !include("rapid_hammer_core", rapid_hammer)
 !include("rapid_sword_core", rapid_sword)
@@ -47,6 +48,7 @@
 !config_integer(splinter_shurikens, 2, "Splinter Shuriken Count", "Throw multiple Shurikens at once")
 !config_integer(bashable_shurikens, 1, "Bashable Shuriken Count", "Allows bashing Shurikens")
 !config_integer(ultra_flaps, 3, "Ultra Flap Count", "Makes Flap deal damage")
+!config_integer(extra_launch, 0, "Extra Launch Count", "Add extra launches when having Launch")
 
 !add_item(rapid_hammer(), rapid_hammers)
 !add_item(rapid_sword(), rapid_swords)
@@ -67,3 +69,4 @@
 !add_item(splinter_shuriken(), splinter_shurikens)
 !add_item(bashable_shuriken(), bashable_shurikens)
 !add_item(ultra_flap(), ultra_flaps)
+!add_item(extra_launch(), extra_launch)
