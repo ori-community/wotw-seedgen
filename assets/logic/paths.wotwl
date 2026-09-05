@@ -3480,7 +3480,7 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
       DoubleJump, Hammer, Spear=1
       Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=3 OR Flash=1 OR Sentry=1
       AerialHammerJump
-      # GrenadeJump, DoubleJump, Spear=1 OR Hammer OR Damage=10 # No energy cost because grabing the pole autocancel grenade
+      # GrenadeJump, DoubleJump, Spear=1 OR Hammer OR Damage=10  # No energy cost because grabing the pole autocancel grenade
     unsafe:
       Bash, Grenade=1  # land near the second pole, throw a grenade, jump on the pole and immediatly jump to the grenade. Avoiding spikes damage is a bit hard.
       GrenadeJump  # gjump to grab the pole then extend pole momentum to reach the ledge above the mortar and do the same from the second pole
@@ -3532,7 +3532,7 @@ anchor EastHollow.AfterBeetleFight at -27, -4233:  # At the breakable floor to B
       Bash, Dash  # use the mortar projectile
       AerialHammerJump
       GlideJump, Bash OR DoubleJump
-      SwordSJump=1, Damage=10  # dboost on the left spikes to climb that wall
+      SwordSJump=1, Damage=10  # sjump then dboost on the left spikes to climb that wall
       SentryJump=1, DoubleJump
       HammerSJump=1, Damage=20  # take a dboost in the right spikes to refresh your upslash then use it to climb the left wall
       HammerSJump=1, Damage=10, Dash OR Shuriken=1 OR GlideJump  # glidejump from the right spikes. Other paths take a dboost by climbing the left wall
@@ -3709,7 +3709,7 @@ anchor EastHollow.TreeAreaJumppad at -15, -4289:  # at the jumppad bellow the de
       HammerSJump=1, DoubleJump, TripleJump OR Dash OR Damage=10
       HammerSJump=2, DoubleJump
       HammerSJump=3, Dash OR Shuriken=1 OR Flash=1 OR Sentry=1
-      AerialHammerJump, TripleJump OR GlideJump
+      AerialHammerJump, TripleJump OR Dash OR Glide OR Sword OR Sentry=2 OR Damage=10
       # GrenadeJump=3, DoubleJump, TripleJump OR Dash
       # GrenadeJump=2, DoubleJump, Damage=10, TripleJump OR Dash
       # DoubleJump, TripleJump, Damage=10, GrenadeJump=1, Damage=10  # tjump into the spikes then gjump, dboost in the spikes and finish with tjump
@@ -3748,7 +3748,7 @@ anchor EastHollow.DepthsLeverDoor at 29, -4302:  # To the left of the lever door
       Bash, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1  # throw your grenade and reach it by either bashing the lower lantern or a slug projectile
       DoubleJump, TripleJump, Damage=10
-      AerialHammerJump, TripleJump OR Dash OR Glide OR Shuriken=1 OR Damage=10  # upslash before hjump
+      AerialHammerJump, TripleJump OR Dash OR Glide OR Shuriken=1 OR Sentry=2 OR Damage=10
       GlideJump, DoubleJump, Damage=10
       # GrenadeJump=1, Damage=10
       # GrenadeJump=1, DoubleJump, TripleJump OR Dash OR Sword OR Hammer
@@ -3778,8 +3778,6 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
       GlideJump, DoubleJump
       GlideJump, Dash, Hammer
     unsafe:
-      SentryJump=1
-      AerialHammerJump
       GlideJump, Hammer OR Spear=2
       GrenadeJump, DoubleJump
       DoubleJump, Dash OR Hammer
@@ -3794,7 +3792,7 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
       DoubleJump, TripleJump
       HammerSJump=1, DoubleJump, Dash
       SentryJump=2, DoubleJump, Dash OR Glide
-    kii:  # sjump=2, damage=10 is redundant with going to the jumpad
+    kii:
       AerialHammerJump
       SentryJump=1, DoubleJump  # running sjump from the tree. Hammer sjump near the spikes then djump + upslash
       GlideJump, DoubleJump OR Hammer
@@ -3807,7 +3805,7 @@ anchor EastHollow.BashTreeCheckpoint at -7, -4325:  # Checkpoint at Bash tree
       SwordSJump=1, Dash OR Shuriken=2
       GrenadeJump
   conn EastHollow.TreeAreaJumppad:
-    unsafe: SentryJump=2, Damage=10
+    unsafe: SentryJump=2, Damage=10  # sjump from spikes
 
 anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door blocking Depths access
   refill Checkpoint
@@ -3850,7 +3848,7 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
       Bash, Grenade=1, DoubleJump  # Bait the mantis
       HammerSJump=1, DoubleJump
       SwordSJump=1, DoubleJump, TripleJump OR Dash
-      AerialHammerJump, Glide OR TripleJump
+      AerialHammerJump, Bash OR Glide OR TripleJump
       GlideJump, DoubleJump, TripleJump
     unsafe:
       Glide, DoubleJump, TripleJump
@@ -3922,14 +3920,13 @@ anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to 
     kii:
       Grapple, DoubleJump, TripleJump, Hammer, Shuriken=1 # Grapple, tjump, upslash, one horizontal attack, shuriken
       Grapple, DoubleJump, TripleJump, Dash, Sword OR Hammer  # pogo the mortar with sword or tjump + upslash with hammer
-      AerialHammerJump, TripleJump OR GlideJump
+      AerialHammerJump
       SwordSJump=1, DoubleJump OR SentryJump=1  # running sjump to the mortar
     unsafe:
       DoubleJump, TripleJump, Dash  # using the walls and ceilings
       DoubleJump, TripleJump, Sword OR Hammer  # Tjump+upslash from friendly spikes. Sword upslash need to hit the mortar to reset your jumps
       SentryJump=1  # hover to friendly spikes bellow the second mortar and sjump from here
       GrenadeJump, DoubleJump
-      AerialHammerJump
 
   conn EastHollow.KwolokPathGrapplePlant: free
   conn EastHollow.Kwolok:
@@ -3945,7 +3942,6 @@ anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to 
       DoubleJump, Sentry=2, Damage=10
       Grapple, Glide, Dash
       SwordSJump=1, Glide OR Dash # running sjump to land near the mortar. Refresh dash into ceiling.
-      SwordSJump=2, Damage=10
       HammerSJump=1, Glide, Dash OR Damage=10
       HammerSJump=1, Dash, Damage=10
       GlideJump, Dash OR Damage=10
@@ -4025,8 +4021,6 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       Water, DoubleJump, TripleJump, Damage=10
       Water, DoubleJump, Hammer, Damage=20
       Water, AerialHammerJump
-      Water, Damage=10, SwordSJump=1  # OR GrenadeJump=1
-      Water, Damage=10, GlideJump, DoubleJump
     unsafe:
       Water, Damage=10, DoubleJump OR SentryJump=1 OR GrenadeJump
       Water, DoubleJump, GrenadeJump
@@ -4108,7 +4102,7 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       WaterDash, Hammer, Damage=10, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       WaterDash, Glide, Damage=10, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       # Glitched paths probably really lacking. The pathfinder seed doesn't have the balloon here and I got lazy
-      AerialHammerJump, DoubleJump, TripleJump OR Damage=10
+      AerialHammerJump, TripleJump OR Damage=10
     unsafe, EastHollow.SilentSwimWall:
       Water, Grapple, Sentry=3
       Water, Grapple, Shuriken=2, Combat=Balloon OR Damage=20
@@ -4118,9 +4112,9 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       Water, WaterDash, Sword  # Pogo the projectile
       Water, WaterDash, GlideJump
       Water, SwordSJump=1  # probably doable with hammer as well, but it's much harder
-      Water, Bash
+      Water, Bash OR AerialHammerJump OR GlideHammerJump
       # Dirty Swims, probably incomplete. Stand in shallow water on the side of the first air pocket to regen.
-      Damage=210, Launch
+      Damage=210, Launch OR AerialHammerJump  # GlideHammerJump doesn't work from where you regen
       Damage=210, Grapple, DoubleJump OR Dash OR Sword OR Sentry=3
       Damage=210, Grapple, Hammer, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       Damage=210, Grapple, Glide, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
