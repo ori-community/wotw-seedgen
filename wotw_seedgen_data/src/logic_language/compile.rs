@@ -421,7 +421,16 @@ impl RequirementRepository {
             ]),
             Trick::GrenadeJump => Requirement::and([
                 self.trick.grenade_jump.clone(),
-                Requirement::NonConsumingEnergySkill(Skill::Grenade),
+                Requirement::or([
+                    Requirement::and([
+                        self.difficulty.r#unsafe.clone(),
+                        Requirement::NonConsumingEnergySkill(Skill::Grenade),
+                    ]),
+                    match amount.take() {
+                        None => Requirement::Impossible,
+                        Some(amount) => Requirement::EnergySkill(Skill::Grenade, amount as f32),
+                    },
+                ]),
             ]),
             Trick::SwordJump => Requirement::and([
                 self.trick.sword_jump.clone(),
