@@ -52,7 +52,9 @@ GladesTown.Lightcatchers, 21, 47651,
 GladesTown.SelaFlowers, 21, 16254,
 GladesTown.SpringPlants, 21, 38393,
 GladesTown.StickyGrass, 21, 64583,
+GladesTown.FamilyReunionMokiTalkedTo, 14019, 27804, 1
 GladesTown.FamilyReunion, 14019, 27804, 4
+GladesTown.FatherMokiGone, 42178, 36609,
 GladesTown.DiamondInTheRoughCompleted, 14019, 61011, 5
 WestGlades.CombatShrineCompleted, 44310, 58796,
 MidnightBurrows.TeleporterActive, 24922, 42531,
@@ -79,6 +81,9 @@ OuterWellspring.LifeHarvestWallBroken, 53632, 62781,
 OuterWellspring.WestDoorBlueMoonFree, 53632, 2522,
 OuterWellspring.FallingWheel, 37858, 16604,
 OuterWellspring.TrialActivation, 44964, 11512, 1
+WoodsEntry.CanOpenMokiFatherHut, 6, 500,
+WoodsEntry.MokiFatherHutDoorOpen, 58674, 14313,
+WoodsEntry.FamilyReunionDollQICollected, 14019, 27804, 3
 WoodsEntry.TeleporterActive, 58674, 7071,
 WoodsEntry.KeystoneDoor, 58674, 21500,
 WoodsMain.KeystoneDoor, 18793, 41544,
