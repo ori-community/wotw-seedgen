@@ -126,9 +126,7 @@ struct Compiler<'source, 'log> {
     index_offset: usize,
     entrance_nodes: Vec<usize>,
     default_entrance_connections: FxHashMap<EntranceId, EntranceId>,
-    difficulty_requirements: DifficultyRequirements,
-    trick_requirements: TrickRequirements,
-    hard_requirement: Requirement,
+    requirements: RequirementRepository,
     state_map: FxHashMap<Cow<'source, str>, usize>,
     pickup_map: FxHashMap<&'source str, usize>,
     anchor_map: FxHashMap<String, usize>,
@@ -146,13 +144,6 @@ impl<'source, 'log> Compiler<'source, 'log> {
         settings: &[WorldSettings],
         log_capture: &'log LogCapture,
     ) -> Self {
-        let hard_requirement = setting_requirement(
-            settings,
-            WorldSettingsHelpers::none_play_hard,
-            WorldSettingsHelpers::all_play_hard,
-            Requirement::NormalGameDifficulty,
-        );
-
         let mut errors = vec![];
         let mut node_index_iter = 0..;
 
@@ -267,9 +258,7 @@ impl<'source, 'log> Compiler<'source, 'log> {
             index_offset: loc_data_nodes.len() + state_data_nodes.len(),
             entrance_nodes: vec![],
             default_entrance_connections: FxHashMap::default(),
-            difficulty_requirements: DifficultyRequirements::new(settings),
-            trick_requirements: TrickRequirements::new(settings),
-            hard_requirement,
+            requirements: RequirementRepository::new(settings),
             state_map,
             pickup_map,
             anchor_map,
@@ -347,11 +336,173 @@ impl<'source, 'log> Compiler<'source, 'log> {
     }
 }
 
+struct RequirementRepository {
+    difficulty: DifficultyRequirements,
+    trick: TrickRequirements,
+    normal: Requirement,
+}
+
+impl RequirementRepository {
+    fn new(settings: &[WorldSettings]) -> Self {
+        Self {
+            difficulty: DifficultyRequirements::new(settings),
+            trick: TrickRequirements::new(settings),
+            normal: setting_requirement(
+                settings,
+                WorldSettingsHelpers::all_play_hard,
+                WorldSettingsHelpers::none_play_hard,
+                Requirement::NormalGameDifficulty,
+            ),
+        }
+    }
+
+    fn difficulty(&self, difficulty: Difficulty) -> Requirement {
+        match difficulty {
+            Difficulty::Moki => self.difficulty.moki.clone(),
+            Difficulty::Gorlek => self.difficulty.gorlek.clone(),
+            Difficulty::Kii => self.difficulty.kii.clone(),
+            Difficulty::Unsafe => self.difficulty.r#unsafe.clone(),
+        }
+    }
+
+    fn trick(&self, trick: Trick, amount: &mut Option<usize>) -> Option<Requirement> {
+        let requirement = match trick {
+            Trick::SwordSentryJump => Requirement::and([
+                self.trick.sword_sentry_jump.clone(),
+                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::Skill(Skill::Sword),
+            ]),
+            Trick::HammerSentryJump => Requirement::and([
+                self.trick.hammer_sentry_jump.clone(),
+                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::ShurikenBreak => Requirement::and([
+                self.trick.shuriken_break.clone(),
+                Requirement::ShurikenBreak(amount.take()? as f32),
+            ]),
+            Trick::SentryBreak => Requirement::and([
+                self.trick.sentry_break.clone(),
+                Requirement::SentryBreak(amount.take()? as f32),
+            ]),
+            Trick::HammerBreak => Requirement::and([
+                self.trick.hammer_break.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::SpearBreak => Requirement::and([
+                self.trick.spear_break.clone(),
+                Requirement::EnergySkill(Skill::Spear, 1.),
+            ]),
+            Trick::SentryBurn => Requirement::and([
+                self.trick.sentry_burn.clone(),
+                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+            ]),
+            Trick::RemoveKillPlane => self.trick.remove_kill_plane.clone(),
+            Trick::LaunchSwap => Requirement::and([
+                self.trick.launch_swap.clone(),
+                Requirement::Skill(Skill::Launch),
+            ]),
+            Trick::SentrySwap => Requirement::and([
+                self.trick.sentry_swap.clone(),
+                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+            ]),
+            Trick::FlashSwap => Requirement::and([
+                self.trick.flash_swap.clone(),
+                Requirement::NonConsumingEnergySkill(Skill::Flash),
+            ]),
+            Trick::BlazeSwap => Requirement::and([
+                self.trick.blaze_swap.clone(),
+                Requirement::EnergySkill(Skill::Blaze, amount.take()? as f32),
+            ]),
+            Trick::WaveDash => Requirement::and([
+                self.trick.wave_dash.clone(),
+                Requirement::Skill(Skill::Dash),
+                Requirement::NonConsumingEnergySkill(Skill::Regenerate),
+            ]),
+            Trick::GrenadeJump => Requirement::and([
+                self.trick.grenade_jump.clone(),
+                Requirement::NonConsumingEnergySkill(Skill::Grenade),
+            ]),
+            Trick::SwordJump => Requirement::and([
+                self.trick.sword_jump.clone(),
+                Requirement::Skill(Skill::Sword),
+                Requirement::Skill(Skill::DoubleJump),
+            ]),
+            Trick::GlideJump => Requirement::and([
+                self.trick.glide_jump.clone(),
+                Requirement::Skill(Skill::Glide),
+            ]),
+            Trick::AerialHammerJump => Requirement::and([
+                self.trick.aerial_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+                Requirement::Skill(Skill::DoubleJump),
+            ]),
+            Trick::GlideHammerJump => Requirement::and([
+                self.trick.glide_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+                Requirement::Skill(Skill::Glide),
+            ]),
+            Trick::CoyoteHammerJump => Requirement::and([
+                self.trick.coyote_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::WallHammerJump => Requirement::and([
+                self.trick.wall_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::GroundedHammerJump => Requirement::and([
+                self.trick.grounded_hammer_jump.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::HammerExtension => Requirement::and([
+                self.trick.hammer_extension.clone(),
+                Requirement::Skill(Skill::Hammer),
+            ]),
+            Trick::GrenadeRedirect => Requirement::and([
+                self.trick.grenade_redirect.clone(),
+                Requirement::EnergySkill(Skill::Grenade, amount.take()? as f32),
+            ]),
+            Trick::SentryRedirect => Requirement::and([
+                self.trick.sentry_redirect.clone(),
+                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+            ]),
+            Trick::PauseFloat => self.trick.pause_float.clone(),
+            Trick::SpearJump => Requirement::and([
+                self.trick.spear_jump.clone(),
+                Requirement::EnergySkill(Skill::Spear, amount.take()? as f32),
+            ]),
+            Trick::GlideBashChain => Requirement::and([
+                self.trick.glide_bash_chain.clone(),
+                Requirement::Skill(Skill::Glide),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::DoubleJumpBashChain => Requirement::and([
+                self.trick.double_jump_bash_chain.clone(),
+                Requirement::Skill(Skill::DoubleJump),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::DashBashChain => Requirement::and([
+                self.trick.dash_bash_chain.clone(),
+                Requirement::Skill(Skill::Dash),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::LaunchBashChain => Requirement::and([
+                self.trick.launch_bash_chain.clone(),
+                Requirement::Skill(Skill::Launch),
+                Requirement::Skill(Skill::Bash),
+            ]),
+            Trick::Unpopular => self.trick.unpopular.clone(),
+        };
+
+        Some(requirement)
+    }
+}
+
 struct DifficultyRequirements {
     moki: Requirement,
     gorlek: Requirement,
     kii: Requirement,
-    notsafe: Requirement,
+    r#unsafe: Requirement,
 }
 
 impl DifficultyRequirements {
@@ -374,16 +525,7 @@ impl DifficultyRequirements {
             moki: build_difficulty(Difficulty::Moki),
             gorlek: build_difficulty(Difficulty::Gorlek),
             kii: build_difficulty(Difficulty::Kii),
-            notsafe: build_difficulty(Difficulty::Unsafe),
-        }
-    }
-
-    fn get(&self, difficulty: Difficulty) -> Requirement {
-        match difficulty {
-            Difficulty::Moki => self.moki.clone(),
-            Difficulty::Gorlek => self.gorlek.clone(),
-            Difficulty::Kii => self.kii.clone(),
-            Difficulty::Unsafe => self.notsafe.clone(),
+            r#unsafe: build_difficulty(Difficulty::Unsafe),
         }
     }
 }
@@ -467,135 +609,6 @@ impl TrickRequirements {
             launch_bash_chain: build_trick(Trick::LaunchBashChain),
             unpopular: build_trick(Trick::Unpopular),
         }
-    }
-
-    fn get(&self, trick: Trick, amount: &mut Option<usize>) -> Option<Requirement> {
-        let requirement = match trick {
-            Trick::SwordSentryJump => Requirement::and([
-                self.sword_sentry_jump.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
-                Requirement::Skill(Skill::Sword),
-            ]),
-            Trick::HammerSentryJump => Requirement::and([
-                self.hammer_sentry_jump.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
-                Requirement::Skill(Skill::Hammer),
-            ]),
-            Trick::ShurikenBreak => Requirement::and([
-                self.shuriken_break.clone(),
-                Requirement::ShurikenBreak(amount.take()? as f32),
-            ]),
-            Trick::SentryBreak => Requirement::and([
-                self.sentry_break.clone(),
-                Requirement::SentryBreak(amount.take()? as f32),
-            ]),
-            Trick::HammerBreak => {
-                Requirement::and([self.hammer_break.clone(), Requirement::Skill(Skill::Hammer)])
-            }
-            Trick::SpearBreak => Requirement::and([
-                self.spear_break.clone(),
-                Requirement::EnergySkill(Skill::Spear, 1.),
-            ]),
-            Trick::SentryBurn => Requirement::and([
-                self.sentry_burn.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
-            ]),
-            Trick::RemoveKillPlane => self.remove_kill_plane.clone(),
-            Trick::LaunchSwap => {
-                Requirement::and([self.launch_swap.clone(), Requirement::Skill(Skill::Launch)])
-            }
-            Trick::SentrySwap => Requirement::and([
-                self.sentry_swap.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
-            ]),
-            Trick::FlashSwap => Requirement::and([
-                self.flash_swap.clone(),
-                Requirement::NonConsumingEnergySkill(Skill::Flash),
-            ]),
-            Trick::BlazeSwap => Requirement::and([
-                self.blaze_swap.clone(),
-                Requirement::EnergySkill(Skill::Blaze, amount.take()? as f32),
-            ]),
-            Trick::WaveDash => Requirement::and([
-                self.wave_dash.clone(),
-                Requirement::Skill(Skill::Dash),
-                Requirement::NonConsumingEnergySkill(Skill::Regenerate),
-            ]),
-            Trick::GrenadeJump => Requirement::and([
-                self.grenade_jump.clone(),
-                Requirement::NonConsumingEnergySkill(Skill::Grenade),
-            ]),
-            Trick::SwordJump => Requirement::and([
-                self.sword_jump.clone(),
-                Requirement::Skill(Skill::Sword),
-                Requirement::Skill(Skill::DoubleJump),
-            ]),
-            Trick::GlideJump => {
-                Requirement::and([self.glide_jump.clone(), Requirement::Skill(Skill::Glide)])
-            }
-            Trick::AerialHammerJump => Requirement::and([
-                self.aerial_hammer_jump.clone(),
-                Requirement::Skill(Skill::Hammer),
-                Requirement::Skill(Skill::DoubleJump),
-            ]),
-            Trick::GlideHammerJump => Requirement::and([
-                self.glide_hammer_jump.clone(),
-                Requirement::Skill(Skill::Hammer),
-                Requirement::Skill(Skill::Glide),
-            ]),
-            Trick::CoyoteHammerJump => Requirement::and([
-                self.coyote_hammer_jump.clone(),
-                Requirement::Skill(Skill::Hammer),
-            ]),
-            Trick::WallHammerJump => Requirement::and([
-                self.wall_hammer_jump.clone(),
-                Requirement::Skill(Skill::Hammer),
-            ]),
-            Trick::GroundedHammerJump => Requirement::and([
-                self.grounded_hammer_jump.clone(),
-                Requirement::Skill(Skill::Hammer),
-            ]),
-            Trick::HammerExtension => Requirement::and([
-                self.hammer_extension.clone(),
-                Requirement::Skill(Skill::Hammer),
-            ]),
-            Trick::GrenadeRedirect => Requirement::and([
-                self.grenade_redirect.clone(),
-                Requirement::EnergySkill(Skill::Grenade, amount.take()? as f32),
-            ]),
-            Trick::SentryRedirect => Requirement::and([
-                self.sentry_redirect.clone(),
-                Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
-            ]),
-            Trick::PauseFloat => self.pause_float.clone(),
-            Trick::SpearJump => Requirement::and([
-                self.spear_jump.clone(),
-                Requirement::EnergySkill(Skill::Spear, amount.take()? as f32),
-            ]),
-            Trick::GlideBashChain => Requirement::and([
-                self.glide_bash_chain.clone(),
-                Requirement::Skill(Skill::Glide),
-                Requirement::Skill(Skill::Bash),
-            ]),
-            Trick::DoubleJumpBashChain => Requirement::and([
-                self.double_jump_bash_chain.clone(),
-                Requirement::Skill(Skill::DoubleJump),
-                Requirement::Skill(Skill::Bash),
-            ]),
-            Trick::DashBashChain => Requirement::and([
-                self.dash_bash_chain.clone(),
-                Requirement::Skill(Skill::Dash),
-                Requirement::Skill(Skill::Bash),
-            ]),
-            Trick::LaunchBashChain => Requirement::and([
-                self.launch_bash_chain.clone(),
-                Requirement::Skill(Skill::Launch),
-                Requirement::Skill(Skill::Bash),
-            ]),
-            Trick::Unpopular => self.unpopular.clone(),
-        };
-
-        Some(requirement)
     }
 }
 
@@ -1100,9 +1113,9 @@ impl Compile for ast::PlainRequirement<'_> {
                 }
             }
         } else if let Ok(difficulty) = Difficulty::from_str(identifier) {
-            no_amount().map(|()| compiler.difficulty_requirements.get(difficulty))
+            no_amount().map(|()| compiler.requirements.difficulty(difficulty))
         } else if let Ok(trick) = Trick::from_str(identifier) {
-            let option = compiler.trick_requirements.get(trick, &mut amount);
+            let option = compiler.requirements.trick(trick, &mut amount);
 
             if amount.is_some() {
                 Err(Error::error(
@@ -1129,7 +1142,9 @@ impl Compile for ast::PlainRequirement<'_> {
                 // TODO free is lowercase but impossible is uppercase
                 "free" => no_amount().map(|()| Requirement::Free),
                 "Impossible" => no_amount().map(|()| Requirement::Impossible),
-                "NormalGameDifficulty" => no_amount().map(|()| compiler.hard_requirement.clone()),
+                "NormalGameDifficulty" => {
+                    no_amount().map(|()| compiler.requirements.normal.clone())
+                }
                 "SpiritLight" => get_amount().map(Requirement::SpiritLight),
                 // TODO remove Ore
                 "Ore" | "GorlekOre" => get_amount().map(Requirement::GorlekOre),
@@ -1145,14 +1160,14 @@ impl Compile for ast::PlainRequirement<'_> {
                         Requirement::Skill(Skill::Hammer),
                         Requirement::EnergySkill(Skill::Bow, 1.0),
                         Requirement::and([
-                            compiler.difficulty_requirements.get(Difficulty::Gorlek),
+                            compiler.requirements.difficulty(Difficulty::Gorlek),
                             Requirement::or([
                                 Requirement::EnergySkill(Skill::Shuriken, 1.0),
                                 Requirement::EnergySkill(Skill::Grenade, 1.0),
                             ]),
                         ]),
                         Requirement::and([
-                            compiler.difficulty_requirements.get(Difficulty::Unsafe),
+                            compiler.requirements.difficulty(Difficulty::Unsafe),
                             Requirement::EnergySkill(Skill::Spear, 1.0),
                         ]),
                     ])
@@ -1164,15 +1179,15 @@ impl Compile for ast::PlainRequirement<'_> {
                         Requirement::or([
                             Requirement::and([
                                 compiler
-                                    .trick_requirements
-                                    .get(Trick::SwordSentryJump, &mut Some(amount))
+                                    .requirements
+                                    .trick(Trick::SwordSentryJump, &mut Some(amount))
                                     .unwrap(),
                                 Requirement::Skill(Skill::Sword),
                             ]),
                             Requirement::and([
                                 compiler
-                                    .trick_requirements
-                                    .get(Trick::HammerSentryJump, &mut Some(amount))
+                                    .requirements
+                                    .trick(Trick::HammerSentryJump, &mut Some(amount))
                                     .unwrap(),
                                 Requirement::Skill(Skill::Hammer),
                             ]),
@@ -1181,27 +1196,27 @@ impl Compile for ast::PlainRequirement<'_> {
                 }),
                 // TODO remove?
                 "SwordSJump" => compiler
-                    .trick_requirements
-                    .get(Trick::SwordSentryJump, &mut amount)
+                    .requirements
+                    .trick(Trick::SwordSentryJump, &mut amount)
                     .ok_or_else(|| todo!()),
                 // TODO remove?
                 "HammerSJump" => compiler
-                    .trick_requirements
-                    .get(Trick::HammerSentryJump, &mut amount)
+                    .requirements
+                    .trick(Trick::HammerSentryJump, &mut amount)
                     .ok_or_else(|| todo!()),
                 "AbilitySwap" => get_amount().map(|amount| {
                     Requirement::or([
                         compiler
-                            .trick_requirements
-                            .get(Trick::SentrySwap, &mut Some(amount))
+                            .requirements
+                            .trick(Trick::SentrySwap, &mut Some(amount))
                             .unwrap(),
                         compiler
-                            .trick_requirements
-                            .get(Trick::FlashSwap, &mut Some(amount))
+                            .requirements
+                            .trick(Trick::FlashSwap, &mut Some(amount))
                             .unwrap(),
                         compiler
-                            .trick_requirements
-                            .get(Trick::BlazeSwap, &mut Some(amount))
+                            .requirements
+                            .trick(Trick::BlazeSwap, &mut Some(amount))
                             .unwrap(),
                     ])
                 }),
