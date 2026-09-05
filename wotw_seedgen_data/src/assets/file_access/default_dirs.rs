@@ -6,7 +6,7 @@ pub static RANDOMIZER_USER_DATA_DIR: LazyLock<PathBuf> =
     LazyLock::new(|| match env::var_os("RANDOMIZER_USER_DATA_DIR") {
         None => {
             let mut data_dir = dirs::data_dir().expect("cannot determine data directory");
-            data_dir.push("Ori and the Will of the Wisps Randomizer");
+            data_dir.push("ori-wotw-randomizer");
             data_dir
         }
         Some(data_dir) => PathBuf::from(data_dir),
