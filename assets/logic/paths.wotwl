@@ -3534,8 +3534,7 @@ anchor EastHollow.AfterBeetleFight at -27, -4233:  # At the breakable floor to B
       GlideJump, Bash OR DoubleJump
       SwordSJump=1, Damage=10  # sjump then dboost on the left spikes to climb that wall
       SentryJump=1, DoubleJump
-      HammerSJump=1, Damage=20  # take a dboost in the right spikes to refresh your upslash then use it to climb the left wall
-      HammerSJump=1, Damage=10, Dash OR Shuriken=1 OR GlideJump  # glidejump from the right spikes. Other paths take a dboost by climbing the left wall
+      HammerSJump=1, Damage=10, Dash  # take a dboost by climbing the left wall
       # GrenadeJump=1, DoubleJump  # There's other solutions but climbing the first wall without djump seems too hard for kii
     unsafe:
       Grapple, DoubleJump, Sword  # pogo the mantis; too precise for kii without Dash
