@@ -2969,7 +2969,7 @@ anchor WestHollow.AboveJumppad at -207, -4304:  # At the ledge above the jumppad
         # GrenadeJump=1, Blaze=1, Spear=1 OR Damage=10
         # GrenadeJump=2, Blaze=1, Bow=1  # Bow is to ensure you can retract the upper tongue. Could add paths for WestHollow.UpperTongueRetracted from this anchor but most path which can jump on the lower tongue can finish the connection directly. Adding a state means that the whole connection would use 3 gjump so it wouldn't even be accurate
       SwordSJump=1  # with tongue extended, running sjump to the left to land on the tongue. Else, running sjump to the right and sword hover directly to the anchor
-      AerialHammerJump, TripleJump OR Damage=10  # dboost in the spikes on the right
+      AerialHammerJump
     unsafe, WestHollow.FullyDrained:
       DoubleJump, TripleJump  # https://youtu.be/6BwlBv2Y4yM
       WestHollow.LowerTongueExtended, Bash  # Get a slime onto the tongue and then lure a Skeeto up to follow
@@ -3189,10 +3189,8 @@ anchor WestHollow.DashApproach at -111, -4429:  # To the left of the lever door
       Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # bash the mantis
       Dash, Sword OR Hammer OR Shuriken=4 OR Flash=4 OR Sentry=4  # From the starting point, both coyote dash and jumping then dashing works.
       GlideJump, Dash OR SentryJump=1  # OR GrenadeJump=2  # Glide to the slime. With sjump, use weapon to reach the ledge above the slime and sjump from here. With gjump, one to reach the ledge above the slime and gjump+glide to the left wall (also possible to gjump to the pole directly but seems harder)
-      GlideJump, Damage=10, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # OR GrenadeJump=1  # Glide jump from spikes to the first pole. Energy weapon to reach the ledge above slime after walljumping from the left wall
       # GrenadeJump=2, DoubleJump OR Sword
       # GrenadeJump=3, Dash OR Glide OR Sword OR Hammer  # With hammer, easier to go directly to the pole. Sword could pogo the slime but you can kill it by throwing your grenade its way so not considering it
-      # GrenadeJump=3, Damage=10, Shuriken=4 OR Flash=4 OR Sentry=4  # hjump from the spikes to the first pole. energy weapon after first gjump to the slime + to grab the first pole + to grab the second pole + to reach the anchor (1st pole and anchor aren't mandatory)
       # GrenadeJump=3, Sentry=6  # gjump to left wall instead of from spikes
     unsafe:
       Dash  # avoiding slugs is hard and might take patience
@@ -3264,7 +3262,7 @@ anchor WestHollow.DashCrushers at -23, -4443:  # To the right of the crushers at
       SentryJump=1 OR Bash OR GlideJump:  # OR GrenadeJump=1:  # Reach the mantis spawning point
         SwordSJump=1  # sjump to the pole then use sword hover
         HammerSJump=1, Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
-      GlideJump, Bash, Grenade=1 OR Dash OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the mantis to reach the hanging log. Multiple solution to bash the mantis from higher: glide jump before bashing, bash the lizard as well or bait the mantis and return to the anchor coordinates before bashing it (you can also glide jump from the frinedly spikes above the right wall)
+      GlideJump, Bash, Grenade=1 OR Dash OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the mantis to reach the hanging log. Multiple solution to bash the mantis from higher: glide jump before bashing, bash the lizard as well or bait the mantis and return to the anchor coordinates before bashing it (you can also glide jump from the friendly spikes above the right wall)
       # GrenadeJump=3, Dash  # possible to reduce number of gjumps by using Spear/Blaze (which wouldn't be redundant with the dash+energy weapons paths) but using a them will always cost the same (or more) energy than a gjump
       # GrenadeJump=1, Dash, Glide
       # GrenadeJump=3, DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
