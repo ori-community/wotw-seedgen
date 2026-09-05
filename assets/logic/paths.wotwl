@@ -316,7 +316,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
 
   state MarshSpawn.TokkBarrier:
     gorlek: ShurikenBreak=16
-    unsafe: HammerBreak OR SpearBreak OR SentryBreak=16
+    kii: HammerBreak OR SpearBreak OR SentryBreak=16
   state MarshSpawn.CaveFight:
     moki: Combat=3xLizard  # at day there's two extra lizards
 
@@ -1060,7 +1060,7 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
       SentrySwap=1 OR BlazeSwap=1 OR FlashSwap OR GrenadeJump
   conn HowlsDen.MidwayBottomLoop:
     gorlek: ShurikenBreak=16
-    unsafe: HammerBreak OR SpearBreak OR SentryBreak=16
+    kii: HammerBreak OR SpearBreak OR SentryBreak=16
 
 anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door blocking the loop with the right hc
   refill Checkpoint:
@@ -1338,7 +1338,7 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
 anchor HowlsDen.AboveTeleporter at -348, -4497:  # After dropping down from the Sword Tree area and destroying the bone barrier
   state HowlsDen.BoneBarrier:
     gorlek: ShurikenBreak=16
-    unsafe: SentryBreak=16 OR HammerBreak OR SpearBreak
+    kii: SentryBreak=16 OR HammerBreak OR SpearBreak
 
   pickup HowlsDen.AboveTPSL:
     moki: BreakWall=10
@@ -1478,7 +1478,7 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
 
   state MarshSpawn.ToOpherBarrier:
     gorlek: ShurikenBreak=16
-    unsafe: HammerBreak OR SpearBreak OR SentryBreak=16
+    kii: HammerBreak OR SpearBreak OR SentryBreak=16
 
   conn OpherShop: free
   conn MarshPastOpher.TrialStart: free
@@ -1890,11 +1890,13 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
     gorlek, ShurikenBreak=20:
       Bash OR Launch OR SentryJump=1
       DoubleJump, TripleJump
-    kii, ShurikenBreak=20:
-      DoubleJump OR GlideJump  # OR GrenadeJump=1
+    kii:
+      SentryBreak=20, Bash OR Launch OR SentryJump=1  # gorlek paths but with sentry break
+      ShurikenBreak=20 OR SentryBreak=20:
+        DoubleJump OR GlideJump  # OR GrenadeJump=1
     unsafe, ShurikenBreak=20 OR SentryBreak=20:
       Sword  # Pogo the mortar projectile
-      Bash OR Launch OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR SwordSJump=1 OR BlazeSwap=1 OR GrenadeJump
+      Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR SwordSJump=1 OR BlazeSwap=1 OR FlashSwap OR GrenadeJump
   conn MarshPastOpher.PoolsPathBellowOneWayWall:
     moki, MarshPastOpher.PoolsPathFloor:
       Bash, DoubleJump OR Launch
@@ -2115,6 +2117,7 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPast
       GlideJump, DoubleJump OR Dash
   conn PoolsApproach.MarshBreakableWall:
     gorlek: ShurikenBreak=20
+    kii: SentryBreak=20
 
 region MidnightBurrows:
   # Burrows spikes deal 15 damage, enemies 10 with either contact or projectile damage.
@@ -5861,7 +5864,7 @@ anchor OuterWellspring.LifeHarvestEntry at -978, -4042:  # Checkpoint before the
       GrenadeJump, Water OR Damage=20 OR PauseFloat
   state OuterWellspring.LifeHarvestWallBroken:
     gorlek: ShurikenBreak=20
-    unsafe: SentryBreak=20
+    kii: SentryBreak=20
 
   pickup OuterWellspring.LifeHarvestShard:
     moki:
@@ -6860,12 +6863,18 @@ anchor InnerWellspring.DrainRoom at -1169, -3946:  # Left of the water you can d
       InnerWellspring.DrainRoomBottomWheel, Hammer
       InnerWellspring.DrainLever, Bash, Grenade=1, Damage=15 OR Grenade=1
       Bash, Grenade=1, Water, Damage=15 OR Grenade=1  # use the bottom of the wheel, don't have to free it
-    kii, ShurikenBreak=10:
-      InnerWellspring.DrainRoomBottomWheel, Shuriken=3 OR Flash=3 OR Sentry=3
-      Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, you can use gorlek path instead
-      InnerWellspring.DrainLever, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15:
-        Damage=45
-      Bash, Grenade=1, Shuriken=1, InnerWellspring.DrainLever OR Water
+    kii:
+      SentryBreak=10: # gorlek paths but with sentry break
+        Glide
+        InnerWellspring.DrainRoomBottomWheel, Hammer
+        InnerWellspring.DrainLever, Bash, Grenade=1, Damage=15 OR Grenade=1
+        Bash, Grenade=1, Water, Damage=15 OR Grenade=1  # use the bottom of the wheel, don't have to free it
+      ShurikenBreak=10 OR SentryBreak=10:
+        InnerWellspring.DrainRoomBottomWheel, Shuriken=3 OR Flash=3 OR Sentry=3
+        Bash, Grenade=1, Damage=20  # dboost in dirty water. If you drained the water, you can use gorlek path instead
+        InnerWellspring.DrainLever, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15:
+          Damage=45
+        Bash, Grenade=1, Shuriken=1, InnerWellspring.DrainLever OR Water
 
 anchor InnerWellspring.DrainAreaEntrance at -1128, -3968:  # On the wall after dropping through the gate draining the water
   pickup InnerWellspring.DrainHF:
@@ -6993,6 +7002,7 @@ anchor InnerWellspring.DrainRoomCheckpoint at -1096, -3938:  # checkpoint to the
     moki: InnerWellspring.DrainLever
   conn InnerWellspring.DrainAreaExit:
     gorlek: ShurikenBreak=10
+    kii: SentryBreak=10
   conn InnerWellspring.DrainRoom:
     kii:  # Dboost in water or in spikes if drained
       Damage=15, InnerWellspring.DrainLever OR Water
@@ -7281,6 +7291,7 @@ anchor InnerWellspring.EastDoor at -1190, -3732:  # Inside the door leading to t
       DoubleJump, TripleJump
       Damage=15, GlideJump  # OR GrenadeJump=1
       AerialHammerJump OR SentryJump=1
+      SentryBreak=10, Combat=Tentacle OR Bash
     unsafe:
       DoubleJump OR GlideJump OR AbilitySwap=1 OR Damage=15
 
@@ -8325,8 +8336,8 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
   state WoodsMain.BalloonLureBlobDestroyed:
     moki: Sword OR Hammer OR Grenade=1 OR Blaze=1
-    #kii: ShurikenBreak=3
-    unsafe: ShurikenBreak=3 OR Sentry=1
+    kii: ShurikenBreak=3
+    unsafe: Sentry=1
 
   pickup WoodsMain.HiddenOre:
     moki: Flap, Glide
@@ -8652,9 +8663,7 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
   state WoodsMain.LogBlobDestroyed:  # these can break the corruption from behind
     gorlek: Sword OR Hammer OR Grenade=1 OR Blaze=1 OR Sentry=1
     kii: ShurikenBreak=3
-    unsafe:
-      ShurikenBreak=3
-      DoubleJump, Glide, Damage=20  # use the balloon
+    unsafe: DoubleJump, Glide, Damage=20  # use the balloon
 
   conn Teleporters: free
   conn WoodsMain.AbovePit:  # So far, this also cover the OrangeTree connection
@@ -9743,6 +9752,7 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
     gorlek: SentryJump=1
   conn LowerReach.EastFurnace:
     gorlek: ShurikenBreak=20
+    kii: SentryBreak=20
   conn LowerReach.SnowballEnemyPaths:
     moki, LowerReach.RolledSnowball:
       LowerReach.ThawCentralFurnace, Combat=Lizard OR Bash
@@ -10968,6 +10978,7 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
     gorlek:
       Water, UpperDepths.ForestsEyes OR Flash=1
       DepthsLight, ShurikenBreak=20, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=30
+    kii: DepthsLight, SentryBreak=20, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=30
 
   conn UpperDepths.FirstFirefly:
     moki:
@@ -11115,7 +11126,9 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
 
   quest UpperDepths.LightcatcherSeed:
     gorlek: ShurikenBreak=20, DepthsLight, DoubleJump OR Dash OR Glide OR Sword
-    # kii: ShurikenBreak=20, DepthsLight, Sword OR Sentry=2
+    kii:
+      SentryBreak=20, DepthsLight, DoubleJump OR Dash OR Glide OR Sword OR Sentry=2
+      ShurikenBreak=20, DepthsLight, Sentry=2
 
   pickup UpperDepths.HiveSL:
     moki: Bash OR Launch  # bash makes paths destroying the hive redundant in moki
