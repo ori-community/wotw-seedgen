@@ -2213,8 +2213,7 @@ anchor MidnightBurrows.Central at -781, -4564:  # The left ledge of the big port
     gorlek: Bash OR SentryJump=2
     kii:
       DoubleJump, TripleJump, Damage=30 OR Sword  # with sword, pogo the mortar
-      SentryJump=1
-      AerialHammerJump  # upslash first
+      SentryJump=1 OR AerialHammerJump
       GlideJump, DoubleJump, Sword
       GlideJump, DoubleJump, TripleJump, Damage=15
       # GrenadeJump=1, DoubleJump
@@ -2337,7 +2336,7 @@ anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the por
       Bash, DoubleJump, TripleJump
       Bash, Dash, Glide OR Sword
     kii:
-      Launch
+      Launch OR AerialHammerJump
       Bash, Damage=15
       Bash, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
       Bash, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -2350,22 +2349,19 @@ anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the por
       Damage=75, Dash OR Sword
       Damage=90, Hammer
       Damage=60, Glide  # go to the left portal
-      SwordSJump=1, Damage=15  # hover to the bashable plant then sjump from the spikes
-      AerialHammerJump
       GlideJump, Bash
-      GlideJump, Dash, Damage=30
-      GlideJump, Damage=45
-      GlideJump, DoubleJump, TripleJump OR Damage=30
-      GlideJump, DoubleJump, Damage=15, Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # use everything to get a wjump to the right of the bashable plant. From there glide to the top of the left spikes the djump to the right portal
+      GlideJump, DoubleJump, TripleJump      
     unsafe:
+      Damage=75 OR GlideHammerJump
+      Hammer, Damage=60
+      Damage=30, DoubleJump OR GlideJump
+      GlideJump, DoubleJump, Damage=15  # wjump to the right of the bashable plant. From there glide to the top of the left spikes the djump to the right portal
+      SwordSJump=1, Damage=15  # hover to the bashable plant then sjump from the spikes
       Bash, DoubleJump, Spear=1 OR Flash=1 OR Sentry=1
       Bash, Dash OR Grenade=1
       Bash, Sword, Shuriken=1  # pogo the shuriken
       DoubleJump, TripleJump  # https://youtu.be/OMjOhM767ac
-      Damage=30, DoubleJump OR GlideJump
-      Hammer, Damage=60
-      Damage=75 OR GlideHammerJump
-
+      
 anchor MidnightBurrows.East at -687, -4553:  # Behind the timed-puzzle door
   refill Checkpoint
 
