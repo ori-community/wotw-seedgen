@@ -107,15 +107,14 @@ on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState,
 on WillowsEnd.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
 
 // In door rando or with warps/oob, collecting the DollQI can skip earlier quest steps and lock you out of obtaining the key.
-// The key is given on familyReunionQuest==2, which can be skipped over when obtaining the QI (familyReunionQuest==3)
 on spawn store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
-// When receiving the key, allow opening the hut. canOpenMokiFatherHut is only used to track if the player has obtained the key.
+// When receiving the key, allow opening the hut
 on questUberStateGroup.familyReunionQuest == 2 {
     store(randoState.canOpenMokiFatherHut, true)
     // If DollQI is already collected and we have previously reverted this state, skip the DollQI quest step
     if WoodsEntry.DollQI store(questUberStateGroup.familyReunionQuest, 3)
 }
-// If DollQI is collected without obtaining the key, revert the quest state to its previous value
+// If DollQI is collected without having opened the hut, revert the quest state to its previous value
 on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut == false {
     if gladesProjects.housesABuilt == false store(questUberStateGroup.familyReunionQuest, 0)
     if gladesProjects.housesABuilt store(questUberStateGroup.familyReunionQuest, 1)

@@ -8118,8 +8118,10 @@ anchor WoodsEntry.FamilyHut at 469, -4179: # infront of family reunion hut door
   # refill Checkpoint:
   #   unsafe: WoodsEntry.MokiFatherHutDoorOpen
 
-  state WoodsEntry.MokiFatherHutDoorOpen:
-    moki: GladesTown.FamilyReunionKey
+  state WoodsEntry.MokiFatherHutDoorOpen:  # Whether the door is actually open
+    moki: WoodsEntry.CanOpenMokiFatherHut
+  state WoodsEntry.CanOpenMokiFatherHut:  # Rando-specific config to allow opening the door
+    moki: GladesTown.FamilyReunionKey  # Requirement defined by seed_core
 
   conn WoodsEntry.BellowHut: free
   conn WoodsEntry.ShriekMeet:

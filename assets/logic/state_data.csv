@@ -81,6 +81,7 @@ OuterWellspring.LifeHarvestWallBroken, 53632, 62781,
 OuterWellspring.WestDoorBlueMoonFree, 53632, 2522,
 OuterWellspring.FallingWheel, 37858, 16604,
 OuterWellspring.TrialActivation, 44964, 11512, 1
+WoodsEntry.CanOpenMokiFatherHut, 6, 500,
 WoodsEntry.MokiFatherHutDoorOpen, 58674, 14313,
 WoodsEntry.FamilyReunionDollQICollected, 14019, 27804, 3
 WoodsEntry.TeleporterActive, 58674, 7071,
