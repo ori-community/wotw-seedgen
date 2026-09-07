@@ -23,7 +23,6 @@ use wotw_seedgen_parse::{
 
 // TODO not really part of compilation but some kind of lints would be nice, like:
 // verify all states were used
-// verify nothing was used mixed as either quest or pickup
 // verify all anchors are connected
 // check for implicit moki
 
@@ -804,7 +803,7 @@ impl Compile for ast::Anchor<'_> {
                                 ast::ConnectionKeyword::State => compiler
                                     .state_map
                                     .get(&Cow::Borrowed(connection.identifier.data.0)),
-                                ast::ConnectionKeyword::Pickup | ast::ConnectionKeyword::Quest => {
+                                ast::ConnectionKeyword::Pickup => {
                                     compiler.pickup_map.get(connection.identifier.data.0)
                                 }
                                 ast::ConnectionKeyword::Anchor => {

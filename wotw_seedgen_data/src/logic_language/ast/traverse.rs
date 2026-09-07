@@ -217,9 +217,9 @@ impl<'ast, 'source, H: Handler<'ast, 'source>> Traverse<'ast, 'source, H>
             Self::Connection(keyword, connection) => {
                 if let SpannedOption::Some(connection) = &connection.value {
                     match keyword.data {
-                        ConnectionKeyword::State
-                        | ConnectionKeyword::Quest
-                        | ConnectionKeyword::Pickup => handler.state_def(&connection.identifier),
+                        ConnectionKeyword::State | ConnectionKeyword::Pickup => {
+                            handler.state_def(&connection.identifier)
+                        }
                         ConnectionKeyword::Anchor => handler.anchor_use(&connection.identifier),
                     }
 

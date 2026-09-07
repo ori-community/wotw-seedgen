@@ -320,7 +320,11 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
   state MarshSpawn.CaveFight:
     moki: Combat=3xLizard  # at day there's two extra lizards
 
-  quest MarshSpawn.CaveKS:
+  pickup MarshSpawn.LeftTokkSL:
+    moki: BreakWall=10
+  pickup MarshSpawn.FightRoomSL:
+    moki: BreakWall=10
+  pickup MarshSpawn.CaveKS:
     moki:
       DoubleJump, Dash OR Grapple
       Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
@@ -331,13 +335,8 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       GlideJump
       # GrenadeJump=1, Glide
     unsafe: GrenadeJump
-  quest MarshSpawn.TokkKeystoneQuest:
+  pickup MarshSpawn.TokkKeystoneQuest:
     moki: MarshSpawn.CaveKS
-
-  pickup MarshSpawn.LeftTokkSL:
-    moki: BreakWall=10
-  pickup MarshSpawn.FightRoomSL:
-    moki: BreakWall=10
 
   conn Tokk: free  # this one is tokk anywhere'd
   conn MarshSpawn.CaveEntrance:
@@ -454,8 +453,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
     moki: BreakCrystal  # on the ground on the way to Burrows
     unsafe: free  # bait the bat into shooting it
 
-  quest MarshSpawn.CaveKS: free
-
+  pickup MarshSpawn.CaveKS: free
   pickup MarshSpawn.CaveOre:
     moki:
       DoubleJump OR Launch
@@ -632,9 +630,8 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
     moki: Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Bash
 
-  quest MarshSpawn.TokkTabletQuest:
+  pickup MarshSpawn.TokkTabletQuest:
     moki: MidnightBurrows.TabletQICollected
-
   pickup MarshSpawn.DamageTree:
     moki: MarshSpawn.DamageTreeOpen
   pickup MarshSpawn.CrusherSwimSL:  # Clean Water path originate from MarshSpawn.BeforeBurrows
@@ -859,9 +856,8 @@ anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but ou
   state MarshSpawn.MokkTalkedTo:  # First step of the "A little braver" quest. Required to progress the quest to step 2.
     moki: MarshSpawn.HowlBurnt
 
-  quest MarshSpawn.MokkFangQuest:
+  pickup MarshSpawn.MokkFangQuest:
     moki: MarshSpawn.HowlBurnt, MarshSpawn.FangQI OR MarshSpawn.FangQICollected  # This is the only situation where the quest can be completed by either holding the QI or having progressed to the previous step
-
   pickup MarshSpawn.RecklessShard:  #Make sure it's not redundant with MarshSpawn.MokkTheBrave->MarshSpawn.HowlApproach->MarshSpawn.RecklessShard
     moki, MarshSpawn.HowlBurnt, BreakWall=10:
       Bash, Grenade=1
@@ -954,8 +950,7 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
   state MarshSpawn.FangQICollected:  # Quest progression state. This is relevant because it can be used to complete the quest without picking up the fang (e.g. in a snippet)
     moki: MarshSpawn.MokkTalkedTo, MarshSpawn.FangQI
   
-  quest MarshSpawn.FangQI: free  # Only a pickup now
-
+  pickup MarshSpawn.FangQI: free  # Only a pickup now
   pickup MarshSpawn.FangEF:  #Make sure it's not redundant with MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena->MarshSpawn.FangEF
     gorlek:
       SentryJump=1
@@ -1112,8 +1107,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
     moki: BreakWall=16
     unsafe: HowlsDen.RainLifted, Unpopular, Bash, UltraBash  # Lure any enemies to the semisolid platform and UltraBash Ori against the wall
 
-  quest HowlsDen.SwordTree: free
-
+  pickup HowlsDen.SwordTree: free
   pickup HowlsDen.BoneOre:
     moki:
       Hammer
@@ -2235,7 +2229,7 @@ anchor MidnightBurrows.TabletRoom at -824, -4531:  # Before the four keystone do
   state MidnightBurrows.TabletQICollected:  # Quest state progression
     moki: MidnightBurrows.TabletQI
 
-  quest MidnightBurrows.TabletQI:  # Only a pickup now
+  pickup MidnightBurrows.TabletQI:  # Only a pickup now
     moki: MidnightBurrows.KeystoneDoor
 
   conn MidnightBurrows.Central: free
@@ -3449,8 +3443,7 @@ anchor EastHollow.MapMoki at -106, -4221:  # after crossing the voicelocked door
   refill Checkpoint
 
   # the VoiceDoorOpen state cannot be gained from this side, the cutscene that opens the door if you have the Voice doesn't trigger here
-  quest EastHollow.HandToHandMap: free
-
+  pickup EastHollow.HandToHandMap: free
   pickup EastHollow.GladesApproachOre:
     moki: Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Bash
@@ -3957,11 +3950,11 @@ anchor EastHollow.KwolokPathLantern at 32, -4217:  # at the safe ground next to 
 anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
 
-  quest EastHollow.ForestsVoice: free
-  quest EastHollow.WellspringDoneTalk:
+  state GladesTown.TuleySpawned:
     moki: InnerWellspring.WaterEscape
 
-  state GladesTown.TuleySpawned:
+  pickup EastHollow.ForestsVoice: free
+  pickup EastHollow.WellspringDoneTalk:
     moki: InnerWellspring.WaterEscape
 
   # Because of the slowzone, paths coming from Woods can't easily reach that anchor so pickups originate from EastHollow.KwolokShrine instead
@@ -3988,15 +3981,14 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
 anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mortar, after the amulet shrine
   refill Checkpoint
 
-  quest EastHollow.KwolokAmuletQuest:
-    moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
-
   state EastHollow.SilentSwimWall:
     moki: Water
     unsafe:
       Damage=120, Damage=120, Bash
       Damage=50, Damage=80, WaterDash  # Take a dboost from the mortar projectile before going in the water
 
+  pickup EastHollow.KwolokAmuletQuest:
+    moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
   pickup EastHollow.RightKwolokSL:
     moki: Bash OR Launch
     gorlek: SentryJump=1
@@ -4144,9 +4136,8 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
     moki: GladesTown.ClearThorns, Ore=29
   # decoration not accounted for
 
-  quest GladesTown.RebuildTheGlades:
+  pickup GladesTown.RebuildTheGlades:
     moki: Ore=40  # Eiko told me not to modify this so orishrug ~Cosmic
-
   pickup GladesTown.LupoSwimSL:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump
@@ -4308,11 +4299,10 @@ anchor GladesTown.TwillenHome at -414, -4160:  # At Twillen in Glades
   state GladesTown.FamilyReunion:
     moki: WoodsEntry.FamilyReunionDollQICollected
 
-  quest GladesTown.HandToHandLantern:
+  pickup GladesTown.HandToHandLantern:
     moki: LowerReach.HandToHandHat
-  quest GladesTown.FamilyReunionKey:  # Both state and pickup
+  pickup GladesTown.FamilyReunionKey:  # Both state and pickup
     moki: GladesTown.BuildHuts
-
   pickup GladesTown.TwillenOre:
     moki, Hammer OR Spear=1:
       DoubleJump OR Dash OR Glide OR Launch
@@ -4360,9 +4350,8 @@ anchor GladesTown.KeyMokiHutInside at -110, -4571:
 anchor GladesTown.West at -430, -4135:  # Path exiting the village, above Twillen
   refill Checkpoint
 
-  quest GladesTown.HandToHandCanteen:
+  pickup GladesTown.HandToHandCanteen:
     moki: EastPools.HandToHandSpyglass
-
   pickup GladesTown.UpperOre:
   # Paths using GladesTown.BuildHuts originate from GladesTown.BuiltMotayHut since if you can reach either hut
   # you can get access that anchor and building the hut also solves the connection towards GladesTown.West
@@ -4705,9 +4694,8 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
 
   state GladesTown.AcornMokiTalkedTo: free  # This starts the "Into the Darkness" quest
   
-  quest GladesTown.MokiAcornQuest:
+  pickup GladesTown.MokiAcornQuest:
     moki: GladesTown.AcornQICollected
-
   pickup GladesTown.AboveCaveSL:
     moki:
       Launch OR DoubleJump
@@ -4751,7 +4739,7 @@ anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at 
   state GladesTown.AcornQICollected:  # Quest state progression 
     moki: GladesTown.AcornQI
 
-  quest GladesTown.AcornQI:  # Only a pickup now
+  pickup GladesTown.AcornQI:  # Only a pickup now
   # Flash=3 do the swim / Flash=2 go above the entrance
     moki:
       Flash=3:
@@ -6165,9 +6153,8 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
       InnerWellspring.TopDoorOpen, Grapple
     gorlek: BreakWall=3  # each weapon has its way of dealing with the spikes below
 
-  quest OuterWellspring.TheLostCompass:
+  pickup OuterWellspring.TheLostCompass:
     moki: InnerWellspring.NeedleQI
-
   pickup OuterWellspring.RightWallEF:
     moki, BreakWall=20:
       DoubleJump, Dash
@@ -7266,9 +7253,8 @@ anchor InnerWellspring.EastDoor at -1190, -3732:  # Inside the door leading to t
     gorlek: InnerWellspring.SpinArena, BreakWall=16
   # It's possible to solve InnerWellspring.TopDoorOpen from there with ChargedBlaze but logic doesn't have any keyword for it
 
-  quest InnerWellspring.HandToHandHerbs:
+  pickup InnerWellspring.HandToHandHerbs:
     moki: GladesTown.HandToHandPouch
-
   pickup InnerWellspring.AboveSpinArenaSL:
     moki:
       Grapple, DoubleJump OR Dash
@@ -7444,7 +7430,7 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
   state InnerWellspring.TopDoorOpen:
     moki: BreakWall=16
 
-  quest InnerWellspring.NeedleQI:
+  pickup InnerWellspring.NeedleQI:
     moki: InnerWellspring.TopDoorOpen
 
   conn InnerWellspring.EastDoor:
@@ -7491,7 +7477,7 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
-  quest InnerWellspring.BlueMoonSeed:
+  pickup InnerWellspring.BlueMoonSeed:
     moki:
       DoubleJump, Dash
       Bash, Grenade=1
@@ -7504,7 +7490,6 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # double jump can solve it by itself but the branch you are jumping from can be a bit janky
       GlideJump  # OR GrenadeJump=1
     unsafe: Dash OR DoubleJump OR AbilitySwap=1 OR GrenadeJump OR WallHammerJump OR CoyoteHammerJump
-
   pickup InnerWellspring.LibrarySL: free
   pickup InnerWellspring.AboveTPSL:
     moki:
@@ -7564,7 +7549,7 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
   nospawn
   refill Full
 
-  quest InnerWellspring.WaterEscape:
+  pickup InnerWellspring.WaterEscape:
     moki:
       Bash, Grapple, DoubleJump, Dash OR Glide
       Bash, Grapple, Dash, Glide
@@ -7597,7 +7582,6 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Grapple, Bash, WaterDash, Damage=40, Sentry=2, Shuriken=1 OR Flash=1  # same as above + either one at the 2nd jump or between the two rotating wheels
       Grapple, Bash, WaterDash, Damage=20, Sentry=2, Shuriken=2 OR Flash=2  # same as above but use both options
       Grapple, Bash, Sentry=4, Shuriken=2 OR Flash=2  # same as above but use 2 sentries to make the first jump
-
   pickup InnerWellspring.EscapeRevisitSL:
     moki: InnerWellspring.WaterEscape
 
@@ -7773,10 +7757,9 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
-  quest WoodsEntry.LastTreeBranch: free
-  quest WoodsEntry.TreeSeed:
+  pickup WoodsEntry.LastTreeBranch: free
+  pickup WoodsEntry.TreeSeed:
     moki: GladesTown.LastTreeBranchRejected
-
   pickup WoodsEntry.TPSL: free
   pickup WoodsEntry.LeafPileSL:
     moki: Flap
@@ -7857,7 +7840,7 @@ anchor WoodsEntry.FamilyHutInside at 445, -4118: # inside of family reunion hut
   state WoodsEntry.FamilyReunionDollQICollected:  # Quest state progression
     moki: WoodsEntry.DollQI
 
-  quest WoodsEntry.DollQI:  # Only a pickup now
+  pickup WoodsEntry.DollQI:  # Only a pickup now
     moki: free
 
 anchor WoodsEntry.TwoKeystoneRoom at 672, -4183:  # In front of the keystone door
@@ -9570,9 +9553,8 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
       Bash, Grenade=1
     kii: BreakCrystal, Shuriken=1 OR Sentry=1 OR Flash=1 OR Damage=20
 
-  quest LowerReach.HandToHandHat:
+  pickup LowerReach.HandToHandHat:
     moki: LowerReach.HandToHandSoup
-
   pickup LowerReach.WindHiddenSL:
     gorlek:
       DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Hammer OR Damage=20
@@ -10078,7 +10060,7 @@ anchor LowerReach.SnowEscape at 79, -3733:
   nospawn
   refill Full
 
-  quest LowerReach.ForestsMemory:  # currently based on the requirements of getting here to simplify
+  pickup LowerReach.ForestsMemory:  # currently based on the requirements of getting here to simplify
     moki:
       Dash, Bash, Grapple, Glide, Water OR DoubleJump
       Bash, Glide, Launch
@@ -10101,16 +10083,14 @@ anchor LowerReach.SnowEscape at 79, -3733:
       SentryJump=3, Dash, Grapple OR Damage=20
       Dash, SentryJump=4
       FlashSwap  # Dodging the water is scary but totally doable.
-
   pickup LowerReach.EscapeRevisitSL:
     moki: LowerReach.ForestsMemory
 
 anchor LowerReach.VeralHome at -140, -4096:  # At the soup
   refill Checkpoint
 
-  quest LowerReach.HandToHandSoup:
+  pickup LowerReach.HandToHandSoup:
     moki: InnerWellspring.HandToHandHerbs
-
   pickup GladesTown.LeafPileSL:
     moki: Flap
   pickup LowerReach.CatalystShard:
@@ -10848,7 +10828,7 @@ anchor UpperReach.SeedHut at -131, -3857: # inside the hut with the seed
     target: UpperReach.TreeRoom
     enter: free
 
-  quest UpperReach.SpringSeed:
+  pickup UpperReach.SpringSeed:
     moki: Grenade=1
     gorlek: SentryBurn=1  # Use sentry to light the lantern
 
@@ -11122,12 +11102,11 @@ anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tun
       DepthsLight, Sentry=1 OR Shuriken=1 OR Spear=1
       Flash=1 # if flash is your lightsource as well you need to turn it off and then turn it on again during your jump
 
-  quest UpperDepths.LightcatcherSeed:
+  pickup UpperDepths.LightcatcherSeed:
     gorlek: ShurikenBreak=20, DepthsLight, DoubleJump OR Dash OR Glide OR Sword
     kii:
       SentryBreak=20, DepthsLight, DoubleJump OR Dash OR Glide OR Sword OR Sentry=2
       ShurikenBreak=20, DepthsLight, Sentry=2
-
   pickup UpperDepths.HiveSL:
     moki: Bash OR Launch  # bash makes paths destroying the hive redundant in moki
     gorlek:
@@ -11309,7 +11288,7 @@ anchor UpperDepths.MoraPath at 572, -4431:  # At the safe light during the dark 
   refill Energy=3:
     moki: BreakCrystal
 
-  quest UpperDepths.LightcatcherSeed:
+  pickup UpperDepths.LightcatcherSeed:
     moki:
       DepthsLight, Grapple, DoubleJump, Dash
       DepthsLight, Combat=2xSpiderling, DoubleJump, Dash, Bash, Grenade=1  # clear the floor to bashgrenade
@@ -11415,7 +11394,7 @@ anchor MoraSecondPhase at 690, -4386:
   refill Energy=3:
     moki: BreakCrystal
 
-  quest UpperDepths.ForestsEyes:
+  pickup UpperDepths.ForestsEyes:
     moki:
       SkipMora2  # Impossible state used to logically support skipping Mora through headers
       Boss=165, Regenerate, Damage=60, Bash, Flash, DoubleJump OR Dash OR Launch
@@ -11569,9 +11548,8 @@ anchor LowerDepths.West at 322, -4510:  # At the Moki needing a Lantern
       SentrySwap=2 OR BlazeSwap=2 OR FlashSwap
   # energy crystal on the way not considered
 
-  quest LowerDepths.HandToHandSilk:
+  pickup LowerDepths.HandToHandSilk:
     moki: GladesTown.HandToHandLantern
-
   pickup LowerDepths.SwimEF:
     moki: Water, Bash, UpperDepths.ForestsEyes OR Flash
     gorlek: Water, Damage=10, UpperDepths.ForestsEyes OR Flash
@@ -12736,8 +12714,7 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       Damage=60, Spear=1
       WaterDash, Damage=40, Spear=1
 
-  quest EastPools.KwolokAmuletQI: free
-
+  pickup EastPools.KwolokAmuletQI: free
   pickup EastPools.TwoCrushersSL:
     moki: Water, WaterDash
     kii: WaterDash, Damage=40
@@ -13118,7 +13095,7 @@ anchor EastPools.Teleporter at -1316, -4153:  # At the teleporter after draining
     unsafe: EastPools.LowerWaterDrained, Water, Bash  # Juggle the torpedo
 
 anchor EastPools.FishingPool at -1278, -4124:  # At the fisher moki
-  quest EastPools.HandToHandSpyglass:
+  pickup EastPools.HandToHandSpyglass:
     moki: LowerDepths.HandToHandSilk
 
   conn EastPools.AboveFishingPool:
@@ -13416,7 +13393,7 @@ anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok 
       Water, Bow=1
       Water, Grenade=1, Fracture
 
-  quest EastPools.GrassSeed:
+  pickup EastPools.GrassSeed:
     moki:
       Water, WaterDash
       EastPools.CentralRoomBubbleFree, DoubleJump OR Dash OR Glide
@@ -13514,13 +13491,12 @@ anchor UpperPools.KeystoneRoomEntrance at -1535, -4115:  # At the bottom entranc
       Combat=SpinCrab, Bow=1 OR Grenade=1 OR Spear=1
       Bash, Bow=1 OR Grenade=1 OR Spear=1
 
-  quest EastPools.GrassSeed:
+  pickup EastPools.GrassSeed:
     moki:
       Combat=SpinCrab OR Bash OR Launch
       DoubleJump, Dash
     gorlek: Dash OR Glide OR Damage=10
     kii: free
-
   pickup UpperPools.LowerKS:
     moki:
       Water, DoubleJump, Bash
@@ -14414,7 +14390,7 @@ anchor KwolokFight at -1978, -4135:
   refill Energy=3:
     moki: BreakCrystal
 
-  quest WestPools.ForestsStrength:
+  pickup WestPools.ForestsStrength:
     moki:
       SkipKwolok  # Impossible state used to logically support skipping Kwolok's fight through headers
       Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Launch OR Dash
@@ -14559,9 +14535,8 @@ anchor LowerWastes.Shovel at 1635, -3981:  # On the ground to the left of the Sa
   state LowerWastes.GemQICollected:  # Quest state progression
     moki: LowerWastes.EerieGemQI
 
-  quest LowerWastes.EerieGemQI:  # Only a pickup now
+  pickup LowerWastes.EerieGemQI:  # Only a pickup now
     moki: Burrow
-
   pickup LowerWastes.SandBridgeOre: free
 
   conn LowerWastes.SunsetView:
@@ -15007,9 +14982,8 @@ anchor LowerWastes.ThirstyGorlek at 1681, -3923:  # next to the Gorlek on the wa
   state LowerWastes.TrialActivation:  # Since you have to reach this place again in a race to get an advantage, only paths possible during a trial are meaningful
     moki: Burrow, DoubleJump OR Dash OR Glide
 
-  quest LowerWastes.HandToHandMapstone:
+  pickup LowerWastes.HandToHandMapstone:
     moki: GladesTown.HandToHandCanteen
-
   pickup LowerWastes.BurrowTree: free
   pickup LowerWastes.BurrowTreeSL:
     moki: Burrow
@@ -15337,7 +15311,7 @@ anchor UpperWastes.OuterRuinsTP at 2044, -3679:  # Left of the teleporter, on to
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
-  quest UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
+  pickup UpperWastes.FlowersSeed:  # most paths here would be redundant with the connection upwards
     gorlek:
       Burrow, Bash, DoubleJump OR Dash
       Burrow, Bash, Dash, Grenade=1 OR SentryJump=1 OR Damage=30  # Dash wasn't considered gorlek to climb the last part up to ruins
@@ -15351,7 +15325,6 @@ anchor UpperWastes.OuterRuinsTP at 2044, -3679:  # Left of the teleporter, on to
     unsafe:
       SentryJump=1, Damage=30, DoubleJump  # dboost in the spikes and sjump to the seed (use djump+upslash as well), sjump again to reach the lantern, djump on the sand ball, djump on the wall above and djump + use weapon to air stall to the pickup
       Bash, Grenade=1, DoubleJump, Shuriken=1
-
   pickup UpperWastes.WallOre:  # Most paths here would be redundant with the connection upwards. Paths to WallOre which can't reach the ruins not considered for moki/gorlek
     kii:
       # Use a bashnade to reach the sand bag above the sand pot. All the following paths are combination of different variations in order to optimize energy and health. Key parts are:
@@ -15448,8 +15421,7 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       LaunchSwap OR FlashSwap OR BlazeSwap=6 OR SentrySwap=6
       GlideHammerJump, AerialHammerJump
 
-  quest UpperWastes.FlowersSeed: free
-
+  pickup UpperWastes.FlowersSeed: free
   pickup UpperWastes.WallOre:
     moki:
       Burrow, DoubleJump, Dash OR Glide
@@ -15624,7 +15596,7 @@ anchor WindtornRuins.Escape at 2021, -4026:
   # After you complete the escape, there's a gap in the floor to its right, making the location unreachable with skillsets
   # that would have reached it before completing the escape. That's why this has no outside connections; the paths to here
   # can softlock after achieving the EscapeComplete state, so this anchor is only safe as long as it does nothing else than handling that state.
-  quest WindtornRuins.Seir:
+  pickup WindtornRuins.Seir:
     moki, WindtornRuins.TeleporterCorruption:
       Burrow, Dash, Grapple, DoubleJump OR Glide
       Burrow, DoubleJump, Glide, Grapple
@@ -15656,9 +15628,8 @@ anchor WindtornRuins.Escape at 2021, -4026:
         Burrow, GrenadeJump, DoubleJump, TripleJump
 
 anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedestal
-  quest WindtornRuins.HandToHandComplete:
+  pickup WindtornRuins.HandToHandComplete:
     moki: LowerWastes.HandToHandMapstone
-
   pickup WindtornRuins.EscapeRevisitEF:
     moki: WindtornRuins.Seir, Burrow
 
@@ -17048,15 +17019,15 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
 
 
 anchor Tokk:  # Tokk's talks
-  quest GladesTown.HandToHandPouch:
+  pickup GladesTown.HandToHandPouch:
     moki: EastHollow.HandToHandMap
 
 anchor TwillenShop:
   state GladesTown.DiamondInTheRoughCompleted:  # Quest state progression
     moki: LowerWastes.GemQICollected
-  quest GladesTown.SecretShard:  # Only a pickup now
-    moki: LowerWastes.GemQICollected
 
+  pickup GladesTown.SecretShard:  # Only a pickup now
+    moki: LowerWastes.GemQICollected
   pickup TwillenShop.Slot1:
     moki: SpiritLight=1200
   pickup TwillenShop.Slot2:
@@ -17104,9 +17075,6 @@ anchor OpherShop:  # Opher's offers
 anchor TuleyShop at -173, -4139:
   nospawn
 
-  quest GladesTown.RegrowTheGlades:
-    moki: GladesTown.SelaFlowers, GladesTown.StickyGrass, GladesTown.Lightcatchers, GladesTown.BlueMoon, GladesTown.SpringPlants, GladesTown.LastTree
-
   state GladesTown.LastTreeBranchRejected:  # written out the steps in case they give pickups
     moki: WoodsEntry.LastTreeBranch
   state GladesTown.SelaFlowers:
@@ -17121,3 +17089,6 @@ anchor TuleyShop at -173, -4139:
     moki: UpperReach.SpringSeed
   state GladesTown.LastTree:
     moki: WoodsEntry.TreeSeed
+
+  pickup GladesTown.RegrowTheGlades:
+    moki: GladesTown.SelaFlowers, GladesTown.StickyGrass, GladesTown.Lightcatchers, GladesTown.BlueMoon, GladesTown.SpringPlants, GladesTown.LastTree

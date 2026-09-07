@@ -35,8 +35,6 @@ pub enum Token {
     Refill,
     #[token("state")]
     State,
-    #[token("quest")]
-    Quest,
     #[token("pickup")]
     Pickup,
     #[token("conn")]

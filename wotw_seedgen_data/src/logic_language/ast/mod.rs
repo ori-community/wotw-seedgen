@@ -311,9 +311,6 @@ impl<'source> Recover<'source, Tokenizer> for RecoverPass {
 pub enum ConnectionKeyword {
     #[ast(token = Token::State)]
     State,
-    // TODO remove?
-    #[ast(token = Token::Quest)]
-    Quest,
     #[ast(token = Token::Pickup)]
     Pickup,
     #[ast(token = Token::Connection)]
