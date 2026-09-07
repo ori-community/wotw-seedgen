@@ -349,10 +349,8 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     gorlek:
       DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
       SwordSentryJump=1  # Hover with sword
-    # kii:
-      # Sword and hammer both solves the connection with movement but is redundant with beating the arena
-      # Glitched
-      # GlideJump
+    kii:  # Sword and hammer both solves the connection with movement but is redundant with beating the arena
+      GlideJump
       # GrenadeJump=1, Glide
     unsafe:
       Dash  # dash ramp
