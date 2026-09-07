@@ -19,8 +19,8 @@
 !config_boolean(marsh_ancestral_light_tree, true, "Marsh Ancestral Light Tree")
 !config_boolean(glades_ancestral_light_tree, true, "Glades Ancestral Light Tree")
 
-!include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
-!include("list_core", new_row, add_current_row)
+!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
+!include("list_core", new_row, add_row_item, add_current_row)
 
 !if randomize {
     !random_boolean(sword_tree)

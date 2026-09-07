@@ -235,8 +235,9 @@ pub struct Ids {
     // never empty
     // 9000 is the first rando-reserved wheel (aside from root)
     pub wheel: IdMap<0, 9000, IdMapWheel>,
+    // warp icon 0 is reserved for the spawn warp
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    warp_icon: IdMap<0>,
+    warp_icon: IdMap<1>,
 }
 
 impl Ids {

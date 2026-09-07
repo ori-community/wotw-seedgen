@@ -5,9 +5,7 @@
 !builtin_icon(message_icon, "icons/game/message.png")
 
 !include("progress_helper", write_progress_message, update_progress_message, disable_keybinds)
-!include("list_core", new_column, new_row, add_row_item, add_current_row)
-
-!export(add_row_item)
+!include("list_core", new_column, new_row, add_current_row)
 
 !export(check_goals_completed)
 fun check_goals_completed() {

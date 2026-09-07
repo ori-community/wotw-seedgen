@@ -1,20 +1,39 @@
 #hidden
 #name("Bingo")
-#description(
-"prints updates on line completion; sets the 'game_complete' state once you have enough lines (3 by default)
-(remember to enable netcode in options when rolling the seed)")
-
+#description("Bingo snippet included by the launcher when playing Bingo games")
 !tags("Bingo")
-!config_integer(lines, 3, "Lines", "How many lines you need to complete the game")
-!state(bingo_complete, Boolean)
 
-on change bingoState.lines {
-    item_message(bingoState.lines + " line(s) completed!")
-    if bingoState.lines >= lines {
-        store(bingo_complete, true)
-    }
+!config_boolean(cards, false, "Cards", "cards = false, lines = true")
+!config_integer(amount, 0, "Amount", "The amount of cards/lines required")
+!include("goal_mode_core", check_goals_completed, write_missing_goals, update_goals)
+!include("list_core", add_row)
+
+!if (cards) {
+  !augment_fun(check_goals_completed(), {
+    if bingoState.squares < amount set_boolean("goals_completed", false)
+  })
+
+  !augment_fun(write_missing_goals(), {
+      if bingoState.squares < amount {
+          set_string("color", "@")
+          add_row(get_string("color") + "Cards: " + bingoState.squares + "/" + amount + get_string("color"))
+      }
+  })
+
+  on change bingoState.squares update_goals()
 }
-on bingo_complete {
-    item_message("Bingo complete! Press Alt+C to warp to credits")
-    store(gameStateGroup.gameFinished, true)
+
+!if (cards == false) {
+  !augment_fun(check_goals_completed(), {
+    if bingoState.lines < amount set_boolean("goals_completed", false)
+  })
+
+  !augment_fun(write_missing_goals(), {
+      if bingoState.lines < amount {
+          set_string("color", "@")
+          add_row(get_string("color") + "Lines: " + bingoState.lines + "/" + amount + get_string("color"))
+      }
+  })
+
+  on change bingoState.lines update_goals()
 }

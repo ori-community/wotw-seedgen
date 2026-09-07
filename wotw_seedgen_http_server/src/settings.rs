@@ -98,7 +98,8 @@ fn inline_snippet<'c>(
     if snippet_info.metadata.requires_local_files {
         failed.push(identifier.to_string());
     } else {
-        let snippet = cache.read_snippet(identifier).unwrap();
+        let mut snippet = cache.read_snippet(identifier).unwrap();
+        snippet.id = format!("inlined: {}", snippet.id);
         inline_snippets.insert(identifier.to_string(), snippet);
     }
 

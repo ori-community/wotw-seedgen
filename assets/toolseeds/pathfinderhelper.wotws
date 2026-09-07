@@ -1,5 +1,3 @@
-// TODO test
-
 !include("seed_core")
 
 !builtin_icon(clean_water_icon, "icons/game/water.png")
@@ -18,6 +16,7 @@ on reload {
         clean_water_icon,
     )
     set_wheel_item_all_actions("root", Left, toggle_clean_water())
+
     set_wheel_item_data(
         "root",
         LeftTop,
@@ -26,6 +25,7 @@ on reload {
         gears_icon,
     )
     set_wheel_item_all_actions("root", LeftTop, toggle_difficulty())
+
     set_wheel_item_data(
         "root",
         TopLeft,
@@ -34,6 +34,7 @@ on reload {
         teleporter_icon,
     )
     set_wheel_item_all_actions("root", TopLeft, choose_teleport_target())
+
     set_wheel_item_data(
         "root",
         Top,
@@ -42,6 +43,7 @@ on reload {
         teleporter_icon,
     )
     set_wheel_item_all_actions("root", Top, teleport())
+
     set_wheel_item_data(
         "root",
         TopRight,
@@ -50,6 +52,7 @@ on reload {
         save_icon,
     )
     set_wheel_item_all_actions("root", TopRight, save_game())
+
     set_wheel_item_data(
         "root",
         RightTop,
@@ -58,14 +61,143 @@ on reload {
         health_icon,
     )
     set_wheel_item_all_actions("root", RightTop, refill())
+
     set_wheel_item_data(
         "root",
         Right,
+        "Toggle Glades Projects",
+        "[Ability1]Toggle All\n[Ability2]Open Menu",
+        wall_icon,
+    )
+    set_wheel_item_action("root", Right, Ability1, toggle_glades_projects())
+    set_wheel_item_action("root", Right, Ability2, switch_wheel("glades_projects"))
+    set_wheel_item_action("root", Right, Ability3, switch_wheel("glades_projects"))
+
+    set_wheel_item_data(
+        "root",
+        RightBottom,
         "World Reset",
         "[Ability1]Reset\nShortcut: [Binding5]",
         wall_icon,
     )
-    set_wheel_item_all_actions("root", Right, world_reset())
+    set_wheel_item_all_actions("root", RightBottom, world_reset())
+
+    set_wheel_item_data(
+        "glades_projects",
+        Left,
+        "Toggle Glades Projects",
+        "[Ability1]Toggle All\n[Ability2]Open Menu",
+        wall_icon,
+    )
+
+    set_wheel_item_data(
+        "glades_projects",
+        Left,
+        "Toggle Dwelling Repairs",
+        "[Ability1]Toggle",
+        DwellingRepairs,
+    )
+    set_wheel_item_all_actions("glades_projects", Left, store(gladesProjects.housesABuilt, gladesProjects.housesABuilt == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        LeftTop,
+        "Toggle Roofs Over Heads",
+        "[Ability1]Toggle",
+        RoofsOverHeads,
+    )
+    set_wheel_item_all_actions("glades_projects", LeftTop, store(gladesProjects.housesBBuilt, gladesProjects.housesBBuilt == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        TopLeft,
+        "Toggle Onwards and Upwards",
+        "[Ability1]Toggle",
+        OnwardsAndUpwards,
+    )
+    set_wheel_item_all_actions("glades_projects", TopLeft, store(gladesProjects.housesCBuilt, gladesProjects.housesCBuilt == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        Top,
+        "Toggle Thorny Situation",
+        "[Ability1]Toggle",
+        ThornySituation,
+    )
+    set_wheel_item_all_actions("glades_projects", Top, store(gladesProjects.removeThornsBuilt, gladesProjects.removeThornsBuilt == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        TopRight,
+        "Toggle Clear the Cave Entrance",
+        "[Ability1]Toggle",
+        ClearTheCaveEntrance,
+    )
+    set_wheel_item_all_actions("glades_projects", TopRight, store(gladesProjects.openCaveBuilt, gladesProjects.openCaveBuilt == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        RightTop,
+        "Toggle The Gorlek Touch",
+        "[Ability1]Toggle",
+        TheGorlekTouch,
+    )
+    set_wheel_item_all_actions("glades_projects", RightTop, store(gladesProjects.beautifyBuilt, gladesProjects.beautifyBuilt == false))
+
+
+    set_wheel_item_data(
+        "glades_projects",
+        Right,
+        "Toggle Sela Flowers",
+        "[Ability1]Toggle",
+        SelaFlowers,
+    )
+    set_wheel_item_all_actions("glades_projects", Right, store(gladesProjects.selaFlowersPlanted, gladesProjects.selaFlowersPlanted == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        RightBottom,
+        "Toggle Sticky Grass",
+        "[Ability1]Toggle",
+        StickyGrass,
+    )
+    set_wheel_item_all_actions("glades_projects", RightBottom, store(gladesProjects.stickyGrassPlanted, gladesProjects.stickyGrassPlanted == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        BottomRight,
+        "Toggle Lightcatchers",
+        "[Ability1]Toggle",
+        Lightcatchers,
+    )
+    set_wheel_item_all_actions("glades_projects", BottomRight, store(gladesProjects.lightcatchersPlanted, gladesProjects.lightcatchersPlanted == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        Bottom,
+        "Toggle Blue Moon",
+        "[Ability1]Toggle",
+        BlueMoon,
+    )
+    set_wheel_item_all_actions("glades_projects", Bottom, store(gladesProjects.blueMoonPlanted, gladesProjects.blueMoonPlanted == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        BottomLeft,
+        "Toggle Spring Plants",
+        "[Ability1]Toggle",
+        SpringPlants,
+    )
+    set_wheel_item_all_actions("glades_projects", BottomLeft, store(gladesProjects.springPlantsPlanted, gladesProjects.springPlantsPlanted == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        LeftBottom,
+        "Toggle Last Tree",
+        "[Ability1]Toggle",
+        TheLastSeed,
+    )
+    set_wheel_item_all_actions("glades_projects", LeftBottom, store(gladesProjects.lastTreePlanted, gladesProjects.lastTreePlanted == false))
 }
 
 on spawn give_stuff()
@@ -267,6 +399,51 @@ fun world_reset() {
     )
     trigger_client_event(spawn)
     item_message("@World Reset@")
+}
+
+fun toggle_glades_projects() {
+    set_boolean("all_built",
+        gladesProjects.housesABuilt
+        && gladesProjects.housesBBuilt
+        && gladesProjects.housesCBuilt
+        && gladesProjects.removeThornsBuilt
+        && gladesProjects.openCaveBuilt
+        && gladesProjects.beautifyBuilt
+        && gladesProjects.blueMoonPlanted
+        && gladesProjects.stickyGrassPlanted
+        && gladesProjects.springPlantsPlanted
+        && gladesProjects.lightcatchersPlanted
+        && gladesProjects.selaFlowersPlanted
+        && gladesProjects.lastTreePlanted
+    )
+    if get_boolean("all_built") {
+        store(gladesProjects.housesABuilt, false)
+        store(gladesProjects.housesBBuilt, false)
+        store(gladesProjects.housesCBuilt, false)
+        store(gladesProjects.removeThornsBuilt, false)
+        store(gladesProjects.openCaveBuilt, false)
+        store(gladesProjects.beautifyBuilt, false)
+        store(gladesProjects.blueMoonPlanted, false)
+        store(gladesProjects.stickyGrassPlanted, false)
+        store(gladesProjects.springPlantsPlanted, false)
+        store(gladesProjects.lightcatchersPlanted, false)
+        store(gladesProjects.selaFlowersPlanted, false)
+        store(gladesProjects.lastTreePlanted, false)
+    }
+    if get_boolean("all_built") == false {
+        store(gladesProjects.housesABuilt, true)
+        store(gladesProjects.housesBBuilt, true)
+        store(gladesProjects.housesCBuilt, true)
+        store(gladesProjects.removeThornsBuilt, true)
+        store(gladesProjects.openCaveBuilt, true)
+        store(gladesProjects.beautifyBuilt, true)
+        store(gladesProjects.blueMoonPlanted, true)
+        store(gladesProjects.stickyGrassPlanted, true)
+        store(gladesProjects.springPlantsPlanted, true)
+        store(gladesProjects.lightcatchersPlanted, true)
+        store(gladesProjects.selaFlowersPlanted, true)
+        store(gladesProjects.lastTreePlanted, true)
+    }
 }
 
 on spawn anchor_warps()

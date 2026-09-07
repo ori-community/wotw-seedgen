@@ -18,8 +18,8 @@
 !config_boolean(rebuilding_the_glades, true, "Rebuilding the Glades")
 !config_boolean(regrowing_the_glades, true, "Regrowing the Glades")
 
-!include("goal_mode_core", add_row_item, write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
-!include("list_core", new_row, add_current_row)
+!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
+!include("list_core", new_row, add_row_item, add_current_row)
 
 !if randomize {
     !random_boolean(silent_teeth)

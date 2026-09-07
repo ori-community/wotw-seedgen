@@ -64,6 +64,8 @@ on spawn {
     // Always allow opening the Kwolok Statue door
     store(randoConfig.useAllowOpeningEyestoneDoorState, true)
     store(randoState.allowOpeningEyestoneDoor, true)
+    // Makes the Mora fight start trigger wider so you don't fly through it at high velocities
+    store(randoConfig.fixMoraArenaTrigger, true)
 }
 
 // Lower water around pools TP when collecting it
