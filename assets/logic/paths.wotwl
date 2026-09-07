@@ -319,19 +319,9 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     kii: HammerBreak OR SpearBreak OR SentryBreak=16
   state MarshSpawn.CaveFight:
     moki: Combat=3xLizard  # at day there's two extra lizards
+  state MarshSpawn.MissingKeyTokkTalkedTo: free  # Start of the "Missing Key" quest. Also necessary to TokkAnywhere the quest reward
 
-  quest MarshSpawn.CaveKS:
-    moki:
-      DoubleJump, Dash OR Grapple
-      Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
-      Launch
-      MarshSpawn.CaveFight
-    gorlek: DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
-    kii: # Sword and hammer both solves the connection with movement but is redundant with beating the arena
-      GlideJump
-      # GrenadeJump=1, Glide
-    unsafe: GrenadeJump
-  quest MarshSpawn.TokkKeystoneQuest:
+  quest MarshSpawn.TokkKeystoneQuest:  # This quest can be completed without MarshSpawn.MissingKeyQICollected only at this specific Tokk
     moki: MarshSpawn.CaveKS
 
   pickup MarshSpawn.LeftTokkSL:
@@ -342,33 +332,50 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
   conn Tokk: free  # this one is tokk anywhere'd
   conn MarshSpawn.CaveEntrance:
     moki: MarshSpawn.TokkBarrier
-  conn MarshSpawn.PoolsBurrowsSignpost:
+  conn MarshSpawn.CaveWaterfall:
     moki:
       DoubleJump, Dash OR Grapple
-      Bash, DoubleJump OR Dash
-      Bash, Grenade=1, Glide OR Grapple
+      Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
       Launch
-      MarshSpawn.CaveFight, DoubleJump OR Dash
-      MarshSpawn.CaveFight, Bash, Grenade=1
+      MarshSpawn.CaveFight
     gorlek:
-      DoubleJump
-      Bash, Grenade=1
-      MarshSpawn.CaveFight, SentryJump=1  # makes other sentryjump paths unnecessary
-      # weapon floats maybe too precise for gorlek
-    kii:
-      Sword  # Pogo on the slime and slash to the left, Upslash to reach the branch
-      Hammer  # weapon floats
-      Bash  # use slimes
-      MarshSpawn.CaveFight, Shuriken=1 OR Flash=1 OR Sentry=1
-      MarshSpawn.CaveFight, Glide, Spear=1
+      DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
+      SwordSentryJump=1  # Hover with sword
+    kii:  # Sword and hammer both solves the connection with movement but is redundant with beating the arena
       GlideJump
-      # GrenadeJump=2, Glide OR MarshSpawn.CaveFight
+      # GrenadeJump=1, Glide
     unsafe:
-      Dash  # dash ramp at the first slime to skip the arena
-      MarshSpawn.CaveFight, Spear=1  # not lenient enough for kii
-      GrenadeJump OR AbilitySwap=2
+      Dash  # dash ramp
+      GlideJump OR GrenadeJump OR AbilitySwap=1 OR SpearJump=1
 
-# checkpoint at -845, -4438
+anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to the waterfall where you initally lose torch
+  refill Checkpoint
+
+  # This is redundant because MarshSpawn.CaveWaterfall->MarshSpawn.Cave->Tokk is free, and completing the quest at cave Tokk only requires the QI.
+  # However, progressing the quest state to set up TokkAnywhere strictly requires talking to cave Tokk before picking up the QI.
+  # state MarshSpawn.MissingKeyQICollected:  # Quest state progression
+  #   moki: MarshSpawn.MissingKeyTokkTalkedTo, MarshSpawn.CaveKS
+
+  quest MarshSpawn.CaveKS: free  # Only a pickup now
+
+  conn MarshSpawn.Cave: free  # Climb the moss
+  conn MarshSpawn.PoolsBurrowsSignpost:
+    moki:
+      DoubleJump OR Dash OR Launch
+    gorlek:
+      Sword OR Hammer  # Upslash + hover
+      Bash, Grenade=1
+    kii:
+      Bash  # Use the slime
+      Shuriken=1 OR Flash=1 OR Sentry=1
+      Glide, Spear=1  # Spear alone is too precise for Kii
+      # Glitched
+      # GlideJump
+      # GrenadeJump=1
+    unsafe:
+      Spear=1 OR AbilitySwap=1 OR PauseFloat
+
+# checkpoint at -833, -4451
 
 anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
   refill Health=1
@@ -17048,6 +17055,8 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
 
 
 anchor Tokk:  # Tokk's talks
+  quest MarshSpawn.TokkKeystoneQuest:  # This quest requires step 2 if you want to TokkAnywhere the reward. Completing at MarshSpawn.Cave is handled on that anchor.
+    moki: MarshSpawn.MissingKeyQICollected
   quest GladesTown.HandToHandPouch:
     moki: EastHollow.HandToHandMap
 
