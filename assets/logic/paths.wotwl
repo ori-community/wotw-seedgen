@@ -3952,10 +3952,14 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
 
   state GladesTown.TuleySpawned:
     moki: InnerWellspring.WaterEscape
+  # This state controls the slowzone around Kwolok and is also one of the possible requirements to open the Ruins door.
+  # Setting this state by itself on a snippet will prevent you from talking to Kwolok at all, locking the quests.
+  state EastHollow.KwolokMet: free
+  state EastHollow.SilentTeethStarted: free
 
   pickup EastHollow.ForestsVoice: free
-  pickup EastHollow.WellspringDoneTalk:
-    moki: InnerWellspring.WaterEscape
+  pickup EastHollow.SilentTeethCompleted:
+    moki: InnerWellspring.SilentTeethWellspringFixed
 
   # Because of the slowzone, paths coming from Woods can't easily reach that anchor so pickups originate from EastHollow.KwolokShrine instead
 
@@ -5598,6 +5602,8 @@ region OuterWellspring:
   unsafe: free
 
 anchor OuterWellspring.CutsceneIsland at -756, -4071:  # The island on the right of the entrance, where the wellspring cutscene plays out
+  state OuterWellspring.SilentTeethWellspringCutscene: free  # Cutscene progresses the quest
+
   conn OuterWellspring.EntranceDoor:
     moki:
       Launch OR Water
@@ -7549,7 +7555,10 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
   nospawn
   refill Full
 
-  pickup InnerWellspring.WaterEscape:
+  pickup InnerWellspring.EscapeRevisitSL:
+    moki: InnerWellspring.EscapeStateCompleted
+
+  conn InnerWellspring.EscapeSequenceEnd:
     moki:
       Bash, Grapple, DoubleJump, Dash OR Glide
       Bash, Grapple, Dash, Glide
@@ -7582,8 +7591,15 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
       Grapple, Bash, WaterDash, Damage=40, Sentry=2, Shuriken=1 OR Flash=1  # same as above + either one at the 2nd jump or between the two rotating wheels
       Grapple, Bash, WaterDash, Damage=20, Sentry=2, Shuriken=2 OR Flash=2  # same as above but use both options
       Grapple, Bash, Sentry=4, Shuriken=2 OR Flash=2  # same as above but use 2 sentries to make the first jump
-  pickup InnerWellspring.EscapeRevisitSL:
-    moki: InnerWellspring.WaterEscape
+
+anchor InnerWellspring.EscapeSequenceEnd at -541, -3677:  # End of the water escape, before triggering the cutscene
+  nospawn
+
+  state InnerWellspring.EscapeStateCompleted: free  # Disables the corruption enemy at the start of the escape
+  state InnerWellspring.SilentTeethWellspringFixed:  # This state is set when the final scene is loaded with the pickup obtained
+    moki: InnerWellspring.WaterEscapeReward
+
+  pickup InnerWellspring.WaterEscapeReward: free
 
 region WoodsEntry:
   # This is mirrored in WoodsMain.
