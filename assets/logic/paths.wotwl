@@ -340,7 +340,6 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
       MarshSpawn.CaveFight
     gorlek:
       DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
-      SwordSentryJump=1  # Hover with sword
     kii:  # Sword and hammer both solves the connection with movement but is redundant with beating the arena
       GlideJump
       # GrenadeJump=1, Glide
@@ -350,6 +349,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
 
 anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to the waterfall where you initally lose torch
   refill Checkpoint
+  # Additional checkpoint at -833, -4451, but not logically relevant
 
   # This is redundant because MarshSpawn.CaveWaterfall->MarshSpawn.Cave->Tokk is free, and completing the quest at cave Tokk only requires the QI.
   # However, progressing the quest state to set up TokkAnywhere strictly requires talking to cave Tokk before picking up the QI.
@@ -362,9 +362,9 @@ anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to th
   conn MarshSpawn.PoolsBurrowsSignpost:
     moki:
       DoubleJump OR Dash OR Launch
+      Bash, Grenade=1
     gorlek:
       Sword OR Hammer  # Upslash + hover
-      Bash, Grenade=1
     kii:
       Bash  # Use the slime
       Shuriken=1 OR Flash=1 OR Sentry=1
@@ -374,8 +374,6 @@ anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to th
       # GrenadeJump=1
     unsafe:
       Spear=1 OR AbilitySwap=1 OR PauseFloat
-
-# checkpoint at -833, -4451
 
 anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
   refill Health=1
@@ -461,8 +459,6 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
     moki: BreakCrystal  # on the ground on the way to Burrows
     unsafe: free  # bait the bat into shooting it
 
-  quest MarshSpawn.CaveKS: free
-
   pickup MarshSpawn.CaveOre:
     moki:
       DoubleJump OR Launch
@@ -522,7 +518,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
       SwordSJump=1, Damage=10  # air sjump from below the first lantern, weapon stall to minimize damage
       HammerSJump=1, Damage=20
       # AerialHammerJump, Glide OR Damage=10  # Use both of the microwalls near the first lantern, dboost in the spikes under the second lantern. Use a regular double jump + hammer at the end, because a hammer jump goes too high.
-  conn MarshSpawn.Cave: free
+  conn MarshSpawn.CaveWaterfall: free
   conn MarshSpawn.LifepactLedge:
     moki: Bash, DoubleJump OR Dash OR Launch
     gorlek:
