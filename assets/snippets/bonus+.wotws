@@ -9,6 +9,7 @@
 !include("bonus_item_core",
     rapid_grenade,
     quickshot_upgrade,
+    splinter_longer_range,
     melting_blaze,
     melting_sword,
     melting_shuriken,
@@ -35,6 +36,7 @@
 !config_integer(rapid_regenerates, 1, "Rapid Regenerate Count", "Makes Regenerate heal faster")
 !config_integer(rapid_grenades, 2, "Rapid Grenade Count", "Reduces the cooldown for Grenade")
 !config_integer(quickshot_upgrades, 2, "Quickshot Upgrade Count", "Makes Bow shoot faster with Quickshot equipped")
+!config_integer(splinter_longer_range, 2, "Long Splinter Count", "Arrows have longer range with Splinter equipped")
 !config_integer(melting_blazes, 1, "Melting Blaze Count", "Makes Blaze melt ice and light lanterns")
 !config_integer(melting_swords, 1, "Melting Sword Count", "Makes Sword melt ice and light lanterns")
 !config_integer(melting_shurikens, 1, "Melting Shuriken Count", "Makes Shuriken melt ice and light lanterns")
@@ -56,6 +58,7 @@
 !add_item(rapid_regenerate(), rapid_regenerates)
 !add_item(rapid_grenade(), rapid_grenades)
 !add_item(quickshot_upgrade(), quickshot_upgrades)
+!add_item(splinter_longer_range(), splinter_longer_range)
 !add_item(melting_blaze(), melting_blazes)
 !add_item(melting_sword(), melting_swords)
 !add_item(melting_shuriken(), melting_shurikens)

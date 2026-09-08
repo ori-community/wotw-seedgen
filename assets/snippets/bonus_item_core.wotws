@@ -33,6 +33,7 @@
 !builtin_icon(splinter_shuriken_icon, "icons/bonus/splintershuriken.png")
 !builtin_icon(bashable_shuriken_icon, "icons/bonus/bashableshuriken.png")
 !builtin_icon(ultra_flap_icon, "icons/bonus/ultraflap.png")
+!builtin_icon(splinter_longer_range_icon, "icons/bonus/splinterlongerrange.png")
 
 !state(energy_regenerations, Integer)
 !export(energy_regenerations)
@@ -595,3 +596,21 @@ fun ultra_flap() {
     BonusItem
 )
 !export(ultra_flap)
+
+fun splinter_longer_range() {
+    item_message("#Long Splinter#")
+    store(randoUpgrades.splinterLongerRange, true)
+    update_bonus_items()
+}
+!augment_fun(write_bonus_items(relevant: Boolean), {
+    if (skills.bow) == relevant && randoUpgrades.splinterLongerRange add_bonus_item("Long Splinter")
+})
+!item_data(
+    splinter_longer_range(),
+    "#Long Splinter#",
+    200,
+    "Arrows have longer range with " + shard_string(Splinter) + " equipped",
+    splinter_longer_range_icon,
+    BonusItem
+)
+!export(splinter_longer_range)

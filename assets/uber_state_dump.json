@@ -619,6 +619,13 @@
           "type": "SerializedFloatUberState",
           "value": 0.0,
           "value_type": "Float"
+        },
+        "97": {
+          "name": "splinterLongerRange",
+          "readonly": false,
+          "type": "SerializedBooleanUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
         }
       }
     },
