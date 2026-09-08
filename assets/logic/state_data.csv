@@ -30,6 +30,8 @@ EastHollow.BeetleDefeated, 937, 53122,
 EastHollow.VoiceDoorOpen, 937, 6778,
 EastHollow.DepthsLever, 937, 22419,
 EastHollow.DepthsOpen, 18793, 25789,
+EastHollow.KwolokMet, 937, 10071, 1
+EastHollow.SilentTeethStarted, 937, 34641, 1
 EastHollow.SilentSwimWall, 58674, 11400,
 WestHollow.PurpleDoorOpen, 937, 59850,
 WestHollow.UpperDrainLeverPulled, 937, 42245, 1
@@ -77,6 +79,9 @@ InnerWellspring.ThreeWheels, 37858, 64055,
 InnerWellspring.TopDoorOpen, 37858, 31962,
 InnerWellspring.UpperCorruption, 37858, 31584,
 InnerWellspring.TeleporterActive, 53632, 18181,
+InnerWellspring.EscapeStateCompleted, 37858, 10720, 2
+InnerWellspring.SilentTeethWellspringFixed, 937, 34641, 3
+OuterWellspring.SilentTeethWellspringCutscene, 937, 34641, 2
 OuterWellspring.EntranceDoorOpen, 37858, 23644,
 OuterWellspring.LifeHarvestLeverPulled, 26019, 23382,
 OuterWellspring.LifeHarvestWallBroken, 53632, 62781,

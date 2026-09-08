@@ -91,7 +91,7 @@ EastHollow.RightKwolokSL, Hollow, SpiritLight, 100, 58674, 20983, , 289.0, -4195
 EastHollow.SilentSwimEF, Hollow, EnergyFragment, , 58674, 9583, , 331.9, -4191.3, 331.87, -4190.344
 EastHollow.SplinterShard, Hollow, Shard, Splinter, 23987, 62973, , 216.2, -4307.3, 216.17882, -4306.3125
 EastHollow.ForestsVoice, Hollow, Wisp, Voice, 46462, 59806, , 186, -4213, 180, -4210
-EastHollow.WellspringDoneTalk, Hollow, QuestItem, 500 SpiritLight, 937, 34641, 4, 191, -4212, 191.054, -4212.027
+EastHollow.SilentTeethCompleted, Hollow, QuestItem, 500 SpiritLight, 937, 34641, 4, 191, -4212, 191.054, -4212.027
 EastHollow.KwolokSwimOre, Hollow, GorlekOre, , 46462, 37897, , 243.4, -4223.5, 243.44835, -4223.517
 EastHollow.KwolokSwimLeftSL, Hollow, SpiritLight, 200, 46462, 29054, , 113.0, -4228.5, 113, -4228.5
 EastHollow.KwolokSwimRightSL, Hollow, SpiritLight, 50, 46462, 20780, , 161.5, -4244.8, 161.49835, -4244.7866
@@ -173,7 +173,7 @@ InnerWellspring.AboveTPSL, Wellspring, SpiritLight, 50, 37858, 2797, , -1316.6, 
 InnerWellspring.BlueMoonSeed, Wellspring, Seed, , 14019, 24142, , -1185.4, -3668.8, -1185.4348, -3668.7515
 InnerWellspring.SwimOre, Wellspring, GorlekOre, , 37858, 32932, , -1203.9, -3715.7, -1203.8998, -3715.6865
 InnerWellspring.EscapeRevisitSL, Wellspring, SpiritLight, 100, 37858, 56444, , -1313.1, -3640.1, -1313.1079, -3640.099
-InnerWellspring.WaterEscape, Wellspring, QuestItem, Water, 37858, 12379, , -481, -3763, -1159, -3635
+InnerWellspring.WaterEscapeReward, Wellspring, QuestItem, Water, 37858, 12379, , -481, -3763, -1159, -3635
 PoolsApproach.MarshPathCurrentSL, Pools, SpiritLight, 100, 945, 10682, , -1047.3, -4216.8, -1047.3401, -4216.82
 PoolsApproach.AboveWheelSL, Pools, SpiritLight, 100, 945, 14530, , -940.7, -4144.7, -940.6959, -4144.7227
 PoolsApproach.MillPathHF, Pools, HealthFragment, , 945, 37243, , -850.6, -4195.6, -850.61, -4194.55

@@ -790,7 +790,7 @@ on InnerWellspring.EscapeRevisitSL {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on InnerWellspring.WaterEscape {
+on InnerWellspring.WaterEscapeReward {
     store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
