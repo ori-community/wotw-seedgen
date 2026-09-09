@@ -61,7 +61,7 @@ fun write_hints() {
         write_grapple_hint()
         add_row_item(get_string("hint"))
     }
-    if InnerWellspring.WaterEscape {
+    if InnerWellspring.WaterEscapeReward {
         write_clean_water_hint()
         add_row_item(get_string("hint"))
     }
