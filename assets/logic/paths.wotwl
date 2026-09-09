@@ -3951,7 +3951,7 @@ anchor EastHollow.Kwolok at 177, -4215:  # Between Ku and Kwolok
   refill Checkpoint
 
   state GladesTown.TuleySpawned:
-    moki: InnerWellspring.WaterEscape
+    moki: InnerWellspring.WaterEscapeReward
   # This state controls the slowzone around Kwolok and is also one of the possible requirements to open the Ruins door.
   # Setting this state by itself on a snippet will prevent you from talking to Kwolok at all, locking the quests.
   state EastHollow.KwolokMet: free
@@ -7596,7 +7596,7 @@ anchor InnerWellspring.EscapeSequenceEnd at -541, -3677:  # End of the water esc
   nospawn
 
   state InnerWellspring.EscapeStateCompleted: free  # Disables the corruption enemy at the start of the escape
-  state InnerWellspring.SilentTeethWellspringFixed:  # This state is set when the final scene is loaded with the pickup obtained
+  state InnerWellspring.SilentTeethWellspringFixed:  # This state is updated in seed_core to prevent a possible quest softlock?
     moki: InnerWellspring.WaterEscapeReward
 
   pickup InnerWellspring.WaterEscapeReward: free
@@ -17086,7 +17086,7 @@ anchor OpherShop:  # Opher's offers
     moki: SpiritLight=1200
   pickup OpherShop.Slot12:
     # TODO this is snippet dependent though
-    moki: InnerWellspring.WaterEscape, SpiritLight=1200
+    moki: InnerWellspring.WaterEscapeReward, SpiritLight=1200
 
 anchor TuleyShop at -173, -4139:
   nospawn
