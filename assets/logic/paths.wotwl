@@ -7616,7 +7616,7 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
     gorlek: Water, Bash, Damage=10  # bit hard but important for random spawn
     kii: Water, Spear=1
     unsafe:
-      Bash, Water OR Damage=130 # walljump to cancel bash momentum https://youtu.be/cj7xfa6M8Bc (or tp after bashing the projectile). You can walljump on the wall while the shot is moving to save some life
+      Bash, Water OR Damage=130  # walljump to cancel bash momentum https://youtu.be/cj7xfa6M8Bc (or tp after bashing the projectile). You can walljump on the wall while the shot is moving to save some life
       Bash, WaterDash, Damage=110
       Sword, Deflector, Water OR Damage=130
       Sword, Deflector, WaterDash, Damage=110
@@ -7632,7 +7632,7 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
     gorlek: Launch
     kii:
       Bash, Grenade=1, DoubleJump, TripleJump OR Hammer
-      AerialHammerJump, TripleJump
+      AerialHammerJump, TripleJump OR GlideJump OR SwordSJump=1
       HammerSJump=1, DoubleJump
       SwordSJump=1, DoubleJump, TripleJump
     unsafe:
@@ -7641,7 +7641,7 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
       GrenadeJump, DoubleJump, TripleJump OR Hammer OR Spear=1
       Bash, Grenade=1, DoubleJump, Spear=1
       DoubleJump, TripleJump, Hammer OR Spear=1 OR GlideJump OR SwordJump
-  # insert dirty water paths for EastHollow.SilentSwimEF (:
+  # TODO dirty water paths for EastHollow.SilentSwimEF (:
 
   conn WoodsEntry.BellowHut:
     moki: Combat=Balloon, Combat=Tentacle OR Bash OR Launch
@@ -7705,8 +7705,8 @@ anchor WoodsEntry.BellowHut at 478, -4205:  # Bellow the hut, at the checkpoint 
       Bash, Grenade=1  # Bash a mortar projecctile to reach your grenade
       Launch, Sword OR Hammer
       SentryJump=1 OR LaunchSwap
-      AerialHammerJump, TripleJump, Dash OR Glide OR Sword  # works by either going to WoodsEntry.LedgeOre and then going to the hut without using hjumps or by going to WoodsEntry.HutRightSL and use hjump once you're under the hut
-      AerialHammerJump, TripleJump, Bash  # bash a mortar projectile first
+      AerialHammerJump, TripleJump OR Bash  # from the anchor itself
+      AerialHammerJump, Dash OR Sword OR GlideJump  # from the log next to WoodsEntry.HutRightSL
     unsafe: Bash  # Use the mortar
 
 # checkpoint at 525, -4205
