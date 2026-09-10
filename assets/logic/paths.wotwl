@@ -6680,9 +6680,9 @@ anchor InnerWellspring.EntranceDoor at -1263, -3952:  # Inside the door where yo
     gorlek: Grapple, Sword OR Hammer
     kii:
       Grapple, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
-      AerialHammerJump, Damage=15  # either jump in the spikes on the left or upslash first to go directly to the lever
+      AerialHammerJump
     unsafe:
-      Grapple OR AerialHammerJump
+      Grapple
       DoubleJump, Damage=15, TripleJump OR GlideJump
       InnerWellspring.ThreeWheels, Damage=30, DoubleJump
       InnerWellspring.ThreeWheels, Damage=45, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
@@ -6718,7 +6718,7 @@ anchor InnerWellspring.ThornShardArea at -1317, -3933:  # on top of the wall at 
       Dash, DoubleJump, TripleJump OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=15
       Dash, Damage=15, Sword OR Hammer  # With hammer, do only two slashes
       Dash, Glide, Damage=15, Shuriken=1 OR Flash=1 OR Sentry=1
-      AerialHammerJump, TripleJump OR Glide OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15
+      AerialHammerJump  # use the pole
       SwordSJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Sentry=1 OR Damage=15
       HammerSJump=1, Damage=15, DoubleJump OR Dash
       HammerSJump=1, DoubleJump, TripleJump OR Dash
@@ -6823,9 +6823,10 @@ anchor InnerWellspring.DrainRoom at -1169, -3946:  # Left of the water you can d
       Shuriken=2, Dash
       Damage=15, Dash  # dboost on rotating wheel instead of the water
       Bash, Grenade=2, InnerWellspring.DrainRoomBottomWheel OR InnerWellspring.DrainLever OR Water OR Damage=15
-      InnerWellspring.DrainRoomBottomWheel, Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2
-      InnerWellspring.DrainRoomBottomWheel, GrenadeJump, Bash, Grenade=1
-      InnerWellspring.DrainRoomBottomWheel, GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      InnerWellspring.DrainRoomBottomWheel:
+        Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2
+        GrenadeJump, Bash, Grenade=1
+        GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       InnerWellspring.DrainLever, GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=15  # either use energy weapon to grab the pole on the right or dboost in the spikes to reach the platform near the brekable wall
       GrenadeJump, Damage=55  # gjump to grab the pole on the ceiling then land on the wheel to avoid a water dboost. If water is drained, use the path above
       GrenadeJump, WaterDash, Damage=15
@@ -7183,10 +7184,10 @@ anchor InnerWellspring.WestDoor at -1205, -3894:  # Inside the door where you ex
       Bash, DoubleJump, TripleJump  # bait the mantis. Need to bash it when used its third jump.
       Bash, Grenade=1  # bait the mantis, bash it in order to bash your grenade from higher up
       SentryJump=1
-      AerialHammerJump, TripleJump OR Bash
+      AerialHammerJump, TripleJump OR Dash OR Glide OR Sword OR Bash  # climb the right wall or bash the mantis
     unsafe:
       DoubleJump, TripleJump  # https://youtu.be/Z9L-TTU0fdw
-      AbilitySwap=3
+      AerialHammerJump OR AbilitySwap=3
       GrenadeJump, DoubleJump
 
   pickup InnerWellspring.ShortcutWheelSL:
@@ -7416,10 +7417,18 @@ anchor InnerWellspring.GrappleThroughZigZagSpikes at -1100, -3725:  # after the 
       LaunchSwap, Damage=15 OR Water OR Glide OR Dash
       LaunchSwap, Sword, Hammer
       LaunchSwap, DoubleJump, Bash  # bash glide the Miner
+      AerialHammerJump:
+        Damage=15, Glide OR Dash OR Sword
+        TripleJump, Dash OR Glide OR Sword
+        TripleJump, Bash, Damage=15  # bashglide from the miner
+        WaterDash, Water, TripleJump OR Damage=45  # taking 2 dboost in the lower spikes because there's a very big hurtbox there
+        WaterDash, Damage=20, TripleJump
+        WaterDash, Damage=65
     unsafe:
       Launch  # https://youtu.be/wbz2cLfuFOk
       Grapple  # grapple the last bulb multiple time to make it swing
       AbilitySwap=6  # https://youtu.be/hZcM1F_ZN38
+      AerialHammerJump
   conn InnerWellspring.PastSpinPuzzle:  # Camera doesn't show the lower wheel when you are on the top one, making it difficult to rely on them in lower difficulties
     moki:
       Glide, Combat=2xSlug, DoubleJump OR Launch
@@ -7456,7 +7465,10 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
       Launch, Dash, Sword OR Hammer
     kii:
       Glide, Damage=10  # Damage boost the miner
-      Water, Damage=10, DoubleJump OR Dash OR Sword OR Hammer
+      Water, Damage=10, DoubleJump OR Dash
+      Damage=30, DoubleJump OR Dash  # same as above but with dirty water
+      Damage=40, Sword OR Hammer  # Sword/Hammer solve the combat requirement
+      Water, Sword OR Hammer
       Damage=75, Combat=Miner OR Bash
       Damage=85
       Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
@@ -7465,9 +7477,11 @@ anchor InnerWellspring.TopSecondRoom at -1141, -3698:  # Next to the corruption 
         Damage=70
       Launch, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       LaunchSwap
-    unsafe:
+    unsafe:  # if you slide don the last wall, you can regen before dboosting on the miner
       Launch  # There is a small ledge on the ceiling to reset launch
       AerialHammerJump
+      PauseFloat, Combat=Miner OR Bash OR Damage=10
+      Damage=20, Sword OR Hammer
 
 anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
   entrance:
