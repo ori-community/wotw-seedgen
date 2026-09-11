@@ -107,7 +107,7 @@ LowerReach.TeleporterActive, 28895, 54235,
 LowerReach.RolledSnowball, 28895, 20731,
 LowerReach.EastDoorLantern, 28895, 37287,
 LowerReach.KeystoneDoor, 28895, 4290,
-LowerReach.TrialActivation, 44964, 23661,
+LowerReach.TrialActivation, 44964, 23661, 1
 LowerReach.HighestReachCompleted, 14019, 8973, 3
 UpperReach.KeystoneDoor, 28895, 49900,
 UpperDepths.CentralKeystoneDoor, 18793, 10758,
