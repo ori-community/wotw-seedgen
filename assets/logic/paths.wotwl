@@ -5358,7 +5358,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap OR LowerReach.BearFullyAwake
+    moki: Flap
 
   pickup WestGlades.UpperPoolSL:
     moki: Water
@@ -8886,7 +8886,7 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap OR LowerReach.BearFullyAwake
+    moki: Flap
   state LowerReach.ThawBaurFurnace:
     moki, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       Bash, Flap
