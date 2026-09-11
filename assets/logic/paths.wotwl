@@ -7959,11 +7959,11 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
     kii: Flap, Glide  # Lure the balloon
 
   conn WoodsMain.InFrontLowerKS:  # Most paths are gonna be redundant with going to either WoodsMain.AfterKuMeet or WoodsMain.FourKeystoneRoom
-    # kii:
-    #  SwordSJump=1
-    #  HammerSJump=1, DoubleJump
+    kii:
+      SwordSJump=1
+      HammerSJump=1, DoubleJump
     unsafe:
-      SentryJump=1  # https://youtu.be/VIFsMrBUwEk
+      HammerSJump=1  # https://youtu.be/VIFsMrBUwEk
       AbilitySwap=3
   conn WoodsMain.FourKeystoneRoom:
     moki: Combat=2xBalloon, Flap, Glide
@@ -8007,17 +8007,15 @@ anchor WoodsMain.BelowFourKeystoneRoom at 951, -4210:  # At the first leaf pile 
       Bash, Grenade=1 OR SentryJump=1
       Launch, Sword OR Hammer
     kii:
-      Launch, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Launch, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # OR GrenadeJump=1
       DoubleJump, Bash
       DoubleJump, Sword  # Keep hitting the tentacle with sword to reset your double jump
-      Bow=4 OR Spear=2 OR Grenade=1:  # kill the tentacle by using a ranged weapon
-        DoubleJump, TripleJump, Dash OR Glide OR Hammer OR Sentry=2
-        DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       LaunchSwap
-      # Launch, GrenadeJump=1
       SentryJump=2
       HammerSJump=1, DoubleJump  # SwordSJump would be redundant with DoubleJump+Sword
       Bow=4 OR Spear=2 OR Grenade=1:  # kill the tentacle by using a ranged weapon
+        DoubleJump, TripleJump, Dash OR Glide OR Hammer OR Sentry=2
+        DoubleJump, Dash, Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
         Glide, AerialHammerJump  # OR GrenadeJump=2
         DoubleJump, Dash, AerialHammerJump  # OR GrenadeJump=1
         GlideJump, DoubleJump OR HammerSJump=1  # use hammer to hover as well
@@ -8056,9 +8054,8 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
     kii:
       Bash, Grenade=1, DoubleJump
       DoubleJump, Sword OR Hammer OR Shuriken=1  # with sword, breaking the wall makes it way easier than jumping from the small ledge.
-      # Glitched
-      # GlideJump, Sword OR Hammer
-      # GlideJump, BreakWall=20, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GlideJump, Sword OR Hammer
+      GlideJump, BreakWall=20, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2
     unsafe:
       DoubleJump, Flash=1 OR Sentry=1
@@ -8135,14 +8132,11 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
         Launch
     kii:
       Combat=Balloon OR Damage=20:
-        Damage=15, DoubleJump OR Dash OR Hammer
-        Launch
+        Damage=15, DoubleJump OR Dash OR Hammer OR SwordSJump=1  # OR GrenadeJump=2
+        Launch OR AerialHammerJump
         Bash, Dash  # bait the skeetos
-      Combat=Balloon OR Damage=20:
-        AerialHammerJump
-        Damage=15, SwordSJump=1  # OR GrenadeJump=2
-      #   Bash, Damage=15, GrenadeJump=1
-      #   GrenadeJump=1, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2
+      # Bash, Damage=15, GrenadeJump=1
+      # GrenadeJump=1, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=2
     unsafe:
       DoubleJump, TripleJump  # tjump on the wall above
       Bash OR Glide OR Launch OR AerialHammerJump OR GrenadeJump
@@ -8185,7 +8179,6 @@ anchor WoodsMain.FourKeystoneRoom at 944, -4137:  # In front of the four keyston
       # no glide jumps paths without the yellow wall to prevent kii players from having to figure out that you can't hug walls during glide jumps
       WoodsMain.KSRoomYellowBarrierBroken, GlideJump
       AerialHammerJump, Dash OR Glide
-      AerialHammerJump, TripleJump, Sword
     unsafe:
       WoodsMain.KSRoomYellowBarrierBroken:
         Bash OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR AbilitySwap=1
@@ -8343,7 +8336,7 @@ anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the
     kii:
       DoubleJump, Bash, Damage=15  # bash the plant and the skeeto, wall jump on the right wall, Damage for slower reaction times to tp anywhere/just jumping back to safety
       Launch  # Launch straight up from the right side of the fire pit to touch the ceiling, go a bit to the left, launch again on the right wall, wall jump and launch to the pickup. Launch again to return to safety
-      AerialHammerJump, TripleJump, Bash OR Damage=15
+      AerialHammerJump, TripleJump OR Bash
       SwordSJump=1, DoubleJump, TripleJump  # sjump toward the right wall. No hsjump path because it doesn't work when being too close from the furnace.
       SwordSJump=1, Damage=30
       SwordSJump=1, Damage=15, DoubleJump OR GlideJump OR SwordSJump=1
@@ -8387,14 +8380,13 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
       SentryJump=1, DoubleJump, Dash
     kii:
       Bash, DoubleJump OR Grenade=1  # either bash a grenade or the tentacle projectile to reach the bashable plant
-      SentryJump=1
-      AerialHammerJump, TripleJump  # hjump + glide jump works as well but it's redundant with the glide+breakwall path towards BrokenOwl
+      SentryJump=1 OR AerialHammerJump
       # GrenadeJump=1, DoubleJump, TripleJump
       # GrenadeJump=1, DoubleJump, Hammer, Spear=1 OR Shuriken=1 OR Vlaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       Bash
       DoubleJump, TripleJump OR GrenadeJump
-      AerialHammerJump OR GlideHammerJump OR AbilitySwap=3
+      GlideHammerJump OR AbilitySwap=3
   conn WoodsMain.BrokenOwl:  # Check for redundancy with AboveHowl connection
     moki: BreakWall=3, Bash, Glide
     gorlek:
@@ -8406,7 +8398,6 @@ anchor WoodsMain.PetrifiedHowl at 910, -4071:  # At silenced Howl
       BreakWall=3, Glide
       DoubleJump, Sword  # pogo the tentacles
       Dash, DoubleJump, TripleJump
-      AerialHammerJump, Damage=10  # hard to avoid the first tentacle
   conn WoodsMain.BelowHiddenOre:
     moki:
       Glide
@@ -8477,15 +8468,14 @@ anchor WoodsMain.TrialStart at 820, -4047:  # At the start of the trial
       Launch, DoubleJump OR Dash OR Glide
       Bash, Grapple, DoubleJump OR Dash
     kii:
-      Launch
+      Launch OR AerialHammerJump
       DoubleJump, TripleJump, Grapple OR Damage=15
       Grapple, Dash, Bash
-      AerialHammerJump, TripleJump OR Damage=15
     unsafe:
       Grapple, Bash, Hammer  # at the plant above the spikes, upslash to reach the wall above it and then hover to the floating platform
       Hammer, DoubleJump, Grapple  # either djump+upslash to get a walljump just under the checkpoint or upslash+one slash to land on the branch
       Sword, DoubleJump, Grapple  # upslash+downslash to pass through the semi solid branch at the checkpoint
-      AerialHammerJump OR AbilitySwap=7
+      AbilitySwap=7
   conn WoodsMain.AboveHowl:  # make sure it's not redundant with ->BrokenOwl->AboveHowl
     gorlek: Grapple, Glide
     kii: Grapple, Sentry=3 OR Blaze=5
@@ -8509,7 +8499,7 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
       Launch
       DoubleJump, Bash, Burrow OR Grenade=2
       DoubleJump, Burrow, Damage=45
-      AerialHammerJump, TripleJump OR Dash  # at the second sandball, go directly up
+      AerialHammerJump, TripleJump OR Dash OR Glide OR Sword  # at the second sandball, go directly up
       AerialHammerJump, Sentry=2, Bash OR Damage=15
       GlideJump, DoubleJump, TripleJump, Damage=30
       SwordSJump=2, DoubleJump OR Bash OR Damage=15
@@ -8539,7 +8529,6 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
       Burrow, DoubleJump OR Dash OR Sword  # get to the most right sandball, burrow through it and go right
       Burrow, Hammer, Flash=1 OR Sentry=1  # energy weapon to reach the floating platform. No shuriken because it pushes back the platform.
       GlideJump, DoubleJump, TripleJump OR Dash  # GlideJump is enough by itself but adding abilities to reach the floating platform so you don't have to deal with the weird physic of the lower branches
-      AerialHammerJump, TripleJump OR Dash OR Sword OR Sentry=2
     unsafe:
       Burrow, Hammer  # Make the sandball swing before burrowing it
       GlideJump
@@ -8572,7 +8561,7 @@ anchor WoodsMain.TrialEnd at 868, -3952:  # Below the trial end pedestal
       PauseFloat OR AbilitySwap=1
       GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Bow=1
 
-  # From here, you can also access WoodsMain.MidwayTrial. So far, going to WoodsMain.MidwayTrial from here doesn't do anything beneficial.
+  # So far, going to WoodsMain.MidwayTrial from here doesn't do anything beneficial.
   # (no pickups, OrangeTree already reachable from here, no point in going to the start of the trial if you can't beat it and having skills to beat it means you can access it from AboveHowl first)
   # WoodsMain.AboveHowl also accessible but paths can access WoodsMain.BeforeLog directly and then go to AboveHowl for free
 
@@ -8645,12 +8634,11 @@ anchor WoodsMain.BeforeLog at 967, -4008:  # where you go inside of the log (whe
       DoubleJump, SentryJump=2  # one extra to let the player figure out where to sjump
     kii:
       Bash, Grenade=2
-      SentryJump=1
-      AerialHammerJump, TripleJump OR GlideJump
+      SentryJump=1 OR AerialHammerJump
       # GrenadeJump=1, DoubleJump, TripleJump
     unsafe:
       Bash, Grenade=1  # too precise
-      AerialHammerJump OR GlideHammerJump OR AbilitySwap=2
+      GlideHammerJump OR AbilitySwap=2
       GrenadeJump, DoubleJump OR GlideJump
 
 anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
@@ -8672,13 +8660,7 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
       Launch
       DoubleJump, TripleJump, Damage=60
       DoubleJump, TripleJump, Bash, Damage=30
-      AerialHammerJump, TripleJump OR Damage=15
-      Damage=15, SwordSJump=1, Damage=15, SwordSJump=1
-      Damage=15, SwordSJump=1, Damage=15, DoubleJump, TripleJump
-      Damage=15, SwordSJump=1, Bash
-      # Damage=15, GrenadeJump=1, Damage=15, GrenadeJump=1, Bash  # not bashing the last plant because you could throw your grenade at it
-      # Damage=15, GrenadeJump=1, Damage=15, GrenadeJump=1, DoubleJump, Dash
-      # Damage=15, GrenadeJump=1, Damage=15, DoubleJump, TripleJump 
+      AerialHammerJump, TripleJump OR Bash OR Damage=15
     unsafe:
       AerialHammerJump
       DoubleJump, Damage=45, Dash OR Shuriken=2
@@ -8775,8 +8757,10 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
       Dash OR DoubleJump OR Hammer OR Blaze=4 OR Sentry=2
       Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
+      Bash  # Swing the lantern and get a good cycle on the swing animation of the second lantern
       Shuriken=2 OR AbilitySwap=1
-      GrenadeCancel, Bash OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Regenerate, Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # regen jump
+      GrenadeCancel, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn WoodsShrine:  # Make sure this isn't redundant with AbovePit->FeedingGrounds->WoodsShrine
     gorlek: Damage=15, DoubleJump OR Dash
     kii:
@@ -8857,7 +8841,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
     kii:
       Bash, Grenade=1
       Dash, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
-      AerialHammerJump  # intended for the bottom route but also work with upslash+slash then hjump for the top route
+      AerialHammerJump  # intended for the bottom route but also work with hover then hjump for the top route
       GlideJump, DoubleJump, TripleJump
       SentryJump=1  # hammer can go through the bottom route as well
       # GrenadeJump=1, DoubleJump OR Hammer OR GrenadeJump=1  # bottom route
