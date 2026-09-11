@@ -16,7 +16,7 @@
         )
 
         position_trigger_rectangle("baurs_sleep", -527, -4033, -461, -4018)
-        position_trigger_enter_callback("baurs_sleep", if baursReachGroup.baurNpcState == 0 && skills.flap == false
+        position_trigger_enter_callback("baurs_sleep", if LowerReach.BearSneezed == false && skills.flap == false
             item_message("#Motay's Note#\nThe bear will only wake if you use " + skill_string(Flap))
         )
 
