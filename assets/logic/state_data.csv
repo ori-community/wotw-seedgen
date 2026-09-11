@@ -99,6 +99,7 @@ WoodsMain.CombatShrineCompleted, 58674, 56043,
 LowerReach.ArenaBeaten, 28895, 42209,
 LowerReach.BearBridgeBroken, 28895, 49329,
 LowerReach.BearSneezed, 28895, 29098, 1
+LowerReach.BearFullyAwake, 28895, 29098, 3
 LowerReach.Lever, 28895, 62198,
 LowerReach.WindLantern, 28895, 59394,
 LowerReach.TPLantern, 28895, 48757,
@@ -106,7 +107,8 @@ LowerReach.TeleporterActive, 28895, 54235,
 LowerReach.RolledSnowball, 28895, 20731,
 LowerReach.EastDoorLantern, 28895, 37287,
 LowerReach.KeystoneDoor, 28895, 4290,
-LowerReach.TrialActivation, 44964, 23661, 1
+LowerReach.TrialActivation, 44964, 23661,
+LowerReach.HighestReachCompleted, 14019, 8973, 3
 UpperReach.KeystoneDoor, 28895, 49900,
 UpperDepths.CentralKeystoneDoor, 18793, 10758,
 UpperDepths.EntryKeystoneDoor, 21786, 59990,

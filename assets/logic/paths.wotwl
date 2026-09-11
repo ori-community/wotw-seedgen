@@ -5358,7 +5358,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap OR LowerReach.ForestsMemory  # Completing the escape wake up Baur
+    moki: Flap OR LowerReach.BearFullyAwake
 
   pickup WestGlades.UpperPoolSL:
     moki: Water
@@ -8886,7 +8886,7 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap OR LowerReach.ForestsMemory  # Completing the escape wake up Baur
+    moki: Flap OR LowerReach.BearFullyAwake
   state LowerReach.ThawBaurFurnace:
     moki, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       Bash, Flap
@@ -10060,7 +10060,11 @@ anchor LowerReach.SnowEscape at 79, -3733:
   nospawn
   refill Full
 
-  pickup LowerReach.ForestsMemory:  # currently based on the requirements of getting here to simplify
+  # state winterForestGroupDescriptor.springBlossomTimelinePlayed (28287|6764) disables the slow walk zone and the cutscene trigger when the cutscene starts
+  # state winterForestGroupDescriptor.thawStateDescriptor (28287|16339) disables the snowstorm effect when the cutscene starts
+  # state questUberstateGroup.winterForestWispQuestUberstate (14019|8973=2) is set when the cutscene starts
+
+  conn LowerReach.SnowEscapeEnd:  # currently based on the requirements of getting here to simplify
     moki:
       Dash, Bash, Grapple, Glide, Water OR DoubleJump
       Bash, Glide, Launch
@@ -10084,7 +10088,15 @@ anchor LowerReach.SnowEscape at 79, -3733:
       Dash, SentryJump=4
       FlashSwap  # Dodging the water is scary but totally doable.
   pickup LowerReach.EscapeRevisitSL:
-    moki: LowerReach.ForestsMemory
+    moki: LowerReach.HighestReachCompleted  # Completing the quest removes the log in the way
+
+anchor LowerReach.SnowEscapeEnd at -585, -3870:  # At the end of the escape, before jumping down
+  nospawn
+  
+  state LowerReach.HighestReachCompleted: free
+  state LowerReach.BearFullyAwake: free  # Not logically relevant beyond including LowerReach.BearSneezed
+
+  pickup LowerReach.ForestsMemory: free  # After watching the entire cutscene
 
 anchor LowerReach.VeralHome at -140, -4096:  # At the soup
   refill Checkpoint
