@@ -15710,7 +15710,7 @@ anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top o
     gorlek:
       Launch, DoubleJump OR Dash OR Bash OR Glide
       Launch, Sword, Damage=20
-    kii:  # launch path is redundant with AboveTree->Ore
+    kii:  # launch/hjump paths are redundant with WeepingRidge.AfterElementals->Ore
       Bash, Dash
       Bash, DoubleJump, Damage=20, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Damage is for weird laser patterns
       DoubleJump, TripleJump, Sword
@@ -15759,7 +15759,7 @@ anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top o
       Launch, Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
       Launch, Bash, Grenade=1
       Bash, Grenade=3, DoubleJump, TripleJump
-      AerialHammerJump, TripleJump, Dash OR Glide OR Sword
+      AerialHammerJump, TripleJump
       SwordSJump=3, DoubleJump, TripleJump, Dash, Damage=20  # sjump on top of elevator -> sjump + hover from the left wall on top of third laser -> sjump and take a dboost on last laser to reach the wall above -> tjump + dash + upslash to reach the ledge above
       HammerSJump=2, DoubleJump, TripleJump, Dash, Shuriken=1 OR Sentry=1  # similar but tjump+upslash to avoid the last sjump. Energy weapon for the final hover
     unsafe, WeepingRidge.ElevatorFightCompleted:
@@ -15768,7 +15768,7 @@ anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top o
       SwordSJump=4 OR HammerSJump=5  # Hammer takes longer to upswing and lasers will stop you
       HammerSJump=4, DoubleJump OR Dash OR Glide
       Bash, Grenade=3, DoubleJump
-      AerialHammerJump, WallHammerJump OR TripleJump
+      AerialHammerJump  # upslash to get on top ofd the elevator then walljump of the right friendly spikes. Get a wall jump on the last turret to reach the top
       GrenadeJump, GrenadeCancel, DoubleJump
   conn WeepingRidge.Elevator:
     moki, WeepingRidge.ElevatorFightCompleted:
@@ -15800,10 +15800,9 @@ anchor WeepingRidge.AfterElementals at 1303, -3769:  # Ledge next to the spikes,
       Bash, Grenade=1  # https://youtu.be/dOrFj9RT4KE
       Bash, DoubleJump, Dash OR Glide OR PauseFloat  # bait a projectile instead of using the portal
       Bash, GlideJump  # bait a projectile instead of using the portal
-      SentryJump=2
+      SentryJump=2 OR AerialHammerJump OR GlideHammerJump
       SentryJump=1, SwordJump OR Bash  # (2a) sjump, (3) Pogo the elemental, reset above portal, swordJump and upslash
       GrenadeJump, DoubleJump OR Bash
-      AerialHammerJump OR GlideHammerJump
       WallHammerJump  # Off the ledge, (3) Off the ledge and turnaround off the wall
 
   conn WeepingRidge.AboveTree: free
@@ -15814,13 +15813,13 @@ anchor WeepingRidge.AfterElementals at 1303, -3769:  # Ledge next to the spikes,
       Launch, DoubleJump, Dash  # this gives you good mobility to avoid the enemies
     kii:
       Launch, DoubleJump OR Dash OR Damage=20  # dboost on the mine inbetween the two elementals
-      AerialHammerJump, TripleJump, Dash, Damage=60  # dboost on the mine and the spikes after the top portal for leniency
+      AerialHammerJump, Damage=20, TripleJump OR Bash OR Glide  # dboost on the mine at the wall for leniency
+      AerialHammerJump, Dash, Damage=40  # dboost on the mine + laser as you are more likely to aggro the 2nd elemental
     unsafe:
       Launch
-      DoubleJump, TripleJump, Sword, Damage=40
+      DoubleJump, TripleJump, Damage=40
       DoubleJump, TripleJump, Bash  # Bait elemental projectiles
-      AerialHammerJump, TripleJump, Damage=20  # dboost on the mine
-      AerialHammerJump, Damage=20  # dboost on the mine. Safe spot on the upper portal. Dboost on the spikes
+      AerialHammerJump  # continue to extend your hjump when exiting a portal before doing a new one 
       GrenadeJump, DoubleJump, Damage=20  # dboost on the mine
       SwordSJump=5, Damage=20  # Pogo the first elemental, dboost on the mine
       SwordSJump=4, SwordJump, Damage=20  # Same as above, but swordjump+upslash into the top portal
@@ -15833,13 +15832,13 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
     moki: Launch
     kii:
       SentryJump=1, DoubleJump, TripleJump  # Max height
-      AerialHammerJump, TripleJump OR SentryJump=1  # A bit wonky once you go through the portal
+      AerialHammerJump
     unsafe:
       Bash, Grenade=1, DoubleJump, TripleJump, Damage=40  # take a dboost in the left spikes
       SwordSJump=2  # Use the micro ledge on the left after entering the portal
       DoubleJump, TripleJump, Damage=40, Damage=80
       SentryJump=1, DoubleJump  # with sword,need Upswing. With hammer, max height from the right of the portal is enough
-      AerialHammerJump OR GlideHammerJump
+      GlideHammerJump
       GrenadeJump, DoubleJump
   pickup WeepingRidge.SpikeClimbSL:
     moki: Launch, DoubleJump, Bow=2
@@ -15851,8 +15850,8 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
       Launch
       Bash, Grenade=2, DoubleJump, TripleJump
       Bash, Grenade=2, DoubleJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      AerialHammerJump, TripleJump
-      SwordSJump=3, Damage=40
+      AerialHammerJump, TripleJump OR Dash OR Glide OR Sword OR Flash=1 OR Sentry=1  # condition is for the first hjump
+      AerialHammerJump, Shuriken=1, Damage=20  # same as above but account for touching the mine with shuriken 
       SentryJump=2, DoubleJump, TripleJump
       SentryJump=2, DoubleJump, Dash, Shuriken=1 OR Sentry=1
       # GrenadeJump=2, DoubleJump, TripleJump
@@ -15861,7 +15860,7 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
       SentryJump=3
       SentryJump=1, DoubleJump, TripleJump, Dash  # Dash from the wall above the tree + tjump + weapon combo to reach the right platform.
       DoubleJump, TripleJump, Sword, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mine near the tree | wasn't consistent enough for kii
-      AerialHammerJump  # Upswing before hjumping every time
+      AerialHammerJump 
       GrenadeJump, DoubleJump  # Go to the right wall beneath the mine
       GrenadeJump, GlideJump, Damage=40  # Take a dboost beneath the pickup
 
