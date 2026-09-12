@@ -15504,7 +15504,8 @@ anchor WindtornRuins.FallenPillar at 2090, -4012:  # After dropping down from th
       Burrow, DoubleJump OR Dash OR Glide OR Launch
       Burrow, Bash, Grenade=1
     gorlek: Burrow, BreakWall=16
-    unsafe: ShurikenBreak=16 OR SentryBreak=16 OR Blaze=2
+    kii: ShurikenBreak=16 OR SentryBreak=16
+    unsafe: Blaze=2
 
   conn WindtornRuins.BrokenMural:
     # If the corruption blob is not broken, this connection is free. The paths need to solve assuming that the blob is broken
@@ -15535,13 +15536,11 @@ anchor WindtornRuins.FallenPillar at 2090, -4012:  # After dropping down from th
       Burrow, DoubleJump, TripleJump
     kii:
       Burrow, Bash, Grenade=1
-      Burrow, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1
-      Burrow, AerialHammerJump  # DJ alone is a bit tight for kii
-      Burrow, DoubleJump, GlideJump
+      Burrow, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Spear=1 OR Shuriken=1 OR GlideJump
+      WindtornRuins.TeleporterCorruption, AerialHammerJump
       # Burrow, GrenadeJump=1, Damage=40 OR WindtornRuins.TeleporterCorruption  # With the corruption intact, it's a tight jump over the spikes without GrenadeCancel
     unsafe:
-      Burrow, Sword OR GlideJump OR AbilitySwap=1 OR WallHammerJump OR CoyoteHammerJump OR GroundedHammerJump OR PauseFloat OR DoubleJump OR Dash OR GrenadeJump
-      Burrow, SpearJump=1, Spear=1
+      Burrow, DoubleJump OR Dash OR Sword OR GlideJump OR AbilitySwap=1 OR SpearJump=1 OR WallHammerJump OR CoyoteHammerJump OR GroundedHammerJump OR PauseFloat OR GrenadeJump
   conn WindtornRuins.Escape:  # this connection doesn't have to account for the gap in the floor because it only exists after you finished the escape
     moki: WindtornRuins.TeleporterCorruption
   conn WindtornRuins.MapstoneAltar:  # connection after the escape is finished
@@ -15613,6 +15612,7 @@ anchor WindtornRuins.Escape at 2021, -4026:
       Burrow, Grapple, Damage=30, Sentry=3 OR Shuriken=3  # Sentry=5 / Shuriken=5 path but saving 2 uses by dboosting in the section where you fall down
       Burrow, Grapple, Damage=70, Sentry=2 OR Shuriken=2  # Sentry=5 / Shuriken=5 path but saving the first 3 uses by dboosting
       Burrow, Dash, DoubleJump  # djump at the end of the second sandball+grapple section before dashing in order to avoid the spikes
+      Burrow, AerialHammerJump, TripleJump
     unsafe:
       WindtornRuins.TeleporterCorruption:  # do the escape
         Burrow, Dash, Hammer  # upslash at the end of the second sandball+grapple section before dashing in order to avoid the spikes
@@ -15621,7 +15621,8 @@ anchor WindtornRuins.Escape at 2021, -4026:
         Burrow, Dash, Damage=40, Sentry=1 OR Flash=1
         Burrow, FlashSwap
         Burrow, SentryJump=3  # This is pain. Should have jumped over the worm instead
-      UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This need to solve with the pillar destoyed to avoid softlocks
+        Burrow, DoubleJump, TripleJump
+      UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This need to solve with the pillar destroyed to avoid softlocks
         Burrow, Launch OR SentryJump=1 OR FlashSwap OR SentrySwap=4 OR BlazeSwap=4
         Burrow, Bash, Grenade=1, DoubleJump  # you should have rolled this path before I got rid of triplejump https://youtu.be/TMWmknRqCIM
         Burrow, AerialHammerJump, TripleJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
