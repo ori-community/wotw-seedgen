@@ -98,7 +98,7 @@ on spawn {
         "Costs 500 less for every item you found already",
         ShardsMap,
     )
-    if InnerWellspring.WaterEscape == false {
+    if InnerWellspring.WaterEscapeReward == false {
         set_shop_item_description(OpherShop.Slot11, "Complete the Wellspring escape to unlock")
         set_shop_item_hidden(OpherShop.Slot11, true)
     }
@@ -113,7 +113,7 @@ on spawn {
     updateOpherHintPrice()
     updateTwillenHintPrice()
 }
-on InnerWellspring.WaterEscape {
+on InnerWellspring.WaterEscapeReward {
     set_shop_item_description(OpherShop.Slot11, "Costs 500 less for every item you found already")
     set_shop_item_hidden(OpherShop.Slot11, false)
 }
