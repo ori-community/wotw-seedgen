@@ -141,6 +141,8 @@ UpperPools.DrainRoomPurpleWall, 20120, 43231,
 UpperPools.BubbleSpamLever, 5377, 6398,
 UpperPools.BubbleSpamWall, 5377, 65413,
 WestPools.TeleporterActive, 945, 1370,
+WestPools.LostParadiseCompleted, 14019, 35087, 3
+WestPools.KwolokChaseCompleted, 945, 58403, 7
 LowerWastes.FeedingGroundsTeleporterActive, 58674, 10029,
 LowerWastes.GemQICollected, 14019, 61011, 4
 LowerWastes.SandPlatformLever, 20120, 48009,

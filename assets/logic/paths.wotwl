@@ -3988,7 +3988,7 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       Damage=50, Damage=80, WaterDash  # Take a dboost from the mortar projectile before going in the water
 
   pickup EastHollow.KwolokAmuletQuest:
-    moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
+    moki: EastPools.KwolokAmuletQI, WestPools.LostParadiseCompleted
   pickup EastHollow.RightKwolokSL:
     moki: Bash OR Launch
     gorlek: SentryJump=1
@@ -14279,9 +14279,9 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
     kii: Damage=60, Burrow
     unsafe: Damage=40, Burrow
   pickup WestPools.EscapeRevisitOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
-    gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
-    kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
-    unsafe, WestPools.ForestsStrength:
+    gorlek: WestPools.KwolokChaseCompleted, Water, WaterDash, Burrow
+    kii: WestPools.KwolokChaseCompleted, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
+    unsafe, WestPools.KwolokChaseCompleted:
       Water, Burrow
       Damage=80, Damage=60, Damage=80, WaterDash, Burrow
 
@@ -14300,7 +14300,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
       Damage=220, Bash  # 220 health if the mobs haven't spawned yet. Bashing them on your way will result in less damage
     unsafe:
       Water
-      WestPools.ForestsStrength, Bash, Damage=160
+      WestPools.KwolokChaseCompleted, Bash, Damage=160
       Damage=200, Burrow, Blaze=1, DoubleJump  # underwater walking
       Damage=180, Burrow, Blaze=1, Launch  # underwater walking
   conn EastPools.CentralRoom:
@@ -14311,7 +14311,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
 
 anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platform where the Kwolok's escape starts
   refill Checkpoint:  # Checkpoint only appears after you defeated Kwolok
-    moki: WestPools.ForestsStrength
+    moki: WestPools.KwolokChaseCompleted
 
   conn KwolokEscape: free  # Doesn't need any requirement since the enemies will only spawn after Kwolok is defeated
   conn WestPools.Teleporter:  # WaterDash/Bash to deal with the fishes and crabs which spawns after you defeated Kwolok
@@ -14322,17 +14322,17 @@ anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platfor
       Damage=220, Bash  # 220 health if the mobs haven't spawned yet. Bashing them on your way will result in less damage
     unsafe: Water
   conn WestPools.RightKwolokPlatform:
-    moki: WestPools.ForestsStrength, Bash OR Launch OR Combat=Crab+SpinCrab
-    gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
+    moki: WestPools.KwolokChaseCompleted, Bash OR Launch OR Combat=Crab+SpinCrab
+    gorlek: WestPools.KwolokChaseCompleted, DoubleJump OR Damage=10
     unsafe:
-      WestPools.ForestsStrength
+      WestPools.KwolokChaseCompleted
       #pass over the Kwolok's escape trigger
       Launch OR AerialHammerJump
       DoubleJump, TripleJump, Sword  # https://youtu.be/ZpMyu0vLan0
 
 anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platform where the Kwolok's escape starts
   refill Checkpoint:
-    moki: WestPools.ForestsStrength  # Checkpoint only appears after you defeated Kwolok
+    moki: WestPools.KwolokChaseCompleted  # Checkpoint only appears after you defeated Kwolok
 
   pickup WestPools.EscapeRevisitSL:
     moki: Water
@@ -14347,10 +14347,10 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
 
   conn KwolokEscape: free  # Doesn't need any requirement since the enemies will only spawn after Kwolok is defeated
   conn WestPools.LeftKwolokPlatform:
-    moki: WestPools.ForestsStrength, Bash OR Launch OR Combat=Crab+SpinCrab
-    gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
+    moki: WestPools.KwolokChaseCompleted, Bash OR Launch OR Combat=Crab+SpinCrab
+    gorlek: WestPools.KwolokChaseCompleted, DoubleJump OR Damage=10
     unsafe:
-      WestPools.ForestsStrength
+      WestPools.KwolokChaseCompleted
       #pass over the Kwolok's escape trigger
       Launch, Water OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20  # Additional skill because the slow zone prevents you from jumping https://youtu.be/GxZYdw0JC7s
       AerialHammerJump, TripleJump, Dash
@@ -14365,6 +14365,9 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
 anchor KwolokEscape at -1650, -4125:
   nospawn
   refill Full
+
+  # lagoonStateGroup.kwolokBossState (945|58403=1) initial chase cutscene
+  # lagoonStateGroup.kwolokBossState (945|58403=2) chase start
 
   conn KwolokFight:  # Abilities needed for the escape part
     moki:
@@ -14390,13 +14393,30 @@ anchor KwolokFight at -1978, -4135:
   refill Energy=3:
     moki: BreakCrystal
 
-  pickup WestPools.ForestsStrength:
+  # lagoonStateGroup.kwolokBossState (945|58403=3) chase end, fight start. Also closes the wall on the right side until the chase is completed (=7) and removes the tentacle blocking the Ore access.
+  # lagoonStateGroup.kwolokBossState (945|58403=4) arena floods
+  # lagoonStateGroup.kwolokBossState (945|58403=5) unused 
+  # lagoonStateGroup.kwolokBossState (945|58403=6) fight completed, kwolok is dragged up
+
+  conn WestPools.KwolokFightEnd:
     moki:
       SkipKwolok  # Impossible state used to logically support skipping Kwolok's fight through headers
       Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Launch OR Dash
     gorlek: Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump OR Launch OR Dash
     kii: Boss=250, Regenerate, Damage=85, Water, WaterDash, DoubleJump OR Launch OR Dash
     unsafe: Boss=250
+
+anchor WestPools.KwolokFightEnd at -1974, -4073:  # At the checkpoint above Kwolok's arena
+  nospawn
+  refill Checkpoint
+
+  # The vines in Kwolok's arena are controlled by physics and not an uberstate. The ceiling disappears when the Kwolok chase transitions (lagoonStateGroup.kwolokBossState 4->6) and the vines drop.
+
+  state WestPools.LostParadiseCompleted: free  # Quest completion
+  state WestPools.KwolokChaseCompleted: free  # Chase sequence completion. Also removes the right side wall from the arena.
+
+  pickup WestPools.ForestsStrength:
+    moki: WestPools.KwolokChaseCompleted  # Can be obtained by loading the scene above the arena with the chase completed
 
 region LowerWastes:
   # This is mirrored in UpperWastes.
