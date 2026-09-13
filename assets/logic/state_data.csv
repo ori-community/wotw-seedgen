@@ -112,6 +112,8 @@ UpperDepths.CentralKeystoneDoor, 18793, 10758,
 UpperDepths.EntryKeystoneDoor, 21786, 59990,
 UpperDepths.LightPuzzle, 18793, 21994,
 UpperDepths.TeleporterActive, 18793, 38871,
+UpperDepths.BreakingMouldCompleted, 14019, 45931, 3
+UpperDepths.MoraDefeated, 18793, 26713, 7
 LowerDepths.TrialActivation, 44964, 28552, 1
 LowerDepths.CombatShrineCompleted, 18793, 12512,
 PoolsApproach.WheelWall, 945, 28631,
