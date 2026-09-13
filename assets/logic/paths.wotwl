@@ -14260,19 +14260,18 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
       Water, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       Damage=20, WaterDash, DoubleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
       DoubleJump, TripleJump, Sword OR Hammer OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1 OR Shuriken=1  # jump from the right wall (no climbing it since it is too obscure)
-      # Glitched
-      # GlideJump, DoubleJump, TripleJump OR Hammer OR Spear=1
-      # SentryJump=1 OR AerialHammerJump OR GrenadeJump=1
+      GlideJump, DoubleJump, TripleJump OR Hammer OR Spear=1
+      SentryJump=1 OR AerialHammerJump  # OR GrenadeJump=1
     unsafe:
       Bash, Grenade=1  # Stand on the left of the TP, launch the grenade with a curve so it doesn't touch the ceiling and bash it when it falls down
       WaterDash, Dash, Hammer, Water OR Damage=20  # Already hard with analog swimming but it's a nightmare on keyboard
       WaterDash, Dash, Sword, Water OR Damage=20  # downslash to grab the pickup
       DoubleJump  # Climb the right wall
-      SentryJump=1 OR GrenadeJump OR AerialHammerJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR AbilitySwap=2
+      GrenadeJump OR GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR AbilitySwap=2
       Damage=20, BlazeSwap=1 OR SentrySwap=1  # https://youtu.be/OClfrWs1wok
       # Blaze=2 OR Sentry=2  # Use the no ability zone to ability swap without needing a second ability then use Sentry/Blaze a second time
       WaterDash, GlideJump, Water OR Damage=20  # waterdash then glidejump. The angle is pretty precise.
-      GlideJump, DoubleJump, TripleJump OR Sword OR Hammer OR Spear=1
+      GlideJump, DoubleJump, Sword
       Sword, Shuriken=1  # wall jump from the right wall then shuriken pogo
   pickup WestPools.BurrowSL:
     moki: Water, Burrow
@@ -14326,7 +14325,7 @@ anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platfor
     gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
     unsafe:
       WestPools.ForestsStrength
-      #pass over the Kwolok's escape trigger
+      # pass over the Kwolok's escape trigger
       Launch OR AerialHammerJump
       DoubleJump, TripleJump, Sword  # https://youtu.be/ZpMyu0vLan0
 
@@ -14351,7 +14350,7 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
     gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
     unsafe:
       WestPools.ForestsStrength
-      #pass over the Kwolok's escape trigger
+      # pass over the Kwolok's escape trigger
       Launch, Water OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20  # Additional skill because the slow zone prevents you from jumping https://youtu.be/GxZYdw0JC7s
       AerialHammerJump, TripleJump, Dash
   conn UpperPools.KeystoneRoomEntrance:
@@ -14373,16 +14372,23 @@ anchor KwolokEscape at -1650, -4125:
     gorlek:
       Water, WaterDash, Dash, Bash
       Water, WaterDash, Launch
-      Water, Launch, Dash, Bash
+      NormalGameDifficulty, Water, Launch, Dash, Bash
     kii:
-      Launch, Water
-      Launch, Bash, Damage=180  # Bash the fish at the end of the escape. You don't need to abuse bash iframes
+      NormalGameDifficulty:
+        Launch, Water
+        Launch, Bash, Damage=180  # Bash the fish at the end of the escape. You don't need to abuse bash iframes
+        AerialHammerJump, Dash, Water
+        AerialHammerJump, Dash, Water, Bash, Damage=180
       Launch, WaterDash, Damage=100
       Dash, WaterDash, Water OR Damage=120  # water dash to reach the wall at the start
     unsafe:
-      Launch, Damage=160
-      Dash, DoubleJump, TripleJump, Water OR Damage=160
-      WaterDash, Bash, DoubleJump, Grenade=1, Water OR Damage=100
+      Launch, Damage=160 OR Water
+      Launch, Bash, Water OR Damage=120  # Bash the fish at the end of the escape.
+      WaterDash, Water OR Damage=140
+      WaterDash, Bash, Damage=80
+      NormalGameDifficulty:
+        Dash, DoubleJump, TripleJump, Water OR Damage=160
+        AerialHammerJump, TripleJump, Water OR Damage=160
 
 anchor KwolokFight at -1978, -4135:
   nospawn
@@ -14396,7 +14402,7 @@ anchor KwolokFight at -1978, -4135:
       Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Launch OR Dash
     gorlek: Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump OR Launch OR Dash
     kii: Boss=250, Regenerate, Damage=85, Water, WaterDash, DoubleJump OR Launch OR Dash
-    unsafe: Boss=250
+    unsafe: Boss=250  # Water is always clean
 
 region LowerWastes:
   # This is mirrored in UpperWastes.
