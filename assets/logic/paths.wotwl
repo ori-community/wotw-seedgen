@@ -137,24 +137,27 @@ anchor MarshSpawn.Main at -799, -4310:  # spawn location / marsh well
       Grapple, Sentry=1 OR Shuriken=1 OR Flash=1
       Bash, Launch, HowlsDen.RainLifted OR Grenade=1
       HowlsDen.RainLifted, Launch, Sword  # pogo the mantis between launches
-      Launch, DoubleJump, TripleJump  # Multiple solutions
+      Launch, DoubleJump, TripleJump OR GrenadeJump=1  # Multiple solutions
       LaunchSwap
-      SentryJump=1, Launch  # OR AerialHammerJump
-      # AerialHammerJump, TripleJump
-      # AerialHammerJump, Bash, Grenade=1 OR HowlsDen.RainLifted
+      Launch, SentryJump=1 OR AerialHammerJump
+      AerialHammerJump, TripleJump, GrenadeJump=1 OR Damage=20
+      AerialHammerJump, Bash, HowlsDen.RainLifted OR Grenade=1
+      Bash, Grenade=1, SwordJump, TripleJump
     unsafe:
       Launch  # Launching along the ceiling, starting above the LongSwimSL
       Grapple, Spear=1 OR Blaze=2
       HowlsDen.RainLifted, DoubleJumpBashChain OR GlideBashChain   # Chain bash the mantis
       HowlsDen.RainLifted, Unpopular, DashBashChain  # Chain bash the slime
-      # Glitched:
       SentryJump=1, DoubleJump  # walljump on the small wall above the grappable plant. With sword, djump+upslash
       SwordSJump=2  # 1 grounded near full height, 1 aerial mid height, jump off left wall, swordfloat to pickup
       HammerSJump=2, Sentry=1 OR Shuriken=1 OR Damage=10 OR PauseFloat  # 1 grounded near full height, 1 forward attack, 1 aerial mid height, jump off left wall, use hammer floats and extra to pickup
       Grapple, PauseFloat OR GrenadeJump OR BlazeSwap=1
       AerialHammerJump, TripleJump OR CoyoteHammerJump OR WallHammerJump
-      FlashSwap  # hehe
+      BlazeSwap=6 OR FlashSwap OR SentrySwap=8  # https://youtu.be/6FBGsljm-40
+      BlazeSwap=5 OR SentrySwap=7:
+        Damage=10
       Bash, AerialHammerJump, Grenade=1 OR HowlsDen.RainLifted
+      GrenadeJump, DoubleJump, TripleJump
   pickup MarshSpawn.BridgeSL: # not a free pickup because you could break the log and softlock yourself
     moki:
       DoubleJump OR Dash OR Glide OR Launch
