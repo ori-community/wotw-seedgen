@@ -211,23 +211,29 @@ anchor MarshSpawn.OpherBarrier at -681, -4309:  # in front of the wall blocking 
 anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaking bridge
   refill Checkpoint
 
-  pickup MarshSpawn.ResilienceShard:
+  state MarshSpawn.ResilienceWall:
     moki: BreakWall=16
     unsafe: HowlsDen.RainLifted  # Lure mantis
+
+  pickup MarshSpawn.ResilienceShard:
+    moki: MarshSpawn.ResilienceWall
   pickup MarshSpawn.ResilienceOre:
-    moki: BreakWall=16, Water
-    unsafe:
-      HowlsDen.RainLifted, Water # Lure mantis
-      Damage=40, HowlsDen.RainLifted OR BreakWall=16
-      Damage=20, WaterDash, HowlsDen.RainLifted OR BreakWall=16
+    moki, MarshSpawn.ResilienceWall: Water
+    unsafe, MarshSpawn.ResilienceWall:
+      Damage=40
+      Damage=20, WaterDash
   pickup MarshSpawn.BashEF:
     moki: Bash OR Launch
     gorlek: SentryJump=1
     kii:
-      HowlsDen.RainLifted, Sword, DoubleJump, TripleJump  # Pogo on the slime
-      # GrenadeJump=1, DoubleJump
-      GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # Possible without the condition by wall jumping on the left wall instead of going to the pickup but probably too obscur for kii
       AerialHammerJump
+      GrenadeJump=1, DoubleJump OR Hammer
+      HowlsDen.RainLifted:
+        SwordJump  # Pogo the slime
+        Sword, DoubleJump, TripleJump  # same as above
+      SwordJump, TripleJump, Hammer  # upslash with hammer first
+      GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # Possible without the condition by wall jumping on the left wall instead of going to the pickup but probably too obscur for kii
+      GlideJump, SwordJump, Hammer
     unsafe:
       GlideHammerJump OR WallHammerJump
       DoubleJump, TripleJump  # https://youtu.be/DIIHU4JiAj4
@@ -246,11 +252,11 @@ anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaki
       SentryJump=1
       Hammer, Glide
     kii, MarshSpawn.LogBroken:
-      Hammer OR GlideJump  # OR GrenadeJump=1
+      Hammer OR GlideJump OR GrenadeJump=1
       Sword, Glide OR HowlsDen.RainLifted OR Spear=1 OR Shuriken=1 OR Sentry=1 OR Flash=1  # pogo / Upslash then use energy weapon
     unsafe, MarshSpawn.LogBroken:
       Sentry=2  # not lenient enough for kii
-      GrenadeJump
+      AbilitySwap=1 OR PauseFloat
 
 anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen tree
   refill Checkpoint
