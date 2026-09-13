@@ -186,7 +186,7 @@ anchor MarshSpawn.OpherBarrier at -681, -4309:  # in front of the wall blocking 
     moki: Dash OR Glide
     gorlek:
       HowlsDen.RainLifted, Bash  # jump the jumper
-      Sword # Long jump, upslash and neutral slashes are enough with both weapons
+      Sword
     kii, MarshSpawn.ToOpherBarrier:
       Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
 
@@ -201,12 +201,12 @@ anchor MarshSpawn.OpherBarrier at -681, -4309:  # in front of the wall blocking 
     gorlek:
       Hammer
       Sword, Dash
-      SentryJump=1
+      SwordSJump=1
     kii:
       HowlsDen.RainLifted, Bash
-      Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GlideJump  # OR GrenadeJump=1
+      Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GlideJump OR GrenadeJump=1
     unsafe:
-      Glide OR GrenadeJump OR FlashSwap OR PauseFloat
+      Glide OR FlashSwap OR PauseFloat
 
 anchor MarshSpawn.BrokenBridge at -643, -4351:  # after dropping down the breaking bridge
   refill Checkpoint
