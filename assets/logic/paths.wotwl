@@ -275,22 +275,24 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       Bash, Grenade=1, DoubleJump
     gorlek:
       Grapple, Bash, Dash OR Glide  # both weapon float variants are rather awkward
+      Grapple, Glide, DoubleJump, TripleJump
       Bash, Grenade=1
       SentryJump=1, DoubleJump, TripleJump
       SentryJump=1, Bash
       Launch  # different ways to solve
     kii:
       Grapple, Bash, Hammer OR Shuriken=1 OR Sentry=2
-      DoubleJump, TripleJump, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from under the grappable plant
+      DoubleJump, TripleJump, Grapple OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # start jumping from under the grappable plant
       Bash, DoubleJump, Dash, Hammer OR Shuriken=1  # start jumping from under the grappable plant then djump to grab the bashable plant
-      HowlsDen.RainLifted, Bash  # Lure the mantis, then bash off him
+      HowlsDen.RainLifted, Bash  # Bash the mantis
       HowlsDen.RainLifted, DoubleJump, Sword  # Lure the mantis near the door then pogo to reach the wall. Upslash to reach the lever
-      SentryJump=1  # OR AerialHammerJump
+      SentryJump=1
       GlideJump, DoubleJump, TripleJump OR Sword OR Hammer  # condition to reach the lever from the wall
       Bash, DoubleJump, GlideJump
-      # GrenadeJump=1, DoubleJump, TripleJump OR Sword OR Hammer
-      # GrenadeJump=1, GlideJump, DoubleJump   # start jumping from under the grappable plant, goes directly to the lever
-      # GrenadeJump=1, Bash, Dash OR DoubleJump
+      GrenadeJump=1, DoubleJump, TripleJump OR Sword
+      GrenadeJump=1, DoubleJump, Hammer, Dash OR Glide OR Shuriken=1 OR Sentry=2  # condition to reach the wall so you can preserve your upslash to reach the lever
+      GrenadeJump=1, Bash, Dash OR DoubleJump OR Hammer
+      AerialHammerJump, MarshSpawn.KeystoneDoor OR Bash  # opening the door so you can equip hammer on any ability slot
     unsafe:
       AerialHammerJump OR GlideHammerJump OR WallHammerJump  # Have to equip hammer on ability 3
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR GlideJump OR GrenadeJump
@@ -299,6 +301,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
       Grapple, DoubleJump OR Dash  # Swing the plant with Grapple
       GlideJump, GrenadeJump, Dash
       Bash  # In rain, use a slug. If rain lifted use the kii path
+      # Grapple, Bash, Sword
 
   conn MarshSpawn.RegenDoor:
     moki: MarshSpawn.KeystoneDoor
@@ -309,13 +312,10 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
     gorlek:
       Dash OR SentryJump=1
       HowlsDen.RainLifted, Bash  # enemy that only spawns at daytime
-    kii:
-      Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      # Glitched
-      # GlideJump OR GrenadeJump=1
+    kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR GrenadeJump=1
     unsafe:
       Bash  # at night there's a slime that works too
-      GlideJump OR GrenadeJump OR PauseFloat
+      PauseFloat OR BlazeSwap=1 OR FlashSwap
   conn MarshSpawn.Cave:
     moki: MarshSpawn.TokkBarrier
 
