@@ -8786,7 +8786,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
   conn LowerWastes.FeedingGroundsTP:  # every path needs to be possible while having Seir
     moki:
       Grapple, Glide, DoubleJump OR Dash OR Launch  # this solves with Seir as well
-      WindtornRuins.Seir:  # these wouldn't solve without Seir
+      WindtornRuins.Seir:  # these wouldn't solve without Seir (skill). This currently requires Seir (pickup) which is almost the same thing.
         DoubleJump, Bash, Grenade=1, Grapple
         Grapple, Glide
         Burrow
@@ -8797,7 +8797,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       Glide, DoubleJump, TripleJump
       Glide, Grapple, DoubleJump OR Dash
       Grapple, SentryJump=1, DoubleJump OR Dash
-      WindtornRuins.Seir:  # these wouldn't solve without Seir
+      WindtornRuins.Seir:  # these wouldn't solve without Seir (skill). This currently requires Seir (pickup) which is almost the same thing.
         SentryJump=1, DoubleJump, TripleJump  # tjump+up slash to reach the grappable surface
         Bash, Grenade=1, Grapple
         Bash, Grenade=2, Dash  # Dash to get in bash range on the 2nd grenade to get on the grappable surface
@@ -8809,7 +8809,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       Bash, Grenade=1, Dash, DoubleJump, Sword OR Hammer
       Bash, Grenade=1, DoubleJump, Hammer, Flash=1 OR Sentry=1
       Bash, Grenade=1, DoubleJump, TripleJump  # if you are doing the escape, use the hiding spot. if you have seir, use a bashnade
-      WindtornRuins.Seir:  # these wouldn't solve without Seir
+      WindtornRuins.Seir:  # these wouldn't solve without Seir (skill). This currently requires Seir (pickup) which is almost the same thing.
         Glide, Grapple  # don't actually need seir but avoiding the need to figure out getting a grounded jump from the last hidding spot while in the chase
         Glide, Bash, Grenade=1, DoubleJump OR Dash
         Bash, Grenade=2, DoubleJump
@@ -14460,10 +14460,10 @@ anchor LowerWastes.FeedingGroundsTP at 1456, -3997:  # At the Western Wastes TP
       Grapple, Shuriken=3 OR Sentry=4
       Burrow, GlideJump  # Burrow-Glidejump to get up the ledge, GlideJump over the spikes
   conn WoodsMain.FeedingGrounds:
-    moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
+    moki: WindtornRuins.Seir, Burrow  # Seir (skill) to make it a safe path. This currently requires Seir (pickup) which is almost the same thing.
     gorlek: Burrow
   conn WeepingRidge.Bottom:  # These paths need to be solvable after cat and mouse, since there is less platforms at that point and you can't pass above the teleporter
-    moki, Burrow, WindtornRuins.Seir:  # Seir to make it a safe path
+    moki, Burrow, WindtornRuins.Seir:  # Seir (skill) to make it a safe path. This currently requires Seir (pickup) which is almost the same thing.
       DoubleJump, Glide, Grapple
       DoubleJump, Bash, Grenade=1, Grapple
       Launch
@@ -15552,12 +15552,12 @@ anchor WindtornRuins.FallenPillar at 2090, -4012:  # After dropping down from th
   conn WindtornRuins.MapstoneAltar:  # connection after the escape is finished
     # If you completed the escape, there's a gap in the floor that you have to cross
     # Finishing the escape automatically breaks the corruption blob and the wall blocking access
-    moki, WindtornRuins.Seir:
+    moki, WindtornRuins.EscapeCompleted:
       DoubleJump OR Dash OR Glide OR Burrow OR Launch
       Bash, Grenade=1
-    gorlek, WindtornRuins.Seir: Sword OR Hammer
-    kii, WindtornRuins.Seir: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # OR GrenadeJump=1
-    unsafe: WindtornRuins.Seir
+    gorlek, WindtornRuins.EscapeCompleted: Sword OR Hammer
+    kii, WindtornRuins.EscapeCompleted: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # OR GrenadeJump=1
+    unsafe: WindtornRuins.EscapeCompleted
 
 anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
   refill Full
@@ -15598,10 +15598,15 @@ anchor WindtornRuins.Escape at 2021, -4026:
   nospawn
   refill Full
 
+  # windtornRuinsGroup.desertRuinsEscape (10289|19890=1) when the initial cutscene starts
+  # windtornRuinsGroup.desertRuinsEscape (10289|19890=2) when the chase starts
+  # Seir ability (2|108) during the cutscene
+
   # After you complete the escape, there's a gap in the floor to its right, making the location unreachable with skillsets
   # that would have reached it before completing the escape. That's why this has no outside connections; the paths to here
-  # can softlock after achieving the EscapeComplete state, so this anchor is only safe as long as it does nothing else than handling that state.
-  pickup WindtornRuins.Seir:
+  # can softlock after achieving the EscapeCompleted state, so this anchor is only safe as long as it does nothing else than
+  # connecting to the escape end anchor.
+  conn WindtornRuins.EscapeEnd:
     moki, WindtornRuins.TeleporterCorruption:
       Burrow, Dash, Grapple, DoubleJump OR Glide
       Burrow, DoubleJump, Glide, Grapple
@@ -15628,33 +15633,47 @@ anchor WindtornRuins.Escape at 2021, -4026:
         Burrow, FlashSwap
         Burrow, SentryJump=3  # This is pain. Should have jumped over the worm instead
         Burrow, DoubleJump, TripleJump
-      UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This need to solve with the pillar destroyed to avoid softlocks
+      UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This needs to solve with the pillar destroyed to avoid softlocks
         Burrow, Launch OR SentryJump=1 OR FlashSwap OR SentrySwap=4 OR BlazeSwap=4
         Burrow, Bash, Grenade=1, DoubleJump  # you should have rolled this path before I got rid of triplejump https://youtu.be/TMWmknRqCIM
         Burrow, AerialHammerJump, TripleJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
         Burrow, GrenadeJump, DoubleJump, TripleJump
 
+anchor WindtornRuins.EscapeEnd at 2179, -3604:  # At the last air pocket before completing the escape
+  nospawn
+
+  # All the connections from here could be free if we move the anchor inside the sand, but you need Burrow to reach it (from either side).
+  state WindtornRuins.EscapeCompleted:  # Enter the end trigger
+    moki: Burrow
+  state WindtornRuins.SiftingSandsCompleted:  # When the rocks fall on the sandworm
+    moki: Burrow
+
+  # Technically this isn't Seir. This is windtornRuinsGroup.wispRewardPickup (10289|22102) which is the pickup part of Seir. Seir is also an ability (2|108) and is set at the start of the escape.
+  # For simplicity and consistency across difficulties that cannot escape the worm escape, this is Seir.
+  pickup WindtornRuins.Seir:  # After walking left and watching the cutscene
+    moki: Burrow
+
 anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedestal
   pickup WindtornRuins.HandToHandComplete:
     moki: LowerWastes.HandToHandMapstone
   pickup WindtornRuins.EscapeRevisitEF:
-    moki: WindtornRuins.Seir, Burrow
+    moki: WindtornRuins.EscapeCompleted, Burrow
 
   conn WindtornRuins.Escape: free  # walk over the invisible sandworm
   conn WindtornRuins.FallenPillar:  # Finishing the escape removes the pillar. Doing the escape looks mandatory
-    moki, WindtornRuins.Seir:
+    moki, WindtornRuins.EscapeCompleted:
       DoubleJump, Dash OR Glide
       Bash, Grenade=1
       Launch
-    gorlek, WindtornRuins.Seir:
+    gorlek, WindtornRuins.EscapeCompleted:
       DoubleJump, TripleJump OR Sword
       SentryJump=1
-    kii, WindtornRuins.Seir:
+    kii, WindtornRuins.EscapeCompleted:
       DoubleJump, Burrow OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
       Dash, Glide OR Sword OR Hammer OR Spear=1 OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Blaze=1
       GlideJump
       # GrenadeJump=1, Sword OR DoubleJump OR Dash OR Hammer OR Glide
-    unsafe, WindtornRuins.Seir:
+    unsafe, WindtornRuins.EscapeCompleted:
       Dash OR DoubleJump OR PauseFloat OR AbilitySwap=1 OR Burrow OR Sentry=3
       Sword, Shuriken=1  # Pogo
   conn LowerWastes.MinesEntranceEnemyPaths:
@@ -15688,7 +15707,7 @@ anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weepi
       Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
       GrenadeJump
   conn LowerWastes.FeedingGroundsTP:  # covers connections into woods
-    moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
+    moki: WindtornRuins.Seir, Burrow  # Seir (skill) to make it a safe path. This currently requires Seir (pickup) which is almost the same thing.
     gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
 
 anchor WeepingRidge.Elevator at 1170, -3820:  # Bottom checkpoint next to the elevator
