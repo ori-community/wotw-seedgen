@@ -10,5 +10,5 @@ on LowerReach.ForestsMemory store(itemTracker.wispsCount, itemTracker.wispsCount
 on LowerReach.ForestsMemory == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
 on UpperDepths.ForestsEyes store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
 on UpperDepths.ForestsEyes == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
-on WindtornRuins.Seir store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
-on WindtornRuins.Seir == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+on WindtornRuins.ForestsHeart store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+on WindtornRuins.ForestsHeart == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)

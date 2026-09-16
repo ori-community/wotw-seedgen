@@ -293,7 +293,7 @@ on change EastHollow.ForestsVoice update_wisp_progress()
 on change LowerReach.ForestsMemory update_wisp_progress()
 on change UpperDepths.ForestsEyes update_wisp_progress()
 on change WestPools.ForestsStrength update_wisp_progress()
-on change WindtornRuins.Seir update_wisp_progress()
+on change WindtornRuins.ForestsHeart update_wisp_progress()
 fun update_wisp_progress() {
     write_wisp_progress()
     set_message_text("wisp_progress", get_string("wisp_progress"))
@@ -305,7 +305,7 @@ fun wisp_string(found: Boolean) {
     if LowerReach.ForestsMemory == found add_colored_row_item("Memory")
     if UpperDepths.ForestsEyes == found add_colored_row_item("Eyes")
     if WestPools.ForestsStrength == found add_colored_row_item("Strength")
-    if WindtornRuins.Seir == found add_colored_row_item("Heart")
+    if WindtornRuins.ForestsHeart == found add_colored_row_item("Heart")
 
     if get_integer("next_item") == next_item_first set_string("row", get_string("row") + "None")
 }

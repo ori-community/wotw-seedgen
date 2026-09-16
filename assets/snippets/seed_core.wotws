@@ -127,6 +127,18 @@ on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut
     if gladesProjects.housesABuilt == false store(questUberStateGroup.familyReunionQuest, 0)
     if gladesProjects.housesABuilt store(questUberStateGroup.familyReunionQuest, 1)
 }
+// Patience Skip can lock you out of the escape reward. This fix gives the expected rewards when teleporting away in the cutscene area.
+on windtornRuinsGroup.desertRuinsEscape == 3 if is_in_rectangle(2048, -3573, 2154, -3539) {
+    position_trigger_rectangle("seir_walk", 2048, -3573, 2154, -3539)
+    position_trigger_leave_callback("seir_walk", if windtornRuinsGroup.wispRewardPickup == false {
+        store(windtornRuinsGroup.wispRewardPickup, true)
+        store(player.baseMaxHealth, player.baseMaxHealth + 10)
+        store(player.health, player.maxHealth)
+        store(player.baseMaxEnergy, player.baseMaxEnergy + 1)
+        store(player.energy, player.maxEnergy)
+        position_trigger_destroy("seir_walk")
+    })
+}
 // Enable the spoiler map on game finished
 // TODO: Move this to a separate snippet to allow for more customization?
 on gameStateGroup.gameFinished {
