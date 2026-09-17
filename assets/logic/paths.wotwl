@@ -49,7 +49,7 @@
 # requirement macros. must go at the top of the file!
 
 requirement DepthsLight:
-  moki: UpperDepths.ForestsEyes OR Flash=1
+  moki: UpperDepths.MoraDefeated OR Flash=1  # Depths darkness is controlled by the boss state
   gorlek: Bow=3  # should be good, right?
   kii: BowCancel  # is this reasonable?
   # unsafe: Grenade=3  # probably enough
@@ -328,55 +328,63 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     kii: HammerBreak OR SpearBreak OR SentryBreak=16
   state MarshSpawn.CaveFight:
     moki: Combat=3xLizard  # at day there's two extra lizards
+  # This state is irrelevant if you collect MarshSpawn.CaveKS first, because completing the quest can be done with MarshSpawn.CaveKS alone at this Tokk.
+  # This state is only relevant if you talk to Tokk before collecting MarshSpawn.CaveKS. If that's the case, collecting MarshSpawn.CaveKS then progresses the quest to the next step (MarshSpawn.MissingKeyQICollected).
+  state MarshSpawn.MissingKeyTokkTalkedTo: free  # Start of the "Missing Key" quest. 
 
   pickup MarshSpawn.LeftTokkSL:
     moki: BreakWall=10
   pickup MarshSpawn.FightRoomSL:
     moki: BreakWall=10
-  pickup MarshSpawn.CaveKS:
-    moki:
-      DoubleJump, Dash OR Grapple
-      Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
-      Launch
-      MarshSpawn.CaveFight
-    gorlek: DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
-    kii: # Sword and hammer both solves the connection with movement but is redundant with beating the arena
-      GlideJump
-      # GrenadeJump=1, Glide
-    unsafe: GrenadeJump
-  pickup MarshSpawn.TokkKeystoneQuest:
+  pickup MarshSpawn.TokkKeystoneQuest:  # This quest can be completed with just the QI on this specific Tokk
     moki: MarshSpawn.CaveKS
 
   conn Tokk: free  # this one is tokk anywhere'd
   conn MarshSpawn.CaveEntrance:
     moki: MarshSpawn.TokkBarrier
-  conn MarshSpawn.PoolsBurrowsSignpost:
+  conn MarshSpawn.CaveWaterfall:
     moki:
       DoubleJump, Dash OR Grapple
-      Bash, DoubleJump OR Dash
-      Bash, Grenade=1, Glide OR Grapple
+      Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
       Launch
-      MarshSpawn.CaveFight, DoubleJump OR Dash
-      MarshSpawn.CaveFight, Bash, Grenade=1
+      MarshSpawn.CaveFight
     gorlek:
-      DoubleJump
-      Bash, Grenade=1
-      MarshSpawn.CaveFight, SentryJump=1  # makes other sentryjump paths unnecessary
-      # weapon floats maybe too precise for gorlek
-    kii:
-      Sword  # Pogo on the slime and slash to the left, Upslash to reach the branch
-      Hammer  # weapon floats
-      Bash  # use slimes
-      MarshSpawn.CaveFight, Shuriken=1 OR Flash=1 OR Sentry=1
-      MarshSpawn.CaveFight, Glide, Spear=1
+      DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
+    kii:  # Sword and hammer both solves the connection with movement but is redundant with beating the arena
       GlideJump
-      # GrenadeJump=2, Glide OR MarshSpawn.CaveFight
+      # GrenadeJump=1, Glide
     unsafe:
-      Dash  # dash ramp at the first slime to skip the arena
-      MarshSpawn.CaveFight, Spear=1  # not lenient enough for kii
-      GrenadeJump OR AbilitySwap=2
+      Dash  # dash ramp
+      GrenadeJump OR AbilitySwap=1 OR SpearJump=1
 
-# checkpoint at -845, -4438
+anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to the waterfall where you initally lose torch
+  refill Checkpoint
+  # Additional checkpoint at -833, -4451, but not logically relevant
+
+  # This is redundant because you can already complete the quest for free through ->MarshSpawn.Cave->MarshSpawn.TokkKeystoneQuest
+  # It's only noted here to document the quest relation in case it's relevant in the future
+  # state MarshSpawn.MissingKeyQICollected:  # Quest state progression
+  #   moki: MarshSpawn.MissingKeyTokkTalkedTo, MarshSpawn.CaveKS
+
+  pickup MarshSpawn.CaveKS: free
+
+  conn MarshSpawn.Cave: free  # Climb the moss
+  conn MarshSpawn.PoolsBurrowsSignpost:
+    moki:
+      DoubleJump OR Dash OR Launch
+      Bash, Grenade=1
+    gorlek:
+      SentryJump=1
+    kii:
+      Sword OR Hammer  # Upslash + hover not in gorlek
+      Bash  # Use the slime
+      Shuriken=1
+      Glide, Spear=1
+      GlideJump
+      # GrenadeJump=1
+    unsafe:
+      Spear=1 OR Flash=1 OR Sentry=1  # too precise for kii
+      BlazeSwap=1 OR PauseFloat
 
 anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
   refill Health=1
@@ -462,7 +470,6 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
     moki: BreakCrystal  # on the ground on the way to Burrows
     unsafe: free  # bait the bat into shooting it
 
-  pickup MarshSpawn.CaveKS: free
   pickup MarshSpawn.CaveOre:
     moki:
       DoubleJump OR Launch
@@ -522,7 +529,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
       SwordSJump=1, Damage=10  # air sjump from below the first lantern, weapon stall to minimize damage
       HammerSJump=1, Damage=20
       # AerialHammerJump, Glide OR Damage=10  # Use both of the microwalls near the first lantern, dboost in the spikes under the second lantern. Use a regular double jump + hammer at the end, because a hammer jump goes too high.
-  conn MarshSpawn.Cave: free
+  conn MarshSpawn.CaveWaterfall: free
   conn MarshSpawn.LifepactLedge:
     moki: Bash, DoubleJump OR Dash OR Launch
     gorlek:
@@ -3997,7 +4004,7 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       Damage=50, Damage=80, WaterDash  # Take a dboost from the mortar projectile before going in the water
 
   pickup EastHollow.KwolokAmuletQuest:
-    moki: EastPools.KwolokAmuletQI, WestPools.ForestsStrength
+    moki: EastPools.KwolokAmuletQI, WestPools.LostParadiseCompleted
   pickup EastHollow.RightKwolokSL:
     moki: Bash OR Launch
     gorlek: SentryJump=1
@@ -5367,7 +5374,7 @@ anchor WestGlades.Upper at -618, -4054:  # At the sign that gives you directions
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap OR LowerReach.ForestsMemory  # Completing the escape wake up Baur
+    moki: Flap
 
   pickup WestGlades.UpperPoolSL:
     moki: Water
@@ -8895,7 +8902,7 @@ anchor LowerReach.Entry at -390, -4025:  # Behind Baur
   refill Health=1
 
   state LowerReach.BearSneezed:
-    moki: Flap OR LowerReach.ForestsMemory  # Completing the escape wake up Baur
+    moki: Flap
   state LowerReach.ThawBaurFurnace:
     moki, LowerReach.BearSneezed, LowerReach.BearBridgeBroken:
       Bash, Flap
@@ -10069,7 +10076,11 @@ anchor LowerReach.SnowEscape at 79, -3733:
   nospawn
   refill Full
 
-  pickup LowerReach.ForestsMemory:  # currently based on the requirements of getting here to simplify
+  # state winterForestGroupDescriptor.springBlossomTimelinePlayed (28287|6764) disables the slow walk zone and the cutscene trigger when the cutscene starts
+  # state winterForestGroupDescriptor.thawStateDescriptor (28287|16339) disables the snowstorm effect when the cutscene starts
+  # state questUberstateGroup.winterForestWispQuestUberstate (14019|8973=2) is set when the cutscene starts
+
+  conn LowerReach.SnowEscapeEnd:  # currently based on the requirements of getting here to simplify
     moki:
       Dash, Bash, Grapple, Glide, Water OR DoubleJump
       Bash, Glide, Launch
@@ -10093,7 +10104,15 @@ anchor LowerReach.SnowEscape at 79, -3733:
       Dash, SentryJump=4
       FlashSwap  # Dodging the water is scary but totally doable.
   pickup LowerReach.EscapeRevisitSL:
-    moki: LowerReach.ForestsMemory
+    moki: LowerReach.HighestReachCompleted  # Completing the quest blocks the escape and spawns the pickup
+
+anchor LowerReach.SnowEscapeEnd at -585, -3870:  # At the end of the escape, before jumping down
+  nospawn
+  
+  state LowerReach.HighestReachCompleted: free
+  state LowerReach.BearFullyAwake: free  # Not logically relevant beyond including LowerReach.BearSneezed
+
+  pickup LowerReach.ForestsMemory: free  # After watching the entire cutscene
 
 anchor LowerReach.VeralHome at -140, -4096:  # At the soup
   refill Checkpoint
@@ -11371,6 +11390,12 @@ anchor MoraFirstPhase at 674, -4385:
   nospawn
   refill Full
 
+  # mouldwoodDepthsGroup.spiderBossState (18793|26713=1) initial cutscene
+  # mouldwoodDepthsGroup.spiderBossState (18793|26713=2) fight starts
+  # mouldwoodDepthsGroup.spiderBossState (18793|26713=3) mora staggers and breaks the wall
+  #   mouldwoodDepthsGroup.blockerWallBroken (18793|4645=1) the wall and (first) ceiling that break when mora gets staggered
+  #   mouldwoodDepthsGroup.lanternAndCreepBInt (18793|39667=1) is the corruption blob holding the grapple plant
+
   conn MoraEscape:
     moki:
       SkipMora1  # Impossible state used to logically support skipping Mora through headers
@@ -11381,6 +11406,11 @@ anchor MoraFirstPhase at 674, -4385:
 anchor MoraEscape at 712, -4482:
   nospawn
   refill Checkpoint
+
+  # mouldwoodDepthsGroup.spiderBossState (18793|26713=4) chase starts. Also closes the top arena left wall (entrance)
+  #   mouldwoodDepthsGroup.webFallState (18793|44522=1) bash lanterns fall down
+  #   mouldwoodDepthsGroup.arenaBottomBrokenFloor (18793|15422=1) second ceiling broken, allowing the escape
+  #   mouldwoodDepthsGroup.verticalFallingTrunk (18793|49362=1) controlling whether the vertical trunk has fallen down. Gets reset when the escape starts.
 
   conn MoraSecondPhase:  # Abilities needed for the escape part
     moki: Bash, Grapple, DoubleJump OR Launch
@@ -11403,7 +11433,11 @@ anchor MoraSecondPhase at 690, -4386:
   refill Energy=3:
     moki: BreakCrystal
 
-  pickup UpperDepths.ForestsEyes:
+  # mouldwoodDepthsGroup.spiderBossState (18793|26713=5) fight starts
+  #   mouldwoodDepthsGroup.brokenTrunkTop (18793|28692=1) trunk blocking the right side access
+  # mouldwoodDepthsGroup.spiderBossState (18793|26713=6) mora staggers and summons darkness
+
+  conn MoraFightEnd:
     moki:
       SkipMora2  # Impossible state used to logically support skipping Mora through headers
       Boss=165, Regenerate, Damage=60, Bash, Flash, DoubleJump OR Dash OR Launch
@@ -11411,6 +11445,16 @@ anchor MoraSecondPhase at 690, -4386:
       Boss=165, Regenerate, Damage=60, DepthsLight, Launch
       Boss=165, Regenerate, Damage=60, DepthsLight, Bash, DoubleJump OR Dash
     unsafe: Boss=165
+
+anchor MoraFightEnd at 690, -4386:
+  nospawn
+
+  state UpperDepths.BreakingMouldCompleted: free  # Quest completion. Changes enemies in Depths.
+  state UpperDepths.MoraDefeated: free  # Mora is happy now. Lifts darkness in Depths.
+  # Important: Even though it's never set, mouldwoodDepthsGroup.darknessLiftedUberState (18793|13352) is only a visual change. It does not disable the darkness timer
+
+  pickup UpperDepths.ForestsEyes:
+    moki: UpperDepths.MoraDefeated  # Can be obtained by loading the Mora scene with the fight completed
 
 anchor UpperDepths.LowerConnection at 423, -4474:  # The firefly egg to the left of the second keystone door
   refill Checkpoint
@@ -14287,9 +14331,9 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
     kii: Damage=60, Burrow
     unsafe: Damage=40, Burrow
   pickup WestPools.EscapeRevisitOre:  # intended path omitted in moki, as some players cannot reach this in time even with all skills
-    gorlek: WestPools.ForestsStrength, Water, WaterDash, Burrow
-    kii: WestPools.ForestsStrength, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
-    unsafe, WestPools.ForestsStrength:
+    gorlek: WestPools.KwolokChaseCompleted, Water, WaterDash, Burrow
+    kii: WestPools.KwolokChaseCompleted, Damage=100, Damage=80, Damage=100, WaterDash, Burrow
+    unsafe, WestPools.KwolokChaseCompleted:
       Water, Burrow
       Damage=80, Damage=60, Damage=80, WaterDash, Burrow
 
@@ -14308,7 +14352,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
       Damage=220, Bash  # 220 health if the mobs haven't spawned yet. Bashing them on your way will result in less damage
     unsafe:
       Water
-      WestPools.ForestsStrength, Bash, Damage=160
+      WestPools.KwolokChaseCompleted, Bash, Damage=160
       Damage=200, Burrow, Blaze=1, DoubleJump  # underwater walking
       Damage=180, Burrow, Blaze=1, Launch  # underwater walking
   conn EastPools.CentralRoom:
@@ -14319,7 +14363,7 @@ anchor WestPools.Teleporter at -1656, -4171:  # the west Pools TP
 
 anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platform where the Kwolok's escape starts
   refill Checkpoint:  # Checkpoint only appears after you defeated Kwolok
-    moki: WestPools.ForestsStrength
+    moki: WestPools.KwolokChaseCompleted
 
   conn KwolokEscape: free  # Doesn't need any requirement since the enemies will only spawn after Kwolok is defeated
   conn WestPools.Teleporter:  # WaterDash/Bash to deal with the fishes and crabs which spawns after you defeated Kwolok
@@ -14330,17 +14374,17 @@ anchor WestPools.LeftKwolokPlatform at -1668, -4127:  # Left side of the platfor
       Damage=220, Bash  # 220 health if the mobs haven't spawned yet. Bashing them on your way will result in less damage
     unsafe: Water
   conn WestPools.RightKwolokPlatform:
-    moki: WestPools.ForestsStrength, Bash OR Launch OR Combat=Crab+SpinCrab
-    gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
+    moki: WestPools.KwolokChaseCompleted, Bash OR Launch OR Combat=Crab+SpinCrab
+    gorlek: WestPools.KwolokChaseCompleted, DoubleJump OR Damage=10
     unsafe:
-      WestPools.ForestsStrength
+      WestPools.KwolokChaseCompleted
       # pass over the Kwolok's escape trigger
       Launch OR AerialHammerJump
       DoubleJump, TripleJump, Sword  # https://youtu.be/ZpMyu0vLan0
 
 anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platform where the Kwolok's escape starts
   refill Checkpoint:
-    moki: WestPools.ForestsStrength  # Checkpoint only appears after you defeated Kwolok
+    moki: WestPools.KwolokChaseCompleted  # Checkpoint only appears after you defeated Kwolok
 
   pickup WestPools.EscapeRevisitSL:
     moki: Water
@@ -14355,10 +14399,10 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
 
   conn KwolokEscape: free  # Doesn't need any requirement since the enemies will only spawn after Kwolok is defeated
   conn WestPools.LeftKwolokPlatform:
-    moki: WestPools.ForestsStrength, Bash OR Launch OR Combat=Crab+SpinCrab
-    gorlek: WestPools.ForestsStrength, DoubleJump OR Damage=10
+    moki: WestPools.KwolokChaseCompleted, Bash OR Launch OR Combat=Crab+SpinCrab
+    gorlek: WestPools.KwolokChaseCompleted, DoubleJump OR Damage=10
     unsafe:
-      WestPools.ForestsStrength
+      WestPools.KwolokChaseCompleted
       # pass over the Kwolok's escape trigger
       Launch, Water OR DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=20  # Additional skill because the slow zone prevents you from jumping https://youtu.be/GxZYdw0JC7s
       AerialHammerJump, TripleJump, Dash
@@ -14373,6 +14417,9 @@ anchor WestPools.RightKwolokPlatform at -1637, -4127:  # Right side of the platf
 anchor KwolokEscape at -1650, -4125:
   nospawn
   refill Full
+
+  # lagoonStateGroup.kwolokBossState (945|58403=1) initial chase cutscene
+  # lagoonStateGroup.kwolokBossState (945|58403=2) chase start
 
   conn KwolokFight:  # Abilities needed for the escape part
     moki:
@@ -14405,13 +14452,30 @@ anchor KwolokFight at -1978, -4135:
   refill Energy=3:
     moki: BreakCrystal
 
-  pickup WestPools.ForestsStrength:
+  # lagoonStateGroup.kwolokBossState (945|58403=3) chase end, fight start. Also closes the wall on the right side until the chase is completed (=7) and removes the tentacle blocking the Ore access.
+  # lagoonStateGroup.kwolokBossState (945|58403=4) arena floods
+  # lagoonStateGroup.kwolokBossState (945|58403=5) unused 
+  # lagoonStateGroup.kwolokBossState (945|58403=6) fight completed, kwolok is dragged up
+
+  conn KwolokFightEnd:
     moki:
       SkipKwolok  # Impossible state used to logically support skipping Kwolok's fight through headers
       Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump, Launch OR Dash
     gorlek: Boss=250, Regenerate, Damage=85, Water, WaterDash, Bash, DoubleJump OR Launch OR Dash
     kii: Boss=250, Regenerate, Damage=85, Water, WaterDash, DoubleJump OR Launch OR Dash
     unsafe: Boss=250  # Water is always clean
+
+anchor KwolokFightEnd at -1974, -4073:  # At the checkpoint above Kwolok's arena
+  nospawn
+  refill Checkpoint
+
+  # The vines in Kwolok's arena are controlled by physics and not an uberstate. The ceiling disappears when the Kwolok chase transitions (lagoonStateGroup.kwolokBossState 4->6) and the vines drop.
+
+  state WestPools.LostParadiseCompleted: free  # Quest completion
+  state WestPools.KwolokChaseCompleted: free  # Chase sequence completion. Also removes the right side wall from the arena.
+
+  pickup WestPools.ForestsStrength:
+    moki: WestPools.KwolokChaseCompleted  # Can be obtained by loading the scene above the arena with the chase completed
 
 region LowerWastes:
   # This is mirrored in UpperWastes.
@@ -17046,6 +17110,8 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
 
 
 anchor Tokk:  # Tokk's talks
+  pickup MarshSpawn.TokkKeystoneQuest:  # This quest requires step 2 if you want to TokkAnywhere the reward
+    moki: MarshSpawn.MissingKeyQICollected
   pickup GladesTown.HandToHandPouch:
     moki: EastHollow.HandToHandMap
 
