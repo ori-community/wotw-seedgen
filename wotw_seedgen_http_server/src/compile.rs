@@ -10,7 +10,7 @@ use tokio::sync::RwLockReadGuard;
 use utoipa::ToSchema;
 use wotw_seedgen::{
     data::{
-        assets::{ChainedSnippetAccess, InlineSnippets},
+        assets::{AssetCacheValues, ChainedSnippetAccess, InlineSnippets},
         parse::Source,
         seed_language::{
             compile::{self, Compiler},
@@ -53,6 +53,24 @@ pub fn compile(
         max_log_level,
     } = query;
 
+    let mut errors = Vec::new();
+
+    let loc_data = cache
+        .loc_data()
+        .map_err(|message| errors.push(message))
+        .ok();
+    let uber_state_data = cache
+        .uber_state_data()
+        .map_err(|message| errors.push(message))
+        .ok();
+
+    let (Some(loc_data), Some(uber_state_data)) = (loc_data, uber_state_data) else {
+        return Err(CompileError {
+            errors,
+            logs: Vec::new(),
+        });
+    };
+
     let debug = debug.unwrap_or_default();
     let log_capture = LogCapture::new().with_max_level(max_log_level.unwrap_or_default().into());
 
@@ -61,15 +79,10 @@ pub fn compile(
     let inline_snippets = InlineSnippets::new(snippets);
     let snippet_access = ChainedSnippetAccess::new(&inline_snippets, &cache.base);
 
-    let mut compiler = Compiler::new(
-        &mut rng,
-        &snippet_access,
-        &cache.base.loc_data,
-        &cache.base.uber_state_data,
-    )
-    .with_debug(debug)
-    .with_lint(true)
-    .with_log_capture(&log_capture);
+    let mut compiler = Compiler::new(&mut rng, &snippet_access, loc_data, uber_state_data)
+        .with_debug(debug)
+        .with_lint(true)
+        .with_log_capture(&log_capture);
 
     for identifier in inline_snippets.keys() {
         // Cannot fail: identifier comes from inline_snippets and cyclic includes get written into the compiler errors and return Ok here
@@ -88,7 +101,7 @@ pub fn compile(
         .collect::<Vec<_>>();
 
     if errors.is_empty() {
-        let placeholder_map = postprocess(&mut [&mut output], &cache.base.loc_data, &mut rng)
+        let placeholder_map = postprocess(&mut [&mut output], loc_data, &mut rng)
             .pop()
             .unwrap();
 

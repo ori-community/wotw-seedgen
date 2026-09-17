@@ -8,7 +8,7 @@ use wotw_seedgen::data::{
 };
 
 use crate::{
-    api::assets::AssetOrigin,
+    api::{SchemaResult, assets::AssetOrigin},
     assets::Cache,
     error::{Error, Result},
 };
@@ -89,7 +89,9 @@ fn inline_snippet<'c>(
         return;
     };
 
-    let snippet_info = &cache.snippet_info[identifier];
+    let SchemaResult::Ok(snippet_info) = &cache.snippet_info[identifier] else {
+        return;
+    };
 
     if !*ALWAYS_INLINE_SNIPPETS && matches!(snippet_info.origin, AssetOrigin::ExecutableDir) {
         return;

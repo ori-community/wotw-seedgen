@@ -5,7 +5,10 @@ use serde::Serialize;
 use utoipa::{OpenApi, ToSchema};
 use wotw_seedgen::data::seed_language::metadata::Metadata;
 
-use crate::{RouterState, api::assets::AssetOrigin};
+use crate::{
+    RouterState,
+    api::{SchemaResult, assets::AssetOrigin},
+};
 
 pub const TAG: &str = "snippets";
 pub const SNIPPETS: &str = concat!("/", TAG);
@@ -24,9 +27,11 @@ pub struct Docs;
 #[utoipa::path(
     get,
     path = INFO,
-    responses((status = OK, body = FxHashMap<String, SnippetInfo>)),
+    responses((status = OK, body = FxHashMap<String, SchemaResult<SnippetInfo, String>>)),
 )]
-async fn info(State(cache): State<RouterState>) -> Json<FxHashMap<String, SnippetInfo>> {
+async fn info(
+    State(cache): State<RouterState>,
+) -> Json<FxHashMap<String, SchemaResult<SnippetInfo, String>>> {
     Json(cache.read().await.snippet_info.clone())
 }
 

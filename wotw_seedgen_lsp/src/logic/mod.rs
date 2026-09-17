@@ -12,7 +12,7 @@ use tower_lsp::{
     LanguageServer,
 };
 use wotw_seedgen_data::{
-    assets,
+    assets::{self, AssetCacheValues},
     logic_language::{
         ast::{self, Paths},
         output::Graph,
@@ -88,19 +88,15 @@ impl Backend<Cache> {
     async fn update_diagnostics(&self, uri: Url) {
         self.update_diagnostics_with(uri, async |path| {
             let source = self.consume_result(assets::read_to_string(&path)).await?;
+            let cache = self.cache.read().await;
+            let loc_data = self.consume_result(cache.loc_data()).await?;
+            let state_data = self.consume_result(cache.state_data()).await?;
 
             let ParseResult { parsed, mut errors } = Paths::parse(&source);
 
             if let Some(paths) = parsed {
-                let mut result = {
-                    let cache = self.cache.read().await;
-
-                    Graph::compiler().compile(
-                        paths,
-                        cache.loc_data.clone(),
-                        cache.state_data.clone(),
-                    )
-                };
+                let mut result =
+                    Graph::compiler().compile(paths, loc_data.clone(), state_data.clone());
 
                 errors.append(&mut result.errors);
             }

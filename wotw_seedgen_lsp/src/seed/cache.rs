@@ -16,8 +16,8 @@ use wotw_seedgen_server_shared::ServerState;
 pub type Cache = ServerState<DefaultFileAccess, CacheValues>;
 
 pub struct CacheValues {
-    pub loc_data: LocData,
-    pub uber_state_data: UberStateData,
+    pub loc_data: Result<LocData, String>,
+    pub uber_state_data: Result<UberStateData, String>,
     pub uber_identifier_numeric_completion: Vec<CompletionItem>,
     pub uber_identifier_numeric_member_completion: FxHashMap<i32, Vec<CompletionItem>>,
     pub uber_identifier_name_completion: Vec<CompletionItem>,
@@ -25,12 +25,13 @@ pub struct CacheValues {
 }
 
 impl AssetCacheValues for CacheValues {
-    fn new<F>(file_access: &F) -> Result<Self, String>
+    fn new<F>(file_access: &F) -> Self
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        let loc_data = file_access.loc_data()?;
-        let uber_state_data = file_access.uber_state_data(&loc_data, &file_access.state_data()?)?;
+        let loc_data = file_access.loc_data();
+        let uber_state_data =
+            uber_state_data(loc_data.as_ref().map_err(String::clone), file_access);
         let uber_identifier_numeric_completion =
             uber_identifier_numeric_completion(&uber_state_data);
         let uber_identifier_numeric_member_completion =
@@ -39,29 +40,29 @@ impl AssetCacheValues for CacheValues {
         let uber_identifier_name_member_completion =
             uber_identifier_name_member_completion(&uber_state_data);
 
-        Ok(Self {
+        Self {
             loc_data,
             uber_state_data,
             uber_identifier_numeric_completion,
             uber_identifier_numeric_member_completion,
             uber_identifier_name_completion,
             uber_identifier_name_member_completion,
-        })
+        }
     }
 
-    fn loc_data(&self) -> &LocData {
-        &self.loc_data
+    fn loc_data(&self) -> Result<&LocData, String> {
+        self.loc_data.as_ref().map_err(String::clone)
     }
 
-    fn state_data(&self) -> &StateData {
+    fn state_data(&self) -> Result<&StateData, String> {
         unimplemented!()
     }
 
-    fn uber_state_data(&self) -> &UberStateData {
-        &self.uber_state_data
+    fn uber_state_data(&self) -> Result<&UberStateData, String> {
+        self.uber_state_data.as_ref().map_err(String::clone)
     }
 
-    fn paths(&self) -> &Source {
+    fn paths(&self) -> Result<&Source, String> {
         unimplemented!()
     }
 
@@ -78,17 +79,16 @@ impl AssetCacheValues for CacheValues {
         iter::once(unimplemented!())
     }
 
-    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets) -> Result<(), String>
+    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
         if changed.loc_data {
-            self.loc_data = file_access.loc_data()?;
+            self.loc_data = file_access.loc_data();
         }
 
         if changed.loc_data || changed.state_data || changed.uber_state_dump {
-            self.uber_state_data =
-                file_access.uber_state_data(&self.loc_data, &file_access.state_data()?)?;
+            self.uber_state_data = uber_state_data(self.loc_data(), file_access);
             self.uber_identifier_numeric_completion =
                 uber_identifier_numeric_completion(&self.uber_state_data);
             self.uber_identifier_numeric_member_completion =
@@ -98,12 +98,23 @@ impl AssetCacheValues for CacheValues {
             self.uber_identifier_name_member_completion =
                 uber_identifier_name_member_completion(&self.uber_state_data);
         }
-
-        Ok(())
     }
 }
 
-fn uber_identifier_numeric_completion(uber_state_data: &UberStateData) -> Vec<CompletionItem> {
+fn uber_state_data<F: AssetFileAccess>(
+    loc_data: Result<&LocData, String>,
+    file_access: &F,
+) -> Result<UberStateData, String> {
+    file_access.uber_state_data(loc_data?, &file_access.state_data()?)
+}
+
+fn uber_identifier_numeric_completion(
+    uber_state_data: &Result<UberStateData, String>,
+) -> Vec<CompletionItem> {
+    let Ok(uber_state_data) = uber_state_data else {
+        return Vec::new();
+    };
+
     uber_state_data
         .id_lookup
         .iter()
@@ -112,8 +123,12 @@ fn uber_identifier_numeric_completion(uber_state_data: &UberStateData) -> Vec<Co
 }
 
 fn uber_identifier_numeric_member_completion(
-    uber_state_data: &UberStateData,
+    uber_state_data: &Result<UberStateData, String>,
 ) -> FxHashMap<i32, Vec<CompletionItem>> {
+    let Ok(uber_state_data) = uber_state_data else {
+        return FxHashMap::default();
+    };
+
     let mut group_map = FxHashMap::<i32, Vec<CompletionItem>>::default();
 
     for (id, data) in &uber_state_data.id_lookup {
@@ -127,7 +142,13 @@ fn uber_identifier_numeric_member_completion(
     group_map
 }
 
-fn uber_identifier_name_completion(uber_state_data: &UberStateData) -> Vec<CompletionItem> {
+fn uber_identifier_name_completion(
+    uber_state_data: &Result<UberStateData, String>,
+) -> Vec<CompletionItem> {
+    let Ok(uber_state_data) = uber_state_data else {
+        return Vec::new();
+    };
+
     uber_state_data
         .name_lookup
         .iter()
@@ -144,8 +165,12 @@ fn uber_identifier_name_completion(uber_state_data: &UberStateData) -> Vec<Compl
 }
 
 fn uber_identifier_name_member_completion(
-    uber_state_data: &UberStateData,
+    uber_state_data: &Result<UberStateData, String>,
 ) -> FxHashMap<String, Vec<CompletionItem>> {
+    let Ok(uber_state_data) = uber_state_data else {
+        return FxHashMap::default();
+    };
+
     uber_state_data
         .name_lookup
         .iter()

@@ -1170,9 +1170,9 @@ static GORLEK_SETTINGS: LazyLock<WorldSettings> =
     LazyLock::new(|| WorldSettings::difficulty_default(Difficulty::Gorlek));
 
 static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
-    let mut paths = Paths::parse(&TEST_ASSETS.base.paths.content)
-        .eprint_errors(&TEST_ASSETS.base.paths)
-        .unwrap();
+    let source = TEST_ASSETS.expect_paths();
+
+    let mut paths = Paths::parse(&source.content).eprint_errors(source).unwrap();
 
     paths
         .contents
@@ -1183,10 +1183,10 @@ static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
         .with_settings(slice::from_ref(&*GORLEK_SETTINGS))
         .compile(
             paths,
-            TEST_ASSETS.base.loc_data.clone(),
-            TEST_ASSETS.base.state_data.clone(),
+            TEST_ASSETS.expect_loc_data().clone(),
+            TEST_ASSETS.expect_state_data().clone(),
         )
-        .eprint_errors(&TEST_ASSETS.base.paths)
+        .eprint_errors(source)
         .unwrap()
 });
 

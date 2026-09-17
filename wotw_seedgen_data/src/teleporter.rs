@@ -158,13 +158,13 @@ impl<const SUFFIX: bool> Display for TeleporterDisplay<SUFFIX> {
 
 #[cfg(test)]
 mod tests {
-    use crate::assets::{AssetCacheValues, TEST_ASSETS};
+    use crate::assets::TEST_ASSETS;
 
     use super::*;
 
     #[test]
     fn uber_identifiers() {
-        let uber_state_data = TEST_ASSETS.uber_state_data();
+        let uber_state_data = TEST_ASSETS.expect_uber_state_data();
 
         for teleporter in Teleporter::VARIANTS {
             assert!(

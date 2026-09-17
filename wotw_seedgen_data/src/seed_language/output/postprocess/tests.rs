@@ -4,7 +4,7 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 
 use crate::{
-    assets::{AssetCacheValues, TEST_ASSETS},
+    assets::TEST_ASSETS,
     seed_language::{
         ast::ClientEvent,
         compile::{clean_water, store_boolean},
@@ -19,7 +19,7 @@ use crate::{
 
 static MARSH_TRIGGER: LazyLock<Trigger> = LazyLock::new(|| {
     let uber_identifier = TEST_ASSETS
-        .loc_data()
+        .expect_loc_data()
         .entries
         .iter()
         .find(|entry| entry.zone == Zone::Marsh && entry.value.is_none())
@@ -110,7 +110,7 @@ fn count_in_zone() {
                 count_in_zone_message(
                     vec![(
                         &on_marsh(command.clone()),
-                        TEST_ASSETS.loc_data().entries.first().unwrap(),
+                        TEST_ASSETS.expect_loc_data().entries.first().unwrap(),
                     )],
                     &ItemMetadata::new(),
                 )
@@ -131,7 +131,7 @@ fn count_in_zone() {
                     count_in_zone_message(
                         vec![(
                             &on_marsh_multiworld(),
-                            TEST_ASSETS.loc_data().entries.first().unwrap(),
+                            TEST_ASSETS.expect_loc_data().entries.first().unwrap(),
                         )],
                         &ItemMetadata::new(),
                     )
@@ -150,7 +150,11 @@ fn test_postprocess<const N: usize>(commands: [CommandsOutput; N]) -> Vec<Placeh
     let mut output_iter_mut = output.iter_mut();
     let mut worlds = [(); N].map(|()| output_iter_mut.next().unwrap());
 
-    postprocess(&mut worlds, TEST_ASSETS.loc_data(), &mut Pcg64Mcg::new(0))
+    postprocess(
+        &mut worlds,
+        TEST_ASSETS.expect_loc_data(),
+        &mut Pcg64Mcg::new(0),
+    )
 }
 
 fn test_output(events: Vec<Event>) -> CommandsOutput {

@@ -57,7 +57,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         )));
     };
 
-    let mut cache = Cache::new(PlandoFileAccess::new(root))?;
+    let mut cache = Cache::new(PlandoFileAccess::new(root));
 
     let out = match out {
         None => {
@@ -99,7 +99,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         for res in receiver {
             let events = res?;
 
-            if !cache.update_from_watcher_event(events)? {
+            if !cache.update_from_watcher_event(events) {
                 continue;
             }
 
@@ -124,7 +124,10 @@ fn compile(
 ) -> Result<(), Error> {
     let start = Instant::now();
 
-    let mut compiler = Compiler::new(rng, cache, &cache.loc_data, &cache.uber_state_data)
+    let loc_data = cache.loc_data.as_ref()?;
+    let uber_state_data = cache.uber_state_data.as_ref()?;
+
+    let mut compiler = Compiler::new(rng, cache, loc_data, uber_state_data)
         .with_lockfile(lockfile, &NO_LOG_CAPTURE)
         .with_lint(true)
         .with_debug(debug);
@@ -135,7 +138,7 @@ fn compile(
         .eprint_errors()
         .ok_or_else(|| Error(format!("failed to compile \"{entry}\"")))?;
 
-    let placeholder_map = postprocess(&mut [&mut output], &cache.loc_data, rng)
+    let placeholder_map = postprocess(&mut [&mut output], loc_data, rng)
         .pop()
         .unwrap();
 

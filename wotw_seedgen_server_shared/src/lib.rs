@@ -72,10 +72,7 @@ pub async fn watch_assets<F, V>(
 
                 let mut cache = state.write().await;
 
-                let any_changed = cache
-                    .update_from_watcher_event(events)
-                    .map_err(Error::LoadAssets)?;
-
+                let any_changed = cache.update_from_watcher_event(events);
                 if any_changed {
                     eprintln!("Reloaded assets");
                 }

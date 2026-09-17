@@ -34,8 +34,7 @@ pub fn start(inactivity_timeout: Option<Duration>, address: Option<SocketAddr>) 
         exit(2);
     }
 
-    let cache = Cache::new(DefaultFileAccess)
-        .map_err(|err| Error::ServerCore(wotw_seedgen_server_shared::Error::LoadAssets(err)))?;
+    let cache = Cache::new(DefaultFileAccess);
 
     let (mut runtime, cache) = wotw_seedgen_server_shared::start(cache)?;
 

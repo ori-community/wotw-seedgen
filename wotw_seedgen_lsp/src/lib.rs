@@ -17,11 +17,11 @@ use crate::{
 };
 
 pub fn start_seed() {
-    start(AssetCache::<_, SeedCacheValues>::new(DefaultFileAccess).unwrap());
+    start(AssetCache::<_, SeedCacheValues>::new(DefaultFileAccess));
 }
 
 pub fn start_logic() {
-    start(AssetCache::<_, LogicCacheValues>::new(DefaultFileAccess).unwrap());
+    start(AssetCache::<_, LogicCacheValues>::new(DefaultFileAccess));
 }
 
 fn start<F, V>(cache: AssetCache<F, V>)

@@ -6,7 +6,7 @@ use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 use wotw_seedgen::{item_pool::ItemPoolBuilder, orb_variants, Generator, World};
 use wotw_seedgen_data::{
-    assets::{AssetCacheValues, PresetAccess, WorldPreset, WorldPresetSettings, TEST_ASSETS},
+    assets::{PresetAccess, WorldPreset, WorldPresetSettings, TEST_ASSETS},
     logic_language::output::{Enemy, Graph, Requirement},
     seed_language::{
         output::{CommandsOutput, IntermediateOutput},
@@ -137,8 +137,8 @@ fn generation(c: &mut Criterion) {
     let mut seed = 0..;
     let graph = &TEST_ASSETS.graphs.moki;
     let test_assets = &*TEST_ASSETS;
-    let loc_data = test_assets.values.loc_data();
-    let uber_state_data = test_assets.values.uber_state_data();
+    let loc_data = test_assets.expect_loc_data();
+    let uber_state_data = test_assets.expect_uber_state_data();
 
     group.bench_function("default", |b| {
         b.iter(|| {
@@ -235,8 +235,8 @@ fn multiworld(c: &mut Criterion) {
     let graph = TEST_ASSETS.graph(&universe_settings.world_settings);
 
     let test_assets = &*TEST_ASSETS;
-    let loc_data = test_assets.values.loc_data();
-    let uber_state_data = test_assets.values.uber_state_data();
+    let loc_data = test_assets.expect_loc_data();
+    let uber_state_data = test_assets.expect_uber_state_data();
 
     let world_settings = universe_settings.world_settings.pop().unwrap();
     let mut seed = 0..;

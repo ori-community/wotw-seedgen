@@ -3,7 +3,7 @@ use std::{slice, sync::LazyLock};
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand_pcg::Pcg64Mcg;
 use wotw_seedgen_data::{
-    assets::{AssetCacheValues, AssetFileAccess, SnippetAccess, TEST_ASSETS},
+    assets::{AssetFileAccess, SnippetAccess, TEST_ASSETS},
     logic_language::{ast::Paths, output::Graph},
     seed_language::{
         ast::Snippet,
@@ -15,7 +15,7 @@ use wotw_seedgen_data::{
 };
 
 static PATHS: LazyLock<Paths> = LazyLock::new(|| {
-    let source = TEST_ASSETS.values.paths();
+    let source = TEST_ASSETS.expect_paths();
     Paths::parse(&source.content).eprint_errors(source).unwrap()
 });
 
@@ -70,8 +70,8 @@ fn snippets(c: &mut Criterion) {
             let mut compiler = Compiler::new(
                 &mut rng,
                 &*TEST_ASSETS,
-                TEST_ASSETS.values.loc_data(),
-                TEST_ASSETS.values.uber_state_data(),
+                TEST_ASSETS.expect_loc_data(),
+                TEST_ASSETS.expect_uber_state_data(),
             )
             .with_lint(true);
 
@@ -125,8 +125,8 @@ fn simulation(c: &mut Criterion) {
     let mut compiler = Compiler::new(
         &mut Pcg64Mcg::new(0),
         &*TEST_ASSETS,
-        TEST_ASSETS.values.loc_data(),
-        TEST_ASSETS.values.uber_state_data(),
+        TEST_ASSETS.expect_loc_data(),
+        TEST_ASSETS.expect_uber_state_data(),
     );
     compiler.compile_snippet("launch_fragments").unwrap();
     let output = compiler.finish().output;

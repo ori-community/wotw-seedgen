@@ -10,6 +10,4 @@ pub enum Error {
     BuildRuntime(io::Error),
     #[error(transparent)]
     Watcher(#[from] WatcherError),
-    #[error("failed to load assets: {0}")]
-    LoadAssets(String),
 }

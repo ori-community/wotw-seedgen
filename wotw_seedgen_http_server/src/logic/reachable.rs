@@ -28,10 +28,9 @@ pub fn reachable(
         git_info: _,
     } = seedgen_info;
 
-    let spawn = cache
-        .graph
-        .find_node(&spawn_identifier)
-        .map_err(Error::Custom)?;
+    let graph = cache.graph.get()?;
+
+    let spawn = graph.find_node(&spawn_identifier).map_err(Error::Custom)?;
 
     let settings = universe_settings
         .world_settings
@@ -39,14 +38,17 @@ pub fn reachable(
         .ok_or_else(|| "world_index in seedgen_info out of bounds".to_string())
         .map_err(Error::Custom)?;
 
-    let uber_states = cache.uber_states.clone();
+    let uber_states = cache.uber_states.get()?.clone();
+    let uber_state_data = match &cache.base.uber_state_data {
+        Ok(uber_state_data) => uber_state_data,
+        Err(err) => return Err(Error::Custom(err.clone())),
+    };
+    let node_index_to_map_icon_index = cache.node_index_to_map_icon_index.get()?;
 
-    let mut world = World::new(&cache.graph, spawn, settings, uber_states, &mut []);
+    let mut world = World::new(graph, spawn, settings, uber_states, &mut []);
 
     for (uber_identifier, value) in current_uber_states {
-        let data = cache
-            .base
-            .uber_state_data
+        let data = uber_state_data
             .id_lookup
             .get(&uber_identifier)
             .ok_or_else(|| Error::Custom(format!("Unknown UberIdentifier {uber_identifier}")))?;
@@ -72,11 +74,11 @@ pub fn reachable(
 
     let mut reached = world
         .reached_indices()
-        .filter_map(|index| cache.node_index_to_map_icon_index.get(&index))
+        .filter_map(|index| node_index_to_map_icon_index.get(&index))
         .copied()
         .collect::<Vec<_>>();
 
-    reached.push(cache.grom_shop_map_icon_index);
+    reached.extend(cache.grom_shop_map_icon_index);
 
     Ok(reached)
 }
