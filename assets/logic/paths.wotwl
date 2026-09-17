@@ -455,7 +455,9 @@ anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the 
       Sword OR Hammer OR Bash
       Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Glide OR Shuriken=2 OR Sentry=2
+      Glide OR Sentry=2 OR PauseFloat OR AbilitySwap=1
+      Shuriken=1  # jump on top of the vine, jump right and recatch it from lower so it swang to the left then jump and use shuriken
+      GrenadeJump  # coyote jump from the friendly spikes to reach the wall above
   conn MarshSpawn.PoolsBurrowsSignpost:  # check for redundancies with BurrowFightArena
     moki: Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek:
