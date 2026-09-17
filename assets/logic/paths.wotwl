@@ -389,7 +389,9 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
 
   state MarshSpawn.BurrowArena:  # opening the door to MarshSpawn.LifepactShard by fighting the bad guys
     moki: Regenerate, Damage=40, Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug
-    unsafe: Combat=Hornbug+Bat+2xSandworm+2xLizard+3xSkeeto+SneezeSlug
+    unsafe:
+      Bash OR Combat=Hornbug+Bat+2xLizard+3xSkeeto+SneezeSlug:  # can just bash everything into spikes
+        Combat=2xSandworm OR Sword OR Hammer  # wait for the sand worms to attack you then just damage them while they're outside of the sand
 
   pickup MarshSpawn.BurrowOre:
     moki:
@@ -399,17 +401,19 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Burrow, DoubleJump OR Dash OR Launch
       # could do a sentryjump into bashgrenade, but I heard that kind of thing is unwelcome ;P
     kii:
-      Burrow, Glide OR Hammer OR Sword OR Damage=20
+      Burrow, Glide OR Sword OR Hammer OR Damage=20
       Burrow, Damage=10, Shuriken=1
       Burrow, Shuriken=2
       Burrow, Bash, Grenade=1  # bash the first slime past the arena to reach your grenade
-    unsafe: Burrow, Bash  # Bash the first slug up and quickly burrow down and up to catch it midair
+    unsafe:
+      Burrow  # Fake burrow
+      Burrow, Bash  # Bash the first slug up and quickly burrow down and up to catch it midair
+      Burrow, GrenadeCancel OR PauseFloat OR AbilitySwap=1  # Grenade land at the second slug then quickly burrow down then up to do a second grenade cancel
 
   conn MarshSpawn.LifepactLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer OR Damage=10
-    kii:
-      Bash OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1  # OR GrenadeJump=1
+    kii: Bash OR Sentry=1 OR Flash=1 OR Shuriken=1 OR Spear=1 OR Blaze=1 OR GrenadeJump=1
     unsafe: free  # small edge on the very right of the spikes
       #Bow=1 OR Grenade=1 OR GrenadeCancel OR PauseFloat OR GrenadeJump # Bow and Grenade for cancelling vertical momentum
   conn MarshSpawn.PoolsBurrowsSignpost:
@@ -431,11 +435,8 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Burrow, WaterDash, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=20
     unsafe:
-      Burrow, WaterDash, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseFloat OR BlazeSwap=1:
-        Damage=10
-      Burrow, DoubleJump OR Dash OR Launch OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR PauseFloat OR BlazeSwap=1:  # burrow as you exit the sand to exit the water before the 2nd water tick
-        Damage=20
-      Burrow, Water, PauseFloat OR BlazeSwap=1
+      Burrow, Water OR Damage=20  # https://youtu.be/v9rfnvZ7ODY
+      Burrow, WaterDash, Damage=10
 
 anchor MarshSpawn.LifepactLedge at -931, -4399:  # At the ledge in front of the door blocking Life Pact
   pickup MarshSpawn.LifepactShard:
