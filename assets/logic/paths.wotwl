@@ -319,23 +319,14 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     kii: HammerBreak OR SpearBreak OR SentryBreak=16
   state MarshSpawn.CaveFight:
     moki: Combat=3xLizard  # at day there's two extra lizards
-  state MarshSpawn.MissingKeyTokkTalkedTo: free  # Start of the "Missing Key" quest. Also necessary to TokkAnywhere the quest reward
+  # This state is irrelevant if you collect MarshSpawn.CaveKS first, because completing the quest can be done with MarshSpawn.CaveKS alone at this Tokk.
+  # This state is only relevant if you talk to Tokk before collecting MarshSpawn.CaveKS. If that's the case, collecting MarshSpawn.CaveKS then progresses the quest to the next step (MarshSpawn.MissingKeyQICollected).
+  state MarshSpawn.MissingKeyTokkTalkedTo: free  # Start of the "Missing Key" quest. 
 
   pickup MarshSpawn.LeftTokkSL:
     moki: BreakWall=10
   pickup MarshSpawn.FightRoomSL:
     moki: BreakWall=10
-  pickup MarshSpawn.CaveKS:  # If you move this pickup to a different anchor please update the quest requirements as well
-    moki:
-      DoubleJump, Dash OR Grapple
-      Bash, DoubleJump OR Dash OR Glide OR Grapple  # day and night both have a slime here
-      Launch
-      MarshSpawn.CaveFight
-    gorlek: DoubleJump OR Bash OR Grapple  # basically the moki paths without assisting abilities
-    kii: # Sword and hammer both solves the connection with movement but is redundant with beating the arena
-      GlideJump
-      # GrenadeJump=1, Glide
-    unsafe: GrenadeJump
   pickup MarshSpawn.TokkKeystoneQuest:  # This quest can be completed with just the QI on this specific Tokk
     moki: MarshSpawn.CaveKS
 
@@ -361,8 +352,8 @@ anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to th
   refill Checkpoint
   # Additional checkpoint at -833, -4451, but not logically relevant
 
-  # This is redundant because MarshSpawn.CaveWaterfall->MarshSpawn.Cave->Tokk is free, and completing the quest at cave Tokk only requires the QI.
-  # However, progressing the quest state to set up TokkAnywhere strictly requires talking to cave Tokk before picking up the QI.
+  # This is redundant because you can already complete the quest for free through ->MarshSpawn.Cave->MarshSpawn.TokkKeystoneQuest
+  # It's only noted here to document the quest relation in case it's relevant in the future
   # state MarshSpawn.MissingKeyQICollected:  # Quest state progression
   #   moki: MarshSpawn.MissingKeyTokkTalkedTo, MarshSpawn.CaveKS
 
@@ -373,15 +364,18 @@ anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to th
     moki:
       DoubleJump OR Dash OR Launch
       Bash, Grenade=1
+    gorlek:
+      SentryJump=1
     kii:
       Sword OR Hammer  # Upslash + hover not in gorlek
       Bash  # Use the slime
-      Shuriken=1 OR Flash=1 OR Sentry=1
-      Glide, Spear=1  # Spear alone is too precise for Kii
+      Shuriken=1
+      Glide, Spear=1
       GlideJump
       # GrenadeJump=1
     unsafe:
-      Spear=1 OR AbilitySwap=1 OR PauseFloat
+      Spear=1 OR Flash=1 OR Sentry=1  # too precise for kii
+      BlazeSwap=1 OR PauseFloat
 
 anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
   refill Health=1
