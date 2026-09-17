@@ -372,18 +372,17 @@ anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to th
     moki:
       DoubleJump OR Dash OR Launch
       Bash, Grenade=1
-    gorlek:
-      SentryJump=1
+    gorlek: SentryJump=1
     kii:
       Sword OR Hammer  # Upslash + hover not in gorlek
       Bash  # Use the slime
-      Shuriken=1
+      Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR GrenadeJump=1
       Glide, Spear=1
-      GlideJump
-      # GrenadeJump=1
     unsafe:
-      Spear=1 OR Flash=1 OR Sentry=1  # too precise for kii
-      BlazeSwap=1 OR PauseFloat
+      Glide  # walljump under the semisolid
+      Spear=1  # too precise for kii
+      BlazeSwap=1 OR FlashSwap OR PauseFloat
+      Regenerate, Blaze=1  # regenjump almost immediately then blaze when just under the branch
 
 anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
   refill Health=1
