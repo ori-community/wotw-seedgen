@@ -36,7 +36,7 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
                 continue;
             }
 
-            write!(
+            writeln!(
                 &mut source,
                 "on change {group_id}|{state_id} item_message(\"#{group_name}.{state_name}# ({group_id}|{state_id}) -> \" + {group_id}|{state_id})",
                 group_name = group.name,
@@ -44,6 +44,8 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
             ).unwrap();
         }
     }
+
+    assets::write(SEEDGEN_USER_DATA_DIR.join("uber_state_log.wotws"), &source)?;
 
     let snippets = InlineSnippets::from_iter([(
         String::new(),
