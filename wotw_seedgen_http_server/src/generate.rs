@@ -8,7 +8,10 @@ use tokio::sync::RwLockReadGuard;
 use utoipa::ToSchema;
 use wotw_seedgen::{data::UniverseSettings, log_capture::Record};
 
-use crate::{api::GenerateQuery, assets::Cache};
+use crate::{
+    api::{GenerateQuery, JsonSpoilerKind},
+    assets::Cache,
+};
 
 #[derive(Serialize)]
 pub struct Universe {
@@ -31,7 +34,7 @@ pub fn generate(
 
     let max_log_level = max_log_level.unwrap_or_default().into();
 
-    let (universe, logs) = cache.generate(settings, max_log_level)?;
+    let (mut universe, logs) = cache.generate(settings, max_log_level)?;
 
     let worlds = universe
         .worlds
@@ -39,9 +42,15 @@ pub fn generate(
         .map(|seed| ciborium::Value::Bytes(seed.package_into_bytes()))
         .collect::<Vec<_>>();
 
-    let json_spoiler = json_spoiler
-        .unwrap_or_default()
-        .then(|| serde_json::to_string(&universe.spoiler).unwrap());
+    let json_spoiler = json_spoiler.map(|kind| {
+        match kind {
+            JsonSpoilerKind::NoCommands => universe.spoiler.strip_commands(),
+            JsonSpoilerKind::Full => {}
+        };
+
+        serde_json::to_string(&universe.spoiler).unwrap()
+    });
+
     let text_spoiler = text_spoiler
         .unwrap_or_default()
         .then(|| universe.spoiler.to_string());

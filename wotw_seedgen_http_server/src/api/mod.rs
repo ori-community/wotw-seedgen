@@ -151,9 +151,17 @@ async fn generate(
 
 #[derive(Deserialize, IntoParams)]
 pub struct GenerateQuery {
-    pub json_spoiler: Option<bool>,
+    #[param(inline)]
+    pub json_spoiler: Option<JsonSpoilerKind>,
     pub text_spoiler: Option<bool>,
     pub max_log_level: Option<LogLevelFilter>,
+}
+
+#[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum JsonSpoilerKind {
+    NoCommands,
+    Full,
 }
 
 #[derive(Default, Serialize, Deserialize, ToSchema)]

@@ -37,6 +37,21 @@ impl ContainedWrites for CommandVoid {
     }
 }
 
+impl ContainedWrites for Option<CommandVoid> {
+    type Iter<'a> = CommandVoidWrites<'a>;
+
+    fn direct_contained_writes<'a>(&'a self, lookup: &'a [CommandVoid]) -> Self::Iter<'a> {
+        match self {
+            None => CommandVoidWrites {
+                state: Vec::new(),
+                lookup,
+                visited_functions: FxHashSet::default(),
+            },
+            Some(command) => command.direct_contained_writes(lookup),
+        }
+    }
+}
+
 pub struct CommandVoidWrites<'a> {
     state: Vec<CommandVoidWritesState<'a>>,
     lookup: &'a [CommandVoid],
