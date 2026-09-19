@@ -477,12 +477,13 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
       Bash, Grenade=1
     gorlek: SentryJump=1
     kii:
-      Hammer OR Spear=1 OR GlideJump  # OR GrenadeJump=1
+      Hammer OR Spear=1 OR GlideJump OR GrenadeJump=1
     unsafe:
       Bash  # https://youtu.be/1Qo0KvCotvM
       Dash  # Dash ramp
       # WaveDash, Combat=Bat
-      Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR GrenadeJump
+      Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap
+      # Insert theorical stupid PauseFlaot from where the bat is
   pickup MarshSpawn.BurrowsApproachLedgeSL:  # Make sure it's not redundant with MarshSpawn.PoolsBurrowsSignpost->MarshSpawn.BeforeBurrows->MarshSpawn.BurrowsApproachLedgeSL
     moki: Bash, DoubleJump
     gorlek: Bash, Dash OR Glide
@@ -504,7 +505,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
       Launch, Damage=10, DoubleJump OR Dash OR Sword OR Hammer
       Launch, DoubleJump, TripleJump OR Dash OR Sword
       Launch, Dash, Sword
-    kii:
+    kii:  # climbing the walls in between the lanterns isn't easy. Right one pushes you away and there is a small gap in the left wall where you can't walljump anymore so nothing using this is kii
       Launch, Damage=20
       Launch, DoubleJump, Hammer OR Shuriken=1
       Launch, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # energy stall harder if you bonk into the ceiling inbetween the bashable plant but that actually reset your launch
@@ -529,7 +530,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
       GrenadeJump, Damage=30  # damage under the first lantern, damage on the spikes at the top, damage after the second lantern
       SwordSJump=1, Damage=10  # air sjump from below the first lantern, weapon stall to minimize damage
       HammerSJump=1, Damage=20
-      # AerialHammerJump, Glide OR Damage=10  # Use both of the microwalls near the first lantern, dboost in the spikes under the second lantern. Use a regular double jump + hammer at the end, because a hammer jump goes too high.
+      # AerialHammerJump, Damage=10  # Use both of the microwalls near the first lantern, dboost in the spikes under the second lantern. Use a regular double jump + hammer at the end, because a hammer jump goes too high.
   conn MarshSpawn.CaveWaterfall: free
   conn MarshSpawn.LifepactLedge:
     moki: Bash, DoubleJump OR Dash OR Launch
@@ -566,7 +567,8 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       Bash, Sword, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # climb the left wall, cross to the right wall with either a tentacle shot of full combo + energy weapon
       Bash, Glide, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # same as above but only upsmash and one horizontal attack
       AerialHammerJump
-      # GrenadeJump=1, DoubleJump, Damage=10, TripleJump OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1
+      GrenadeJump=1, DoubleJump, Damage=10, TripleJump OR Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # dboost in the spikes leading to MarshSpawn.PoolsBurrowsSignpost. Condition to reach the mortar.
+      GlideJump, SwordJump, TripleJump, Hammer OR Spear=1  # use hammer after GlideJump then sword jump
     unsafe:
       Bash
       DoubleJump, TripleJump OR Sword OR HammerSJump=1 OR GrenadeJump  # https://youtu.be/gYCR4sz7eRw
@@ -585,6 +587,9 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       Water, WaterDash, DoubleJump OR Dash OR SentryJump=1  # With sjump, weapon hover as well
       SentryJump=1, DoubleJump, TripleJump, Dash OR Glide
     kii:
+      DoubleJump, Sword, TripleJump OR GrenadeJump=1  # Refresh jumps on tentacle
+      DoubleJump, TripleJump, Damage=10
+      GlideJump, DoubleJump, TripleJump, Hammer
       Bash, Dash OR Glide  # dash land on the right platform then wjump-*> dash in order to cross the final gap / glide bash the projectile then wait midair for the tenacle to appear again
       Bash, Damage=10, Grenade=1, Sword OR Hammer  # dboost in the spikes where the tentacle is then bashnade from the platform on the right
       WaterDash, Damage=20, Dash OR DoubleJump OR SentryJump=1
@@ -592,10 +597,9 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       SwordSJump=1, DoubleJump OR Dash  # Refresh djump on tentacle
       HammerSJump=1, Damage=10, Dash
       AerialHammerJump, TripleJump OR Glide OR Sword OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
-      # WaterDash, Water OR Damage=20:
-      #   GrenadeJump=1, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
-      # GrenadeJump=1, Damage=10, DoubleJump, TripleJump OR Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with less but taking a dboost on the tentacle push you into the water
-      # GrenadeJump=1, DoubleJump, Sword  # hit the tentacle to reset djump
+      WaterDash, Water OR Damage=20:
+        GrenadeJump=1, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      GrenadeJump=1, Damage=10, DoubleJump, Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with less but taking a dboost on the tentacle push you into the water
     unsafe:
       DoubleJump, TripleJump OR Sword  # Pogo purple blob from the projectile, slash tentacle to refresh djump and land in friendly spikes
       Bash  # https://youtu.be/LurSDmDxrVM
@@ -605,6 +609,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       GrenadeJump, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # beside djump, everything use the friendly spikes
       GrenadeJump, Damage=10, Spear=1 OR Blaze=2
       Water, WaterDash, GlideJump  # Waterdash-Glidejump over the spikes
+      GlideJump, Damage=10  # walljump near the tentacle to reach the friendly spikes
   conn MarshSpawn.PoolsBurrowsSignpost:
     moki:
       Bash, DoubleJump, Dash
@@ -626,6 +631,7 @@ anchor MarshSpawn.BeforeBurrows at -1006, -4497:  # On the island before the Bur
       DoubleJump, TripleJump, Damage=20  # https://youtu.be/gYCR4sz7eRw
       GrenadeJump, DoubleJump, TripleJump OR Bash
       AerialHammerJump, TripleJump OR Dash OR Glide OR Damage=10  # upsash then hjump at the lantern to reach the left wall
+      AbilitySwap=6  # 2 to get on the wall + 1 to finish climbing it + 2 from the friendly spikes at the start to the one above the 2nd lantern + 1 to get on the left wall
 
 anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
   refill Checkpoint
