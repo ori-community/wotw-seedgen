@@ -8856,7 +8856,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
   conn LowerWastes.FeedingGroundsTP:  # every path needs to be possible while having Seir
     moki:
       Grapple, Glide, DoubleJump OR Dash OR Launch  # this solves with Seir as well
-      WindtornRuins.Seir:  # these wouldn't solve without Seir (skill). This currently requires Seir (pickup) which is almost the same thing.
+      WindtornRuins.Seir:  # these wouldn't solve without Seir
         DoubleJump, Bash, Grenade=1, Grapple
         Grapple, Glide
         Burrow
@@ -8867,7 +8867,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       Glide, DoubleJump, TripleJump
       Glide, Grapple, DoubleJump OR Dash
       Grapple, SentryJump=1, DoubleJump OR Dash
-      WindtornRuins.Seir:  # these wouldn't solve without Seir (skill). This currently requires Seir (pickup) which is almost the same thing.
+      WindtornRuins.Seir:  # these wouldn't solve without Seir
         SentryJump=1, DoubleJump, TripleJump  # tjump+up slash to reach the grappable surface
         Bash, Grenade=1, Grapple
         Bash, Grenade=2, Dash  # Dash to get in bash range on the 2nd grenade to get on the grappable surface
@@ -8879,7 +8879,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       Bash, Grenade=1, Dash, DoubleJump, Sword OR Hammer
       Bash, Grenade=1, DoubleJump, Hammer, Flash=1 OR Sentry=1
       Bash, Grenade=1, DoubleJump, TripleJump  # if you are doing the escape, use the hiding spot. if you have seir, use a bashnade
-      WindtornRuins.Seir:  # these wouldn't solve without Seir (skill). This currently requires Seir (pickup) which is almost the same thing.
+      WindtornRuins.Seir:  # these wouldn't solve without Seir
         Glide, Grapple  # don't actually need seir but avoiding the need to figure out getting a grounded jump from the last hidding spot while in the chase
         Glide, Bash, Grenade=1, DoubleJump OR Dash
         Bash, Grenade=2, DoubleJump
@@ -14587,10 +14587,10 @@ anchor LowerWastes.FeedingGroundsTP at 1456, -3997:  # At the Western Wastes TP
       Grapple, Shuriken=3 OR Sentry=4
       Burrow, GlideJump  # Burrow-Glidejump to get up the ledge, GlideJump over the spikes
   conn WoodsMain.FeedingGrounds:
-    moki: WindtornRuins.Seir, Burrow  # Seir (skill) to make it a safe path. This currently requires Seir (pickup) which is almost the same thing.
+    moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow
   conn WeepingRidge.Bottom:  # These paths need to be solvable after cat and mouse, since there is less platforms at that point and you can't pass above the teleporter
-    moki, Burrow, WindtornRuins.Seir:  # Seir (skill) to make it a safe path. This currently requires Seir (pickup) which is almost the same thing.
+    moki, Burrow, WindtornRuins.Seir:  # Seir to make it a safe path
       DoubleJump, Glide, Grapple
       DoubleJump, Bash, Grenade=1, Grapple
       Launch
@@ -15766,19 +15766,19 @@ anchor WindtornRuins.Escape at 2021, -4026:
         Burrow, AerialHammerJump, TripleJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
         Burrow, GrenadeJump, DoubleJump, TripleJump
 
-anchor WindtornRuins.EscapeEnd at 2179, -3604:  # At the last air pocket before completing the escape
+anchor WindtornRuins.EscapeEnd at 2150, -3567:  # At the escape end trigger
   nospawn
 
-  # All the connections from here could be free if we move the anchor inside the sand, but you need Burrow to reach it (from either side).
-  state WindtornRuins.EscapeCompleted:  # Enter the end trigger
-    moki: Burrow
-  state WindtornRuins.SiftingSandsCompleted:  # When the rocks fall on the sandworm
-    moki: Burrow
+  # Seir is obtained at the start of the escape, but it must logically live here.
+  # Allowing Seir to be obtained by leaving the escape would mean that the escape itself would softlock.
+  state WindtornRuins.Seir: free
+  state WindtornRuins.EscapeCompleted: free
+  state WindtornRuins.SiftingSandsCompleted: free  # When the rocks fall on the sandworm
 
-  # Technically this isn't Seir. This is windtornRuinsGroup.wispRewardPickup (10289|22102) which is the pickup part of Seir. Seir is also an ability (2|108) and is set at the start of the escape.
-  # For simplicity and consistency across difficulties that cannot escape the worm escape, this is Seir.
-  pickup WindtornRuins.Seir:  # After walking left and watching the cutscene
-    moki: Burrow
+  # This would be windtornRuinsGroup.wispRewardPickup (10289|22102) but it's possible to lock yourself out of that pickup with Patience Skip.
+  pickup WindtornRuins.EscapeReward: free
+  # Documented just in case
+  # pickup windtornRuinsGroup.wispRewardPickup: free  # After walking left and watching the cutscene
 
 anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedestal
   pickup WindtornRuins.HandToHandComplete:
@@ -15834,7 +15834,7 @@ anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weepi
       Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
       GrenadeJump
   conn LowerWastes.FeedingGroundsTP:  # covers connections into woods
-    moki: WindtornRuins.Seir, Burrow  # Seir (skill) to make it a safe path. This currently requires Seir (pickup) which is almost the same thing.
+    moki: WindtornRuins.Seir, Burrow  # Seir to make it a safe path
     gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
 
 anchor WeepingRidge.Elevator at 1170, -3820:  # Bottom checkpoint next to the elevator
