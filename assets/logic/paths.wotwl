@@ -849,12 +849,11 @@ anchor MarshSpawn.RegenDoor at -573, -4393:  # left of regen tree
       Dash, Glide
       SentryJump=1
     kii:
-      Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump  # OR GrenadeJump=1
+      Dash OR Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR GrenadeJump=1
       Spear=1, Damage=10  # Damage not mandatory
     unsafe:
-      Spear=1
+      Spear=1 OR BlazeSwap=1 OR FlashSwap
       PauseFloat  # Pausefloat from the left platform
-      GrenadeJump OR BlazeSwap=1 OR FlashSwap
 
 anchor MarshSpawn.HowlApproach at -500, -4395:  # right of regen tree
   refill Checkpoint
@@ -871,8 +870,8 @@ anchor MarshSpawn.HowlApproach at -500, -4395:  # right of regen tree
       DoubleJump OR Launch
       Bash, Grenade=1
     gorlek: SentryJump=1  # can do one of a good sjump, a good positioning, pressing left quickly after the sentryjump or spending an extra energy
-    kii: Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump  # OR GrenadeJump=1 # upslash then walljump up
-    unsafe: Dash OR PauseFloat OR BlazeSwap=1 OR GrenadeJump
+    kii: Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR GlideJump OR GrenadeJump=1 # upslash then walljump up
+    unsafe: Dash OR PauseFloat OR BlazeSwap=1 OR FlashSwap
   conn MarshSpawn.MokkTheBrave:
     moki: MarshSpawn.HowlBurnt
 
@@ -884,18 +883,18 @@ anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but ou
 
   pickup MarshSpawn.MokkFangQuest:
     moki: MarshSpawn.HowlBurnt, MarshSpawn.FangQI OR MarshSpawn.FangQICollected  # This is the only situation where the quest can be completed by either holding the QI or having progressed to the previous step
-  pickup MarshSpawn.RecklessShard:  #Make sure it's not redundant with MarshSpawn.MokkTheBrave->MarshSpawn.HowlApproach->MarshSpawn.RecklessShard
+  pickup MarshSpawn.RecklessShard:  # Make sure it's not redundant with MarshSpawn.MokkTheBrave->MarshSpawn.HowlApproach->MarshSpawn.RecklessShard
     moki, MarshSpawn.HowlBurnt, BreakWall=10:
       Bash, Grenade=1
     gorlek, MarshSpawn.HowlBurnt, BreakWall=10:
       Dash OR SentryJump=1
       Glide, Sword OR Hammer
     kii, MarshSpawn.HowlBurnt, BreakWall=10:
-      Sword
-      Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump  # OR GrenadeJump=1
+      Sword OR GrenadeJump=1
+      Glide, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, MarshSpawn.HowlBurnt:
       HowlsDen.RainLifted OR BreakWall=10:
-        Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump OR BlazeSwap=1 OR PauseFloat  # https://youtu.be/b31Zd5M4xDg
+        Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap OR PauseFloat  # https://youtu.be/b31Zd5M4xDg
 
   conn MarshSpawn.HowlsDenEntrance:
     moki: MarshSpawn.HowlBurnt
@@ -908,33 +907,32 @@ anchor MarshSpawn.MokkTheBrave at -376, -4413:  # Next to Mokk the Brave, but ou
       SentryJump=2
       Dash, Bash, HowlsDen.RainLifted OR Grenade=1  # Dash for first jump, bash off fronkey for second
     kii, MarshSpawn.HowlBurnt:
-      Hammer  # upslash -> upslash
+      Hammer OR GlideJump OR GrenadeJump=2
+      GrenadeJump=1, Glide, Shuriken=1 OR Flash=1
       HowlsDen.RainLifted, Sword  # upslash for the first gap, then pogo off the mantis for the second gap
       HowlsDen.RainLifted, Bash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # hop to the first ledge and then bash the mantis
-      GlideJump  # OR GrenadeJump=2
     unsafe, MarshSpawn.HowlBurnt:
       Sword  # upslash then downslash to reach the last platform
-      HowlsDen.RainLifted, Bash  # Long distance lure for the first jump, simple lure for second
+      HowlsDen.RainLifted, Bash  # Bash the lizard from Howls arena for the first jump
       Dash  # Dash ramp
       Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2  # https://youtu.be/v_1aLNaPJeE
-      GrenadeJump
-  conn MarshSpawn.AboveHowlArena:  #Vine/enemy only spawn once the rain is lifted. Not many paths without RainLifted because it is free from here and adding paths without is only related to the logic filter (for when we add showing states in it)
+  conn MarshSpawn.AboveHowlArena:  # Vine/enemy only spawn once the rain is lifted. Not many paths without RainLifted because it is free from here and adding paths without is only related to the logic filter (for when we add showing states in it)
     moki:
       Launch
       HowlsDen.RainLifted, DoubleJump OR Bash
     gorlek:
       HowlsDen.RainLifted, Hammer, Dash
       SentryJump=1
-      DoubleJump, TripleJump OR Dash
+      DoubleJump, TripleJump
     kii:
-      DoubleJump, Glide
+      DoubleJump, Dash OR Glide  # wall jump on the left wall
+      AerialHammerJump OR SwordJump
+      GrenadeJump=1, HowlsDen.RainLifted OR DoubleJump OR Dash OR Hammer
       HowlsDen.RainLifted, Sword  # Pogo
       HowlsDen.RainLifted, Shuriken=1, Hammer OR Spear=1
-      AerialHammerJump
       HowlsDen.RainLifted, GlideJump, Dash OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      # GrenadeJump=1, HowlsDen.RainLifted OR DoubleJump OR Hammer OR Shuriken=1
     unsafe:
-      HowlsDen.RainLifted, Dash OR Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseFloat # https://youtu.be/txogGlFUCwU
+      HowlsDen.RainLifted, Dash OR Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap OR PauseFloat # https://youtu.be/txogGlFUCwU
       GrenadeJump
 
 anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the way to the fang
@@ -946,17 +944,18 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       DoubleJump, Dash  # Stick to the ceiling
       Launch
     gorlek: DoubleJump, TripleJump
-    # kii:
-      # GrenadeJump=1, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
+    kii:
+      SwordJump  # Sword jump to reach the first wall -> full combo+djump to reach the second then just hover+djump
+      GrenadeJump=1, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
     unsafe:
       DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump  # djump then second movement option to reach the first wall in the ceiling. Then djump from one side of the wall to the other before going to the next wall with djump
       WaveDash  # Wavedash on the health plant and regen jump
+      AbilitySwap=2
       Dash, BlazeSwap=1 OR SentrySwap=1  # coyote dash on last suspended platform then swap to the right side of the wooden wall under the EF
       GlideJump, BlazeSwap=1 OR SentrySwap=1  # same as above
-      FlashSwap OR BlazeSwap=2 OR SentrySwap=2
       GrenadeJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
       HowlsDen.RainLifted, GlideBashChain  # Avoid bashing the lizard against the ceiling as it makes it despawn https://youtu.be/BafiLyq5-gk
-      #HowlsDen.RainLifted, GlideBashChain, GlideJump  # BashGlideJump https://youtu.be/P4cEVJRG1RY
+      # HowlsDen.RainLifted, GlideBashChain, GlideJump  # BashGlideJump https://youtu.be/P4cEVJRG1RY
 
   conn MarshSpawn.MokkTheBrave: free
   conn MarshSpawn.FangPlatform:
@@ -966,7 +965,7 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
     gorlek: Glide OR Sword OR Hammer OR Damage=10  # Dboost the last gap
     kii:
       Shuriken=1 OR Flash=1 OR Sentry=1
-      # GrenadeJump=1, Spear=1 OR Blaze=1
+      GrenadeJump=1, Spear=1 OR Blaze=1
     unsafe:
       Spear=1 OR BlazeSwap=1 OR GrenadeJump OR PauseFloat OR FlashSwap
 
@@ -976,58 +975,70 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
   state MarshSpawn.FangQICollected:  # Quest progression state. This is relevant because it can be used to complete the quest without picking up the fang (e.g. in a snippet)
     moki: MarshSpawn.MokkTalkedTo, MarshSpawn.FangQI
   
-  pickup MarshSpawn.FangQI: free  # Only a pickup now
-  pickup MarshSpawn.FangEF:  #Make sure it's not redundant with MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena->MarshSpawn.FangEF
+  pickup MarshSpawn.FangQI: free
+  pickup MarshSpawn.FangEF:  # Make sure it's not redundant with MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena->MarshSpawn.FangEF
     gorlek:
       SentryJump=1
       Bash, Grenade=1
     kii:
       AerialHammerJump
-      # GrenadeJump=1, DoubleJump OR Hammer
+      GrenadeJump=1, DoubleJump OR Hammer
     unsafe:
       GlideHammerJump OR CoyoteHammerJump OR BlazeSwap=2 OR SentrySwap=2
-      GrenadeJump, DoubleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump
+      GrenadeJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump OR BlazeSwap=1
+
+  conn MarshSpawn.FangStonePillar:
+  # As both MarshSpawn.FangStonePillar and MarshSpawn.FangSuspendedPLatform are only used to improve readability when using health/energy to get to MarshSpawn.AboveHowlArena,
+  # paths not using any resources have to be able to reach MarshSpawn.AboveHowlArena.
+  # I.E. Dash isn't listed in moki here while obvisouly possible because it doesn't solve the MarshSpawn.FangSuspendedPLatform->MarshSpawn.AboveHowlArena connection
+    moki: DoubleJump OR Launch
+    gorlek: Dash OR Glide
+    kii: Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1 OR Damage=10
+    unsafe: free
+
+anchor MarshSpawn.FangStonePillar at -256,-4411:  # Stone pillar bellow the suspended platform
+  nospawn
+  # This anchor is only used as a way to help with the readability of the MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena connection
+  # Nospawn is used because it's basically the same as MarshSpawn.FangPlatform and we don't want to add multiple similar possible spawn
+
+  conn MarshSpawn.FangSuspendedPLatform:
+  # As both MarshSpawn.FangStonePillar and MarshSpawn.FangSuspendedPLatform are only used to improve readability when using health/energy to get to MarshSpawn.AboveHowlArena,
+  # paths not using any resources have to be able to reach MarshSpawn.AboveHowlArena.
+  # I.E. Dash isn't listed in moki here while obvisouly possible because it doesn't solve the MarshSpawn.FangSuspendedPLatform->MarshSpawn.AboveHowlArena connection
+    moki: DoubleJump OR Launch
+    gorlek: Dash OR Glide
+    kii:
+      Sword OR Damage=20 OR Flash=3 OR Sentry=3
+      Hammer, Spear=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1 OR Damage=10  # no shuriken because it pushes the platform away
+      Shuriken=1 OR Flash=1 OR Sentry=1:
+        Damage=10  # get on the wall then dboost to reach the platform
+    unsafe:
+      Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR GrenadeCancel OR AbilitySwap=1 OR PauseFloat
+      Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      Regenerate  # https://youtu.be/3CpP4veOBSc regenjump
+
+anchor MarshSpawn.FangSuspendedPLatform at -247, -4394:
+  nospawn
+  # This anchor is only used as a way to help with the readability of the MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena connection
+  # Nospawn is used because it's basically the same as MarshSpawn.FangPlatform and we don't want to add multiple similar possible spawn
 
   conn MarshSpawn.AboveHowlArena:
-    moki:
-      DoubleJump OR Launch
+    moki: DoubleJump OR Launch
     gorlek:
       Dash
-      Glide, Damage=10 OR Sword OR Hammer  # upslash to get on first suspended platform then dboost in the spikes before the checkpoint
-      SentryJump=1, Damage=10
+      Glide, Damage=10
     kii:
-      Sword, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
-      Hammer, Spear=1 OR Flash=1 OR Sentry=1 OR Damage=10  # energy weapon to reach right suspended platform (no shuriken because it can push back the platform). Jump in the spikes to reach the left suspended platform without going on the right one
-      Damage=10, Damage=10, Damage=10, Damage=20
-      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:  # energy weapon to avoid 1st dboost
-        Damage=10, Damage=10, Damage=20
-      Damage=10, Shuriken=1, Damage=10, Shuriken=1, Damage=10  # avoid 2nd dboost and then takes only one tick of damage after the suspended platform
-      Damage=10, Flash=1, Damage=10, Flash=1, Damage=10  # same as above
-      Damage=10, Sentry=1, Damage=10, Sentry=1, Damage=10  # same as above
-      Shuriken=2, Damage=10, Shuriken=1, Damage=10  # avoid 1st and 2nd dboost then takes only one tick of damage after the suspended platform
-      Flash=2, Damage=10, Flash=1, Damage=10  # same as above
-      Sentry=2, Damage=10, Sentry=1, Damage=10  # same as above
-      Sentry=5, Damage=10  # avoid all dboost, energy weapon to get on the right suspended platform then another one to reach the left platform. Final energy usage to only take one tick of damages in spikes
-      Flash=5, Damage=10  # same as above
-      # No shuriken variant because if it hits a suspended patform, it get pushed back
-      SwordSJump=1 OR GlideJump
-      HammerSJump=1, HammerSJump=1 OR Spear=1 OR Flash=1 OR Sentry=1
-      # GrenadeJump=1, Glide OR Sword OR Hammer OR Shuriken=3
-      # Damage=10, GrenadeJump=1, Shuriken=2
-      # Damage=10, GrenadeJump=1, Spear=2 OR Blaze=2 OR Flash=2 OR Sentry=2:  # Gjump into the suspended platform
-      #   Damage=10
-      # GrenadeJump=1, Spear=3 OR Blaze=3 OR Flash=3 OR Sentry=3:  # Gjump into the suspended platform
-      #   Damage=10
-      # GrenadeJump=2, Flash=3 OR Sentry=3  # Gjump to the first suspended platform + from the last supended platform
+      Hammer OR SwordSJump=1 OR GlideJump OR Damage=20
+      Glide, GrenadeJump=1
+      Sword, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1 OR Damage=10
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1:
+        Damage=10
+      GrenadeJump=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Sword  # upslash then downslash for the last jump
-      Hammer
-      FlashSwap OR GrenadeJump OR GlideJump
-      Shuriken=3 OR Flash=3 OR Sentry=3  #  https://youtu.be/U2khlKTXVzA  The shuriken variant might be a ceiling jump?
-      Damage=10, Shuriken=2 OR Flash=2 OR Sentry=2
-      Damage=10, Damage=10, Shuriken=1 OR Flash=1 OR Sentry=1
-      Damage=10, Spear=1, Damage=10
-      Damage=10, Damage=10, Damage=10  # microledge under the left suspended platform to use regen before the 2nd dboost
+      Sword  # upslash then downslash
+      Shuriken=1 OR GrenadeJump OR AbilitySwap=1 OR Damage=10 OR PauseFloat
+      Flash=1 OR Sentry=1  # https://youtu.be/U2khlKTXVzA
+      Regenerate, Spear=1  # https://youtu.be/3CpP4veOBSc regenjump
 
 anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkSL
   pickup MarshSpawn.MokkSL: free
@@ -1037,7 +1048,7 @@ anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkSL
   conn MarshSpawn.MokkTheBrave:
     moki, MarshSpawn.HowlBurnt: DoubleJump OR Dash OR Launch OR Glide
     gorlek, MarshSpawn.HowlBurnt: Sword OR Hammer
-    kii, MarshSpawn.HowlBurnt: Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # OR GrenadeJump=1  # blaze start from the upper platform, the other one from the lower platform
+    kii, MarshSpawn.HowlBurnt: Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR GrenadeJump=1  # blaze start from the upper platform, the other one from the lower platform
     unsafe: MarshSpawn.HowlBurnt  # precise wjump above the spikes from the lower platform
 
 anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where you exit the loop with right hc
