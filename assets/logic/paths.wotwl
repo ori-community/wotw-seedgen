@@ -1065,7 +1065,7 @@ anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where yo
   conn MarshSpawn.HowlsDenEntrance:  # Make sure it's not redundant with paths doing HowlsDen.UpperLoopExit->HowlsDen.AboveBoneBridge->MarshSpawn.HowlsDenEntrance
     moki: HowlsDen.UpperLoopExitBarrier, DoubleJump OR Dash
     gorlek: HowlsDen.UpperLoopExitBarrier, Glide OR Sword
-    kii: HowlsDen.UpperLoopExitBarrier, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    kii: HowlsDen.UpperLoopExitBarrier, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1
     unsafe: HowlsDen.UpperLoopExitBarrier  # tight jump
   conn HowlsDen.AboveBoneBridge:
     moki, HowlsDen.UpperLoopExitBarrier: Launch OR Glide OR DoubleJump OR Dash
@@ -1074,6 +1074,10 @@ anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where yo
 
 anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through the keydoor
   refill Checkpoint
+
+  state HowlsDen.LowerLoopExitBarrier:
+    gorlek: ShurikenBreak=16
+    kii: HammerBreak OR SpearBreak OR SentryBreak=16
 
   conn HowlsDen.UpperLoopEntrance: free
   conn MarshSpawn.HowlsDenEntrance:
@@ -1085,22 +1089,23 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
       Bash
       GlideJump, Spear=1, Damage=10
       GlideJump, DoubleJump OR Dash
-      # GrenadeJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with just gjump but rather precise
+      GrenadeJump=1, DoubleJump OR Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Possible with just gjump but rather precise
     unsafe:
       DoubleJump, Dash
-      GlideJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      SentrySwap=1 OR BlazeSwap=1 OR FlashSwap OR GrenadeJump
+      DoubleJump, Damage=15  # jump toward the spikes, djump to cancel the knockback, get hit by a slug projectile to avoid a second spike dboost
+      GlideJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      AbilitySwap=1 OR GrenadeJump
+      Wavedash, Damage=10  # In you don't aggro the slug, it goes far enough to let you get the right ramp. Jump in the spikes and dash again to get a walljump. Not sure why but sometimes dash doesn't reset the iframes here.
   conn HowlsDen.MidwayBottomLoop:
-    gorlek: ShurikenBreak=16
-    kii: HammerBreak OR SpearBreak OR SentryBreak=16
+    moki: HowlsDen.LowerLoopExitBarrier
 
 anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door blocking the loop with the right hc
   refill Checkpoint:
     moki: HowlsDen.UpperLoopEntranceBarrier
+    unsafe: BreakWall=12  # checkpoint accessible by damaging the wall without fully breaking it. Then reload and walk out of the wall. Can't use the state because it goes back to full health after respawning.
 
   state HowlsDen.UpperLoopEntranceBarrier:
     moki: BreakWall=16
-    unsafe: BreakWall=12  # checkpoint accessible by damaging the wall without fully breaking it. Then reload and walk out of the wall
 
   pickup HowlsDen.SlimeLoopHF:
     moki: HowlsDen.UpperLoopEntranceBarrier, BreakWall=20, Combat=Slug OR Bash OR Launch
@@ -1115,10 +1120,10 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
       DoubleJump, TripleJump
     kii:
       GlideJump, DoubleJump
-      # GrenadeJump=1
+      GrenadeJump=1
     unsafe:
       DoubleJump  # wall jump on the small wall between the breakable wall and the spikes
-      GrenadeJump OR AbilitySwap=1
+      AbilitySwap=1
       GlideJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   conn HowlsDen.UpperLoopExit:
     moki:
@@ -1131,7 +1136,11 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
     kii:
       HowlsDen.UpperLoopEntranceBarrier, Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1
       HowlsDen.UpperLoopEntranceBarrier, WaterDash, Water OR Damage=10
-    unsafe: HowlsDen.UpperLoopEntranceBarrier, Spear=1 OR BlazeSwap=1 OR PauseFloat
+    unsafe:
+      HowlsDen.UpperLoopEntranceBarrier, Spear=1 OR BlazeSwap=1 OR PauseFloat
+      # You technically get a refill after BreakWall=12 but it can't be represented without adding another anchor
+      BreakWall=12, DoubleJump OR Dash OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR BlazeSwap=1 OR Damage=10
+      BreakWall=12, WaterDash, Water OR Damage=10
 
 anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's Den
   refill Checkpoint
@@ -1157,26 +1166,27 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Bash, Damage=10  # Bash off the fronkey or slime to get to the unstable platform wall jump for the other two jumps
       SentryJump=1  # SentryJump onto the unstable platform, hammer/sword stall to left wall, wall jump to pickup
     kii:
-      Sword OR Hammer OR Flash=3 OR Sentry=3  # Shuriken not in kii because throwing it into the platform can push it back
+      Sword OR Hammer OR Flash=3 OR Sentry=3 OR GlideJump  # Shuriken not in kii because throwing it into the platform can push it back
       Flash=2 OR Sentry=2:
         Damage=10
-      GlideJump
-      # GrenadeJump=1, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      GrenadeJump=1, Glide OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
     unsafe:
-      Bash
+      Bash OR GrenadeJump OR AbilitySwap=1
       Shuriken=2 OR Flash=2 OR Sentry=2  # https://youtu.be/ESDKKCgALVc
       Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
-      AbilitySwap=1
-      GrenadeJump  # Grenade jump onto the unstable platform then grenade jump to the pickup (requires some horizontal drifting)
   pickup HowlsDen.MagnetShard:  # Can use the barrier near Sword tree because if it got broken you can just go the long way around for free
-    moki: BreakWall=10, BreakWall=16 OR Launch
-    kii:
-      BreakWall=10, Bash, Grenade=1
-      # Glitched
-      # BreakWall=10, GrenadeJump=1, DoubleJump
+    moki:
+      BreakWall=16 OR Launch:
+        BreakWall=10
+    kii:  # TODO Grenade is technically redundant with BreakWall=16 if charged but that's not currently supported by seedgen
+      Bash, Grenade=1:
+        BreakWall=10
+      GrenadeJump=1, DoubleJump:
+        BreakWall=10
     unsafe:
-      BreakWall=10, DoubleJump OR GrenadeJump OR AbilitySwap=2
+      DoubleJump OR GrenadeJump OR AbilitySwap=2:
+        BreakWall=10
       HowlsDen.RainLifted, Bash  # https://youtu.be/jYZ7oOuq18k
   pickup HowlsDen.AboveTPSL:  # Lizard only spawns if you have sword
     moki: HowlsDen.BoneBarrier, BreakWall=10
@@ -1186,7 +1196,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Launch
       Bash, Grenade=1, DoubleJump, TripleJump
     kii:
-      HammerSJump=2, DoubleJump
+      SentryJump=1, DoubleJump
       AerialHammerJump, TripleJump OR Dash OR Glide OR Sword
       AerialHammerJump, Bash, Grenade=1 OR HowlsDen.RainLifted
     unsafe:
@@ -1196,9 +1206,7 @@ anchor HowlsDen.BoneBridge at -371, -4468:  # After the long drop into Howl's De
       Bash, DoubleJump, Grenade=1
       GrenadeJump, DoubleJump
       SentryJump=2  # Sword sjump can go up to HowlsDen.AboveBoneBridge but landing here and doing the loop also solves the connection to AboveBoneBridge
-      HammerSJump=1, DoubleJump
-      AerialHammerJump OR GlideHammerJump
-      AbilitySwap=4
+      AerialHammerJump OR GlideHammerJump OR AbilitySwap=4
   conn HowlsDen.AboveBoneBridge:  # Paths that can reach HowlsDen.AboveBoneBridge but can't do HowlsDen.BoneBridge->HowlsDen.UpperLoopEntrance->HowlsDen.AboveBoneBridge
     unsafe:
       HowlsDen.RainLifted, GlideBashChain  # Bash chain
@@ -1235,7 +1243,7 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
     kii:
       Bash, Grenade=1
       Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe: Blaze=1 OR PauseFloat OR Bow=1 OR Grenade=1 OR GrenadeCancel OR FlashSwap
+    unsafe: Blaze=1 OR PauseFloat OR Bow=1 OR Grenade=1 OR GrenadeCancel OR FlashSwap OR RegenJump
   conn HowlsDen.MidwayBottomLoop:
     moki:
       Launch
@@ -1253,46 +1261,57 @@ anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable w
         Damage=10
       Sentry=3  # two sentries in the air to avoid spikes
       WaterDash, Damage=10, Damage=10
-      HowlsDen.RainLifted, Bash, Grenade=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Slime only spawn when the rain is lifted
-      HowlsDen.RainLifted, WaterDash, Bash, Water OR Damage=10
-      # GrenadeJump=1, Damage=10 OR Sentry=2
-      # HowlsDen.RainLifted, Bash, GrenadeJump=1
+      GrenadeJump=1, Damage=10 OR Sentry=2
+      GrenadeJump=2, Shuriken=1
+      HowlsDen.RainLifted, Bash:
+        Grenade=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Slime only spawn when the rain is lifted
+        WaterDash, Bash, Water OR Damage=10
     unsafe:
-      Shuriken=2
-      Sentry=1, SentrySwap=1
+      Shuriken=2 OR AbilitySwap=2 OR PauseFloat
       Damage=10, Spear=1 OR BlazeSwap=1  # https://youtu.be/Y5nvYJbEtZg
-      BlazeSwap=2 OR FlashSwap OR PauseFloat
-      GrenadeJump, Damage=10 OR Sentry=2
-      HowlsDen.RainLifted, GrenadeJump, Bash
+      GrenadeJump, Spear=1 OR Flash=1 OR Sentry=1
       GrenadeCancel, Blaze=1, BlazeSwap=1 OR Damage=10  # both abilities are for the first jump
       GrenadeCancel, Blaze=1, HowlsDen.RainLifted, Bash
+      RegenJump, Flap, Sentry=2 OR BlazeSwap=1 OR SentrySwap=1 OR PauseFloat OR Damage=10
+      HowlsDen.RainLifted, Bash:
+        GrenadeJump
+        RegenJump, Flap
 
 anchor HowlsDen.MidwayBottomLoop at -492, -4459:  # At the Health refill behind the door
   refill Health=1
 
   conn HowlsDen.OutsideSecretRoom: free
-  conn HowlsDen.AboveBoneBridge:
-    moki, BreakWall=16:
+  conn HowlsDen.LowerLoopExit:
+    moki:
       Launch
       DoubleJump, Combat=Slug OR Bash
       Dash, Combat=Slug OR Bash
       Bash, Grenade=1, Glide
-    gorlek, BreakWall=16:
+    gorlek:
       DoubleJump OR Dash
       Bash, Grenade=1, Sword OR Hammer OR Damage=10
       SentryJump=1
-    kii, BreakWall=16:
-      Hammer OR Sword
-      Shuriken=2 OR Flash=2 OR Sentry=2  # bashnade paths requires the same amount of energy as those
+    kii:
+      Sword OR Hammer OR Shuriken=2 OR Flash=2 OR Sentry=2 OR GlideJump
+      Bash, Grenade=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Shuriken=1 OR Flash=1 OR Sentry=1:
         Damage=10
-      GlideJump
-      # GrenadeJump=1, GrenadeJump=1 OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
-    unsafe, BreakWall=16:
+      GrenadeJump=1, GrenadeJump=1 OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
+    unsafe:
       Spear=1, Spear=1 OR Damage=10 OR PauseFloat  # https://youtu.be/Y5nvYJbEtZg
       PauseFloat, Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1  # https://youtu.be/e9edNsLqE9Y
       GrenadeJump  # GrenadeCancel to pass above the spikes
+
+anchor HowlsDen.LowerLoopExit at -475, -4441:  # Checkpoint left of the slimes
+  refill Checkpoint
+
+  state HowlsDen.LowerLoopExitBarrier:
+    moki: BreakWall=16
+
+  conn HowlsDen.AboveBoneBridge:
+    moki: HowlsDen.LowerLoopExitBarrier
+  conn HowlsDen.MidwayBottomLoop: free
 
 anchor HowlsDen.SecretRoom at -510, -4479:  # The hidden room holding left hc
   refill Checkpoint
@@ -1312,7 +1331,7 @@ anchor HowlsDen.SecretRoom at -510, -4479:  # The hidden room holding left hc
       WaterDash, Damage=10
       Shuriken=1 OR Flash=1 OR Sentry=1:  # If you jump at the very edge of the blue moss, you'll hit the spikes
         Damage=10
-    unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseFloat OR GrenadeCancel
+    unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseFloat OR GrenadeCancel OR FlashSwap
   conn HowlsDen.OutsideSecretRoom:
     moki: HowlsDen.SecretRoomWall
 
@@ -1324,19 +1343,18 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
       Launch
     gorlek: DoubleJump OR Dash OR Sword OR Hammer
     kii:
-      Glide OR Sword OR Hammer OR Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3
+      Glide OR Spear=3 OR Shuriken=3 OR Flash=3 OR Sentry=3
       Damage=10, Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
         Damage=10
       Bash, Shuriken=2 OR Flash=2 OR Sentry=2  # Bash the slug to reach the suspended platform. No Spear because it one shot the slug in easy
       Bash, Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
-      # Damage=10, GrenadeJump=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # condition to pass the second spikes
-      # GrenadeJump=1, Shuriken=2 OR Flash=2 OR Sentry=2
+      Damage=10, GrenadeJump=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10  # condition to pass the second spikes
+      GrenadeJump=1, Shuriken=2 OR Flash=2 OR Sentry=2
     unsafe:
       Bash  # https://youtu.be/EJ9tExwpRjA
-      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR PauseFloat OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR GrenadeJump
+      Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR PauseFloat OR AbilitySwap=1 OR GrenadeJump
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      GrenadeJump
 
   conn HowlsDen.SecretRoom:
     moki:
@@ -1350,14 +1368,16 @@ anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the mos
     kii:
       Bash, Sword OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # Bash the slug to reach the suspended platform then bash a slug's projectile
       GlideJump
-      # GrenadeJump=2, Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
+      GrenadeJump=1, Glide OR Sword
+      GrenadeJump=2, Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10
       # Paths going back to the moss
       Dash OR Hammer
       Sword, Grapple, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Sword, Water, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Sword, Damage=10, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # hover with sword to avoid the most water ticks possible
     unsafe:
-      Bash OR Sword
+      Bash OR Sword OR AbilitySwap=2
+      Flash=2 OR Sentry=2  # https://youtu.be/iBRcA-F6NGQ
       Spear=1, Water OR Grapple OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # https://youtu.be/QYShpOZYmZQ
       Damage=20, Spear=1
       Damage=10, Spear=1, Glide
