@@ -7664,9 +7664,8 @@ anchor InnerWellspring.EscapeSequence at -1240, -3642:
 anchor InnerWellspring.EscapeSequenceEnd at -541, -3677:  # End of the water escape, before triggering the cutscene
   nospawn
 
-  state InnerWellspring.EscapeStateCompleted: free  # Disables the corruption enemy at the start of the escape
-  state InnerWellspring.SilentTeethWellspringFixed:  # This state is updated in seed_core to prevent a possible quest softlock?
-    moki: InnerWellspring.WaterEscapeReward
+  state InnerWellspring.EscapeStateCompleted: free  # Disables the corruption enemy and right-side wall at the start of the escape
+  state InnerWellspring.SilentTeethWellspringFixed: free  # There is a fix in seed_core for vanilla jank.
 
   pickup InnerWellspring.WaterEscapeReward: free
 
