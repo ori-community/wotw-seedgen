@@ -407,8 +407,8 @@ anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the B
       Burrow, Bash, Grenade=1  # bash the first slime past the arena to reach your grenade
     unsafe:
       Burrow  # Fake burrow
-      Burrow, Bash  # Bash the first slug up and quickly burrow down and up to catch it midair
-      Burrow, GrenadeCancel OR PauseFloat OR AbilitySwap=1  # Grenade land at the second slug then quickly burrow down then up to do a second grenade cancel
+    #  Burrow, Bash  # Bash the first slug up and quickly burrow down and up to catch it midair
+    #  Burrow, GrenadeCancel OR PauseFloat OR AbilitySwap=1  # Grenade land at the second slug then quickly burrow down then up to do a second grenade cancel
 
   conn MarshSpawn.LifepactLedge:
     moki: DoubleJump OR Dash OR Glide OR Launch
@@ -648,7 +648,7 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
       Bash, DoubleJump  # bashgliding
       Bash, Dash OR Sword  # bash upward on the right lantern to reach the left one
       Bash, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1 # do the first 4 notes then use the jumpad + stall to reach the left lantern
-    unsafe: Bash  # fun
+    unsafe: Bash  # After the 4th notes, fake bash the middle lantern to reach the left one without ringing the middle bell
   state MarshSpawn.DamageTreeOpen:
     moki: Bash, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Bash
@@ -697,16 +697,16 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
     moki:
       Water, Burrow, Bash, DoubleJump OR Glide  # Bash for the exploding enemy
       Water, Burrow, Bash, Grenade=1, Dash
-    gorlek: Water, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Sword OR Hammer OR Damage=10
+    gorlek: Water, Burrow, Sword OR Hammer OR Damage=10
     kii:
       Water, Burrow, Shuriken=1  # No other energy weapons because they'll make the CorruptSlug explode and damage you
       Burrow, WaterDash, Damage=10, Shuriken=1
       Burrow, Damage=20, Shuriken=1 OR WaterDash  # 2 water dboost then avoid the spikes or 1 water dboost with wdash then land into the spikes
       Burrow, Damage=30
-    unsafe:
-      Burrow, Water, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseFloat OR FlashSwap  # Precise burrow angle and then wjump off the platform with the CorruptSlug
-      Burrow, Damage=20, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseFloat OR FlashSwap
-      Burrow, WaterDash, Damage=10, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseFloat OR FlashSwap
+    # unsafe:  # everything in unsafe is redundant because of the fake burrow path
+    #   Burrow, Water, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseFloat OR FlashSwap  # Precise burrow angle and then wjump off the platform with the CorruptSlug
+    #   Burrow, Damage=20, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseFloat OR FlashSwap
+    #   Burrow, WaterDash, Damage=10, Spear=2 OR Blaze=2 OR Flash=1 OR Sentry=1 OR PauseFloat OR FlashSwap
   pickup MarshSpawn.PoolsPathSL:  # Most paths are redundant with MarshSpawn.LeftSpawnSignpost -> MarshSpawn.PoolsPath -> MarshSpawn.PoolsPathSL
     unsafe:
       BlazeSwap=8  # 1 to reach the mortar, 4 to reach the turret, 3 to reach the friendly spikes
@@ -724,14 +724,16 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
       Launch, Damage=10, DoubleJump OR Dash  # dboost in the left spikes at the second turret then go under MarshSpawn.PoolsPathSL
       Launch, Glide, Damage=10, Sword OR Hammer  # dboost in the left spikes at the second turret then go under MarshSpawn.PoolsPathSL with glide + upslash
     kii:
-      Launch, Damage=6, Glide OR Damage=10  #  land on first turret then launch upward. taking a turret shot for leniency
+      Launch, Glide OR Damage=10:
+        Damage=6  #  land on first turret then launch upward. taking a turret shot for leniency
       Launch, DoubleJump OR Dash  # launch into the ceiling then djump/dash bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathSL
-      Launch, Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 # launch into the ceiling then glide bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathSL
+      Launch, Glide, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1 # launch into the ceiling then glide bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathSL
+      Launch, GrenadeJump=2, Sword OR Hammer OR Shuriken=2  # gjump+launch from the left of the pound to land on the turret then same as above
       Bash, DoubleJump, Damage=10
       Bash, Damage=20, DoubleJump OR Glide
-      AerialHammerJump, TripleJump, Damage=10
+      AerialHammerJump, TripleJump, Damage=10, Damage=10
+      AerialHammerJump, GrenadeJump=2, Damage=10
       LaunchSwap  # land on the first turret
-      # Launch, Glide, GrenadeJump=1  # launch into the ceiling then glide bellow the spike entrance. Land on the turret then land bellow MarshSpawn.PoolsPathSL
     unsafe:
       Bash, Damage=10  # https://youtu.be/UtHsEHXnWA0
       Bash, Water, WaterDash  # https://youtu.be/zUSZakWugmw
@@ -739,7 +741,7 @@ anchor MarshSpawn.LeftSpawnSignpost at -954, -4296:  # At the signpost above Roc
       DoubleJump, Deflector, Sword, Damage=10 OR TripleJump  # https://youtu.be/f-0Q8yuKV_g
       DoubleJump, TripleJump, Deflector, Hammer, Damage=10  # https://youtu.be/_Fz20Cd4WBU
       CoyoteHammerJump, AerialHammerJump, Damage=6  # coyote hjump from the left, take a dboost on the 2nd turret projectile to avoid damage from spikes then coyote hjump from the turret
-      AerialHammerJump, TripleJump  # figuring out the cycle to not get your hjump canceled isn't fun but possible
+      AerialHammerJump, TripleJump OR GlideJump  # figuring out the cycle to not get your hjump canceled isn't fun but possible
       BlazeSwap=8 OR FlashSwap  # 1 to reach the mortar, 4 to reach the turret, 3 to reach the friendly spikes
       AbilitySwap=3, Damage=10, AbilitySwap=3  # https://youtu.be/daxebP4Or38
       AbilitySwap=4, PauseFloat, AbilitySwap=3
@@ -778,18 +780,19 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
     gorlek:
       Launch
       Glide, Sword OR Hammer OR DoubleJump OR Dash OR Bash
-      DoubleJump, TripleJump OR Dash
+      DoubleJump, Damage=10, TripleJump OR Dash
       Bash, DoubleJump, Sword OR Hammer OR Damage=10
     kii:
-      DoubleJump, Sword
+      DoubleJump, TripleJump OR Dash OR Sword
       DoubleJump, Hammer, Shuriken=1
-      Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      Bash, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=20
       GlideJump
+      Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1
+      Bash, DoubleJump OR Dash OR Sword OR Hammer OR Shuriken=1 OR Sentry=2 OR Damage=20
       SwordSJump=1, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # sword hover as well. Possible without the sjump but then you need to start the path at a specific time to avoid getting hit by a projectile while hovering.
-      # GrenadeJump=1, Glide
-      # GrenadeJump=1, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
-      # GrenadeJump=1, Hammer, Sentry=2      
+      GrenadeJump=1, Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+      GrenadeJump=1, Hammer, Sentry=2
+      GrenadeJump=1, Hammer, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1:
+        Damage=10
     unsafe:
       Bash OR Dash OR Sword OR AbilitySwap=1 OR PauseFloat  # Use friendly spikes in front of turret
       DoubleJump OR Glide OR Hammer OR Shuriken=2 OR Sentry=2 OR Damage=10 # Use frendly spikes in front of turret then wjump on friendly spikes bellow the pickup. Shuriken path requires you to angle the shuriken forwards for quicker catching.
@@ -799,11 +802,9 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       PoolsApproach.WheelFreed OR DoubleJump OR Launch
       Bash, Grenade=1
     gorlek, Water:
-      PoolsApproach.WheelFreed OR DoubleJump OR Launch
+      PoolsApproach.WheelFreed OR DoubleJump OR Launch OR Hammer OR SwordSJump=1
       Bash, Grenade=1
-      Hammer OR SwordSJump=1
-    kii, Water:
-      Spear=1 OR GlideJump  # OR GrenadeJump=1
+    kii, Water: Spear=1 OR GlideJump OR GrenadeJump=1
     unsafe:
       Water  # Precise wall jump where the tentacle is grabbing the wheel
       WaterDash, Damage=160
@@ -824,11 +825,13 @@ anchor MarshSpawn.PoolsPath at -1070, -4275:  # Above the turrets at the left of
       Bash, Dash  # land on 2nd turret to make it easier
       GlideJump  # land on 2nd turret to make it easier
     unsafe:
-      Bash
+      Bash OR PauseFloat OR AbilitySwap=2
       DoubleJump, Shuriken=1 OR Blaze=2 OR Sentry=1  # blaze/sentry wjump under the last turret
       WaterDash, Damage=6  # dboost on a projectile of the 3rd turret while falling so you don't take damage from the water
       Dash  # Reset your dash on the ceiling
-      
+      Water OR Damage=20:  # really precise walljump from under the turret to get on top
+        DoubleJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump OR BlazeSwap=1
+
 anchor MarshSpawn.RegenDoor at -573, -4393:  # left of regen tree
   state MarshSpawn.KeystoneDoor:
     moki: Keystone=2
@@ -15499,12 +15502,12 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
   state UpperWastes.WormEscapeEnd:  # Finishing the escape by touching its ending point from outside Ruins.
   # Some paths could be in kii but I'm unsure we even want to have this "escape worm escape" in something else than unsafe?
     unsafe:
-      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # Climb the laft wall all the way up
+      Launch, DoubleJump OR Dash OR Glide OR Sword OR Hammer  # Climb the left wall all the way up
       Launch, Bash, Grenade=1
       Bash, Grenade=1, GrenadeJump, DoubleJump, TripleJump  # tjump to reach your grenade, bash it then waits until it explodes so you can gjump to the ledge
       SwordSJump=1, DoubleJump, TripleJump, Spear=1  # https://youtu.be/71NiPLGQ2j0
       HammerSJump=1, DoubleJump, TripleJump
-      LaunchSwap OR FlashSwap OR BlazeSwap=6 OR SentrySwap=6
+      LaunchSwap OR AbilitySwap=6
       GlideHammerJump, AerialHammerJump
 
   pickup UpperWastes.FlowersSeed: free
@@ -15709,7 +15712,7 @@ anchor WindtornRuins.Escape at 2021, -4026:
         Burrow, SentryJump=3  # This is pain. Should have jumped over the worm instead
         Burrow, DoubleJump, TripleJump
       UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This need to solve with the pillar destroyed to avoid softlocks
-        Burrow, Launch OR SentryJump=1 OR FlashSwap OR SentrySwap=4 OR BlazeSwap=4
+        Burrow, Launch OR SentryJump=1 OR AbilitySwap=4
         Burrow, Bash, Grenade=1, DoubleJump  # you should have rolled this path before I got rid of triplejump https://youtu.be/TMWmknRqCIM
         Burrow, AerialHammerJump, TripleJump OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
         Burrow, GrenadeJump, DoubleJump, TripleJump
