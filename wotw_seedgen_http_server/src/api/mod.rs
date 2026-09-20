@@ -151,9 +151,17 @@ async fn generate(
 
 #[derive(Deserialize, IntoParams)]
 pub struct GenerateQuery {
-    pub json_spoiler: Option<bool>,
+    #[param(inline)]
+    pub json_spoiler: Option<JsonSpoilerKind>,
     pub text_spoiler: Option<bool>,
     pub max_log_level: Option<LogLevelFilter>,
+}
+
+#[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum JsonSpoilerKind {
+    NoCommands,
+    Full,
 }
 
 #[derive(Default, Serialize, Deserialize, ToSchema)]
@@ -178,6 +186,22 @@ impl From<LogLevelFilter> for log::LevelFilter {
             LogLevelFilter::Info => log::LevelFilter::Info,
             LogLevelFilter::Debug => log::LevelFilter::Debug,
             LogLevelFilter::Trace => log::LevelFilter::Trace,
+        }
+    }
+}
+
+#[derive(Clone, Serialize, ToSchema)]
+#[serde(tag = "status")]
+pub enum SchemaResult<T, E> {
+    Ok(T),
+    Err(E),
+}
+
+impl<T, E> From<Result<T, E>> for SchemaResult<T, E> {
+    fn from(value: Result<T, E>) -> Self {
+        match value {
+            Ok(t) => Self::Ok(t),
+            Err(e) => Self::Err(e),
         }
     }
 }

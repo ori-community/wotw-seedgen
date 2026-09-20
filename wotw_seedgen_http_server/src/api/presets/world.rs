@@ -11,7 +11,7 @@ use wotw_seedgen::data::{WorldSettings, assets::WorldPreset};
 
 use crate::{
     RouterState,
-    api::assets::AssetOrigin,
+    api::{SchemaResult, assets::AssetOrigin},
     error::{Error, Result},
 };
 
@@ -35,9 +35,11 @@ pub struct Docs;
 #[utoipa::path(
     get,
     path = LIST,
-    responses((status = OK, body = FxHashMap<String, WorldPresetInfo>)),
+    responses((status = OK, body = FxHashMap<String, SchemaResult<WorldPresetInfo, String>>)),
 )]
-async fn list(State(cache): State<RouterState>) -> Json<FxHashMap<String, WorldPresetInfo>> {
+async fn list(
+    State(cache): State<RouterState>,
+) -> Json<FxHashMap<String, SchemaResult<WorldPresetInfo, String>>> {
     Json(cache.read().await.world_preset_info.clone())
 }
 

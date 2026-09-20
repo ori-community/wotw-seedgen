@@ -1,7 +1,5 @@
 use crate::{
-    assets::{
-        AssetCacheValues, InlineSnippets, SnippetAccess, SnippetFileAccess, TestAccess, TEST_ASSETS,
-    },
+    assets::{InlineSnippets, SnippetAccess, SnippetFileAccess, TestAccess, TEST_ASSETS},
     seed_language::{
         ast::{
             parse_seed_ast, ClientEvent, ConstantDiscriminants, Expression, ExpressionValue,
@@ -156,8 +154,8 @@ fn test_compiler_with_config<F: SnippetAccess>(
     Compiler::new(
         &mut rand::thread_rng(),
         snippet_access,
-        TEST_ASSETS.values.loc_data(),
-        TEST_ASSETS.values.uber_state_data(),
+        TEST_ASSETS.expect_loc_data(),
+        TEST_ASSETS.expect_uber_state_data(),
     )
     .with_config(config)
 }

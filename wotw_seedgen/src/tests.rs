@@ -3,8 +3,8 @@ use crate::Generator;
 use log::info;
 use wotw_seedgen_data::{
     assets::{
-        AssetCacheValues, AssetFileAccess, PresetAccess, UniversePreset, UniversePresetSettings,
-        WorldPresetSettings, TEST_ASSETS,
+        AssetFileAccess, PresetAccess, UniversePreset, UniversePresetSettings, WorldPresetSettings,
+        TEST_ASSETS,
     },
     logic_language::{ast::Paths, output::Graph},
     test_logger, Difficulty, UniverseSettings,
@@ -17,8 +17,8 @@ fn some_seeds() {
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
         Generator::new(
             graph,
-            TEST_ASSETS.values.loc_data(),
-            TEST_ASSETS.values.uber_state_data(),
+            TEST_ASSETS.expect_loc_data(),
+            TEST_ASSETS.expect_uber_state_data(),
             &*TEST_ASSETS,
             universe_settings,
         )
@@ -26,7 +26,7 @@ fn some_seeds() {
         .unwrap();
     }
 
-    let source = TEST_ASSETS.values.paths();
+    let source = TEST_ASSETS.expect_paths();
     let paths = Paths::parse(&source.content).eprint_errors(source).unwrap();
 
     let mut universe_settings = UniverseSettings::new("0".to_string());

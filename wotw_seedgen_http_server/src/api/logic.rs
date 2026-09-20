@@ -47,20 +47,26 @@ pub struct Docs;
 #[utoipa::path(
     get,
     path = GRAPH,
-    responses((status = OK, body = Graph)),
+    responses(
+        (status = OK, body = Graph),
+        (status = INTERNAL_SERVER_ERROR, body = String),
+    ),
 )]
-async fn graph(State(cache): State<RouterState>) -> Json<Graph> {
-    Json(cache.read().await.graph.clone())
+async fn graph(State(cache): State<RouterState>) -> Result<Json<Graph>> {
+    cache.read().await.graph.get_response()
 }
 
 /// Get a list of logically relevant map icons
 #[utoipa::path(
     get,
     path = MAP_ICONS,
-    responses((status = OK, body = MapIcons)),
+    responses(
+        (status = OK, body = MapIcons),
+        (status = INTERNAL_SERVER_ERROR, body = String),
+    ),
 )]
-async fn map_icons(State(cache): State<RouterState>) -> Json<MapIcons> {
-    Json(cache.read().await.map_icons.clone())
+async fn map_icons(State(cache): State<RouterState>) -> Result<Json<MapIcons>> {
+    cache.read().await.map_icons.get_response()
 }
 
 #[derive(Clone, Serialize, ToSchema)]
@@ -94,10 +100,15 @@ pub struct MapIconCondition {
 #[utoipa::path(
     get,
     path = RELEVANT_UBER_STATES,
-    responses((status = OK, body = RelevantUberStates)),
+    responses(
+        (status = OK, body = RelevantUberStates),
+        (status = INTERNAL_SERVER_ERROR, body = String),
+    ),
 )]
-async fn relevant_uber_states(State(cache): State<RouterState>) -> Json<RelevantUberStates> {
-    Json(cache.read().await.relevant_uber_states.clone())
+async fn relevant_uber_states(
+    State(cache): State<RouterState>,
+) -> Result<Json<RelevantUberStates>> {
+    cache.read().await.relevant_uber_states.get_response()
 }
 
 #[derive(Clone, Serialize, ToSchema)]
@@ -113,10 +124,13 @@ pub struct RelevantUberStates {
 #[utoipa::path(
     get,
     path = SPAWN_ANCHORS,
-    responses((status = OK, body = SpawnAnchors)),
+    responses(
+        (status = OK, body = SpawnAnchors),
+        (status = INTERNAL_SERVER_ERROR, body = String),
+    ),
 )]
-async fn spawn_anchors(State(cache): State<RouterState>) -> Json<SpawnAnchors> {
-    Json(cache.read().await.spawn_anchors.clone())
+async fn spawn_anchors(State(cache): State<RouterState>) -> Result<Json<SpawnAnchors>> {
+    cache.read().await.spawn_anchors.get_response()
 }
 
 #[derive(Clone, Serialize, ToSchema)]
@@ -150,12 +164,14 @@ async fn reach_check(
 
     let cache = cache.read().await;
 
+    let map_icons_hash = cache.map_icons.get()?.hash;
+    let relevant_uber_states_hash = cache.relevant_uber_states.get()?.hash;
     let reachable = reachable(&cache, body.uber_states, seedgen_info)?;
 
     Ok(Json(ReachCheck {
         reachable,
-        map_icons_hash: cache.map_icons.hash,
-        relevant_uber_states_hash: cache.relevant_uber_states.hash,
+        map_icons_hash,
+        relevant_uber_states_hash,
     }))
 }
 

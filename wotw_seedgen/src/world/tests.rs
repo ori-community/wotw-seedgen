@@ -6,7 +6,7 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use smallvec::smallvec;
 use wotw_seedgen_data::{
-    assets::{AssetCacheValues, TEST_ASSETS},
+    assets::TEST_ASSETS,
     logic_language::output::{Enemy, Graph, RefillValue, Requirement},
     seed_language::{
         output::CommandsOutput,
@@ -66,7 +66,7 @@ fn full_reach_check() {
 
     let all_locations = TEST_ASSETS
         .values
-        .loc_data()
+        .expect_loc_data()
         .entries
         .iter()
         .map(|location| location.identifier.as_str())

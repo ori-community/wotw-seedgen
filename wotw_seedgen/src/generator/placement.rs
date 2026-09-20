@@ -824,7 +824,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
     fn spoiler_item(&mut self, target_world_index: usize, command: &CommandVoid) -> SpoilerItem {
         SpoilerItem {
-            command: command.clone(),
+            command: Some(command.clone()),
             name: self.worlds[target_world_index].log_name(command),
         }
     }
@@ -1511,7 +1511,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
     fn spoiler_item(&mut self, command: &CommandVoid) -> SpoilerItem {
         SpoilerItem {
-            command: command.clone(),
+            command: Some(command.clone()),
             name: self.log_name(command),
         }
     }

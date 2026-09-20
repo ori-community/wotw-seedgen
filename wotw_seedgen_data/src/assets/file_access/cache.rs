@@ -30,13 +30,13 @@ pub struct AssetCache<F, V> {
 impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheValues>
     AssetCache<F, V>
 {
-    pub fn new(file_access: F) -> Result<Self, String> {
-        let values = V::new(&file_access)?;
+    pub fn new(file_access: F) -> Self {
+        let values = V::new(&file_access);
 
-        Ok(Self {
+        Self {
             file_access,
             values,
-        })
+        }
     }
 
     pub fn watch(&self, watcher: &mut Watcher) -> WatcherResult<()> {
@@ -59,10 +59,7 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
         Ok(())
     }
 
-    pub fn update_from_watcher_event(
-        &mut self,
-        events: Vec<DebouncedEvent>,
-    ) -> Result<bool, String> {
+    pub fn update_from_watcher_event(&mut self, events: Vec<DebouncedEvent>) -> bool {
         let mut changed = ChangedAssets::default();
 
         for debounced in events {
@@ -98,9 +95,9 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
 
         let any_changed = changed != ChangedAssets::default();
 
-        self.values.update(&self.file_access, changed)?;
+        self.values.update(&self.file_access, changed);
 
-        Ok(any_changed)
+        any_changed
     }
 }
 
@@ -121,11 +118,11 @@ impl<F: AssetFileAccess, V: AssetCacheValues> AssetFileAccess for AssetCache<F, 
     }
 
     fn loc_data(&self) -> Result<LocData, String> {
-        Ok(self.values.loc_data().clone())
+        self.values.loc_data().cloned()
     }
 
     fn state_data(&self) -> Result<StateData, String> {
-        Ok(self.values.state_data().clone())
+        self.values.state_data().cloned()
     }
 
     fn uber_state_data(
@@ -133,26 +130,26 @@ impl<F: AssetFileAccess, V: AssetCacheValues> AssetFileAccess for AssetCache<F, 
         _loc_data: &LocData,
         _state_data: &StateData,
     ) -> Result<UberStateData, String> {
-        Ok(self.values.uber_state_data().clone())
+        self.values.uber_state_data().cloned()
     }
 
     fn paths(&self) -> Result<Source, String> {
-        Ok(self.values.paths().clone())
+        self.values.paths().cloned()
     }
 }
 
 pub trait AssetCacheValues: Sized {
-    fn new<F>(file_access: &F) -> Result<Self, String>
+    fn new<F>(file_access: &F) -> Self
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess;
 
-    fn loc_data(&self) -> &LocData;
+    fn loc_data(&self) -> Result<&LocData, String>;
 
-    fn state_data(&self) -> &StateData;
+    fn state_data(&self) -> Result<&StateData, String>;
 
-    fn uber_state_data(&self) -> &UberStateData;
+    fn uber_state_data(&self) -> Result<&UberStateData, String>;
 
-    fn paths(&self) -> &Source;
+    fn paths(&self) -> Result<&Source, String>;
 
     fn snippet(&self, identifier: &str) -> Result<&Source, String>;
 
@@ -160,7 +157,7 @@ pub trait AssetCacheValues: Sized {
 
     fn available_snippets(&self) -> impl Iterator<Item = &String>;
 
-    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets) -> Result<(), String>
+    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess;
 }
@@ -389,56 +386,53 @@ impl<F, V: PresetAccess> PresetAccess for AssetCache<F, V> {
 }
 
 pub struct DefaultAssetCacheValues {
-    pub loc_data: LocData,
-    pub state_data: StateData,
-    pub uber_state_data: UberStateData,
-    pub paths: Source,
-    pub snippets: FxHashMap<String, Source>,
-    pub universe_presets: FxHashMap<String, UniversePreset>,
-    pub world_presets: FxHashMap<String, WorldPreset>,
+    pub loc_data: Result<LocData, String>,
+    pub state_data: Result<StateData, String>,
+    pub uber_state_data: Result<UberStateData, String>,
+    pub paths: Result<Source, String>,
+    pub snippets: FxHashMap<String, Result<Source, String>>,
+    pub universe_presets: FxHashMap<String, Result<UniversePreset, String>>,
+    pub world_presets: FxHashMap<String, Result<WorldPreset, String>>,
 }
 
 impl AssetCacheValues for DefaultAssetCacheValues {
-    fn new<F>(file_access: &F) -> Result<Self, String>
+    fn new<F>(file_access: &F) -> Self
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        let loc_data = file_access.loc_data()?;
-        let state_data = file_access.state_data()?;
-        let uber_state_data = file_access.uber_state_data(&loc_data, &state_data)?;
-        let paths = file_access.paths()?;
+        let loc_data = file_access.loc_data();
+        let state_data = file_access.state_data();
+        let uber_state_data = uber_state_data(&loc_data, &state_data, file_access);
+        let paths = file_access.paths();
 
         let snippets = file_access
             .available_snippets()
             .into_iter()
             .map(|identifier| {
-                file_access
-                    .read_snippet(&identifier)
-                    .map(|source| (identifier, source))
+                let snippet = file_access.read_snippet(&identifier);
+                (identifier, snippet)
             })
-            .collect::<Result<_, _>>()?;
+            .collect();
 
         let universe_presets = file_access
             .available_universe_presets()
             .into_iter()
             .map(|identifier| {
-                file_access
-                    .universe_preset(&identifier)
-                    .map(|universe_preset| (identifier, universe_preset))
+                let universe_preset = file_access.universe_preset(&identifier);
+                (identifier, universe_preset)
             })
-            .collect::<Result<_, _>>()?;
+            .collect();
 
         let world_presets = file_access
             .available_world_presets()
             .into_iter()
             .map(|identifier| {
-                file_access
-                    .world_preset(&identifier)
-                    .map(|universe_preset| (identifier, universe_preset))
+                let world_preset = file_access.world_preset(&identifier);
+                (identifier, world_preset)
             })
-            .collect::<Result<_, _>>()?;
+            .collect();
 
-        Ok(Self {
+        Self {
             loc_data,
             state_data,
             uber_state_data,
@@ -446,26 +440,10 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             snippets,
             universe_presets,
             world_presets,
-        })
+        }
     }
 
-    fn loc_data(&self) -> &LocData {
-        &self.loc_data
-    }
-
-    fn state_data(&self) -> &StateData {
-        &self.state_data
-    }
-
-    fn uber_state_data(&self) -> &UberStateData {
-        &self.uber_state_data
-    }
-
-    fn paths(&self) -> &Source {
-        &self.paths
-    }
-
-    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets) -> Result<(), String>
+    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
@@ -480,40 +458,56 @@ impl AssetCacheValues for DefaultAssetCacheValues {
         } = changed;
 
         if uber_state_dump || loc_data {
-            self.loc_data = file_access.loc_data()?;
+            self.loc_data = file_access.loc_data();
         }
 
         if uber_state_dump || state_data {
-            self.state_data = file_access.state_data()?;
+            self.state_data = file_access.state_data();
         }
 
         if uber_state_dump {
-            self.uber_state_data = file_access.uber_state_data(&self.loc_data, &self.state_data)?;
+            self.uber_state_data = uber_state_data(&self.loc_data, &self.state_data, file_access);
         }
 
         if paths {
-            self.paths = file_access.paths()?;
+            self.paths = file_access.paths();
         }
 
         update_subfolder(snippets, &mut self.snippets, |identifier| {
             file_access.read_snippet(identifier)
-        })?;
+        });
 
         update_subfolder(universe_presets, &mut self.universe_presets, |identifier| {
             file_access.universe_preset(identifier)
-        })?;
+        });
 
         update_subfolder(world_presets, &mut self.world_presets, |identifier| {
             file_access.world_preset(identifier)
-        })?;
+        });
+    }
 
-        Ok(())
+    fn loc_data(&self) -> Result<&LocData, String> {
+        self.loc_data.as_ref().map_err(String::clone)
+    }
+
+    fn state_data(&self) -> Result<&StateData, String> {
+        self.state_data.as_ref().map_err(String::clone)
+    }
+
+    fn uber_state_data(&self) -> Result<&UberStateData, String> {
+        self.uber_state_data.as_ref().map_err(String::clone)
+    }
+
+    fn paths(&self) -> Result<&Source, String> {
+        self.paths.as_ref().map_err(String::clone)
     }
 
     fn snippet(&self, identifier: &str) -> Result<&Source, String> {
-        self.snippets
-            .get(identifier)
-            .ok_or_else(|| format!("unknown snippet \"{identifier}\""))
+        match self.snippets.get(identifier) {
+            None => Err(format!("unknown snippet \"{identifier}\"")),
+            Some(Ok(source)) => Ok(source),
+            Some(Err(err)) => Err(err.clone()),
+        }
     }
 
     fn allow_read_file(&self) -> bool {
@@ -525,18 +519,29 @@ impl AssetCacheValues for DefaultAssetCacheValues {
     }
 }
 
-fn update_subfolder<F, V>(
-    changes: Vec<ChangeDetails>,
-    values: &mut FxHashMap<String, V>,
-    mut f: F,
-) -> Result<(), String>
+fn uber_state_data<F>(
+    loc_data: &Result<LocData, String>,
+    state_data: &Result<StateData, String>,
+    file_access: &F,
+) -> Result<UberStateData, String>
 where
-    F: FnMut(&str) -> Result<V, String>,
+    F: AssetFileAccess,
+{
+    loc_data
+        .as_ref()
+        .and_then(|loc_data| state_data.as_ref().map(|state_data| (loc_data, state_data)))
+        .map_err(String::clone)
+        .and_then(|(loc_data, state_data)| file_access.uber_state_data(loc_data, state_data))
+}
+
+fn update_subfolder<F, V>(changes: Vec<ChangeDetails>, values: &mut FxHashMap<String, V>, mut f: F)
+where
+    F: FnMut(&str) -> V,
 {
     for change in changes {
         match change {
             ChangeDetails::Create(identifier) | ChangeDetails::Modify(identifier) => {
-                let value = f(&identifier)?;
+                let value = f(&identifier);
                 values.insert(identifier, value);
             }
             ChangeDetails::Remove(identifier) => {
@@ -548,8 +553,6 @@ where
             }
         }
     }
-
-    Ok(())
 }
 
 impl PresetAccess for DefaultAssetCacheValues {
@@ -557,14 +560,14 @@ impl PresetAccess for DefaultAssetCacheValues {
         self.universe_presets
             .get(identifier)
             .cloned()
-            .ok_or_else(|| format!("unknown universe preset \"{identifier}\""))
+            .unwrap_or_else(|| Err(format!("unknown universe preset \"{identifier}\"")))
     }
 
     fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
         self.world_presets
             .get(identifier)
             .cloned()
-            .ok_or_else(|| format!("unknown world preset \"{identifier}\""))
+            .unwrap_or_else(|| Err(format!("unknown world preset \"{identifier}\"")))
     }
 
     fn available_universe_presets(&self) -> Vec<String> {
@@ -581,7 +584,7 @@ impl SnippetAccess for DefaultAssetCacheValues {
         self.snippets
             .get(identifier)
             .cloned()
-            .ok_or_else(|| format!("unknown snippet \"{identifier}\""))
+            .unwrap_or_else(|| Err(format!("unknown snippet \"{identifier}\"")))
     }
 
     fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {

@@ -9,6 +9,7 @@ use tower_lsp::{
 enum ErrorKind {
     UnknownTextDocument = 1,
     PositionOutOfBounds = 2,
+    RequiredAssetError = 3,
 }
 
 pub fn unknown_text_document(url: &Url) -> Error {
@@ -29,6 +30,10 @@ pub fn position_out_of_bounds(position: Position, document: &str) -> Error {
             character = position.character
         )),
     )
+}
+
+pub fn required_asset_error(message: String) -> Error {
+    server_error(ErrorKind::RequiredAssetError, Cow::Owned(message))
 }
 
 fn server_error(kind: ErrorKind, message: Cow<'static, str>) -> Error {

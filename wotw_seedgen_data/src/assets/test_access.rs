@@ -28,7 +28,7 @@ const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../assets");
 pub struct TestAccess;
 
 pub static TEST_ASSETS: LazyLock<AssetCache<TestAccess, TestCacheValues>> =
-    LazyLock::new(|| AssetCache::new(TestAccess).unwrap());
+    LazyLock::new(|| AssetCache::new(TestAccess));
 
 impl AssetFileAccess for TestAccess {
     type Folders = Once<Self::Path>;
@@ -76,37 +76,37 @@ pub struct TestCacheGraphs {
 }
 
 impl AssetCacheValues for TestCacheValues {
-    fn new<F>(file_access: &F) -> Result<Self, String>
+    fn new<F>(file_access: &F) -> Self
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        let base = DefaultAssetCacheValues::new(file_access)?;
-        let uber_states = UberStates::new(&base.uber_state_data);
+        let base = DefaultAssetCacheValues::new(file_access);
+        let uber_states = UberStates::new(base.uber_state_data.as_ref().unwrap());
         let graphs = TestCacheGraphs::new(&base);
         let test_graph = TestGraph::new();
 
-        Ok(Self {
+        Self {
             base,
             uber_states,
             graphs,
             test_graph,
-        })
+        }
     }
 
-    fn loc_data(&self) -> &LocData {
-        &self.base.loc_data
+    fn loc_data(&self) -> Result<&LocData, String> {
+        self.base.loc_data()
     }
 
-    fn state_data(&self) -> &StateData {
-        &self.base.state_data
+    fn state_data(&self) -> Result<&StateData, String> {
+        self.base.state_data()
     }
 
-    fn uber_state_data(&self) -> &UberStateData {
-        &self.base.uber_state_data
+    fn uber_state_data(&self) -> Result<&UberStateData, String> {
+        self.base.uber_state_data()
     }
 
-    fn paths(&self) -> &Source {
-        &self.base.paths
+    fn paths(&self) -> Result<&Source, String> {
+        self.base.paths()
     }
 
     fn snippet(&self, identifier: &str) -> Result<&Source, String> {
@@ -121,11 +121,10 @@ impl AssetCacheValues for TestCacheValues {
         self.base.available_snippets()
     }
 
-    fn update<F>(&mut self, _file_access: &F, _changed: ChangedAssets) -> Result<(), String>
+    fn update<F>(&mut self, _file_access: &F, _changed: ChangedAssets)
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        Ok(())
     }
 }
 
@@ -148,6 +147,22 @@ impl PresetAccess for TestCacheValues {
 }
 
 impl TestCacheValues {
+    pub fn expect_loc_data(&self) -> &LocData {
+        self.base.loc_data.as_ref().unwrap()
+    }
+
+    pub fn expect_state_data(&self) -> &StateData {
+        self.base.state_data.as_ref().unwrap()
+    }
+
+    pub fn expect_uber_state_data(&self) -> &UberStateData {
+        self.base.uber_state_data.as_ref().unwrap()
+    }
+
+    pub fn expect_paths(&self) -> &Source {
+        self.base.paths.as_ref().unwrap()
+    }
+
     pub fn graph(&self, settings: &[WorldSettings]) -> Cow<'_, Graph> {
         match settings {
             [] => Cow::Borrowed(&self.graphs.full),
@@ -189,14 +204,18 @@ impl TestCacheGraphs {
 }
 
 fn graph(base: &DefaultAssetCacheValues, settings: &[WorldSettings]) -> Graph {
-    let paths = Paths::parse(&base.paths.content)
-        .eprint_errors(&base.paths)
-        .unwrap();
+    let source = base.paths.as_ref().unwrap();
+
+    let paths = Paths::parse(&source.content).eprint_errors(source).unwrap();
 
     Graph::compiler()
         .with_settings(settings)
-        .compile(paths, base.loc_data.clone(), base.state_data.clone())
-        .eprint_errors(&base.paths)
+        .compile(
+            paths,
+            base.loc_data.clone().unwrap(),
+            base.state_data.clone().unwrap(),
+        )
+        .eprint_errors(source)
         .unwrap()
 }
 
@@ -259,9 +278,9 @@ mod tests {
 
     #[test]
     fn validate_logic_csvs() {
-        let loc_data = &TEST_ASSETS.base.loc_data;
-        let state_data = &TEST_ASSETS.base.state_data;
-        let uber_state_data = &TEST_ASSETS.base.uber_state_data;
+        let loc_data = TEST_ASSETS.expect_loc_data();
+        let state_data = TEST_ASSETS.expect_state_data();
+        let uber_state_data = TEST_ASSETS.expect_uber_state_data();
 
         for (identifier, uber_identifier, value) in loc_data
             .entries

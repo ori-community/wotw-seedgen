@@ -7,6 +7,7 @@ mod semantic_tokens;
 
 use crate::{
     backend::Backend,
+    error::required_asset_error,
     seed::{
         cache::Cache,
         command::{execute_command, Command},
@@ -121,7 +122,7 @@ impl LanguageServer for Backend<Cache> {
             source.value(),
             ast.parsed,
             index,
-            cache.uber_state_data(),
+            cache.uber_state_data().map_err(required_asset_error)?,
         ))
     }
 
@@ -197,7 +198,11 @@ impl LanguageServer for Backend<Cache> {
 
         let cache = self.cache.read().await;
 
-        execute_command(&params.command, params.arguments, &cache.uber_state_data)
+        execute_command(
+            &params.command,
+            params.arguments,
+            cache.uber_state_data().map_err(required_asset_error)?,
+        )
     }
 }
 
@@ -223,16 +228,18 @@ impl Backend<Cache> {
                 )
                 .await?;
 
+            let cache = self.cache.read().await;
+            let loc_data = self.consume_result(cache.loc_data.as_ref()).await?;
+            let uber_state_data = self.consume_result(cache.uber_state_data.as_ref()).await?;
+
             let snippet_access = PlandoFileAccess::new(root);
 
             let result = {
-                let cache = self.cache.read().await;
-
                 let mut compiler = Compiler::new(
                     &mut rand::thread_rng(),
                     &snippet_access,
-                    &cache.loc_data,
-                    &cache.uber_state_data,
+                    loc_data,
+                    uber_state_data,
                 )
                 .with_lint(true);
 

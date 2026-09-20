@@ -28,6 +28,22 @@ impl SeedSpoiler {
             groups: vec![],
         }
     }
+
+    pub fn strip_commands(&mut self) {
+        for preplacement in &mut self.preplacements {
+            preplacement.item.command = None;
+        }
+
+        for group in &mut self.groups {
+            for item in &mut group.forced_items {
+                item.command = None;
+            }
+
+            for placement in &mut group.placements {
+                placement.item.command = None;
+            }
+        }
+    }
 }
 
 /// One "step" of placements in a [`SeedSpoiler`]
@@ -60,8 +76,9 @@ pub struct SpoilerPlacement {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct SpoilerItem {
-    /// The placed command
-    pub command: CommandVoid,
+    /// The placed command, unless stripped using [`SeedSpoiler::strip_commands`]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub command: Option<CommandVoid>,
     /// The readable name of the placed item, which usually varies from the `command`s [`Display`] implementation
     pub name: String,
 }
