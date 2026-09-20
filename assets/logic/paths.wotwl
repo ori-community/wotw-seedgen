@@ -1409,14 +1409,14 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
     moki:
       DoubleJump OR Launch
       Bash, Grenade=1
-    gorlek:
-      SentryJump=1
+    gorlek: SentryJump=1
     kii:
-      Dash OR Hammer OR Bash OR Shuriken=1 OR GlideJump  # OR GrenadeJump=1
+      Bash  # use a slug
+      Dash OR Hammer OR Shuriken=1 OR GlideJump OR GrenadeJump=1
       Glide, Flash=1 OR Sentry=1
       Sword, Flash=1 OR Sentry=1
     unsafe:
-      Sword OR GrenadeJump
+      Sword OR SpearJump=1 OR PauseFloat
       Glide, Spear=1
 
   conn Teleporters: free
@@ -1429,7 +1429,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       Bash, Grenade=1
     gorlek: Hammer OR SwordSJump=1
     kii:
-      Sword OR Dash OR Spear=1 OR GlideJump
+      Sword OR Dash OR Spear=1 OR GlideJump OR GrenadeJump=1
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: free
   conn HowlsDen.AboveTeleporter:
@@ -1438,7 +1438,7 @@ anchor HowlsDen.Teleporter at -328, -4536:  # At the teleporter
       Bash, Grenade=1
     gorlek: Bash OR SentryJump=1
     kii:
-      Sword OR Hammer OR GlideJump  # OR GrenadeJump=1  # pogo on the slime for sword, upslash for hammer
+      Sword OR Hammer OR GlideJump OR GrenadeJump=1  # pogo on the slime for sword, upslash for hammer
       Dash, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe: Spear=1 OR Dash OR GrenadeJump OR AbilitySwap=1
 
@@ -1455,11 +1455,9 @@ anchor HowlsDen.DoubleJumpApproach at -436, -4528:  # Checkpoint inbetween the t
     moki: HowlsDen.DoubleJumpTreeCombat OR DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer
     kii:
-      Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
+      Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2 OR GrenadeJump=1
       Bash, Grenade=1
-      # GrenadeJump=1
-    unsafe:
-      Bash OR SpearJump=1 OR GrenadeJump OR BlazeSwap=1 OR FlashSwap
+    unsafe: Bash OR Spear=1 OR Blaze=1 OR FlashSwap OR PauseFloat
   conn HowlsDen.Teleporter: free
 
 anchor HowlsDen.DoubleJumpTreeLedge at -514, -4549:  # To the right of the Double Jump Tree
@@ -1468,20 +1466,18 @@ anchor HowlsDen.DoubleJumpTreeLedge at -514, -4549:  # To the right of the Doubl
   pickup HowlsDen.DoubleJumpSL:  # Exploding enemy only spawn once you have Bash
     moki: Launch
     gorlek: SentryJump=1
-    kii:
-      Bash OR AerialHammerJump
+    kii:  # In kii and above, using Sword OR Hammer is redundant with going to HowlsDen.DoubleJumpApproach and beating the arena
+      Bash OR GrenadeJump=1
       GlideJump, DoubleJump
-      # GrenadeJump=1
     unsafe:
       DoubleJump, TripleJump  # Triple jump from the right wall
-      GlideJump, Hammer OR Sword OR Spear=1
-      SwordJump OR GrenadeJump
+      GlideJump, Spear=1
 
   conn HowlsDen.DoubleJumpTreeArea: free
   conn HowlsDen.DoubleJumpApproach:
     moki: DoubleJump OR Launch OR Dash OR Glide
     gorlek: Sword OR Hammer
-    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1  # OR GrenadeJump=1
+    kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR GrenadeJump=1
     unsafe: free
 
 anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
@@ -1501,9 +1497,9 @@ anchor HowlsDen.DoubleJumpTreeArea at -555, -4552:  # At the Double Jump Tree
       Bash, Grenade=1
     gorlek: SentryJump=1
     kii:
-      Bash OR Sword OR Dash OR Sentry=3  # OR GrenadeJump=1
+      Bash OR Sword OR Dash OR Sentry=3 OR GrenadeJump=1
       Hammer, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1
-    unsafe: Hammer OR Shuriken=2 OR Blaze=4 OR Sentry=2 OR GrenadeJump OR SpearJump=1 OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap
+    unsafe: Hammer OR Shuriken=2 OR Blaze=4 OR Sentry=2 OR SpearJump=1 OR AbilitySwap=1 OR PauseFloat
   conn MidnightBurrows.DenConnection:
     moki: MidnightBurrows.HowlsDenShortcut
 
