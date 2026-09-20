@@ -512,7 +512,9 @@ pub enum Trick {
     /// Using the weapon wheel to cancel Blaze
     BlazeSwap,
     /// Gaining speed off a wall with Regenerate and Dash
-    WaveDash,
+    Wavedash,
+    /// Storing a grounded jump into the air with Regenerate
+    RegenJump,
     /// Preserving jump momentum with Grenade
     GrenadeJump,
     /// Preserving Double Jump momentum with Sword
@@ -569,7 +571,8 @@ impl Trick {
             | Self::SentrySwap
             | Self::FlashSwap
             | Self::BlazeSwap
-            | Self::WaveDash
+            | Self::Wavedash
+            | Self::RegenJump
             | Self::SwordJump
             | Self::GlideHammerJump
             | Self::CoyoteHammerJump

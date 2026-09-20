@@ -413,9 +413,13 @@ impl RequirementRepository {
                 self.trick.blaze_swap.clone(),
                 Requirement::EnergySkill(Skill::Blaze, amount.take()? as f32),
             ]),
-            Trick::WaveDash => Requirement::and([
+            Trick::Wavedash => Requirement::and([
                 self.trick.wave_dash.clone(),
                 Requirement::Skill(Skill::Dash),
+                Requirement::NonConsumingEnergySkill(Skill::Regenerate),
+            ]),
+            Trick::RegenJump => Requirement::and([
+                self.trick.regen_jump.clone(),
                 Requirement::NonConsumingEnergySkill(Skill::Regenerate),
             ]),
             Trick::GrenadeJump => Requirement::and([
@@ -556,6 +560,7 @@ struct TrickRequirements {
     flash_swap: Requirement,
     blaze_swap: Requirement,
     wave_dash: Requirement,
+    regen_jump: Requirement,
     grenade_jump: Requirement,
     sword_jump: Requirement,
     glide_jump: Requirement,
@@ -600,7 +605,8 @@ impl TrickRequirements {
             sentry_swap: build_trick(Trick::SentrySwap),
             flash_swap: build_trick(Trick::FlashSwap),
             blaze_swap: build_trick(Trick::BlazeSwap),
-            wave_dash: build_trick(Trick::WaveDash),
+            wave_dash: build_trick(Trick::Wavedash),
+            regen_jump: build_trick(Trick::RegenJump),
             grenade_jump: build_trick(Trick::GrenadeJump),
             sword_jump: build_trick(Trick::SwordJump),
             glide_jump: build_trick(Trick::GlideJump),

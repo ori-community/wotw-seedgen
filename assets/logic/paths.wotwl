@@ -24,7 +24,8 @@
 # SentrySwap=x: Extends to Sentry=x
 # BlazeSwap=x: Extends to Blaze=x
 # AbilitySwap=x: Extends to BlazeSwap=x OR FlashSwap OR SentrySwap=x
-# WaveDash: Extends to Dash, Regenerate and having energy to use it
+# Wavedash: Extends to Dash, Regenerate and having energy to use it
+# RegenJump: Extends to Regenerate and having energy to use it
 # GrenadeJump: Extends to Grenade and having energy to use it
 # GrenadeCancel: Extends to Grenade and having energy to use it
 # BowCancel: Extends to Bow and having energy to use it
@@ -296,7 +297,7 @@ anchor MarshSpawn.CaveEntrance at -588, -4393:  # before the door blocking regen
     unsafe:
       AerialHammerJump OR GlideHammerJump OR WallHammerJump  # Have to equip hammer on ability 3
       DoubleJump, TripleJump OR Hammer OR Spear=1 OR GlideJump OR GrenadeJump
-      WaveDash, DoubleJump OR Hammer OR Spear=1  # https://youtu.be/odX6-SYmQCQ
+      Wavedash, DoubleJump OR Hammer OR Spear=1  # https://youtu.be/odX6-SYmQCQ
       DoubleJump, Dash, Sword  # coyote dash from under the grappable plant
       Grapple, DoubleJump OR Dash  # Swing the plant with Grapple
       GlideJump, GrenadeJump, Dash
@@ -382,7 +383,7 @@ anchor MarshSpawn.CaveWaterfall at -845, -4438:  # At the first ledge next to th
       Glide  # walljump under the semisolid
       Spear=1  # too precise for kii
       BlazeSwap=1 OR FlashSwap OR PauseFloat
-      Regenerate, Blaze=1  # regenjump almost immediately then blaze when just under the branch
+      RegenJump, Blaze=1  # RegenJump almost immediately then blaze when just under the branch
 
 anchor MarshSpawn.BurrowFightArena at -959, -4406:  # at the right side of the BurrowFightArena
   refill Health=1
@@ -481,7 +482,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
     unsafe:
       Bash  # https://youtu.be/1Qo0KvCotvM
       Dash  # Dash ramp
-      # WaveDash, Combat=Bat
+      # Wavedash, Combat=Bat
       Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap
       # Insert theorical stupid PauseFlaot from where the bat is
   pickup MarshSpawn.BurrowsApproachLedgeSL:  # Make sure it's not redundant with MarshSpawn.PoolsBurrowsSignpost->MarshSpawn.BeforeBurrows->MarshSpawn.BurrowsApproachLedgeSL
@@ -949,7 +950,7 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       GrenadeJump=1, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
     unsafe:
       DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump  # djump then second movement option to reach the first wall in the ceiling. Then djump from one side of the wall to the other before going to the next wall with djump
-      WaveDash  # Wavedash on the health plant and regen jump
+      Wavedash, RegenJump  # From the health plant
       AbilitySwap=2
       Dash, BlazeSwap=1 OR SentrySwap=1  # coyote dash on last suspended platform then swap to the right side of the wooden wall under the EF
       GlideJump, BlazeSwap=1 OR SentrySwap=1  # same as above
@@ -1015,7 +1016,7 @@ anchor MarshSpawn.FangStonePillar at -256,-4411:  # Stone pillar bellow the susp
     unsafe:
       Hammer OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR GrenadeCancel OR AbilitySwap=1 OR PauseFloat
       Damage=10, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10
-      Regenerate  # https://youtu.be/3CpP4veOBSc regenjump
+      RegenJump  # https://youtu.be/3CpP4veOBSc
 
 anchor MarshSpawn.FangSuspendedPLatform at -247, -4394:
   nospawn
@@ -1038,7 +1039,7 @@ anchor MarshSpawn.FangSuspendedPLatform at -247, -4394:
       Sword  # upslash then downslash
       Shuriken=1 OR GrenadeJump OR AbilitySwap=1 OR Damage=10 OR PauseFloat
       Flash=1 OR Sentry=1  # https://youtu.be/U2khlKTXVzA
-      Regenerate, Spear=1  # https://youtu.be/3CpP4veOBSc regenjump
+      RegenJump, Spear=1  # https://youtu.be/3CpP4veOBSc
 
 anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to MarshSpawn.MokkSL
   pickup MarshSpawn.MokkSL: free
@@ -1716,7 +1717,7 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
       Sword OR Hammer
       Bash, Grenade=1
     kii: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Bow=1 OR Grenade=1 OR GrenadeCancel OR PauseFloat OR Regenerate  # regen jump
+    unsafe: Bow=1 OR Grenade=1 OR GrenadeCancel OR PauseFloat OR RegenJump
   conn MarshPastOpher.TrialStart:  # Make sure it's not redundant with MarshPastOpher.BowPath->MarshPastOpher.MillView->MarshPastOpher.TrialStart
     moki: Bash, Grenade=1
     gorlek: free
@@ -1765,15 +1766,15 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
       Bash, HammerExtension, Bow=1 OR Spear=1 OR Grenade=1  # Same as above but HammerExtension from the jumpad instead of using the first lantern
       Bash, Glide, Bow=1 OR Spear=1 OR Grenade=1 OR Shuriken=1  # https://youtu.be/LJmKEirEloM
       Sword OR Bow=1 OR Spear=1 OR Shuriken=1 OR Grenade=1 OR Blaze=1:  # break the corruption. Sword uses the jumpad, shuriken and blaze do a wavedash on the health plant to get in range. Sentry potentially possible by regen jumping out of that wavedash
-        Bash, WaveDash
-      WaveDash, Hammer  # upslash on the jumpad, if you're full health take a dboost on either the spikes or slime then long wavedash+regen jump
+        Bash, Wavedash
+      Wavedash, RegenJump, Hammer  # upslash on the jumpad, if you're full health take a dboost on either the spikes or slime then long wavedash+regen jump
       DoubleJump, TripleJump, Bash OR Combat=Slug:
-        WaveDash
+        Wavedash
   conn MarshPastOpher.OpherSkipBranch:  # Make sure it's not redundant with MarshPastOpher.MillView->MarshPastOpher.OpherSkipBranch nor MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast
     unsafe:
       PauseFloat  # I hope it'll make you regret playing with that trick in logic
-      WaveDash, Glide  # wavedash off health plant
-      WaveDash, DoubleJump, Sword OR Hammer
+      Wavedash, Glide  # wavedash off health plant
+      Wavedash, DoubleJump, Sword OR Hammer
 
 anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit with bow tree.
   refill Energy=1:
@@ -1997,7 +1998,7 @@ anchor MarshPastOpher.PoolsPathOneWayWall at -744, -4173:  # Left of the one way
       Damage=20, Hammer OR Sentry=2
       Damage=10, DoubleJump OR Dash OR AbilitySwap=1 OR GlideJump
       GlideJump, DoubleJump OR Dash
-      AerialHammerJump OR GlideHammerJump OR WaveDash
+      AerialHammerJump OR GlideHammerJump OR Wavedash
 
 anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bellow PoolsPathOneWayWall
   state MarshPastOpher.PoolsPathFloor:  # No paths with Bash because then you can go to PoolsPathOneWayWall and destroy the wall with either hammer or a single spear and then the ceiling with just bash from MarshPastOpher.PoolsPathEast
@@ -2024,7 +2025,7 @@ anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bell
       DoubleJump, Spear=1, Water OR Damage=10 OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       AbilitySwap=1, Spear=1  # Use Spear just after passing above the spikes to snipe the ceiling
       DashBashChain  # https://youtu.be/H0tGcrzQW1o
-      Sword OR WaveDash OR PauseFloat:  # sword downslash at the end
+      Sword OR Wavedash OR PauseFloat:  # sword downslash at the end
         Hammer OR Spear=1
       
   conn MarshPastOpher.PoolsPathOneWayWall:
@@ -2068,7 +2069,7 @@ anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bell
     unsafe, MarshPastOpher.PoolsPathFloor:
       Bash, Flash=1 OR Sentry=1 OR BlazeSwap=1
       DoubleJump, Water OR Damage=10 OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
-      WaveDash OR PauseFloat OR AbilitySwap=3
+      Wavedash OR PauseFloat OR AbilitySwap=3
 
 anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of MarshPastOpher.PoolsPathSL
   refill Checkpoint
@@ -3397,7 +3398,7 @@ anchor EastHollow.Teleporter at -150, -4237:  # the teleporter
     unsafe:
       EastHollow.BeetleDefeated  # Grab the vine by jumping from its right. Alternatively, can QtM after defeating the boss to lower the vine which makes grabbing it possible from the left or just under it.
       SentryJump=1  # sentryjump from the arena to the vine then weapon hover. Sword use horizontal combo + down attack to grab the vine
-      WaveDash, DoubleJump  # wavedash off the teleporter
+      Wavedash, DoubleJump  # wavedash off the teleporter
   conn EastHollow.VoiceDoorPlatform:
   # paths where the beetle is still alive, going from here is more advantageous than going from EastHollow.AfterBeetleFight
   # paths using EastHollow.BeetleDefeated originate from EastHollow.AfterBeetleFight instead
@@ -3470,7 +3471,7 @@ anchor EastHollow.VoiceDoorPlatform at -96, -4222:  # right to the voice door
     unsafe:
       Glide
       CoyoteHammerJump OR WallHammerJump  # the hammer stall after the walljump on the ceiling looks veeery precise
-      WaveDash  # both the door and the wall after the moki works
+      Wavedash  # both the door and the wall after the moki works
       DoubleJump, Spear=1 OR Flash=1 OR Sentry=1  # Spear either extends djump or ceiling jump (like flash/sentry)
       DoubleJump, Shuriken=2  # shuriken -> djump -> shuriken directly to the vine
       GrenadeJump, DoubleJump OR Dash OR Sword
@@ -4268,7 +4269,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
       # GrenadeJump=1, DoubleJump OR Hammer
     unsafe:  # gjumps goes through GladesTown.LeftUpdraft because it would softlock with the 2nd hut otherwise
       # Grenade=1, Sword  # Grenade Pogos. Commented because I'm pretty sure this is impossible once you build the second house
-      WaveDash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
+      Wavedash  # wavedash from where Tuley is. If the second house is built, you have to jump out of your wavedash.
       Dash, GlideJump  # coyote dash from where Tuley. Also possible without a coyote dash once the second hut is built
       Dash, Burrow  # Pretty sure you need a fake burrow once the 2nd hut is built
       GladesTown.Lightcatchers, Bash  # https://youtu.be/dPruhdk4jYs
@@ -4886,7 +4887,7 @@ anchor GladesTown.LeftUpdraft at -239, -4136:  # On the platform hovering to the
     kii: GladesTown.Lightcatchers, Bash, Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
       GladesTown.Lightcatchers, Bash
-      GladesTown.SpringPlants, WaveDash  # https://youtu.be/3PvuIK07M1E  haha nice path
+      GladesTown.SpringPlants, Wavedash  # https://youtu.be/3PvuIK07M1E  haha nice path
   conn GladesTown.AboveOpher:
     moki: DoubleJump
     gorlek: Dash OR Glide
@@ -6285,7 +6286,7 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
       SentryJump=1, Glide OR Damage=15
     unsafe:
       Dash  # Coyote dash to grab the wheel on the right and use friendly spike on the very edge of the platform.
-      DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel OR Regenerate OR PauseFloat OR Damage=15  # Condition to grab the wheel (regen is a regen jump). There's a little friendly spike area on the very edge of the platform
+      DoubleJump, TripleJump OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel OR RegenJump OR PauseFloat OR Damage=15  # Condition to grab the wheel. There's a little friendly spike area on the very edge of the platform
       Bash, Grenade=1, Sentry=2, Damage=10
       AbilitySwap=3
       Damage=10, BlazeSwap=2 OR SentrySwap=2
@@ -7843,7 +7844,7 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
       Glide OR PauseFloat  # No Glide jump, just start from the higher ground
       GrenadeJump, DoubleJump
       SwordJump  # https://youtu.be/WWermg8hs8g / was written as Sword, DoubleJump but that's the only solution I managed to get
-      WaveDash  # Also possible with Blaze
+      Wavedash  # Also possible with Blaze
 
   conn Teleporters: free
   conn WoodsEntry.BelowTeleporter: free
@@ -8796,7 +8797,7 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
     unsafe:
       Bash  # Swing the lantern and get a good cycle on the swing animation of the second lantern
       Shuriken=2 OR AbilitySwap=1
-      Regenerate, Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # regen jump
+      RegenJump, Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       GrenadeCancel, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
   conn WoodsShrine:  # Make sure this isn't redundant with AbovePit->FeedingGrounds->WoodsShrine
     gorlek: Damage=15, DoubleJump OR Dash
@@ -11903,7 +11904,7 @@ anchor LowerDepths.East at 570, -4550:  # The lit up room on the trial path
       Bash, GrenadeCancel  # Grenade Zoom.
       DoubleJump, GrenadeJump
       GlideJump
-      WaveDash  # The slope on the platform is Wave-Dash-safe for some reason.
+      Wavedash  # The slope on the platform is Wave-Dash-safe for some reason.
       DepthsLight, Shuriken=3  # Double shuriken catch.
       DepthsLight, Damage=30, Damage=30
       DepthsLight, Damage=30, Blaze=1 OR Sentry=1 OR Flash=1 OR Shuriken=1
@@ -15541,7 +15542,7 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
       Bash, Grenade=2
       Burrow, DoubleJump OR Sentry=3
       Damage=30, DoubleJump
-    unsafe: WaveDash  # off the health plant
+    unsafe: Wavedash  # off the health plant
 
   conn UpperWastes.OuterRuinsTP:
     moki: Burrow OR Launch OR Bash
@@ -15685,7 +15686,7 @@ anchor WindtornRuins.RuinsTP at 2130, -3984:  # Windtorn Ruins teleporter.
       Burrow, Sentry=3 OR Shuriken=2 OR Blaze=5
       Burrow, Hammer, Spear=1 OR Blaze=1
       PauseFloat, Burrow OR WindtornRuins.TeleporterCorruption
-      WindtornRuins.TeleporterCorruption, WaveDash OR Shuriken=3  # Sometimes you will bonk on the pillar with wavedash
+      WindtornRuins.TeleporterCorruption, Wavedash OR Shuriken=3  # Sometimes you will bonk on the pillar with wavedash
       WindtornRuins.TeleporterCorruption, Dash, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Sword  # Ceiling reset on the pillar
 
 anchor WindtornRuins.Escape at 2021, -4026:
@@ -16324,7 +16325,7 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
       Bash, Grenade=1
       Damage=40, Sword OR Hammer OR DoubleJump OR Dash  # Jump to the lava blob and use it as an elevator
       Dash, Shuriken=1
-      Dash, Blaze=1  # Blaze WaveDash off the floating platform
+      Dash, Blaze=1  # Blaze Wavedash off the floating platform
       AerialHammerJump
   conn WillowsEnd.GrappleHeartMidPoint:  # Connections going backwards without being able to break the heart
     unsafe:
