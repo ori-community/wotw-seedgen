@@ -104,9 +104,11 @@ on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneS
 // In vanilla, completing the Wellspring escape increases the Silent Teeth quest uberstate by 1 instead of directly setting it to 3.
 // In vanilla, there is an additional check after watching the soggy cutscene, the quest state updating, and autosaving: if the quest's value is 2, it gets set to 3.
 // This is probably a patch by Moon to "fix" not watching the cutscene outside, but it gets reverted if Ori dies before hitting another checkpoint.
-// In rando, we want the escape to consistently set the quest state to 3. Since InnerWellspring.WaterEscapeReward is set to `true` before the cutscene
-// starts, we use that to preemptively set the quest state to 2 to simulate the expected vanilla progression. If the quest has been completed, we do nothing.
-on InnerWellspring.WaterEscapeReward if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 store_without_triggers(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
+// It also doesn't help if the quest is not started, leaving the quest's value at 1 after the escape.
+// To prevent quest softlocks, before the vanilla logic happens, we set the quest to 2 (cutscene outside watched) if it is 1 (quest started) or 0 (quest not started).
+// The vanilla logic then increases the quest to 3 (escape cleared) and saves properly.
+// This fix does not prevent abusing the glitch to benefit, for example by finishing the quest through multiple wellspring escapes (although no such OOB is known).
+on InnerWellspring.WaterEscapeReward if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store_without_triggers(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
 // No one remembers what this does anymore.
 on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState, 8)
 // This is presumed to fix some multiplayer bug but no one really knows.
