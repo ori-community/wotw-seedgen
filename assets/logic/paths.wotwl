@@ -1537,7 +1537,9 @@ anchor MarshPastOpher.MillView at -596, -4293:  # Standing next to Opher, lookin
       Launch, DoubleJump
     kii:
       Launch OR SentryJump=1
-      DoubleJump, TripleJump, Bash, Water OR Grenade=1
+      Bash, Water OR Grenade=1:
+        DoubleJump, TripleJump
+        SwordJump
       AerialHammerJump, TripleJump
       AerialHammerJump, Bash, Water  # Combining with grenade is redundant with the top path
     unsafe:
@@ -1560,8 +1562,10 @@ anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
     kii:
       Launch OR SentryJump=1
       Bash, Grenade=1, DoubleJump, TripleJump
+      SwordJump, TripleJump, Damage=10
       AerialHammerJump, TripleJump  # Combining with bashnade is redundant with the top path
     unsafe:
+      Bash, Grenade=1
       DoubleJump, TripleJump, Damage=10
       DoubleJump, Damage=20
       GlideHammerJump OR Damage=30
@@ -1601,7 +1605,7 @@ anchor MarshPastOpher.UnderTrunk at -573, -4339:  # After breaking the tree trun
   pickup MarshPastOpher.TrialLeftSL:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer OR Damage=10  # Horizontal slash combo
-    kii: Sentry=1 OR Flash=1 OR Spear=1 OR Blaze=1 OR Shuriken=1  # Use Sentry instead of DoubleJump
+    kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe: free  # https://youtu.be/F_4nWtGCcBM
 
   conn MarshPastOpher.TrialArea: free
@@ -1631,8 +1635,7 @@ anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
       Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1
       Damage=10, Spear=1 OR Blaze=1
     unsafe:
-      Damage=10
-      Grenade=1 OR GrenadeCancel  # Use grenade before landing on the left bouncepad
+      PauseFloat OR GrenadeCancel OR BlazeSwap=1 OR FlashSwap OR Damage=10  # Use grenade before landing on the left bouncepad
       Unpopular, Bash  # Can place the slug on the lower bouncepad and juggle yourself up. Precise.
   pickup MarshPastOpher.TrialHF:
     moki: Hammer OR Spear=1
@@ -1646,9 +1649,9 @@ anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
     kii:
       Bash  # the mantis usually jump into spikes but you can use the slime instead
       Dash, Sword OR Hammer
-      GlideJump  # OR GrenadeJump=1
+      GlideJump OR GrenadeJump=1
     unsafe:
-      Dash OR Sword OR Hammer OR Spear=1 OR GrenadeJump OR AbilitySwap=1
+      Dash OR Sword OR Hammer OR Spear=1 OR AbilitySwap=1
 
   conn MarshShrine: free
   conn MarshPastOpher.UnderTrunk:  # Make sure it's not redundant with MarshPastOpher.TrialArea->MarshPastOpher.BowPath->MarshPastOpher.UnderTrunk
@@ -1660,20 +1663,24 @@ anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
       Damage=10, DoubleJump OR Dash OR Glide
     kii: Damage=20  # If you jump at the wrong place, you'll take another dboost
     unsafe:
-      Dash OR DoubleJump OR Damage=10 OR SentrySwap=1 OR BlazeSwap=1 OR FlashSwap
+      Dash OR DoubleJump OR Damage=10 OR AbilitySwap=1
       Spear=1  # https://youtu.be/EYPELh1H0UY
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      Grenade=1, Bash  # standing on a piece of wood on the edge of the spikes
+      Bash, Grenade=1  # standing on a piece of wood on the edge of the spikes
   conn MarshPastOpher.BowPath:
     moki, BreakWall=20:
       Bash, DoubleJump OR Dash OR Glide OR Grapple OR Launch
       Combat=Mantis+SneezeSlug, DoubleJump OR Dash OR Glide OR Grapple OR Launch
-    gorlek, BreakWall=20:
-      Sword OR Hammer OR Launch
-      Bash, Grenade=1
-    kii, BreakWall=20:
-      Bash OR Shuriken=3 OR Sentry=4 OR Blaze=6
-      # GrenadeJump, Combat=Mantis+SneezeSlug, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # No gjump energy cost because grabbing the pole cancel grenade automatically
+    gorlek:
+      Sword OR Hammer 
+      BreakWall=20:
+        Launch
+        Bash, Grenade=1
+    kii:
+      BreakWall=20:
+        Bash  # activate the shrine and bash the enemies
+        Combat=Mantis+SneezeSlug, Shuriken=3 OR Sentry=4 OR Blaze=6
+        GrenadeJump=1, Combat=Mantis+SneezeSlug, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       Bash OR DoubleJump OR Dash OR Glide OR Grapple OR Launch OR Spear=2 OR Shuriken=2 OR Blaze=2 OR Flash=2 OR Sentry=2 OR BowCancel OR FlashSwap OR PauseFloat  #  https://youtu.be/4TnvbyW1BHE
       GrenadeJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -1707,7 +1714,7 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
     kii:
       Bash, Damage=10  # Mantis used to disappear when spawning at this anchor. Slime do not spawn in easy 
       Damage=10, Blaze=3 OR Sentry=2
-      # GrenadeJump  # No energy cost because grabbing the pole cancel grenade automatically
+      GrenadeJump=1, Damage=10
     unsafe: Bash OR Shuriken=1 OR Blaze=2 OR Sentry=2 OR GrenadeJump
 
   conn MarshPastOpher.BowApproach:
@@ -1717,12 +1724,12 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
       Bash, Grenade=2
       Glide, Sword OR Hammer
     kii:
-      Sword OR Hammer OR Sentry=3 OR GlideJump  # OR GrenadeJump=1  # actually two gjump but the first one cancel grenade automatically by grabbing the pole
+      Sword OR Hammer OR Sentry=3 OR GlideJump OR GrenadeJump=2
       Sentry=2, Shuriken=1 OR Flash=1
       Blaze=3, Spear=1 OR Shuriken=1 OR Flash=1
     unsafe:
       Glide  # make the suspended platform swing
-      Shuriken=2 OR GrenadeJump
+      Shuriken=2
       Blaze=2, Spear=1 OR Flash=1  # using shuriken is more energy than Shuriken=2 / using sentry is the same energy requirement as Sentry=3
   conn MarshPastOpher.MillView:
     moki:
@@ -1732,7 +1739,7 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
       Sword OR Hammer
       Bash, Grenade=1
     kii: Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Bow=1 OR Grenade=1 OR GrenadeCancel OR PauseFloat OR RegenJump
+    unsafe: Bow=1 OR GrenadeCancel OR PauseFloat OR RegenJump OR FlashSwap
   conn MarshPastOpher.TrialStart:  # Make sure it's not redundant with MarshPastOpher.BowPath->MarshPastOpher.MillView->MarshPastOpher.TrialStart
     moki: Bash, Grenade=1
     gorlek: free
@@ -1753,10 +1760,10 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
     gorlek: Sword OR Hammer OR Damage=10
     kii:
       Shuriken=1 OR Flash=1 OR Sentry=1
-      # GrenadeJump=1, Spear=1 OR Blaze=1
+      GrenadeJump=1, Spear=1 OR Blaze=1
     unsafe: Spear=1 OR Blaze=2 OR GrenadeCancel OR PauseFloat OR BlazeSwap=1 OR FlashSwap
   conn MarshPastOpher.MillView:
-    moki: Bash, Grenade=1  # this is the only non-redundant connection that will ever exist.
+    moki: Bash, Grenade=1  # this is the only non-redundant connection that will ever exist because everything else can pass through MarshPastOpher.BowPath first
   conn MarshPastOpher.PoolsPathEast:
     moki:
       Bow=4, DoubleJump, Dash, Bash, Glide  # autoaim doesn't catch the second target, 2 is needed minimum
@@ -1789,7 +1796,7 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
     unsafe:
       PauseFloat  # I hope it'll make you regret playing with that trick in logic
       Wavedash, Glide  # wavedash off health plant
-      Wavedash, DoubleJump, Sword OR Hammer
+      Wavedash, DoubleJump, RegenJump, Sword OR Hammer
 
 anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit with bow tree.
   refill Energy=1:
