@@ -24,7 +24,6 @@ Supply lasts indefinitely, but the price grows with the demand.")
         keystone_icon,
     )
 
-    !remove_location(OpherShop.Slot12)
     on reload disable_server_sync(OpherShop.Slot12)
     on OpherShop.Slot12 {
         store(OpherShop.Slot12, false)
@@ -34,6 +33,10 @@ Supply lasts indefinitely, but the price grows with the demand.")
             store(keystone_price, keystone_price + base_price)
             set_shop_item_price(OpherShop.Slot12, keystone_price)
         }
+    }
+
+    !only_simulation {
+        on spawn store_without_triggers(OpherShop.Slot12, true)
     }
 }
 
@@ -49,7 +52,6 @@ Supply lasts indefinitely, but the price grows with the demand.")
         ore_icon,
     )
 
-    !remove_location(TwillenShop.Slot5)
     on reload disable_server_sync(TwillenShop.Slot5)
     on TwillenShop.Slot5 {
         store(TwillenShop.Slot5, false)
@@ -59,5 +61,9 @@ Supply lasts indefinitely, but the price grows with the demand.")
             store(ore_price, ore_price + base_price)
             set_shop_item_price(TwillenShop.Slot5, ore_price)
         }
+    }
+
+    !only_simulation {
+        on spawn store_without_triggers(TwillenShop.Slot5, true)
     }
 }
