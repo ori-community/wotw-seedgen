@@ -352,7 +352,7 @@ UpperWastes.SpinLasersLowerSL, Wastes, SpiritLight, 100, 7228, 61548, , 1935.2, 
 UpperWastes.FlowersSeed, Wastes, Seed, , 14019, 20601, , 1995.7, -3650.6, 1995.6826, -3650.5928
 UpperWastes.WallOre, Wastes, GorlekOre, , 7228, 8370, , 1951.6, -3615.8, 1951.6055, -3615.8252
 WindtornRuins.EscapeRevisitEF, Ruins, EnergyFragment, , 10289, 44555, , 2053.7, -4050.2, 2053.74, -4049.1924
-WindtornRuins.EscapeReward, Ruins, Wisp, Seir, 10289, 19890, 3, 2151, -3568, 2151, -3568
+WindtornRuins.EscapeReward, Ruins, Wisp, Seir, 10289, 22102, , 2151, -3568, 2151, -3568
 WindtornRuins.HandToHandComplete, Ruins, QuestItem, Secrets, 14019, 26318, 11, 1969, -4024, 1969, -4024
 WeepingRidge.Ore, Woods, GorlekOre, , 36153, 3013, , 1305.5, -3732.6, 1305.48, -3732.58
 WeepingRidge.LaunchTree, Woods, Skill, Launch, 0, 8, , 1363, -3815, 1362.97, -3809.77

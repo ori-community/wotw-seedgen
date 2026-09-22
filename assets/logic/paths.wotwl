@@ -15727,7 +15727,7 @@ anchor WindtornRuins.Escape at 2021, -4026:
 
   # windtornRuinsGroup.desertRuinsEscape (10289|19890=1) when the initial cutscene starts
   # windtornRuinsGroup.desertRuinsEscape (10289|19890=2) when the chase starts
-  # Seir ability (2|108) during the cutscene
+  # Seir ability (24|108) during the cutscene, but it logically lives at WindtornRuins.EscapeEnd to prevent softlocks
 
   # After you complete the escape, there's a gap in the floor to its right, making the location unreachable with skillsets
   # that would have reached it before completing the escape. That's why this has no outside connections; the paths to here
@@ -15775,10 +15775,7 @@ anchor WindtornRuins.EscapeEnd at 2150, -3567:  # At the escape end trigger
   state WindtornRuins.EscapeCompleted: free
   state WindtornRuins.SiftingSandsCompleted: free  # When the rocks fall on the sandworm
 
-  # This would be windtornRuinsGroup.wispRewardPickup (10289|22102) but it's possible to lock yourself out of that pickup with Patience Skip.
-  pickup WindtornRuins.EscapeReward: free
-  # Documented just in case
-  # pickup windtornRuinsGroup.wispRewardPickup: free  # After walking left and watching the cutscene
+  pickup WindtornRuins.EscapeReward: free  # seed_core has a patch for Patience Skip locking you out of this pickup
 
 anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedestal
   pickup WindtornRuins.HandToHandComplete:
