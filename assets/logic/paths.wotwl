@@ -4044,8 +4044,8 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       Damage=120, Damage=120, Bash
       Damage=50, Damage=80, WaterDash  # Take a dboost from the mortar projectile before going in the water
 
-  pickup EastHollow.KwolokAmuletQuest:
-    moki: EastPools.KwolokAmuletQI, WestPools.LostParadiseCompleted
+  pickup EastHollow.KwoloksWisdomCompleted:
+    moki: EastPools.KwolokAmuletQI, EastPools.KwoloksWisdomBossDefeated, WestPools.LostParadiseCompleted  # Lost Paradise spawns the altar, Kwolok's Wisdom allows interacting with the altar, QI required to turn it in
   pickup EastHollow.RightKwolokSL:
     moki: Bash OR Launch
     gorlek: SentryJump=1
@@ -12820,8 +12820,14 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       PoolsApproach.WheelWall, WaterDash, Damage=120
       Damage=60, Spear=1
       WaterDash, Damage=40, Spear=1
+  state EastPools.KwoloksWisdomStarted: free  # Start of the Kwolok's Wisdom quest
+  state EastPools.KwoloksWisdomAmuletObtained:  # Report back to the moki after finding Kwolok in CentralRoom
+    moki: EastPools.KwolokMetHalfway
+  state EastPools.KwoloksWisdomBossDefeated:  # Report back to the moki after defeating Kwolok
+    moki: EastPools.KwolokAmuletQI, EastPools.KwoloksWisdomAmuletObtained, WestPools.LostParadiseCompleted
 
-  pickup EastPools.KwolokAmuletQI: free
+  pickup EastPools.KwolokAmuletQI:
+    moki: EastPools.KwolokMetHalfway
   pickup EastPools.TwoCrushersSL:
     moki: Water, WaterDash
     kii: WaterDash, Damage=40
@@ -13484,6 +13490,7 @@ anchor EastPools.MissilePuzzle at -1425, -4144:  # Below where the trial starts
 anchor EastPools.CentralRoom at -1485, -4148:  # The room where you meet Kwolok when he's still fine
   refill Checkpoint
 
+  state EastPools.KwolokMetHalfway: free  # The cutscene where you meet Kwolok when he's still fine
   state EastPools.CentralRoomPurpleWall:  # @Validator Could had moki/gorlek paths if knowing that a tentacle projectile can break the wall isn't too heavy of the knowledge side
     kii: Water OR Damage=60  # no waterdash path because the tentacle is not shooting a projectile if you water dash into it
     unsafe:

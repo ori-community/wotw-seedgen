@@ -88,7 +88,7 @@ fun write_missing_quests() { new_row("#Missing Quests (" + (quests_required - it
 !if rough_diamond { !augment_fun(write_missing_quests(), if questUberStateGroup.desertCogQuest < 5 add_row_item("Rough Diamond")) }
 !if hand_to_hand { !augment_fun(write_missing_quests(), if WindtornRuins.HandToHandComplete == false add_row_item("Hand to Hand")) }
 !if into_darkness { !augment_fun(write_missing_quests(), if GladesTown.MokiAcornQuest == false add_row_item("Into Darkness")) }
-!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwolokAmuletQuest == false add_row_item("Kwolok's Wisdom")) }
+!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwoloksWisdomCompleted == false add_row_item("Kwolok's Wisdom")) }
 !if rebuilding_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RebuildTheGlades == false add_row_item("Rebuilding the Glades")) }
 !if regrowing_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RegrowTheGlades == false add_row_item("Regrowing the Glades")) }
 !augment_fun(write_missing_quests(), add_current_row())
@@ -178,11 +178,11 @@ on change itemTracker.questsCount update_goals()
 }
 
 !if kwoloks_wisdom {
-    on EastHollow.KwolokAmuletQuest {
+    on EastHollow.KwoloksWisdomCompleted {
         create_stats_entry(QuestEnd, "Kwolok's Wisdom")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on EastHollow.KwolokAmuletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on EastHollow.KwoloksWisdomCompleted == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if rebuilding_the_glades {

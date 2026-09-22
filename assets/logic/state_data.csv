@@ -131,6 +131,9 @@ PoolsApproach.WheelWall, 945, 28631,
 PoolsApproach.WheelFreed, 945, 12852,
 PoolsApproach.UnderwaterWallBroken, 945, 55795,
 PoolsApproach.MillPathEFWall, 945, 3487,
+EastPools.KwoloksWisdomStarted, 14019, 50597, 1
+EastPools.KwoloksWisdomAmuletObtained, 14019, 50597, 2
+EastPools.KwoloksWisdomBossDefeated, 14019, 50597, 3
 EastPools.TeleporterActive, 945, 58183,
 EastPools.TokkBubbleFree, 5377, 35751,
 EastPools.TokkBubblePurpleWall, 5377, 26170,
@@ -143,6 +146,7 @@ EastPools.LowerWaterDrained, 5377, 63173,
 EastPools.LupoPurpleFloor, 5377, 8451,
 EastPools.CentralRoomPurpleWall, 5377, 10782,
 EastPools.CentralRoomBubbleFree, 5377, 57453,
+EastPools.KwolokMetHalfway, 5377, 21700,
 UpperPools.TrialActivation, 44964, 54686, 1
 UpperPools.KeystoneDoor, 5377, 47621,
 UpperPools.KeystoneRoomBubbleFree, 5377, 15754,
