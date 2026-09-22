@@ -417,6 +417,7 @@ impl Requirement {
             | (Self::SpiritLight(a), Self::SpiritLight(b))
             | (Self::GorlekOre(a), Self::GorlekOre(b))
             | (Self::Keystone(a), Self::Keystone(b)) => a.cmp(b),
+            (Self::ShopItemVisible(a), Self::ShopItemVisible(b)) => a.cmp(b),
             (Self::Skill(a), Self::Skill(b)) => a.cmp(b),
             (Self::Shard(a), Self::Shard(b)) => a.cmp(b),
             (Self::Teleporter(a), Self::Teleporter(b)) => a.cmp(b),
@@ -617,6 +618,9 @@ impl Requirement {
             (Self::Difficulty(a), Self::Difficulty(b)) => Some(a.cmp(b)),
             (Self::Trick(a), Self::Trick(b)) => (a == b).then_some(Ordering::Equal),
             (Self::State(a), Self::State(b)) | (Self::Extern(a), Self::Extern(b)) => {
+                (a == b).then_some(Ordering::Equal)
+            }
+            (Self::ShopItemVisible(a), Self::ShopItemVisible(b)) => {
                 (a == b).then_some(Ordering::Equal)
             }
             (Self::NonConsumingEnergySkill(a), Self::NonConsumingEnergySkill(b))

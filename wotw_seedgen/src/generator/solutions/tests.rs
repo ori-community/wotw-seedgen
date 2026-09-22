@@ -108,7 +108,7 @@ fn sort_test_solutions(solutions: &mut Vec<Vec<(CommandVoid, u32)>>) {
 
 fn solution_sort_key((item, amount): &(CommandVoid, u32)) -> (CommonItem, u32) {
     (
-        item.direct_contained_writes(&[])
+        item.direct_contained_uber_state_writes(&[])
             .common_items()
             .next()
             .unwrap(),

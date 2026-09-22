@@ -91,7 +91,11 @@ impl ItemMetadataRef<'_, '_, '_> {
             .try_force_name()
             .and_then(|name| name.into_constant().ok())
         {
-            None => match single_item(self.command.contained_writes(commands).common_items()) {
+            None => match single_item(
+                self.command
+                    .contained_uber_state_writes(commands)
+                    .common_items(),
+            ) {
                 None => self.command.to_string(),
                 Some(common_item) => common_item.log_name().to_string(),
             },
@@ -112,7 +116,7 @@ impl ItemMetadataRef<'_, '_, '_> {
         self.shop_price().or_else(|| {
             let price = self
                 .command
-                .contained_writes(commands)
+                .contained_uber_state_writes(commands)
                 .common_identifiers()
                 .map(CommonUberIdentifier::shop_price)
                 .sum::<i32>();
@@ -155,7 +159,7 @@ impl ItemMetadataRef<'_, '_, '_> {
         self.icon().or_else(|| {
             single_item(
                 self.command
-                    .contained_writes(commands)
+                    .contained_uber_state_writes(commands)
                     .common_identifiers()
                     .filter_map(CommonUberIdentifier::icon),
             )
@@ -175,7 +179,7 @@ impl ItemMetadataRef<'_, '_, '_> {
         self.map_icon().or_else(|| {
             single_item(
                 self.command
-                    .contained_writes(commands)
+                    .contained_uber_state_writes(commands)
                     .common_identifiers()
                     .map(CommonUberIdentifier::map_icon),
             )

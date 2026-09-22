@@ -3,7 +3,8 @@ use crate::{
     seed_language::{
         output::{CommandsOutput, Trigger},
         simulate::{
-            condition_values::ConditionValues, set_uber_state, Heap, Simulate, Stack, UberStates,
+            condition_values::ConditionValues, set_uber_state, shop_state::ShopState, Heap,
+            Simulate, Stack, UberStates, WorldState,
         },
     },
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
@@ -11,19 +12,45 @@ use crate::{
 use strum::VariantArray;
 
 pub trait Simulation: Sized {
-    fn stack(&self) -> &Stack;
+    fn world_state(&self) -> &WorldState;
 
-    fn stack_mut(&mut self) -> &mut Stack;
+    fn world_state_mut(&mut self) -> &mut WorldState;
 
-    fn heap(&self) -> &Heap;
+    fn stack(&self) -> &Stack {
+        &self.world_state().stack
+    }
 
-    fn heap_mut(&mut self) -> &mut Heap;
+    fn stack_mut(&mut self) -> &mut Stack {
+        &mut self.world_state_mut().stack
+    }
 
-    fn uber_states(&self) -> &UberStates;
+    fn heap(&self) -> &Heap {
+        &self.world_state().heap
+    }
 
-    fn uber_states_mut(&mut self) -> &mut UberStates;
+    fn heap_mut(&mut self) -> &mut Heap {
+        &mut self.world_state_mut().heap
+    }
 
-    fn condition_values(&mut self) -> &mut ConditionValues;
+    fn uber_states(&self) -> &UberStates {
+        &self.world_state().uber_states
+    }
+
+    fn uber_states_mut(&mut self) -> &mut UberStates {
+        &mut self.world_state_mut().uber_states
+    }
+
+    fn condition_values(&mut self) -> &mut ConditionValues {
+        &mut self.world_state_mut().condition_values
+    }
+
+    fn shops(&self) -> &ShopState {
+        &self.world_state().shops
+    }
+
+    fn shops_mut(&mut self) -> &mut ShopState {
+        &mut self.world_state_mut().shops
+    }
 
     #[inline]
     fn register_trigger(&mut self, trigger: &mut Trigger, event_index: usize) {
@@ -32,6 +59,16 @@ pub trait Simulation: Sized {
 
     #[inline]
     fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        let _ = (uber_identifier, output);
+    }
+
+    #[inline]
+    fn on_shop_unhidden(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        let _ = (uber_identifier, output);
+    }
+
+    #[inline]
+    fn on_shop_unlocked(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
         let _ = (uber_identifier, output);
     }
 

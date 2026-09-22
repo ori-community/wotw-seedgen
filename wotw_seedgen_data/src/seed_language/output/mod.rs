@@ -12,9 +12,10 @@ pub use command::{
     CommandZone, IntoConstant,
 };
 pub use contained_uber_identifiers::{
-    CommandVoidWrites, CommonItem, CommonUberStateWrite, CommonWriteCommand, ContainedWrites,
-    ContainedWritesExt, ContainedWritesIter, UberStateWrite, UberStateWriteGeneric,
-    UberStateWriteOwned, WriteCommand, WriteCommandOwned,
+    CommandVoidWrites, CommonItem, CommonItemLogName, CommonUberStateWrite, CommonWriteCommand,
+    ContainedUberStateWrites, ContainedWrites, ContainedWritesExt, ContainedWritesIter,
+    ShopBooleanWrite, ShopBooleanWriteOwned, ShopWrite, UberStateWrite, UberStateWriteGeneric,
+    UberStateWriteOwned, Write, WriteCommand, WriteCommandOwned, WriteExtra,
 };
 pub use event::{ClientEvent, Event, Trigger, TriggerCondition};
 pub use intermediate::{Constant, Literal, Reference, VariableValue};

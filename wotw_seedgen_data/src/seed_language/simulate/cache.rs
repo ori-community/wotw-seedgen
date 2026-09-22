@@ -7,9 +7,7 @@ use crate::{
     assets::UberStateValue,
     seed_language::{
         output::CommandsOutput,
-        simulate::{
-            condition_values::ConditionValues, Heap, Simulation, Snapshot, Stack, UberStates,
-        },
+        simulate::{Simulation, Snapshot, WorldState},
     },
     CommonUberIdentifier, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
 };
@@ -131,32 +129,12 @@ impl Cache {
 }
 
 impl<S: Simulation> Simulation for SimulationCache<S> {
-    fn stack(&self) -> &Stack {
-        self.simulation.stack()
+    fn world_state(&self) -> &WorldState {
+        self.simulation.world_state()
     }
 
-    fn stack_mut(&mut self) -> &mut Stack {
-        self.simulation.stack_mut()
-    }
-
-    fn heap(&self) -> &Heap {
-        self.simulation.heap()
-    }
-
-    fn heap_mut(&mut self) -> &mut Heap {
-        self.simulation.heap_mut()
-    }
-
-    fn uber_states(&self) -> &UberStates {
-        self.simulation.uber_states()
-    }
-
-    fn uber_states_mut(&mut self) -> &mut UberStates {
-        self.simulation.uber_states_mut()
-    }
-
-    fn condition_values(&mut self) -> &mut ConditionValues {
-        self.simulation.condition_values()
+    fn world_state_mut(&mut self) -> &mut WorldState {
+        self.simulation.world_state_mut()
     }
 
     fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
@@ -166,6 +144,14 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
 
     fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
         self.simulation.on_change(uber_identifier, output);
+    }
+
+    fn on_shop_unhidden(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.simulation.on_shop_unhidden(uber_identifier, output);
+    }
+
+    fn on_shop_unlocked(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.simulation.on_shop_unlocked(uber_identifier, output);
     }
 
     fn store_spirit_light(&mut self, value: i32, output: &CommandsOutput) {

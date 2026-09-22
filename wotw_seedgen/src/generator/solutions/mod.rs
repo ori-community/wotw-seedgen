@@ -35,7 +35,8 @@ use wotw_seedgen_data::{
     logic_language::output::{Connection, Graph, Node, Requirement},
     seed_language::{
         output::{
-            CommandVoid, CommandsOutput, CommonWriteCommand, IntermediateOutput, UberStateWrite,
+            CommandVoid, CommandsOutput, CommonWriteCommand, IntermediateOutput,
+            ShopBooleanWriteOwned, UberStateWrite,
         },
         simulate::{Simulate, Simulation, Snapshot},
     },
@@ -43,7 +44,7 @@ use wotw_seedgen_data::{
 };
 
 use crate::{
-    item_pool::ItemPool,
+    item_pool::{Item, ItemPool},
     logical_difficulty::LogicalDifficulty,
     orbs::OrbVariants,
     world::{
@@ -337,13 +338,22 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         spirit_light_slots: usize,
         search_radius: Option<u8>,
     ) -> Vec<Solution<'graph>> {
-        let fails = self.fails();
-        let initial_solutions = fails
-            .uber_state
+        let ReachStateFails {
+            uber_state,
+            logical_state: _,
+            shop_item_hidden,
+            shop_item_locked,
+            health,
+            energy,
+        } = self.fails();
+
+        let initial_solutions = uber_state
             .values()
             .flatten()
-            .chain(&fails.health)
-            .chain(&fails.energy)
+            .chain(shop_item_hidden.values())
+            .chain(shop_item_locked.values())
+            .chain(health)
+            .chain(energy)
             .collect::<FxHashSet<_>>()
             .into_iter()
             .map(|fail| PartialSolution::new(fail.clone(), item_pool, search_radius))
@@ -828,9 +838,16 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
     ) -> FxHashSet<ConnectionIndex<'graph>> {
         let mut new_fails = FxHashSet::default();
 
-        let fails = self.world.fails();
+        let ReachStateFails {
+            uber_state,
+            logical_state: _,
+            shop_item_hidden,
+            shop_item_locked,
+            health,
+            energy,
+        } = self.world.fails();
 
-        for (current_uber_identifier, current_connections) in &fails.uber_state {
+        for (current_uber_identifier, current_connections) in uber_state {
             let current_connections_iter = current_connections.iter();
 
             let initial_filter = self
@@ -877,26 +894,65 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             }
         }
 
-        new_fails.extend(
-            fails
-                .health
-                .iter()
-                .filter(|fail| {
-                    !self.initial_fails.health.contains(fail)
-                        && solution.new_fails.health.insert((*fail).clone())
-                })
-                .cloned(),
+        fn new_shop_item_fails<'graph>(
+            new_fails: &mut FxHashSet<ConnectionIndex<'graph>>,
+            current: &FxHashMap<UberIdentifier, ConnectionIndex<'graph>>,
+            initial: &FxHashMap<UberIdentifier, ConnectionIndex<'graph>>,
+            solution: &mut FxHashMap<UberIdentifier, ConnectionIndex<'graph>>,
+        ) {
+            new_fails.extend(
+                current
+                    .iter()
+                    .filter(|&(current_uber_identifier, current_connection)| {
+                        !initial.contains_key(current_uber_identifier)
+                            && solution
+                                .insert(*current_uber_identifier, current_connection.clone())
+                                .is_none()
+                    })
+                    .map(|(_, connection)| connection.clone()),
+            );
+        }
+
+        new_shop_item_fails(
+            &mut new_fails,
+            shop_item_hidden,
+            &self.initial_fails.shop_item_hidden,
+            &mut solution.new_fails.shop_item_hidden,
         );
 
-        new_fails.extend(
-            fails
-                .energy
-                .iter()
-                .filter(|fail| {
-                    !self.initial_fails.energy.contains(fail)
-                        && solution.new_fails.energy.insert((*fail).clone())
-                })
-                .cloned(),
+        new_shop_item_fails(
+            &mut new_fails,
+            shop_item_locked,
+            &self.initial_fails.shop_item_locked,
+            &mut solution.new_fails.shop_item_locked,
+        );
+
+        fn new_orb_fails<'graph>(
+            new_fails: &mut FxHashSet<ConnectionIndex<'graph>>,
+            current: &FxHashSet<ConnectionIndex<'graph>>,
+            initial: &FxHashSet<ConnectionIndex<'graph>>,
+            solution: &mut FxHashSet<ConnectionIndex<'graph>>,
+        ) {
+            new_fails.extend(
+                current
+                    .iter()
+                    .filter(|fail| !initial.contains(fail) && solution.insert((*fail).clone()))
+                    .cloned(),
+            );
+        }
+
+        new_orb_fails(
+            &mut new_fails,
+            health,
+            &self.initial_fails.health,
+            &mut solution.new_fails.health,
+        );
+
+        new_orb_fails(
+            &mut new_fails,
+            energy,
+            &self.initial_fails.energy,
+            &mut solution.new_fails.energy,
         );
 
         new_fails
@@ -933,6 +989,12 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
                 self.solve_integer(solution, uber_identifier, amount, simulate)
             }
             Missing::LogicalState(_) => ControlFlow::Break(()),
+            Missing::ShopItemHidden(shop_identifier) => {
+                self.solve_shop_item_hidden(solution, shop_identifier, simulate)
+            }
+            Missing::ShopItemLocked(shop_identifier) => {
+                self.solve_shop_item_locked(solution, shop_identifier, simulate)
+            }
             Missing::Health(amount) => self.solve_health(solution, *amount.ceil() as i32, simulate),
             Missing::Energy(amount) => self.solve_energy::<true>(solution, amount, simulate),
             Missing::WallWeapon => self.solve_weapon::<true>(solution, simulate),
@@ -1381,6 +1443,78 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         trace!(
             logger: self.item_pool.log_capture,
             "progressed {uber_identifier} for {solution}",
+            solution = self.display_partial_solution(&solution),
+        );
+
+        ControlFlow::Continue(solution)
+    }
+
+    fn solve_shop_item_hidden(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        shop_identifier: UberIdentifier,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_shop_item(
+            solution,
+            shop_identifier,
+            Item::shop_hidden_writes,
+            "unhide",
+            "unhid",
+            simulate,
+        )
+    }
+
+    fn solve_shop_item_locked(
+        &mut self,
+        solution: PartialSolution<'graph>,
+        shop_identifier: UberIdentifier,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>> {
+        self.solve_shop_item(
+            solution,
+            shop_identifier,
+            Item::shop_locked_writes,
+            "unlock",
+            "unlocked",
+            simulate,
+        )
+    }
+
+    fn solve_shop_item<W>(
+        &mut self,
+        mut solution: PartialSolution<'graph>,
+        shop_identifier: UberIdentifier,
+        mut writes: W,
+        log_action_present: &str,
+        log_action_past: &str,
+        simulate: bool,
+    ) -> ControlFlow<(), PartialSolution<'graph>>
+    where
+        W: FnMut(&Item) -> &Vec<ShopBooleanWriteOwned>,
+    {
+        self.has_free_slot(&solution)?;
+
+        let Some(index) = solution.remaining_items.iter().copied().find(|index| {
+            // TODO only consider positive writes
+            writes(&self.item_pool[*index])
+                .iter()
+                .any(|write| write.uber_identifier == shop_identifier)
+        }) else {
+            // TODO can we remember pointless paths that we know end in this branch?
+            trace!(
+                logger: self.item_pool.log_capture,
+                "no items in the pool to {log_action_present} {shop_identifier}"
+            );
+
+            return ControlFlow::Break(());
+        };
+
+        self.add_item(&mut solution, index, simulate)?;
+
+        trace!(
+            logger: self.item_pool.log_capture,
+            "{log_action_past} {shop_identifier} for {solution}",
             solution = self.display_partial_solution(&solution),
         );
 

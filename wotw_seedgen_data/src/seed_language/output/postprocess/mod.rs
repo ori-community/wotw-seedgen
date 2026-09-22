@@ -326,7 +326,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
             matches.extend(
                 event
                     .command
-                    .direct_contained_writes(&origin_world.output.commands.lookup)
+                    .direct_contained_uber_state_writes(&origin_world.output.commands.lookup)
                     .identifiers()
                     .filter_map(UberIdentifier::as_multiworld)
                     .filter_map(|id| self.multiworld_lookup.get(&id))
@@ -564,7 +564,7 @@ impl<'output> MultiworldLookup<'output> {
                 } else {
                     for id in event
                         .command
-                        .direct_contained_writes(&output.commands.lookup)
+                        .direct_contained_uber_state_writes(&output.commands.lookup)
                         .identifiers()
                         .filter_map(UberIdentifier::as_multiworld)
                     {

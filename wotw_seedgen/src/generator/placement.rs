@@ -289,11 +289,17 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 .placements
                 .sort_unstable_by(|a, b| {
                     let a_commands = &self.worlds[a.target_world_index].output.commands;
-                    let mut a_common_items =
-                        a.item.command.contained_writes(a_commands).common_items();
+                    let mut a_common_items = a
+                        .item
+                        .command
+                        .contained_uber_state_writes(a_commands)
+                        .common_items();
                     let b_commands = &self.worlds[b.target_world_index].output.commands;
-                    let mut b_common_items =
-                        b.item.command.contained_writes(b_commands).common_items();
+                    let mut b_common_items = b
+                        .item
+                        .command
+                        .contained_uber_state_writes(b_commands)
+                        .common_items();
 
                     match (a_common_items.next(), b_common_items.next()) {
                         (None, None) => b.item.name.cmp(&a.item.name),

@@ -17216,8 +17216,7 @@ anchor OpherShop:  # Opher's offers
   pickup OpherShop.Slot11:
     moki: SpiritLight=1200
   pickup OpherShop.Slot12:
-    # TODO this is snippet dependent though
-    moki: InnerWellspring.WaterEscapeReward, SpiritLight=1200
+    moki: SpiritLight=1200
 
 anchor TuleyShop at -173, -4139:
   nospawn

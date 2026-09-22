@@ -13,6 +13,7 @@ use smallvec::SmallVec;
 use strum::Display;
 use wotw_seedgen_data::assets::{LocDataEntry, StateDataEntry};
 use wotw_seedgen_data::logic_language::output::Node;
+use wotw_seedgen_data::seed_language::simulate::ShopItemVisibility;
 use wotw_seedgen_data::Teleporter;
 use wotw_seedgen_data::{
     logic_language::output::{Enemy, Requirement},
@@ -27,6 +28,8 @@ pub enum Missing<'graph> {
     Boolean(UberIdentifier),
     Integer(UberIdentifier, i32),
     LogicalState(usize),
+    ShopItemHidden(UberIdentifier),
+    ShopItemLocked(UberIdentifier),
     Health(OrderedFloat<f32>),
     Energy(OrderedFloat<f32>),
     WallWeapon,
@@ -115,6 +118,12 @@ impl Display for Missing<'_> {
             Missing::Boolean(uber_identifier) => uber_identifier.fmt(f),
             Missing::Integer(uber_identifier, amount) => write!(f, "{uber_identifier}*{amount}"),
             Missing::LogicalState(state) => write!(f, "{{{state}}}"),
+            Missing::ShopItemHidden(shop_identifier) => {
+                write!(f, "ShopItemHidden({shop_identifier})")
+            }
+            Missing::ShopItemLocked(shop_identifier) => {
+                write!(f, "ShopItemLocked({shop_identifier})")
+            }
             Missing::Health(amount) => write!(f, "Health*{amount}"),
             Missing::Energy(amount) => write!(f, "Energy*{amount}"),
             Missing::WallWeapon => "WallWeapon".fmt(f),
@@ -194,6 +203,17 @@ impl<'graph> World<'graph, '_, '_, '_> {
                     ControlFlow::Continue(())
                 } else {
                     ControlFlow::Break(Missing::state(*state, &self.graph.nodes[*state]))
+                }
+            }
+            Requirement::ShopItemVisible(shop_identifier) => {
+                match self.shops().visibility(*shop_identifier) {
+                    ShopItemVisibility::Visible => ControlFlow::Continue(()),
+                    ShopItemVisibility::Hidden => {
+                        ControlFlow::Break(Missing::ShopItemHidden(*shop_identifier))
+                    }
+                    ShopItemVisibility::Locked => {
+                        ControlFlow::Break(Missing::ShopItemLocked(*shop_identifier))
+                    }
                 }
             }
             Requirement::Water => self.boolean_met(self.clean_water(), UberIdentifier::CLEAN_WATER),

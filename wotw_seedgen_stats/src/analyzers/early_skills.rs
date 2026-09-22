@@ -36,7 +36,7 @@ impl Analyzer for EarlySkillsStats {
                 placement
                     .item
                     .command
-                    .direct_contained_writes(&[])
+                    .direct_contained_uber_state_writes(&[])
                     .common_items()
             })
             .filter(|item| match item {

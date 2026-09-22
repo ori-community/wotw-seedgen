@@ -17,8 +17,8 @@ use wotw_seedgen_data::{
     seed_language::{
         compile,
         output::{
-            CommandVoid, CommandsOutput, ContainedWrites, ContainedWritesExt, IntermediateOutput,
-            ItemMetadata, UberStateWriteOwned,
+            CommandVoid, CommandsOutput, ContainedWrites, IntermediateOutput, ItemMetadata,
+            ShopBooleanWriteOwned, ShopWrite, UberStateWriteOwned, Write,
         },
     },
     Shard, Skill, WeaponUpgrade,
@@ -177,26 +177,52 @@ pub struct ItemPool<'log> {
 pub struct Item {
     command: CommandVoid,
     writes: Vec<UberStateWriteOwned>,
+    shop_hidden_writes: Vec<ShopBooleanWriteOwned>,
+    shop_locked_writes: Vec<ShopBooleanWriteOwned>,
     cost: f32,
 }
 
 impl Item {
     fn new(command: CommandVoid, commands: &CommandsOutput) -> Self {
-        let writes = command
-            .contained_writes(commands)
-            .owned()
-            .collect::<Vec<_>>();
+        let mut writes = Vec::new();
+        let mut shop_hidden_writes = Vec::new();
+        let mut shop_locked_writes = Vec::new();
+
+        for write in command.contained_writes_with_shops(commands) {
+            match write {
+                Write::UberState(uber_state_write) => {
+                    writes.push(UberStateWriteOwned::new(uber_state_write))
+                }
+                Write::Extra(ShopWrite::Hidden(shop_hidden_write)) => {
+                    shop_hidden_writes.push(ShopBooleanWriteOwned::new(shop_hidden_write))
+                }
+                Write::Extra(ShopWrite::Locked(shop_locked_write)) => {
+                    shop_locked_writes.push(ShopBooleanWriteOwned::new(shop_locked_write))
+                }
+            }
+        }
+
         let cost = cost_from_iter(writes.iter().map(UberStateWriteOwned::as_ref));
 
         Self {
             command,
             writes,
+            shop_hidden_writes,
+            shop_locked_writes,
             cost,
         }
     }
 
     pub fn writes(&self) -> &Vec<UberStateWriteOwned> {
         &self.writes
+    }
+
+    pub fn shop_hidden_writes(&self) -> &Vec<ShopBooleanWriteOwned> {
+        &self.shop_hidden_writes
+    }
+
+    pub fn shop_locked_writes(&self) -> &Vec<ShopBooleanWriteOwned> {
+        &self.shop_locked_writes
     }
 }
 

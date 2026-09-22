@@ -26,7 +26,7 @@ impl Analyzer for TotalSpiritLightStats {
                 placement
                     .item
                     .command
-                    .direct_contained_writes(&[])
+                    .direct_contained_uber_state_writes(&[])
                     .common_items()
             })
             .filter_map(|common_item| match common_item {

@@ -12,7 +12,7 @@ use crate::{
         token::Tokenizer,
     },
     Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, WorldSettings,
-    WorldSettingsHelpers,
+    WorldSettingsHelpers, Zone,
 };
 use rustc_hash::FxHashMap;
 use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
@@ -127,12 +127,17 @@ struct Compiler<'source, 'log> {
     default_entrance_connections: FxHashMap<EntranceId, EntranceId>,
     requirements: RequirementRepository,
     state_map: FxHashMap<Cow<'source, str>, usize>,
-    pickup_map: FxHashMap<&'source str, usize>,
+    pickup_map: FxHashMap<&'source str, PickupData>,
     anchor_map: FxHashMap<String, usize>,
     extern_requirement_map: FxHashMap<String, usize>,
     regions: FxHashMap<String, Requirement>,
     errors: Vec<Error>,
     log_capture: &'log LogCapture,
+}
+
+struct PickupData {
+    index: usize,
+    shop_identifier: Option<UberIdentifier>,
 }
 
 impl<'source, 'log> Compiler<'source, 'log> {
@@ -149,8 +154,19 @@ impl<'source, 'log> Compiler<'source, 'log> {
         // index_iter has to be the second iterator so it doesn't get incremented when the first one runs out
         let mut pickup_map = FxHashMap::default();
         for (node, index) in iter::zip(loc_data_nodes, &mut node_index_iter) {
-            let identifier = node.identifier();
-            if pickup_map.insert(identifier, index).is_some() {
+            let pickup = node.expect_pickup();
+
+            let identifier = pickup.identifier.as_str();
+            let pickup_data = PickupData {
+                index,
+                shop_identifier: matches!(pickup.zone, Zone::Shop)
+                    .then_some(pickup.uber_identifier),
+            };
+
+            if pickup_map
+                .insert(pickup.identifier.as_str(), pickup_data)
+                .is_some()
+            {
                 errors.push(Error::error(
                     format!("duplicate identifier \"{identifier}\" in loc_data"),
                     0..0,
@@ -805,13 +821,19 @@ impl Compile for ast::Anchor<'_> {
                     }
                     ast::AnchorContent::Connection(keyword, connection) => {
                         if let SpannedOption::Some(connection) = connection.value {
+                            let mut shop_identifier = None;
+
                             let to = match keyword.data {
                                 ast::ConnectionKeyword::State => compiler
                                     .state_map
                                     .get(&Cow::Borrowed(connection.identifier.data.0)),
-                                ast::ConnectionKeyword::Pickup => {
-                                    compiler.pickup_map.get(connection.identifier.data.0)
-                                }
+                                ast::ConnectionKeyword::Pickup => compiler
+                                    .pickup_map
+                                    .get(connection.identifier.data.0)
+                                    .map(|pickup_data| {
+                                        shop_identifier = pickup_data.shop_identifier;
+                                        &pickup_data.index
+                                    }),
                                 ast::ConnectionKeyword::Anchor => {
                                     compiler.anchor_map.get(connection.identifier.data.0)
                                 }
@@ -840,6 +862,13 @@ impl Compile for ast::Anchor<'_> {
                                             region_requirement.clone(),
                                             requirement,
                                         ]);
+                                    }
+
+                                    if let Some(shop_identifier) = shop_identifier {
+                                        requirement = Requirement::and([
+                                            requirement,
+                                            Requirement::ShopItemVisible(shop_identifier),
+                                        ])
                                     }
 
                                     connections.push(Connection {
@@ -1036,11 +1065,12 @@ impl Compile for ast::Requirement<'_> {
 }
 
 fn compile_state(compiler: &mut Compiler, identifier: &str, span: Range<usize>) -> Requirement {
-    match compiler
-        .state_map
-        .get(identifier)
-        .or_else(|| compiler.pickup_map.get(identifier))
-    {
+    match compiler.state_map.get(identifier).or_else(|| {
+        compiler
+            .pickup_map
+            .get(identifier)
+            .map(|pickup_data| &pickup_data.index)
+    }) {
         None => {
             compiler.error(format!("Unknown requirement \"{identifier}\""), span);
             Requirement::Impossible

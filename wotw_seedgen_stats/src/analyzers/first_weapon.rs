@@ -22,7 +22,7 @@ impl Analyzer for FirstWeaponStats {
                 placement
                     .item
                     .command
-                    .direct_contained_writes(&[])
+                    .direct_contained_uber_state_writes(&[])
                     .common_items()
                     .any(|item| {
                         matches!(

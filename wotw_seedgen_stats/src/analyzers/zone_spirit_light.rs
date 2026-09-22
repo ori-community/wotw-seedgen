@@ -30,7 +30,7 @@ impl Analyzer for ZoneSpiritLightStats {
                 placement
                     .item
                     .command
-                    .direct_contained_writes(&[])
+                    .direct_contained_uber_state_writes(&[])
                     .common_items()
             })
             .filter_map(|item| match item {

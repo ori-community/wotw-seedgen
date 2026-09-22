@@ -1,6 +1,7 @@
 mod cache;
 mod condition_values;
 mod heap;
+mod shop_state;
 mod simulation;
 mod snapshot;
 mod stack;
@@ -12,6 +13,7 @@ use std::mem;
 pub use cache::SimulationCache;
 pub use condition_values::ConditionValues;
 pub use heap::Heap;
+pub use shop_state::{ShopItemVisibility, ShopState};
 pub use simulation::Simulation;
 pub use snapshot::{CloneSnapshot, Snapshot};
 pub use stack::Stack;
@@ -331,6 +333,28 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             CommandVoid::TriggerClientEvent { client_event } => {
                 client_event.simulate(simulation, output);
             }
+            CommandVoid::SetShopItemHidden {
+                uber_identifier,
+                hidden,
+            } => {
+                let hidden = hidden.simulate(simulation, output);
+                simulation.shops_mut().set_hidden(*uber_identifier, hidden);
+
+                if !hidden {
+                    simulation.on_shop_unhidden(*uber_identifier, output)
+                };
+            }
+            CommandVoid::SetShopItemLocked {
+                uber_identifier,
+                locked,
+            } => {
+                let locked = locked.simulate(simulation, output);
+                simulation.shops_mut().set_locked(*uber_identifier, locked);
+
+                if !locked {
+                    simulation.on_shop_unlocked(*uber_identifier, output)
+                };
+            }
             // TODO simulate more maybe?
             CommandVoid::DefineTimer { .. }
             | CommandVoid::QueuedMessage { .. }
@@ -373,8 +397,6 @@ impl<S: Simulation> Simulate<S> for CommandVoid {
             | CommandVoid::SetShopItemName { .. }
             | CommandVoid::SetShopItemDescription { .. }
             | CommandVoid::SetShopItemIcon { .. }
-            | CommandVoid::SetShopItemHidden { .. }
-            | CommandVoid::SetShopItemLocked { .. }
             | CommandVoid::SetWheelItemName { .. }
             | CommandVoid::SetWheelItemDescription { .. }
             | CommandVoid::SetWheelItemIcon { .. }

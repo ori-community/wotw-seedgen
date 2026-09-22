@@ -30,10 +30,7 @@ use wotw_seedgen_data::{
     logic_language::output::{Graph, RefillValue},
     seed_language::{
         output::{CommandsOutput, Event},
-        simulate::{
-            ConditionValues, Heap, Simulation, SimulationCache, Snapshot, Stack, UberStates,
-            WorldState,
-        },
+        simulate::{Simulation, SimulationCache, Snapshot, UberStates, WorldState},
     },
     Difficulty, Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade, WorldSettings,
 };
@@ -517,38 +514,12 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
 }
 
 impl Simulation for World<'_, '_, '_, '_> {
-    #[inline]
-    fn stack(&self) -> &Stack {
-        self.state.stack()
+    fn world_state(&self) -> &WorldState {
+        self.state.world_state()
     }
 
-    #[inline]
-    fn stack_mut(&mut self) -> &mut Stack {
-        self.state.stack_mut()
-    }
-
-    #[inline]
-    fn heap(&self) -> &Heap {
-        self.state.heap()
-    }
-
-    #[inline]
-    fn heap_mut(&mut self) -> &mut Heap {
-        self.state.heap_mut()
-    }
-
-    #[inline]
-    fn uber_states(&self) -> &UberStates {
-        self.state.uber_states()
-    }
-
-    #[inline]
-    fn uber_states_mut(&mut self) -> &mut UberStates {
-        self.state.uber_states_mut()
-    }
-
-    fn condition_values(&mut self) -> &mut ConditionValues {
-        self.state.condition_values()
+    fn world_state_mut(&mut self) -> &mut WorldState {
+        self.state.world_state_mut()
     }
 
     fn store_impl(&mut self, uber_identifier: UberIdentifier, value: UberStateValue) -> &[usize] {
@@ -557,6 +528,14 @@ impl Simulation for World<'_, '_, '_, '_> {
 
     fn on_change(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
         self.update_reached(uber_identifier, output);
+    }
+
+    fn on_shop_unhidden(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.update_shop_unhidden(uber_identifier, output);
+    }
+
+    fn on_shop_unlocked(&mut self, uber_identifier: UberIdentifier, output: &CommandsOutput) {
+        self.update_shop_unlocked(uber_identifier, output);
     }
 
     // Not sure how we could use the cache-efficient specialized stores without invalidating our reach

@@ -117,6 +117,13 @@ impl Node {
             _ => panic!("Called expect_anchor_mut on {self:?}"),
         }
     }
+
+    pub fn expect_pickup(&self) -> &LocDataEntry {
+        match self {
+            Node::Pickup(pickup) => pickup,
+            _ => panic!("Called expect_pickup on {self:?}"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, ToSchema)]
@@ -188,8 +195,8 @@ pub enum RefillValue {
 // While Requirement does not implement any `Ord`, we still want to order the discriminants in accordance to
 // `Requirement::discriminant_value` to transparently match the intrinsic discriminant values.
 // We order roughly from cheap to expensize and specifically order non-orb-changing < orb-changing < nested.
-// When adding requirements, don't forget to add their respective logic to `Requirement::discriminant_value`
-// as well as all the requirement comparison functions.
+// When adding requirements, don't forget to add them in the correct position of `Requirement::discriminant_value`
+// as well as the various requirement comparison functions in `super::optimize`.
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
 pub enum Requirement {
     Free,
@@ -198,6 +205,7 @@ pub enum Requirement {
     Difficulty(Difficulty),
     Trick(Trick),
     State(usize),
+    ShopItemVisible(UberIdentifier),
     Water,
     Skill(Skill),
     Shard(Shard),
@@ -289,25 +297,26 @@ impl Requirement {
             Self::Difficulty(_) => 3,
             Self::Trick(_) => 4,
             Self::State(_) => 5,
-            Self::Water => 6,
-            Self::Skill(_) => 7,
-            Self::Shard(_) => 8,
-            Self::Teleporter(_) => 9,
-            Self::SpiritLight(_) => 10,
-            Self::GorlekOre(_) => 11,
-            Self::Keystone(_) => 12,
-            Self::Danger(_) => 14,
-            Self::Damage(_) => 13,
-            Self::NonConsumingEnergySkill(_) => 15,
-            Self::EnergySkill(..) => 16,
-            Self::ShurikenBreak(_) => 17,
-            Self::SentryBreak(_) => 18,
-            Self::Extern(_) => 19,
-            Self::BreakWall(_) => 20,
-            Self::Boss(_) => 21,
-            Self::Combat(_) => 22,
-            Self::And(_) => 23,
-            Self::Or(_) => 24,
+            Self::ShopItemVisible(_) => 6,
+            Self::Water => 7,
+            Self::Skill(_) => 8,
+            Self::Shard(_) => 9,
+            Self::Teleporter(_) => 10,
+            Self::SpiritLight(_) => 11,
+            Self::GorlekOre(_) => 12,
+            Self::Keystone(_) => 14,
+            Self::Danger(_) => 13,
+            Self::Damage(_) => 15,
+            Self::NonConsumingEnergySkill(_) => 16,
+            Self::EnergySkill(..) => 17,
+            Self::ShurikenBreak(_) => 18,
+            Self::SentryBreak(_) => 19,
+            Self::Extern(_) => 20,
+            Self::BreakWall(_) => 21,
+            Self::Boss(_) => 22,
+            Self::Combat(_) => 23,
+            Self::And(_) => 24,
+            Self::Or(_) => 25,
         }
     }
 
@@ -347,6 +356,9 @@ impl Display for Requirement {
             Self::Teleporter(teleporter) => teleporter.display::<true>().fmt(f),
             Self::Water => write!(f, "Water"),
             Self::State(state) => write!(f, "{{{state}}}"),
+            Self::ShopItemVisible(shop_identifier) => {
+                write!(f, "ShopItemVisible={shop_identifier}")
+            }
             Self::Extern(index) => write!(f, "{{extern {index}}}"),
             Self::Damage(amount) => write!(f, "Damage={amount}"),
             Self::Danger(amount) => write!(f, "Danger={amount}"),

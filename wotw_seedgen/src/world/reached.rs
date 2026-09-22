@@ -96,6 +96,10 @@ pub(crate) struct ReachStateFails<'graph> {
     pub uber_state: FxHashMap<UberIdentifier, FxHashSet<ConnectionIndex<'graph>>>,
     /// All [`ConnectionIndex`] which failed to solve and might be solved by reaching the logical state
     pub logical_state: FxHashMap<usize, FxHashSet<ConnectionIndex<'graph>>>,
+    /// All [`ConnectionIndex`] which failed to solve and might be solved by unhiding the shop [`UberIdentifier`]
+    pub shop_item_hidden: FxHashMap<UberIdentifier, ConnectionIndex<'graph>>,
+    /// All [`ConnectionIndex`] which failed to solve and might be solved by unlocking the shop [`UberIdentifier`]
+    pub shop_item_locked: FxHashMap<UberIdentifier, ConnectionIndex<'graph>>,
     /// Some connections failed to solve and might require more health.
     /// Resuming progress along those connections would be very hard because of refill logic,
     /// So we just reset the entire Reach when progressing orbs.
@@ -114,17 +118,39 @@ impl ReachState<'_> {
 
 impl<'graph> ReachStateFails<'graph> {
     fn is_empty(&self) -> bool {
-        self.uber_state.is_empty()
-            && self.logical_state.is_empty()
-            && self.health.is_empty()
-            && self.energy.is_empty()
+        let Self {
+            uber_state,
+            logical_state,
+            shop_item_hidden,
+            shop_item_locked,
+            health,
+            energy,
+        } = self;
+
+        uber_state.is_empty()
+            && logical_state.is_empty()
+            && shop_item_hidden.is_empty()
+            && shop_item_locked.is_empty()
+            && health.is_empty()
+            && energy.is_empty()
     }
 
     fn clear(&mut self) {
-        self.uber_state.clear();
-        self.logical_state.clear();
-        self.health.clear();
-        self.energy.clear();
+        let Self {
+            uber_state,
+            logical_state,
+            shop_item_hidden,
+            shop_item_locked,
+            health,
+            energy,
+        } = self;
+
+        uber_state.clear();
+        logical_state.clear();
+        shop_item_hidden.clear();
+        shop_item_locked.clear();
+        health.clear();
+        energy.clear();
     }
 
     #[cfg(test)]
@@ -155,8 +181,16 @@ impl Display for ReachStateFailsDisplay<'_, '_> {
                 .format(", ")
         }
 
-        self.fails
-            .uber_state
+        let ReachStateFails {
+            uber_state,
+            logical_state,
+            shop_item_hidden,
+            shop_item_locked,
+            health,
+            energy,
+        } = self.fails;
+
+        uber_state
             .iter()
             .format_with(", ", |(uber_identifier, connections), f| {
                 f(&format_args!(
@@ -166,40 +200,81 @@ impl Display for ReachStateFailsDisplay<'_, '_> {
             })
             .fmt(f)?;
 
-        let mut comma = !self.fails.uber_state.is_empty();
-        if comma {
-            write!(f, ", ")?;
+        let mut comma = !uber_state.is_empty();
+
+        if !logical_state.is_empty() {
+            if comma {
+                f.write_str(", ")?;
+            }
+            comma = true;
+
+            logical_state
+                .iter()
+                .format_with(", ", |(state, connections), f| {
+                    f(&format_args!(
+                        "{{{state}}} for [{connections}]",
+                        connections = format_connections(connections, self.graph),
+                    ))
+                })
+                .fmt(f)?;
         }
 
-        self.fails
-            .logical_state
-            .iter()
-            .format_with(", ", |(state, connections), f| {
-                f(&format_args!(
-                    "{{{state}}} for [{connections}]",
-                    connections = format_connections(connections, self.graph),
-                ))
-            })
-            .fmt(f)?;
+        if !shop_item_hidden.is_empty() {
+            if comma {
+                f.write_str(", ")?;
+            }
+            comma = true;
 
-        comma |= !self.fails.logical_state.is_empty();
-        if comma {
-            write!(f, ", ")?;
+            shop_item_hidden
+                .iter()
+                .format_with(", ", |(shop_identifier, connection), f| {
+                    f(&format_args!(
+                        "ShopItemHidden({shop_identifier}) for {connection}",
+                        connection = connection.display(self.graph),
+                    ))
+                })
+                .fmt(f)?;
         }
 
-        if !self.fails.health.is_empty() {
+        if !shop_item_locked.is_empty() {
+            if comma {
+                f.write_str(", ")?;
+            }
+            comma = true;
+
+            shop_item_locked
+                .iter()
+                .format_with(", ", |(shop_identifier, connection), f| {
+                    f(&format_args!(
+                        "ShopItemLocked({shop_identifier}) for {connection}",
+                        connection = connection.display(self.graph),
+                    ))
+                })
+                .fmt(f)?;
+        }
+
+        if !health.is_empty() {
+            if comma {
+                f.write_str(", ")?;
+            }
+            comma = true;
+
             write!(
                 f,
                 "Health for [{connections}]",
-                connections = format_connections(&self.fails.health, self.graph),
+                connections = format_connections(health, self.graph),
             )?;
         }
 
-        if !self.fails.energy.is_empty() {
+        if !energy.is_empty() {
+            if comma {
+                f.write_str(", ")?;
+            }
+
             write!(
                 f,
                 "Energy for [{connections}]",
-                connections = format_connections(&self.fails.energy, self.graph),
+                connections = format_connections(energy, self.graph),
             )?;
         }
 
@@ -550,6 +625,52 @@ impl<'graph> World<'graph, '_, '_, '_> {
         }
     }
 
+    pub(super) fn update_shop_unhidden(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        output: &CommandsOutput,
+    ) {
+        trace!(
+            logger: self.log_capture,
+            "updating unhidden shop {uber_identifier} with {inventory}",
+            inventory = self.inventory_display(),
+        );
+
+        if let Some(fail) = self
+            .reach
+            .state
+            .fails
+            .shop_item_hidden
+            .remove(&uber_identifier)
+        {
+            trace!(logger: self.log_capture, "removed {uber_identifier} from ShopItemHidden fails");
+            self.progress(fail, output);
+        }
+    }
+
+    pub(super) fn update_shop_unlocked(
+        &mut self,
+        uber_identifier: UberIdentifier,
+        output: &CommandsOutput,
+    ) {
+        trace!(
+            logger: self.log_capture,
+            "updating unlocked shop {uber_identifier} with {inventory}",
+            inventory = self.inventory_display(),
+        );
+
+        if let Some(fail) = self
+            .reach
+            .state
+            .fails
+            .shop_item_locked
+            .remove(&uber_identifier)
+        {
+            trace!(logger: self.log_capture, "removed {uber_identifier} from ShopItemLocked fails");
+            self.progress(fail, output);
+        }
+    }
+
     fn check_all_states(&mut self) {
         let logic_states = self
             .reach
@@ -850,6 +971,20 @@ impl<'graph> World<'graph, '_, '_, '_> {
             }
             Missing::LogicalState(index) => {
                 add_fail_to(&mut self.reach.state.fails.logical_state, index, connection);
+            }
+            Missing::ShopItemHidden(shop_identifier) => {
+                self.reach
+                    .state
+                    .fails
+                    .shop_item_hidden
+                    .insert(shop_identifier, connection);
+            }
+            Missing::ShopItemLocked(shop_identifier) => {
+                self.reach
+                    .state
+                    .fails
+                    .shop_item_locked
+                    .insert(shop_identifier, connection);
             }
             Missing::Health(_) => {
                 self.reach.state.fails.health.insert(connection);
