@@ -130,7 +130,7 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - ite
 !if into_darkness { !augment_fun(write_missing_quests(), if GladesTown.MokiAcornQuest == false add_missing_goal_in_zone(
     "Into Darkness", current_zone() == Glades
 )) }
-!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwolokAmuletQuest == false add_missing_goal_in_zone(
+!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwoloksWisdomCompleted == false add_missing_goal_in_zone(
     "Kwolok's Wisdom",
     (questUberStateGroup.kwoloksWisdomQuest != 3 && current_zone() == Pools)
     || (questUberStateGroup.kwoloksWisdomQuest == 3 && current_zone() == Hollow)
@@ -228,11 +228,11 @@ on change itemTracker.questsCount update_goals()
 }
 
 !if kwoloks_wisdom {
-    on EastHollow.KwolokAmuletQuest {
+    on EastHollow.KwoloksWisdomCompleted {
         create_stats_entry(QuestEnd, "Kwolok's Wisdom")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on EastHollow.KwolokAmuletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on EastHollow.KwoloksWisdomCompleted == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if rebuilding_the_glades {
