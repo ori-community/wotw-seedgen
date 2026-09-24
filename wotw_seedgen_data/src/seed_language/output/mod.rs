@@ -26,6 +26,7 @@ pub use operation::{
     LogicOperator, Operation,
 };
 pub use postprocess::{postprocess, PlaceholderMap, UniversePostprocessor};
+use serde_with::skip_serializing_none;
 use utoipa::ToSchema;
 
 use crate::{Icon, Position, UberIdentifier, Zone};
@@ -66,6 +67,33 @@ impl<'log> IntermediateOutput<'log> {
 pub struct PreloadOutput {
     pub spawn: Option<Position>,
     pub tags: Vec<String>,
+    pub game_difficulties: GameDifficultyConfigs,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub struct GameDifficultyConfigs {
+    pub easy: GameDifficultyConfig,
+    pub normal: GameDifficultyConfig,
+    pub hard: GameDifficultyConfig,
+}
+
+#[skip_serializing_none]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GameDifficultyConfig {
+    pub visible: bool,
+    pub label: Option<String>,
+    pub confirmation_message: Option<String>,
+}
+
+impl Default for GameDifficultyConfig {
+    fn default() -> Self {
+        Self {
+            visible: true,
+            label: None,
+            confirmation_message: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]

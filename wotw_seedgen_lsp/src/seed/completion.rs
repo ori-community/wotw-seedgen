@@ -13,14 +13,16 @@ use wotw_seedgen_data::{
             ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandOnlySimulation,
             CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs, ConfigFloatRangeArgs,
             ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, ConfigType,
-            ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding, Event, Expression,
-            ExpressionValue, FunctionCall, FunctionDefinition, ItemDataArgs,
-            ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
-            ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation,
-            PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-            RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SeparatedNonEmpty,
-            SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg, Trigger, TriggerBinding,
-            UberIdentifier, UberIdentifierName, UberIdentifierNumeric, UberStateType, ZoneOfArgs,
+            ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding,
+            DifficultyConfirmationArgs, DifficultyLabelArgs, DifficultyVisibleArgs, Event,
+            Expression, ExpressionValue, FunctionCall, FunctionDefinition, GameDifficulty,
+            ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs,
+            ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs,
+            Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs,
+            RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs,
+            SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg,
+            Trigger, TriggerBinding, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
+            UberStateType, ZoneOfArgs,
         },
         compile::FunctionIdentifier,
         types::Type,
@@ -135,12 +137,13 @@ where
 impl<Open, Content, Close> CompletionInSpan for Delimited<Open, Content, Close>
 where
     Open: SpanStart,
-    // TODO why this unused bound?
     Content: Completion + ErrCompletion,
     Close: SpanEnd,
 {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        self.content.completion(index, cache)
+        self.content
+            .completion(index, cache)
+            .or_else(|| Some(Content::err_completion(cache)))
     }
 }
 
@@ -809,6 +812,15 @@ impl CompletionInSpan for Command<'_> {
             Command::Tags(tags, args) => {
                 args.span_checked_completion((tags, args).span(), index, cache)
             }
+            Command::DifficultyVisible(difficulty_visible, args) => {
+                args.span_checked_completion((difficulty_visible, args).span(), index, cache)
+            }
+            Command::DifficultyLabel(difficulty_label, args) => {
+                args.span_checked_completion((difficulty_label, args).span(), index, cache)
+            }
+            Command::DifficultyConfirmation(difficulty_confirmation, args) => {
+                args.span_checked_completion((difficulty_confirmation, args).span(), index, cache)
+            }
             Command::ConfigBoolean(config, args) => {
                 args.span_checked_completion((config, args).span(), index, cache)
             }
@@ -949,6 +961,45 @@ impl CompletionInSpan for TagsArg<'_> {
 impl ErrCompletion for TagsArg<'_> {
     fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         Expression::err_completion(cache)
+    }
+}
+
+static GAME_DIFFICULTY_COMPLETION: LazyLock<Vec<CompletionItem>> =
+    LazyLock::new(|| enum_member_completions(GameDifficulty::VARIANTS));
+
+impl CompletionInSpan for DifficultyVisibleArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.visible.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for DifficultyVisibleArgs<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        GAME_DIFFICULTY_COMPLETION.clone()
+    }
+}
+
+impl CompletionInSpan for DifficultyLabelArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.label.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for DifficultyLabelArgs<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        GAME_DIFFICULTY_COMPLETION.clone()
+    }
+}
+
+impl CompletionInSpan for DifficultyConfirmationArgs<'_> {
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        self.confirmation_message.completion(index, cache)
+    }
+}
+
+impl ErrCompletion for DifficultyConfirmationArgs<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        GAME_DIFFICULTY_COMPLETION.clone()
     }
 }
 

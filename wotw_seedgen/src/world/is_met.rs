@@ -193,7 +193,9 @@ impl<'graph> World<'graph, '_, '_, '_> {
         match requirement {
             Requirement::Free => ControlFlow::Continue(()),
             Requirement::Impossible => ControlFlow::Break(Missing::Impossible),
-            Requirement::NormalGameDifficulty => self.setting_met(!self.settings.hard),
+            Requirement::NormalGameDifficulty => {
+                self.setting_met(!self.settings.game_difficulties.hard)
+            }
             Requirement::Difficulty(difficulty) => {
                 self.setting_met(self.settings.difficulty >= *difficulty)
             }

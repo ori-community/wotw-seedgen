@@ -6,7 +6,7 @@ mod slug;
 
 use std::{
     cmp::Ordering,
-    fmt::{self, Display, Write},
+    fmt::{self, Arguments, Display, Write},
     iter,
     num::NonZeroU8,
     ops::Deref,
@@ -28,7 +28,10 @@ use utoipa::{
 use crate::{
     assets::{InlineSnippets, SnippetAccess},
     parse::Source,
-    seed_language::metadata::{ConfigValue, Metadata},
+    seed_language::{
+        metadata::{ConfigValue, Metadata},
+        output::{GameDifficultyConfigs, PreloadOutput},
+    },
 };
 
 /// A representation of all the relevant settings when generating a seed
@@ -137,7 +140,7 @@ impl WorldSettingsHelpers for [WorldSettings] {
     }
 
     fn iter_hard(&self) -> impl Iterator<Item = bool> {
-        self.iter().map(|settings| settings.hard)
+        self.iter().map(|settings| settings.game_difficulties.hard)
     }
 }
 
@@ -176,8 +179,8 @@ pub struct WorldSettings {
     pub difficulty: Difficulty,
     /// Logically expected tricks
     pub tricks: FxHashSet<Trick>,
-    /// Logically assume hard in-game difficulty
-    pub hard: bool,
+    /// Which in-game difficulties to generate for
+    pub game_difficulties: GameDifficulties,
     /// Randomize entrance connections with the given max loop size
     pub randomize_entrances: Option<GreaterOneU8>,
     /// Names of snippets to use
@@ -270,7 +273,7 @@ impl WorldSettings {
             spawn: Spawn::FullyRandom,
             difficulty,
             tricks,
-            hard: rng.gen_bool(0.25),
+            game_difficulties: GameDifficulties::random(rng),
             randomize_entrances,
             snippets,
             snippet_config,
@@ -282,7 +285,13 @@ impl WorldSettings {
         matches!(self.spawn, Spawn::Random | Spawn::FullyRandom)
     }
 
-    pub fn write_tags(&self, tags: &mut Vec<String>) {
+    pub fn write_output(&self, output: &mut PreloadOutput) {
+        self.write_tags(&mut output.tags);
+        self.game_difficulties
+            .write_output(&mut output.game_difficulties);
+    }
+
+    fn write_tags(&self, tags: &mut Vec<String>) {
         // Debug variant for the uppercase formatting
         tags.push(format!("{:?}", self.difficulty));
 
@@ -588,6 +597,100 @@ impl Trick {
             | Self::DashBashChain
             | Self::LaunchBashChain
             | Self::Unpopular => Difficulty::Unsafe,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
+#[schema(default = GameDifficulties::default)]
+pub struct GameDifficulties {
+    /// Whether seedgen should ensure the seed is possible on easy
+    pub easy: bool,
+    /// Whether seedgen should ensure the seed is possible on normal
+    pub normal: bool,
+    /// Whether seedgen should ensure the seed is possible on hard
+    pub hard: bool,
+    /// Whether the main menu should limit the shown difficulties to only the selected ones
+    pub only_show_selected: bool,
+}
+
+impl GameDifficulties {
+    pub const NONE: Self = Self {
+        easy: false,
+        normal: false,
+        hard: false,
+        only_show_selected: false,
+    };
+
+    fn random<R: Rng>(rng: &mut R) -> Self {
+        Self {
+            easy: rng.gen(),
+            normal: rng.gen(),
+            hard: rng.gen(),
+            only_show_selected: rng.gen(),
+        }
+    }
+
+    fn write_output(&self, settings: &mut GameDifficultyConfigs) {
+        fn confirm_message(selected: &str, middle_line: Arguments) -> String {
+            format!(
+                concat!(
+                    "This seed was not generated for #{selected}# difficulty.\n",
+                    "{middle_line}\n",
+                    "Try anyway?"
+                ),
+                selected = selected,
+                middle_line = middle_line,
+            )
+        }
+
+        fn unexpected_logic_message(selected: &str) -> String {
+            confirm_message(
+                selected,
+                format_args!("Logic may be unexpected when playing on #{selected}#."),
+            )
+        }
+
+        fn hard_impossible_message() -> String {
+            confirm_message(
+                "Hard",
+                format_args!("Finishing on #Hard# might be impossible."),
+            )
+        }
+
+        let Self {
+            easy,
+            normal,
+            hard,
+            only_show_selected,
+        } = *self;
+
+        if only_show_selected {
+            settings.easy.visible = easy;
+            settings.normal.visible = normal;
+            settings.hard.visible = hard;
+        } else {
+            if !easy && hard {
+                settings.easy.confirmation_message = Some(unexpected_logic_message("Easy"))
+            }
+            if !normal && hard {
+                settings.normal.confirmation_message = Some(unexpected_logic_message("Normal"))
+            }
+            if !hard {
+                settings.hard.confirmation_message = Some(hard_impossible_message())
+            }
+        }
+    }
+}
+
+impl Default for GameDifficulties {
+    fn default() -> Self {
+        Self {
+            easy: true,
+            normal: true,
+            hard: false,
+            only_show_selected: false,
         }
     }
 }

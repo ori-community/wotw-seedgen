@@ -19,12 +19,13 @@ use std::{
     fmt::{Debug, Display, Write},
     marker::PhantomData,
     num::NonZeroUsize,
+    ops::{Index, IndexMut},
     str::FromStr,
 };
-use strum::VariantNames;
+use strum::{Display, VariantNames};
 use wotw_seedgen::data::{
     assets::{Tricks, UniversePresetSettings, WorldPresetSettings},
-    Difficulty, GreaterOneU8, Spawn, Trick, WorldSettings,
+    Difficulty, GameDifficulties, GreaterOneU8, Spawn, Trick, WorldSettings,
 };
 
 #[derive(Debug, Default)]
@@ -47,7 +48,7 @@ impl Args for SeedSettings {
             .arg(difficulty_arg(true))
             .arg(tricks_arg(true))
             .arg(all_tricks_arg(true))
-            .arg(hard_arg(true))
+            .arg(game_difficulties_arg(true))
             .arg(randomize_entrances_arg(true))
             .arg(snippets_arg(true))
             .arg(snippet_config_arg(true))
@@ -75,7 +76,7 @@ impl Args for SeedWorldSettings {
             .arg(difficulty_arg(false))
             .arg(tricks_arg(false))
             .arg(all_tricks_arg(false))
-            .arg(hard_arg(false))
+            .arg(game_difficulties_arg(false))
             .arg(randomize_entrances_arg(false))
             .arg(snippets_arg(false))
             .arg(snippet_config_arg(false))
@@ -269,15 +270,24 @@ fn all_tricks_arg(world_scoped: bool) -> Arg {
     choose_parser!(arg, world_scoped, bool)
 }
 
-fn hard_arg(world_scoped: bool) -> Arg {
-    let arg = world_scoped_flag_arg("hard", world_scoped)
-        .long("hard")
-        .help("Logically assume hard in-game difficulty")
-        .long_help(
-            "Logic will account for the player using the hard in-game difficulty, for instance by scaling damage requirements"
-        );
+fn game_difficulties_arg(world_scoped: bool) -> Arg {
+    let arg = Arg::new("game_difficulties")
+        .group("seed_settings")
+        .long("game-difficulties")
+        .short('g')
+        .value_name("GAME_DIFFICULTY")
+        .num_args(1..)
+        .help("Logically supported in-game difficulties")
+        .long_help(format!(
+            "This refers to the vanilla difficulties when starting a savefile.\n\
+            By default seeds support {literal}easy{reset} and {literal}normal{reset}. If you want to play on {literal}hard{reset},\n\
+            you should use '{literal}--game-difficulties hard{reset}' (short: '{literal}-g h{reset}') to ensure damage requirements are scaled and such.\n\
+            You can combine your difficulties with '{literal}o{reset}' or '{literal}only-show-selected{reset}' (example: '{literal}-g o n{reset}') to hide all other difficulties from the main menu.",
+            literal = LITERAL.render(), // TODO .render() is optional now, shorten these
+            reset = Reset.render(),
+        ));
 
-    choose_parser!(arg, world_scoped, bool)
+    choose_strum_enum_parser!(arg, world_scoped, GameDifficulty)
 }
 
 fn randomize_entrances_arg(world_scoped: bool) -> Arg {
@@ -483,6 +493,61 @@ impl FromStr for SpawnArg {
             other => Spawn::Set(other.to_string()),
         };
         Ok(Self(spawn))
+    }
+}
+
+#[derive(Debug, Clone, Copy, Display, VariantNames)]
+#[strum(serialize_all = "kebab-case")]
+pub enum GameDifficulty {
+    Easy,
+    Normal,
+    Hard,
+    OnlyShowSelected,
+}
+
+impl FromStr for GameDifficulty {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "e" | "easy" => Ok(Self::Easy),
+            "n" | "normal" => Ok(Self::Normal),
+            "h" | "hard" => Ok(Self::Hard),
+            "o" | "only-show-selected" => Ok(Self::OnlyShowSelected),
+            other => Err(format!(
+                "invalid game difficulty \"{other}\": possible values are \
+                \"{literal}e{reset}asy\", \
+                \"{literal}n{reset}ormal\", \
+                \"{literal}h{reset}ard\" or \
+                \"{literal}o{reset}nly-show-selected\"",
+                literal = LITERAL.render(),
+                reset = Reset.render(),
+            )),
+        }
+    }
+}
+
+impl Index<GameDifficulty> for GameDifficulties {
+    type Output = bool;
+
+    fn index(&self, index: GameDifficulty) -> &Self::Output {
+        match index {
+            GameDifficulty::Easy => &self.easy,
+            GameDifficulty::Normal => &self.normal,
+            GameDifficulty::Hard => &self.hard,
+            GameDifficulty::OnlyShowSelected => &self.only_show_selected,
+        }
+    }
+}
+
+impl IndexMut<GameDifficulty> for GameDifficulties {
+    fn index_mut(&mut self, index: GameDifficulty) -> &mut Self::Output {
+        match index {
+            GameDifficulty::Easy => &mut self.easy,
+            GameDifficulty::Normal => &mut self.normal,
+            GameDifficulty::Hard => &mut self.hard,
+            GameDifficulty::OnlyShowSelected => &mut self.only_show_selected,
+        }
     }
 }
 
@@ -719,12 +784,21 @@ impl FromArgMatches for SeedSettings {
             },
         )?;
 
-        update_from_world_scoped_flag(
+        update_from_world_scoped_args(
             matches,
             &mut world_settings,
-            "hard",
-            |world_preset, hard| world_preset.hard = Some(*hard),
+            "game_difficulties",
+            |world_preset, game_difficulty: &GameDifficulty| {
+                world_preset
+                    .game_difficulties
+                    .get_or_insert(GameDifficulties::NONE)[*game_difficulty] = true;
+            },
         )?;
+        for world in &mut world_settings {
+            if let Some(game_difficulties) = &mut world.game_difficulties {
+                sanitize_game_difficulties(game_difficulties);
+            }
+        }
 
         update_from_world_scoped_args(
             matches,
@@ -796,7 +870,17 @@ impl FromArgMatches for SeedWorldSettings {
                     .get_many("tricks")
                     .map(|trick| Tricks::Some(trick.copied().collect()))
             },
-            hard: matches.get_flag("hard").then_some(true),
+            game_difficulties: matches.get_many("game_difficulties").map(|values| {
+                let mut game_difficulties = GameDifficulties::NONE;
+
+                for game_difficulty in values {
+                    game_difficulties[*game_difficulty] = true;
+                }
+
+                sanitize_game_difficulties(&mut game_difficulties);
+
+                game_difficulties
+            }),
             randomize_entrances: matches.get_one("randomize_entrances").copied(),
             snippets: matches
                 .get_many("snippets")
@@ -815,6 +899,23 @@ impl FromArgMatches for SeedWorldSettings {
         }
 
         Ok(())
+    }
+}
+
+fn sanitize_game_difficulties(game_difficulties: &mut GameDifficulties) {
+    if matches!(
+        game_difficulties,
+        GameDifficulties {
+            easy: false,
+            normal: false,
+            hard: false,
+            only_show_selected: true,
+        }
+    ) {
+        *game_difficulties = GameDifficulties {
+            only_show_selected: true,
+            ..GameDifficulties::default()
+        };
     }
 }
 

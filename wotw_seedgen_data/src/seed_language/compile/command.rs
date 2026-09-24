@@ -7,8 +7,8 @@ use crate::{
         ast::{self, get_command_arg, UberStateType},
         compile::{self, error::type_error, ids::IdMap, FunctionSignature},
         output::{
-            CommandBoolean, CommandVoid, Event, ItemMetadataEntry, Literal, StringOrPlaceholder,
-            VariableValue,
+            CommandBoolean, CommandVoid, Event, GameDifficultyConfig, ItemMetadataEntry, Literal,
+            StringOrPlaceholder, VariableValue,
         },
         types::Type,
     },
@@ -43,6 +43,15 @@ impl<'source> Compile<'source> for ast::Command<'source> {
                 command.compile(compiler);
             }
             ast::Command::Tags(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::DifficultyVisible(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::DifficultyLabel(_, command) => {
+                command.compile(compiler);
+            }
+            ast::Command::DifficultyConfirmation(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::ConfigBoolean(_, command) => {
@@ -435,6 +444,68 @@ impl<'source> Compile<'source> for ast::TagsArg<'source> {
         if let Some(tag) = self.0.evaluate(compiler) {
             compiler.global.output.preload.tags.push(tag);
         }
+    }
+}
+
+impl<'source> Compile<'source> for ast::DifficultyVisibleArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let Some(visible) = get_command_arg(self.visible) else {
+            return;
+        };
+
+        let Some(visible) = visible.evaluate(compiler) else {
+            return;
+        };
+
+        get_game_difficulty(compiler, self.difficulty.data).visible = visible;
+    }
+}
+
+impl<'source> Compile<'source> for ast::DifficultyLabelArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let Some(label) = get_command_arg(self.label) else {
+            return;
+        };
+
+        let Some(label) = label.evaluate(compiler) else {
+            return;
+        };
+
+        get_game_difficulty(compiler, self.difficulty.data).label = Some(label);
+    }
+}
+
+impl<'source> Compile<'source> for ast::DifficultyConfirmationArgs<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        let Some(confirmation_message) = get_command_arg(self.confirmation_message) else {
+            return;
+        };
+
+        let Some(confirmation_message) = confirmation_message.evaluate(compiler) else {
+            return;
+        };
+
+        get_game_difficulty(compiler, self.difficulty.data).confirmation_message =
+            Some(confirmation_message);
+    }
+}
+
+fn get_game_difficulty<'a>(
+    compiler: &'a mut SnippetCompiler,
+    game_difficulty: ast::GameDifficulty,
+) -> &'a mut GameDifficultyConfig {
+    let game_difficulties = &mut compiler.global.output.preload.game_difficulties;
+
+    match game_difficulty {
+        ast::GameDifficulty::Easy => &mut game_difficulties.easy,
+        ast::GameDifficulty::Normal => &mut game_difficulties.normal,
+        ast::GameDifficulty::Hard => &mut game_difficulties.hard,
     }
 }
 

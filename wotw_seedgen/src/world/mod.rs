@@ -385,7 +385,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
             defense_mod *= 0.9;
         }
 
-        if self.settings.hard {
+        if self.settings.game_difficulties.hard {
             defense_mod *= 2.0;
         }
 

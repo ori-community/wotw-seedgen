@@ -1,6 +1,6 @@
 use crate::{
-    assets::SnippetAccess, Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
-    DEFAULT_SPAWN,
+    assets::SnippetAccess, settings::GameDifficulties, Difficulty, GreaterOneU8, Spawn, Trick,
+    UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
@@ -383,8 +383,8 @@ pub struct WorldPresetSettings {
     pub difficulty: Option<Difficulty>,
     /// Logically expected tricks
     pub tricks: Option<Tricks>,
-    /// Logically assume hard in-game difficulty
-    pub hard: Option<bool>,
+    /// Which in-game difficulties to generate for
+    pub game_difficulties: Option<GameDifficulties>,
     /// Randomize entrance connections with the given max loop size
     pub randomize_entrances: Option<GreaterOneU8>,
     /// Names of snippets to use
@@ -419,7 +419,12 @@ impl WorldPresetSettings {
                     .map(trick_len)
                     .cmp(&other.tricks.as_ref().map(trick_len))
             })
-            .then_with(|| self.hard.cmp(&other.hard))
+            .then_with(|| {
+                bool::cmp(
+                    &self.game_difficulties.as_ref().is_some_and(|a| a.hard),
+                    &other.game_difficulties.as_ref().is_some_and(|b| b.hard),
+                )
+            })
     }
 
     fn apply_impl<A: PresetAccess + SnippetAccess>(
@@ -434,7 +439,7 @@ impl WorldPresetSettings {
             difficulty,
             tricks,
             spawn,
-            hard,
+            game_difficulties,
             randomize_entrances,
             snippets,
             snippet_config,
@@ -473,12 +478,12 @@ impl WorldPresetSettings {
             }
         }
 
-        if let Some(hard) = hard {
-            settings.hard = hard;
+        if let Some(game_difficulties) = game_difficulties {
+            settings.game_difficulties = game_difficulties;
         }
 
-        if let Some(randomize_entrances) = randomize_entrances {
-            settings.randomize_entrances = Some(randomize_entrances);
+        if let randomize_entrances @ Some(_) = randomize_entrances {
+            settings.randomize_entrances = randomize_entrances;
         }
 
         if let Some(snippets) = snippets {

@@ -9,14 +9,15 @@ use crate::seed_language::ast::{
     BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandArgs, CommandIf,
     CommandOnlySimulation, CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs,
     ConfigFloatRangeArgs, ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, Content,
-    CountInZoneArgs, CountInZoneBinding, Event, ExportArgs, Expression, ExpressionValue,
-    FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
-    ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
-    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
-    RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs,
-    RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs,
-    SetLogicStateArgs, Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
-    UberIdentifier, ZoneOfArgs,
+    CountInZoneArgs, CountInZoneBinding, DifficultyConfirmationArgs, DifficultyLabelArgs,
+    DifficultyVisibleArgs, Event, ExportArgs, Expression, ExpressionValue, FunctionCall,
+    FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs, ItemDataDescriptionArgs,
+    ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
+    LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs, RandomBooleanArgs,
+    RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
+    RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs,
+    Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
+    ZoneOfArgs,
 };
 
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
@@ -322,6 +323,18 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
+            Self::DifficultyVisible(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
+            Self::DifficultyLabel(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
+            Self::DifficultyConfirmation(keyword, args) => {
+                handler.command_keyword(&keyword.span);
+                args.traverse(handler);
+            }
             Self::ConfigBoolean(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
@@ -521,6 +534,32 @@ impl<H: Handler> Traverse<H> for SpawnArgs<'_> {
 impl<H: Handler> Traverse<H> for TagsArg<'_> {
     fn traverse(&self, handler: &mut H) {
         self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for DifficultyVisibleArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        handler.constant(&self.difficulty.span);
+
+        inspect_command_arg(&self.visible, |visible| visible.traverse(handler));
+    }
+}
+
+impl<H: Handler> Traverse<H> for DifficultyLabelArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        handler.constant(&self.difficulty.span);
+
+        inspect_command_arg(&self.label, |label| label.traverse(handler));
+    }
+}
+
+impl<H: Handler> Traverse<H> for DifficultyConfirmationArgs<'_> {
+    fn traverse(&self, handler: &mut H) {
+        handler.constant(&self.difficulty.span);
+
+        inspect_command_arg(&self.confirmation_message, |confirmation_message| {
+            confirmation_message.traverse(handler)
+        });
     }
 }
 

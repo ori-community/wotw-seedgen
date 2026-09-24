@@ -500,6 +500,18 @@ pub enum Command<'source> {
         Spanned<Tags>,
         CommandArgsCollection<SeparatedNonEmpty<TagsArg<'source>, Symbol<','>>>,
     ),
+    DifficultyVisible(
+        Spanned<DifficultyVisible>,
+        CommandArgs<DifficultyVisibleArgs<'source>>,
+    ),
+    DifficultyLabel(
+        Spanned<DifficultyLabel>,
+        CommandArgs<DifficultyLabelArgs<'source>>,
+    ),
+    DifficultyConfirmation(
+        Spanned<DifficultyConfirmation>,
+        CommandArgs<DifficultyConfirmationArgs<'source>>,
+    ),
     ConfigBoolean(
         Spanned<ConfigBoolean>,
         CommandArgs<ConfigBooleanArgs<'source>>,
@@ -672,6 +684,43 @@ pub struct Tags;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct TagsArg<'source>(pub Expression<'source>);
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct DifficultyVisible;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct DifficultyVisibleArgs<'source> {
+    pub difficulty: Spanned<GameDifficulty>,
+    pub visible: CommandArg<Expression<'source>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct DifficultyLabel;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct DifficultyLabelArgs<'source> {
+    pub difficulty: Spanned<GameDifficulty>,
+    pub label: CommandArg<Expression<'source>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast)]
+#[ast(case = "snake_case")]
+pub struct DifficultyConfirmation;
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct DifficultyConfirmationArgs<'source> {
+    pub difficulty: Spanned<GameDifficulty>,
+    pub confirmation_message: CommandArg<Expression<'source>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ast, Display, VariantArray)]
+pub enum GameDifficulty {
+    Easy,
+    Normal,
+    Hard,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]

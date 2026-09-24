@@ -37,8 +37,8 @@ pub use message::{Alignment, CoordinateSystem, Corner, HorizontalAnchor, Vertica
 pub use partial_then::PartialThen;
 pub use position::Position;
 pub use settings::{
-    Difficulty, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings, WorldSettingsHelpers,
-    DEFAULT_SPAWN,
+    Difficulty, GameDifficulties, GreaterOneU8, Spawn, Trick, UniverseSettings, WorldSettings,
+    WorldSettingsHelpers, DEFAULT_SPAWN,
 };
 pub use shard::Shard;
 pub use skill::Skill;

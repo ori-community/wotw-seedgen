@@ -18,7 +18,8 @@ use wotw_seedgen::data::{
         WorldPresetSettings,
     },
     seed_language::metadata::{ConfigArg, ConfigValue},
-    Difficulty, GreaterOneU8, Spawn, UniverseSettings, WorldSettings, DEFAULT_SPAWN,
+    Difficulty, GameDifficulties, GreaterOneU8, Spawn, UniverseSettings, WorldSettings,
+    DEFAULT_SPAWN,
 };
 
 use crate::{
@@ -90,7 +91,7 @@ pub fn seed_world_settings(
     choose_spawn(&prefix, settings, include_settings)?;
     select_difficulty(&prefix, settings, include_settings)?;
     select_tricks(&prefix, settings, include_settings)?;
-    select_hard(&prefix, settings, include_settings)?;
+    select_game_difficulties(&prefix, settings, include_settings)?;
     select_randomize_entrances(&prefix, settings, include_settings)?;
     select_snippets(&prefix, settings, include_settings)?;
     select_snippet_config(&prefix, settings, include_settings)?;
@@ -371,20 +372,43 @@ fn select_tricks(
     Ok(())
 }
 
-fn select_hard(
+fn select_game_difficulties(
     prefix: &str,
     settings: &mut WorldPresetSettings,
     include_settings: &WorldSettings,
 ) -> Result<(), Error> {
-    if settings.hard.is_none() {
-        if let Some(true) = Confirm::new()
+    if settings.game_difficulties.is_none() {
+        if let Some(indices) = MultiSelect::new()
             .with_prompt(format!(
-                "{prefix}Choose whether the seed should assume hard in-game difficulty"
+                "{prefix}Choose which in-game difficulties the seed should support"
             ))
-            .default(include_settings.hard)
+            .items(&[
+                "Easy",
+                "Normal",
+                "Hard",
+                "Only show selected difficulties in the main menu",
+            ])
+            .defaults(&[
+                include_settings.game_difficulties.easy,
+                include_settings.game_difficulties.normal,
+                include_settings.game_difficulties.hard,
+                include_settings.game_difficulties.only_show_selected,
+            ])
             .interact_opt()?
         {
-            settings.hard = Some(true);
+            let mut game_difficulties = GameDifficulties::NONE;
+
+            for index in indices {
+                match index {
+                    0 => game_difficulties.easy = true,
+                    1 => game_difficulties.normal = true,
+                    2 => game_difficulties.hard = true,
+                    3 => game_difficulties.only_show_selected = true,
+                    _ => unreachable!(),
+                }
+            }
+
+            settings.game_difficulties = Some(game_difficulties);
         }
     }
 

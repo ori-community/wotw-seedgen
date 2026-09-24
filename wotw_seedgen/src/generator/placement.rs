@@ -1557,9 +1557,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         let spawn = &self.world.graph.nodes[self.world.spawn];
         self.output.preload.spawn = Some(*spawn.position().unwrap());
 
-        self.world
-            .settings
-            .write_tags(&mut self.output.preload.tags);
+        self.world.settings.write_output(&mut self.output.preload);
 
         let seedgen_info = SeedgenInfo::new(
             settings.clone(),

@@ -14,7 +14,7 @@ use rustc_hash::{FxBuildHasher, FxHashMap};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use wotw_seedgen_data::seed_language::output::{
-    DebugOutput, IntermediateOutput, PlaceholderMap, PreloadOutput,
+    DebugOutput, GameDifficultyConfigs, IntermediateOutput, PlaceholderMap, PreloadOutput,
 };
 use wotw_seedgen_data::Position;
 
@@ -90,15 +90,19 @@ impl Seed {
     }
 }
 
-/// Contains necessary information while preloading in the main menu.
+/// Contains information relevant while still in the main menu.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Preload {
     /// May be displayed as brief summary of the settings
     pub tags: Vec<String>,
     /// For preloading before starting the savefile
     pub spawn: Position,
     /// Identical for seeds with the same universe settings (including the rng seed)
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<String>,
+    /// Customizations for the vanilla difficulty selection
+    pub game_difficulties: GameDifficultyConfigs,
 }
 
 impl Preload {
@@ -107,6 +111,7 @@ impl Preload {
             tags: output.tags,
             spawn: output.spawn.unwrap_or(Position::new(-799., -4310.)),
             slug: None,
+            game_difficulties: output.game_difficulties,
         }
     }
 }
