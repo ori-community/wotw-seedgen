@@ -340,20 +340,6 @@
           "value": 1.0,
           "value_type": "Float"
         },
-        "30": {
-          "name": "healthRegenerationPerMinute",
-          "readonly": false,
-          "type": "SerializedFloatUberState",
-          "value": 0.0,
-          "value_type": "Float"
-        },
-        "31": {
-          "name": "energyRegenerationPerMinute",
-          "readonly": false,
-          "type": "SerializedFloatUberState",
-          "value": 0.0,
-          "value_type": "Float"
-        },
         "35": {
           "name": "extraDoubleJumps",
           "readonly": false,
