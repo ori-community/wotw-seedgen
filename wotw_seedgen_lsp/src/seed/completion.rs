@@ -15,14 +15,14 @@ use wotw_seedgen_data::{
             ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, ConfigType,
             ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding,
             DifficultyConfirmationArgs, DifficultyLabelArgs, DifficultyVisibleArgs, Event,
-            Expression, ExpressionValue, FunctionCall, FunctionDefinition, GameDifficulty,
-            ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs,
-            ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs,
-            Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs, RandomNumberArgs,
-            RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs,
-            SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs, StateArgs, TagsArg,
-            Trigger, TriggerBinding, UberIdentifier, UberIdentifierName, UberIdentifierNumeric,
-            UberStateType, ZoneOfArgs,
+            EventContent, Expression, ExpressionValue, FunctionCall, FunctionDefinition,
+            GameDifficulty, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
+            ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
+            LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
+            RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
+            RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
+            StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
+            UberIdentifierNumeric, UberStateType, ZoneOfArgs,
         },
         compile::FunctionIdentifier,
         types::Type,
@@ -1364,6 +1364,22 @@ impl ErrCompletion for LocationSlotsArgs<'_> {
 impl CompletionInSpan for CommandOnlySimulation<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.0.completion(index, cache)
+    }
+}
+
+impl Completion for EventContent<'_> {
+    fn completion(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        let (on, event) = self;
+        event.span_checked_completion((on, event).span(), index, cache)
+    }
+}
+
+impl ErrCompletion for EventContent<'_> {
+    fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
+        vec![CompletionItem {
+            label: "on".to_string(),
+            ..Default::default()
+        }]
     }
 }
 

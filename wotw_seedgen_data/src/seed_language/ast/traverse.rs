@@ -10,14 +10,14 @@ use crate::seed_language::ast::{
     CommandOnlySimulation, CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs,
     ConfigFloatRangeArgs, ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, Content,
     CountInZoneArgs, CountInZoneBinding, DifficultyConfirmationArgs, DifficultyLabelArgs,
-    DifficultyVisibleArgs, Event, ExportArgs, Expression, ExpressionValue, FunctionCall,
-    FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs, ItemDataDescriptionArgs,
-    ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs,
-    LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs, RandomBooleanArgs,
-    RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs,
-    RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs,
-    Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
-    ZoneOfArgs,
+    DifficultyVisibleArgs, Event, EventContent, ExportArgs, Expression, ExpressionValue,
+    FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
+    ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
+    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
+    RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs,
+    RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs,
+    SetLogicStateArgs, Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
+    UberIdentifier, ZoneOfArgs,
 };
 
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
@@ -769,6 +769,14 @@ impl<H: Handler> Traverse<H> for SetLogicStateArgs<'_> {
 impl<H: Handler> Traverse<H> for CommandOnlySimulation<'_> {
     fn traverse(&self, handler: &mut H) {
         self.0.traverse(handler);
+    }
+}
+
+impl<H: Handler> Traverse<H> for EventContent<'_> {
+    fn traverse(&self, handler: &mut H) {
+        let (keyword, event) = self;
+        handler.keyword(&keyword.span);
+        event.traverse(handler);
     }
 }
 

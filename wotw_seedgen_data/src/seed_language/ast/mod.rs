@@ -979,7 +979,10 @@ pub struct SetLogicStateArgs<'source>(pub Spanned<&'source str>);
 pub struct OnlySimulation;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct CommandOnlySimulation<'source>(pub NestedContent<'source>);
+pub struct CommandOnlySimulation<'source>(pub Delimited<'{', Vec<EventContent<'source>>, '}'>);
+
+// TODO No good recovery strategies that make sure not to escape Delimited...
+pub type EventContent<'source> = (Spanned<On>, Event<'source>);
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]

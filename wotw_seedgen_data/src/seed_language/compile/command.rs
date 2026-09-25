@@ -1233,6 +1233,14 @@ impl<'source> Compile<'source> for ast::CommandOnlySimulation<'source> {
     }
 }
 
+impl<'source> Compile<'source> for ast::EventContent<'source> {
+    type Output = ();
+
+    fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
+        self.1.compile(compiler);
+    }
+}
+
 impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
     type Output = ();
 
