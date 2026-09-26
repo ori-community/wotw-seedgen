@@ -1,7 +1,9 @@
 use std::io::Write;
 
 use arboard::Clipboard;
-use wotw_seedgen::data::assets::{self, LocData, StateData, UberStateData, UberStateDump};
+use wotw_seedgen::data::assets::{
+    self, LocData, StateData, UberStateData, UberStateDump, UberStateNameEntry,
+};
 
 use crate::Error;
 
@@ -47,7 +49,14 @@ pub fn import_uber_states() -> Result<(), Error> {
 
     for (name, value) in &OVERRIDES {
         let (group, member) = name.split_once('.').unwrap();
-        let uber_identifier = data.name_lookup[group][member][0].uber_identifier;
+
+        let UberStateNameEntry::Vanilla(uber_identifiers) = &data.name_lookup[group][member] else {
+            panic!("overrides should reference the vanilla names");
+        };
+
+        assert_eq!(uber_identifiers.len(), 1);
+
+        let uber_identifier = uber_identifiers[0];
 
         let dump_member = dump
             .groups

@@ -284,22 +284,32 @@ impl CompletionInSpan for UberIdentifierNumeric {
         cache: &CacheValues,
     ) -> Option<Vec<CompletionItem>> {
         cache
-            .uber_identifier_numeric_member_completion
+            .uber_identifier_completion
+            .numeric
+            .members
             .get(&self.group.data)
             .cloned()
     }
 }
 
 impl CompletionInSpan for UberIdentifierName<'_> {
-    fn completion_in_span(
-        &self,
-        _index: usize,
-        cache: &CacheValues,
-    ) -> Option<Vec<CompletionItem>> {
-        cache
-            .uber_identifier_name_member_completion
-            .get(self.group.data.0)
-            .cloned()
+    fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
+        if index < self.group.span.end {
+            return Some(cache.uber_identifier_completion.name.groups.clone());
+        }
+
+        let member_completion = cache
+            .uber_identifier_completion
+            .name
+            .members
+            .get(self.group.data.0)?;
+
+        if (self.group.span.end..self.member.span_end()).contains(&index) {
+            return Some(member_completion.members.clone());
+        }
+
+        let member = self.member.value.as_option()?;
+        member_completion.pickups.get(member.data.0).cloned()
     }
 }
 
@@ -552,8 +562,8 @@ fn expression_completion(cache: &CacheValues) -> Vec<CompletionItem> {
 
     completion.append(&mut CONSTANT_COMPLETION.clone());
 
-    completion.append(&mut cache.uber_identifier_numeric_completion.clone());
-    completion.append(&mut cache.uber_identifier_name_completion.clone());
+    completion.append(&mut cache.uber_identifier_completion.numeric.groups.clone());
+    completion.append(&mut cache.uber_identifier_completion.name.groups.clone());
 
     completion
 }
@@ -638,7 +648,7 @@ fn literal_completion(
 ) -> Option<Vec<CompletionItem>> {
     match &literal.data {
         Literal::UberIdentifier(uber_identifier) => uber_identifier.completion(index, cache),
-        Literal::Integer(_) => Some(cache.uber_identifier_numeric_completion.clone()),
+        Literal::Integer(_) => Some(cache.uber_identifier_completion.numeric.groups.clone()),
         Literal::String(string) => string_literal_completion(string, literal.span.start, index),
         Literal::Constant(_) => Some(CONSTANT_COMPLETION.clone()),
         Literal::Boolean(_) | Literal::Float(_) => None,
@@ -762,7 +772,7 @@ impl CompletionInSpan for TriggerBinding<'_> {
                 uber_identifier.completion(index, cache)
             }
             TriggerBinding::Identifier(identifier) => {
-                let mut completion = cache.uber_identifier_name_completion.clone();
+                let mut completion = cache.uber_identifier_completion.name.groups.clone();
 
                 if let Some(mut identifier_completion) = identifier.completion(index, cache) {
                     completion.append(&mut identifier_completion);
@@ -777,7 +787,7 @@ impl CompletionInSpan for TriggerBinding<'_> {
 impl ErrCompletion for TriggerBinding<'_> {
     fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         // Failure means there was no identifier, so only numeric completions may be relevant
-        cache.uber_identifier_numeric_completion.clone()
+        cache.uber_identifier_completion.numeric.groups.clone()
     }
 }
 

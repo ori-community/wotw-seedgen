@@ -762,7 +762,7 @@ impl<'source> Compile<'source> for ast::StateArgs<'source> {
 
         compiler.define_variable(
             self.identifier.data,
-            UberStateAlias::regular(uber_identifier),
+            UberStateAlias::identifier(uber_identifier),
         );
     }
 }
@@ -788,8 +788,11 @@ impl<'source> Compile<'source> for ast::TimerArgs<'source> {
             .commands
             .push_event(Event::on_reload(CommandVoid::DefineTimer { toggle, timer }));
 
-        compiler.define_variable(self.toggle_identifier.data, UberStateAlias::regular(toggle));
-        compiler.define_variable(timer_identifier.data, UberStateAlias::regular(timer));
+        compiler.define_variable(
+            self.toggle_identifier.data,
+            UberStateAlias::identifier(toggle),
+        );
+        compiler.define_variable(timer_identifier.data, UberStateAlias::identifier(timer));
     }
 }
 

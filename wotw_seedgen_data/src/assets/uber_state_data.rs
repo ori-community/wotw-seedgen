@@ -14,39 +14,55 @@ use std::{
 /// Information about all UberStates used by the game
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct UberStateData {
-    /// Two-level map to resolve UberStates by their internal name.
-    /// Resolve by the group name first, then the member name.
-    /// UberState names are often written as `<group>.<member>`
+    /// Nested lookup to resolve UberStates by name.
     ///
-    /// Every UberState does have a name, but multiple UberStates can have
-    /// the same name, which is why this resolves to [`Vec<UberStateAlias>`]
+    /// Vanilla UberState names are usually written as camelCase `<group>.<member>`.
+    /// Resolve by `<group>` first, then `<member>`. This should yield a [`Vec<UberIdentifier>`].
     ///
-    /// This may also include randomizer aliases, which are generally more intuitive.
+    /// Rando names are usually written as PascalCase `<zone>[.<region>].<item>`.
+    /// Resolve by the first two parts, then continue as desired in the resulting [`RandoUberStateGroup`].
     ///
-    /// If successful, this lookup will yield you the name's corresponding [`UberIdentifier`],
-    /// which you can use to query `id_lookup` for additional information
-    pub name_lookup: FxHashMap<String, FxHashMap<String, Vec<UberStateAlias>>>,
+    /// In both cases once you have resolved to an [`UberIdentifier`],
+    /// you can query `id_lookup` for additional information.
+    pub name_lookup: FxHashMap<String, FxHashMap<String, UberStateNameEntry>>,
     /// Query a unique `UberIdentifier` for information about the UberState
     pub id_lookup: FxHashMap<UberIdentifier, UberStateDataEntry>,
 }
 
-/// Successful Resolution of an UberState name
+/// Successful resolution of two UberState name parts
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub enum UberStateNameEntry {
+    /// Vanilla names are always two-parted and resolve directly to [`UberIdentifier`]s, but multiple may have the same name.
+    Vanilla(Vec<UberIdentifier>),
+    /// Rando names can resolve to different expressions, see [`RandoUberStateGroup`]
+    Rando(RandoUberStateGroup),
+}
+
+/// Successful resolution of two name parts of a rando UberState
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct RandoUberStateGroup {
+    /// Two-parted rando names will be found here.
+    pub root_member: Option<UberStateAlias>,
+    /// Three-parted rando names can be looked up further in this map.
+    pub members: FxHashMap<String, UberStateAlias>,
+}
+
+/// Successful Resolution of a rando UberState name
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct UberStateAlias {
     /// The unique `UberIdentifier` corresponding to this name
     pub uber_identifier: UberIdentifier,
-    /// `None` for all regular UberState names
+    /// `None` if the rando name resolves directly to `uber_identifier`.
     ///
-    /// For custom identifiers from the randomizer, an additional value may be associated which
-    /// represents the minimum value inside the UberState. For instance, all Hand to Hand steps
-    /// have individual custom identifiers, even though Hand to Hand progress is stored in a single
-    /// UberState. The value represents the current step of Hand to Hand.
+    /// If `Some`, this represents the expression `uber_identifier` >= `value`, which is commonly used in logic.
+    /// For instance, all Hand to Hand steps have individual rando names, even though Hand to Hand progress
+    /// is stored in a single UberState. The value then represents the current step of Hand to Hand.
     pub value: Option<i32>,
 }
 
 impl UberStateAlias {
-    /// A regular alias referring to an entire UberState
-    pub fn regular(uber_identifier: UberIdentifier) -> Self {
+    /// An alias directly referring to an [`UberIdentifier`]
+    pub fn identifier(uber_identifier: UberIdentifier) -> Self {
         Self {
             uber_identifier,
             value: None,
@@ -223,10 +239,15 @@ impl UberStateData {
             for (member, dump_member) in dump_group.states {
                 let name = format!("{}.{}", dump_group.name, dump_member.name);
 
-                group_map
+                match group_map
                     .entry(dump_member.name)
-                    .or_default()
-                    .push(UberStateAlias::regular(UberIdentifier::new(group, member)));
+                    .or_insert(UberStateNameEntry::Vanilla(Vec::new()))
+                {
+                    UberStateNameEntry::Vanilla(uber_identifiers) => {
+                        uber_identifiers.push(UberIdentifier::new(group, member))
+                    }
+                    UberStateNameEntry::Rando(_) => rando_name_in_vanilla_group(&dump_group.name),
+                };
 
                 let default_value = match dump_member.value_type {
                     UberStateDumpValueType::Boolean => {
@@ -253,7 +274,7 @@ impl UberStateData {
 
         for record in &loc_data.entries {
             uber_state_data.add_rando_name(
-                record.identifier.clone(),
+                &record.identifier,
                 record.uber_identifier,
                 record.value,
             );
@@ -261,7 +282,7 @@ impl UberStateData {
 
         for record in &state_data.entries {
             uber_state_data.add_rando_name(
-                record.identifier.clone(),
+                &record.identifier,
                 record.uber_identifier,
                 record.value,
             );
@@ -270,28 +291,48 @@ impl UberStateData {
         uber_state_data
     }
 
-    fn add_rando_name(
-        &mut self,
-        name: String,
-        uber_identifier: UberIdentifier,
-        value: Option<i32>,
-    ) {
-        let (group, member) = name.split_once('.').expect("Invalid UberState name");
+    fn add_rando_name(&mut self, name: &str, uber_identifier: UberIdentifier, value: Option<i32>) {
+        let mut parts = name.split('.');
+        let zone = parts.next().unwrap();
+        let region_or_pickup = parts.next().expect("Invalid UberState name");
 
-        self.name_lookup
-            .entry(group.to_string())
+        let rando_group = match self
+            .name_lookup
+            .entry(zone.to_string())
             .or_default()
-            .entry(member.to_string())
-            .or_default()
-            .push(UberStateAlias {
-                uber_identifier,
-                value,
-            });
+            .entry(region_or_pickup.to_string())
+            .or_insert(UberStateNameEntry::Rando(RandoUberStateGroup::default()))
+        {
+            UberStateNameEntry::Vanilla(_) => rando_name_in_vanilla_group(zone),
+            UberStateNameEntry::Rando(rando_group) => rando_group,
+        };
+
+        let alias = UberStateAlias {
+            uber_identifier,
+            value,
+        };
+
+        let previous = match parts.next() {
+            None => rando_group.root_member.replace(alias),
+            Some(pickup) => rando_group.members.insert(pickup.to_string(), alias),
+        };
+
+        if previous.is_some() {
+            panic!("duplicate rando name \"{name}\"");
+        }
+
+        if parts.next().is_some() {
+            panic!("rando name \"{name}\" exceeds three parts");
+        }
 
         if value.is_none() {
-            self.id_lookup.get_mut(&uber_identifier).unwrap().rando_name = Some(name);
+            self.id_lookup.get_mut(&uber_identifier).unwrap().rando_name = Some(name.to_string());
         }
     }
+}
+
+fn rando_name_in_vanilla_group(group: &str) -> ! {
+    panic!("Vanilla UberState group \"{group}\" cannot contain rando names")
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

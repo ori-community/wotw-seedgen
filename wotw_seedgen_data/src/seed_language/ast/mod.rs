@@ -484,6 +484,14 @@ pub struct UberIdentifierName<'source> {
     pub group: Spanned<Identifier<'source>>,
     pub period: Symbol<'.'>,
     pub member: Recoverable<Spanned<Identifier<'source>>, RecoverPass>,
+    /// Names imported from logic may have a third part
+    pub pickup: SpannedOption<UberIdentifierNamePickup<'source>>, // TODO this should be able to work with normal option
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
+pub struct UberIdentifierNamePickup<'source> {
+    pub period: Spanned<Symbol<'.'>>,
+    pub identifier: Recoverable<Spanned<Identifier<'source>>, RecoverPass>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, VariantNames, Ast, Span)]

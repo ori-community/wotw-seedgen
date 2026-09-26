@@ -79,6 +79,7 @@ fn uber_identifier() {
             },
             period: Symbol,
             member: Recoverable::none(14),
+            pickup: SpannedOption::None(14),
         }))
     );
     let error = result.errors.into_iter().next().unwrap();
@@ -124,6 +125,7 @@ fn function_call() {
                                 data: Identifier("TrialActivation"),
                                 span: 15..30,
                             }),
+                            pickup: SpannedOption::None(30),
                         })),
                         span: 4..30,
                     })),

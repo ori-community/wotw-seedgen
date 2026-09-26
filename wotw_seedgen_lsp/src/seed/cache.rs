@@ -5,8 +5,8 @@ use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLab
 use wotw_seedgen_data::{
     assets::{
         AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, LocData,
-        PresetFileAccess, SnippetFileAccess, StateData, UberStateAlias, UberStateData,
-        UberStateDataEntry,
+        PresetFileAccess, SnippetFileAccess, StateData, UberStateData, UberStateDataEntry,
+        UberStateNameEntry,
     },
     parse::Source,
     UberIdentifier,
@@ -18,10 +18,31 @@ pub type Cache = ServerState<DefaultFileAccess, CacheValues>;
 pub struct CacheValues {
     pub loc_data: Result<LocData, String>,
     pub uber_state_data: Result<UberStateData, String>,
-    pub uber_identifier_numeric_completion: Vec<CompletionItem>,
-    pub uber_identifier_numeric_member_completion: FxHashMap<i32, Vec<CompletionItem>>,
-    pub uber_identifier_name_completion: Vec<CompletionItem>,
-    pub uber_identifier_name_member_completion: FxHashMap<String, Vec<CompletionItem>>,
+    pub uber_identifier_completion: UberIdentifierCompletion,
+}
+
+#[derive(Default)]
+pub struct UberIdentifierCompletion {
+    pub numeric: UberIdentifierNumericCompletion,
+    pub name: UberIdentifierNameCompletion,
+}
+
+#[derive(Default)]
+pub struct UberIdentifierNumericCompletion {
+    pub groups: Vec<CompletionItem>,
+    pub members: FxHashMap<i32, Vec<CompletionItem>>,
+}
+
+#[derive(Default)]
+pub struct UberIdentifierNameCompletion {
+    pub groups: Vec<CompletionItem>,
+    pub members: FxHashMap<String, UberIdentifierNameMemberCompletion>,
+}
+
+#[derive(Default)]
+pub struct UberIdentifierNameMemberCompletion {
+    pub members: Vec<CompletionItem>,
+    pub pickups: FxHashMap<String, Vec<CompletionItem>>,
 }
 
 impl AssetCacheValues for CacheValues {
@@ -32,21 +53,12 @@ impl AssetCacheValues for CacheValues {
         let loc_data = file_access.loc_data();
         let uber_state_data =
             uber_state_data(loc_data.as_ref().map_err(String::clone), file_access);
-        let uber_identifier_numeric_completion =
-            uber_identifier_numeric_completion(&uber_state_data);
-        let uber_identifier_numeric_member_completion =
-            uber_identifier_numeric_member_completion(&uber_state_data);
-        let uber_identifier_name_completion = uber_identifier_name_completion(&uber_state_data);
-        let uber_identifier_name_member_completion =
-            uber_identifier_name_member_completion(&uber_state_data);
+        let uber_identifier_completion = UberIdentifierCompletion::new(&uber_state_data);
 
         Self {
             loc_data,
             uber_state_data,
-            uber_identifier_numeric_completion,
-            uber_identifier_numeric_member_completion,
-            uber_identifier_name_completion,
-            uber_identifier_name_member_completion,
+            uber_identifier_completion,
         }
     }
 
@@ -89,14 +101,7 @@ impl AssetCacheValues for CacheValues {
 
         if changed.loc_data || changed.state_data || changed.uber_state_dump {
             self.uber_state_data = uber_state_data(self.loc_data(), file_access);
-            self.uber_identifier_numeric_completion =
-                uber_identifier_numeric_completion(&self.uber_state_data);
-            self.uber_identifier_numeric_member_completion =
-                uber_identifier_numeric_member_completion(&self.uber_state_data);
-            self.uber_identifier_name_completion =
-                uber_identifier_name_completion(&self.uber_state_data);
-            self.uber_identifier_name_member_completion =
-                uber_identifier_name_member_completion(&self.uber_state_data);
+            self.uber_identifier_completion = UberIdentifierCompletion::new(&self.uber_state_data);
         }
     }
 }
@@ -108,100 +113,133 @@ fn uber_state_data<F: AssetFileAccess>(
     file_access.uber_state_data(loc_data?, &file_access.state_data()?)
 }
 
-fn uber_identifier_numeric_completion(
-    uber_state_data: &Result<UberStateData, String>,
-) -> Vec<CompletionItem> {
-    let Ok(uber_state_data) = uber_state_data else {
-        return Vec::new();
-    };
+impl UberIdentifierCompletion {
+    fn new(uber_state_data: &Result<UberStateData, String>) -> Self {
+        let Ok(uber_state_data) = uber_state_data else {
+            return Self::default();
+        };
 
-    uber_state_data
-        .id_lookup
-        .iter()
-        .map(|(id, data)| uber_identifier_numeric_completion_item(*id, data))
-        .collect()
-}
-
-fn uber_identifier_numeric_member_completion(
-    uber_state_data: &Result<UberStateData, String>,
-) -> FxHashMap<i32, Vec<CompletionItem>> {
-    let Ok(uber_state_data) = uber_state_data else {
-        return FxHashMap::default();
-    };
-
-    let mut group_map = FxHashMap::<i32, Vec<CompletionItem>>::default();
-
-    for (id, data) in &uber_state_data.id_lookup {
-        group_map.entry(id.group).or_default().push(CompletionItem {
-            insert_text: Some(id.member.to_string()),
-            filter_text: Some(id.member.to_string()),
-            ..uber_identifier_numeric_completion_item(*id, data)
-        });
+        Self {
+            numeric: UberIdentifierNumericCompletion::new(uber_state_data),
+            name: UberIdentifierNameCompletion::new(uber_state_data),
+        }
     }
-
-    group_map
 }
 
-fn uber_identifier_name_completion(
-    uber_state_data: &Result<UberStateData, String>,
-) -> Vec<CompletionItem> {
-    let Ok(uber_state_data) = uber_state_data else {
-        return Vec::new();
-    };
+impl UberIdentifierNumericCompletion {
+    fn new(uber_state_data: &UberStateData) -> Self {
+        let mut numeric = Self::default();
 
-    uber_state_data
-        .name_lookup
-        .iter()
-        .flat_map(|(group, members)| {
-            members.iter().flat_map(move |(member, aliases)| {
-                let ambiguous = aliases.len() > 1;
+        for (id, data) in &uber_state_data.id_lookup {
+            numeric.groups.push(numeric_completion_item(*id, data));
 
-                aliases.iter().map(move |alias| {
-                    uber_identifier_name_completion_item(group, member, alias, ambiguous)
-                })
-            })
-        })
-        .collect()
+            numeric
+                .members
+                .entry(id.group)
+                .or_default()
+                .push(CompletionItem {
+                    insert_text: Some(id.member.to_string()),
+                    filter_text: Some(id.member.to_string()),
+                    ..numeric_completion_item(*id, data)
+                });
+        }
+
+        numeric
+    }
 }
 
-fn uber_identifier_name_member_completion(
-    uber_state_data: &Result<UberStateData, String>,
-) -> FxHashMap<String, Vec<CompletionItem>> {
-    let Ok(uber_state_data) = uber_state_data else {
-        return FxHashMap::default();
-    };
+impl UberIdentifierNameCompletion {
+    fn new(uber_state_data: &UberStateData) -> Self {
+        let mut name = Self::default();
 
-    uber_state_data
-        .name_lookup
-        .iter()
-        .map(|(group, members)| {
-            (
-                group.clone(),
-                members
-                    .iter()
-                    .flat_map(|(member, aliases)| {
-                        let ambiguous = aliases.len() > 1;
+        name.groups.reserve(uber_state_data.name_lookup.len());
+        name.members.reserve(uber_state_data.name_lookup.len());
 
-                        aliases.iter().map(move |alias| CompletionItem {
-                            insert_text: Some(member.clone()), // TODO edit in numbers on ambiguous names?
-                            filter_text: Some(member.clone()),
-                            ..uber_identifier_name_completion_item(group, member, alias, ambiguous)
-                        })
-                    })
-                    .collect(),
-            )
-        })
-        .collect()
+        for (group, members) in &uber_state_data.name_lookup {
+            let mut member_completions = UberIdentifierNameMemberCompletion::default();
+
+            for (member, entry) in members {
+                match entry {
+                    UberStateNameEntry::Vanilla(uber_identifiers) => {
+                        let ambiguous = uber_identifiers.len() > 1;
+
+                        name.groups.reserve(uber_identifiers.len());
+                        member_completions.members.reserve(uber_identifiers.len());
+
+                        for uber_identifier in uber_identifiers {
+                            push_name_member_completion(
+                                CompletionItem {
+                                    label: format!("{group}.{member}"),
+                                    label_details: Some(CompletionItemLabelDetails {
+                                        description: Some(uber_identifier.to_string()),
+                                        detail: ambiguous.then(|| "(ambiguous name)".to_string()),
+                                    }),
+                                    kind: Some(CompletionItemKind::VALUE),
+                                    ..Default::default()
+                                },
+                                member,
+                                &mut name,
+                                &mut member_completions,
+                            );
+                        }
+                    }
+                    UberStateNameEntry::Rando(rando_group) => {
+                        if let Some(alias) = &rando_group.root_member {
+                            push_name_member_completion(
+                                simple_completion_item(
+                                    format!("{group}.{member}"),
+                                    alias.to_string(),
+                                ),
+                                member,
+                                &mut name,
+                                &mut member_completions,
+                            );
+                        }
+
+                        name.groups.reserve(rando_group.members.len());
+                        member_completions
+                            .members
+                            .reserve(rando_group.members.len());
+
+                        let mut pickup_completions = Vec::with_capacity(rando_group.members.len());
+
+                        for (pickup, alias) in &rando_group.members {
+                            push_name_pickup_completion(
+                                simple_completion_item(
+                                    format!("{group}.{member}.{pickup}"),
+                                    alias.to_string(),
+                                ),
+                                member,
+                                pickup,
+                                &mut name,
+                                &mut member_completions,
+                                &mut pickup_completions,
+                            );
+                        }
+
+                        member_completions
+                            .pickups
+                            .insert(member.clone(), pickup_completions);
+                    }
+                }
+            }
+
+            name.members.insert(group.clone(), member_completions);
+        }
+
+        name
+    }
 }
 
-fn uber_identifier_numeric_completion_item(
-    id: UberIdentifier,
-    data: &UberStateDataEntry,
-) -> CompletionItem {
+fn numeric_completion_item(id: UberIdentifier, data: &UberStateDataEntry) -> CompletionItem {
+    simple_completion_item(id.to_string(), data.preferred_name().clone())
+}
+
+fn simple_completion_item(label: String, description: String) -> CompletionItem {
     CompletionItem {
-        label: id.to_string(),
+        label,
         label_details: Some(CompletionItemLabelDetails {
-            description: Some(data.preferred_name().clone()),
+            description: Some(description),
             ..Default::default()
         }),
         kind: Some(CompletionItemKind::VALUE),
@@ -209,19 +247,40 @@ fn uber_identifier_numeric_completion_item(
     }
 }
 
-fn uber_identifier_name_completion_item(
-    group: &str,
+fn push_name_member_completion(
+    full_completion: CompletionItem,
     member: &str,
-    alias: &UberStateAlias,
-    ambiguous: bool,
-) -> CompletionItem {
-    CompletionItem {
-        label: format!("{group}.{member}"),
-        label_details: Some(CompletionItemLabelDetails {
-            description: Some(alias.to_string()),
-            detail: ambiguous.then(|| "(ambiguous name)".to_string()),
-        }),
-        kind: Some(CompletionItemKind::VALUE),
-        ..Default::default()
-    }
+    name: &mut UberIdentifierNameCompletion,
+    member_completions: &mut UberIdentifierNameMemberCompletion,
+) {
+    member_completions.members.push(CompletionItem {
+        insert_text: Some(member.to_string()), // TODO edit in numbers on ambiguous names?
+        filter_text: Some(member.to_string()),
+        ..full_completion.clone()
+    });
+
+    name.groups.push(full_completion);
+}
+
+fn push_name_pickup_completion(
+    full_completion: CompletionItem,
+    member: &String,
+    pickup: &String,
+    name: &mut UberIdentifierNameCompletion,
+    member_completions: &mut UberIdentifierNameMemberCompletion,
+    pickup_completions: &mut Vec<CompletionItem>,
+) {
+    pickup_completions.push(CompletionItem {
+        insert_text: Some(pickup.clone()),
+        filter_text: Some(pickup.clone()),
+        ..full_completion.clone()
+    });
+
+    member_completions.members.push(CompletionItem {
+        insert_text: Some(format!("{member}.{pickup}")),
+        filter_text: Some(format!("{member}.{pickup}")),
+        ..full_completion.clone()
+    });
+
+    name.groups.push(full_completion);
 }

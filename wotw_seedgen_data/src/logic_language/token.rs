@@ -43,7 +43,7 @@ pub enum Token {
     Or,
     #[regex(r"[_a-vyzA-Z]\w*")]
     Identifier,
-    #[regex(r"[_a-vyzA-Z]\w*\.\w+")]
+    #[regex(r"[_a-vyzA-Z]\w*\.\w+(\.\w+)?")]
     LogicIdentifier,
     #[regex(r"-?\d+\.\d*")]
     Float,

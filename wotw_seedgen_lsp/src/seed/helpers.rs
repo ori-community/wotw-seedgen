@@ -1,5 +1,10 @@
 use itertools::Itertools;
-use wotw_seedgen_data::{assets::UberStateData, seed_language::ast, UberIdentifier};
+use wotw_seedgen_data::{
+    assets::{UberStateData, UberStateNameEntry},
+    parse::SpannedOption,
+    seed_language::ast,
+    UberIdentifier,
+};
 
 pub fn uber_identifier_info(
     uber_identifier: &ast::UberIdentifier,
@@ -24,14 +29,23 @@ pub fn uber_identifier_info(
 
             let member = &name.member.value.as_option()?;
 
-            let member_lookup = group_lookup.get(member.data.0)?;
-
-            match member_lookup.as_slice() {
-                [single_element] => single_element.to_string(),
-                elements => elements
-                    .iter()
-                    .format_with("\n", |alias, f| f(&format_args!("- {alias}")))
-                    .to_string(),
+            match group_lookup.get(member.data.0)? {
+                UberStateNameEntry::Vanilla(uber_identifiers) => {
+                    match uber_identifiers.as_slice() {
+                        [single_element] => single_element.to_string(),
+                        elements => elements
+                            .iter()
+                            .format_with("\n", |identifier, f| f(&format_args!("- {identifier}")))
+                            .to_string(),
+                    }
+                }
+                UberStateNameEntry::Rando(rando_group) => match &name.pickup {
+                    SpannedOption::Some(pickup) => {
+                        let pickup = pickup.identifier.value.as_option()?.data.0;
+                        rando_group.members.get(pickup)?.to_string()
+                    }
+                    SpannedOption::None(_) => rando_group.root_member.as_ref()?.to_string(),
+                },
             }
         }
     };
