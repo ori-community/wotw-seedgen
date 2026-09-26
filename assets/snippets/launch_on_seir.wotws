@@ -5,5 +5,5 @@
 !tags("Launch on Seir")
 
 !remove_item(skill(Launch), 1)
-!remove_location(WindtornRuins.Seir)
-on WindtornRuins.Seir skill(Launch)
+!remove_location(WindtornRuins.EscapeReward)
+on WindtornRuins.EscapeReward skill(Launch)

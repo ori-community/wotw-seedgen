@@ -127,6 +127,12 @@ on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut
     if gladesProjects.housesABuilt == false store(questUberStateGroup.familyReunionQuest, 0)
     if gladesProjects.housesABuilt store(questUberStateGroup.familyReunionQuest, 1)
 }
+// Patience Skip can lock you out of the escape reward. This fix gives the expected rewards when teleporting away in the cutscene area.
+on player.isTeleporting if windtornRuinsGroup.desertRuinsEscape == 3 if windtornRuinsGroup.wispRewardPickup == false if is_in_rectangle(2050, -3571, 2150, -3545) {
+    store(windtornRuinsGroup.wispRewardPickup, true)
+    store(player.baseMaxHealth, player.baseMaxHealth + 10)
+    store(player.baseMaxEnergy, player.baseMaxEnergy + 1)
+}
 // Enable the spoiler map on game finished
 // TODO: Move this to a separate snippet to allow for more customization?
 on gameStateGroup.gameFinished {

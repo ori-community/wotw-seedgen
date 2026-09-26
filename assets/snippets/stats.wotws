@@ -1506,7 +1506,7 @@ on WindtornRuins.EscapeRevisitEF {
     store(randoStats.pickupsCollectedRuins, randoStats.pickupsCollectedRuins + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on WindtornRuins.Seir {
+on WindtornRuins.EscapeReward {
     store(randoStats.pickupsCollectedRuins, randoStats.pickupsCollectedRuins + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
