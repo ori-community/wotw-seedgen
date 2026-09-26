@@ -446,7 +446,7 @@ on EastHollow.BashTree {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }
-on EastHollow.KwolokAmuletQuest {
+on EastHollow.KwoloksWisdomCompleted {
     store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
     store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
 }

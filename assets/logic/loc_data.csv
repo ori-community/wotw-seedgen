@@ -86,7 +86,7 @@ EastHollow.BashAreaEF, Hollow, EnergyFragment, , 937, 23772, , 46.8, -4236.6, 46
 EastHollow.BashHF, Hollow, HealthFragment, , 13428, 59730, , 84.0, -4263.0, 84.0289, -4262.0195
 EastHollow.AboveBashSL, Hollow, SpiritLight, 100, 937, 30182, , -31.4, -4302.3, -31.656738, -4301.913
 EastHollow.BashTree, Hollow, Skill, Bash, 0, 0, , -20, -4326, -20.328445, -4319.618
-EastHollow.KwolokAmuletQuest, Hollow, QuestItem, 500 SpiritLight, 14019, 50597, 4, 240, -4207, 240.1, -4207.5
+EastHollow.KwoloksWisdomCompleted, Hollow, QuestItem, 500 SpiritLight, 14019, 50597, 4, 240, -4207, 240.1, -4207.5
 EastHollow.RightKwolokSL, Hollow, SpiritLight, 100, 58674, 20983, , 289.0, -4195.7, 289.0374, -4195.708
 EastHollow.SilentSwimEF, Hollow, EnergyFragment, , 58674, 9583, , 331.9, -4191.3, 331.87, -4190.344
 EastHollow.SplinterShard, Hollow, Shard, Splinter, 23987, 62973, , 216.2, -4307.3, 216.17882, -4306.3125
