@@ -40,7 +40,7 @@ pub trait AstCollectionInit<'source, T: Tokenize>: Sized {
     ) -> SpannedOption<Self> {
         let option = Self::ast_first_impl::<E>(parser);
 
-        SpannedOption::from_option(option, || parser.last_error_span())
+        SpannedOption::from_option(option, || parser.last_end())
     }
 
     fn ast_first(parser: &mut Parser<'source, T>) -> Option<Self> {

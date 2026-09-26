@@ -115,8 +115,8 @@ impl<T, R> Recoverable<T, R> {
     }
 
     #[inline]
-    pub const fn none(span: Range<usize>) -> Self {
-        Self::new(SpannedOption::None(span))
+    pub const fn none(position: usize) -> Self {
+        Self::new(SpannedOption::None(position))
     }
 
     #[inline]

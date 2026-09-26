@@ -319,7 +319,7 @@ pub trait Ast<'source, T: Tokenize>: Sized {
     fn ast_impl_spanned<E: ErrorMode>(parser: &mut Parser<'source, T>) -> SpannedOption<Self> {
         let option = Self::ast_impl::<E>(parser);
 
-        SpannedOption::from_option(option, || parser.last_error_span())
+        SpannedOption::from_option(option, || parser.last_end())
     }
 
     fn ast(parser: &mut Parser<'source, T>) -> Option<Self> {

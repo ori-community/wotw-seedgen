@@ -38,7 +38,7 @@ where
                         }
                         ControlFlow::Break(Ok(())) => break Close::ast_spanned(parser),
                         ControlFlow::Break(Err(())) => {
-                            break SpannedOption::None(parser.last_error_span())
+                            break SpannedOption::None(parser.last_error_span().start)
                         }
                     },
                 }

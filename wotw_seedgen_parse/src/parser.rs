@@ -462,6 +462,15 @@ impl<'source, T: Tokenize> Parser<'source, T> {
     }
 
     #[inline]
+    pub fn last_end(&self) -> usize {
+        if self.position == 0 {
+            return 0;
+        }
+
+        self.token_at(self.position - 1).1.end
+    }
+
+    #[inline]
     pub fn fold_errors(&mut self, at: usize) {
         let errors = self.errors.split_off(at);
         self.errors.push(Error::all_failed(errors));

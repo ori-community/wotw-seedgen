@@ -53,6 +53,7 @@ fn uber_identifier() {
             data: Identifier("TuleySpawned"),
             span: 16..28,
         }),
+        pickup: SpannedOption::None(28),
     };
     let uber_identifier = parse_seed_ast(source).parsed;
     assert_eq!(uber_identifier, Some(expected.clone()));
@@ -77,7 +78,7 @@ fn uber_identifier() {
                 span: 3..13
             },
             period: Symbol,
-            member: Recoverable::none(16..17),
+            member: Recoverable::none(14),
         }))
     );
     let error = result.errors.into_iter().next().unwrap();

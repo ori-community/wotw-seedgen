@@ -241,17 +241,20 @@ where
     }
 }
 
+/// An alternative for [`Spanned<Option>`] that doesn't need to store an extra span if it is `Some`
+///
+/// If `None`, it will have a zero-width span at the end of the previous token.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SpannedOption<T> {
     Some(T),
-    None(Range<usize>),
+    None(usize),
 }
 
 impl<T> SpannedOption<T> {
     #[inline]
-    pub fn from_option<F: FnOnce() -> Range<usize>>(option: Option<T>, span: F) -> Self {
+    pub fn from_option<F: FnOnce() -> usize>(option: Option<T>, position: F) -> Self {
         match option {
-            None => Self::None(span()),
+            None => Self::None(position()),
             Some(t) => Self::Some(t),
         }
     }
@@ -296,7 +299,7 @@ impl<T: Span> Span for SpannedOption<T> {
     fn span(&self) -> Range<usize> {
         match self {
             Self::Some(t) => t.span(),
-            Self::None(span) => span.clone(),
+            Self::None(position) => *position..*position,
         }
     }
 }
@@ -306,7 +309,7 @@ impl<T: SpanStart> SpanStart for SpannedOption<T> {
     fn span_start(&self) -> usize {
         match self {
             Self::Some(t) => t.span_start(),
-            Self::None(span) => span.start,
+            Self::None(position) => *position,
         }
     }
 }
@@ -316,7 +319,7 @@ impl<T: SpanEnd> SpanEnd for SpannedOption<T> {
     fn span_end(&self) -> usize {
         match self {
             Self::Some(t) => t.span_end(),
-            Self::None(span) => span.end,
+            Self::None(position) => *position,
         }
     }
 }
