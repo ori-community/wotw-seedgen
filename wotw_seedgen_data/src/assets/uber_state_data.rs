@@ -57,7 +57,7 @@ pub struct UberStateAlias {
     /// If `Some`, this represents the expression `uber_identifier` >= `value`, which is commonly used in logic.
     /// For instance, all Hand to Hand steps have individual rando names, even though Hand to Hand progress
     /// is stored in a single UberState. The value then represents the current step of Hand to Hand.
-    pub value: Option<i32>,
+    pub value: Option<i32>, // TODO NonZero?
 }
 
 impl UberStateAlias {

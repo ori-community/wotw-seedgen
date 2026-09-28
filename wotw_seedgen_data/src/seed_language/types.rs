@@ -308,19 +308,22 @@ impl<'source> Expression<'source> {
                 ..
             })) => {
                 let uber_state = uber_identifier.resolve(compiler)?;
-
-                if uber_state.value.is_none() {
-                    return compiler.uber_state_type(uber_state.uber_identifier, uber_identifier);
+                if uber_state.value.is_some() {
+                    return Some(UberStateType::Boolean);
                 }
+
+                return compiler.uber_state_type(uber_state.uber_identifier, uber_identifier);
             }
             Expression::Value(ExpressionValue::Identifier(identifier)) => {
                 let value = compiler.resolve_variable(identifier)?;
 
                 if let VariableValue::Literal(output::Literal::UberIdentifier(uber_state)) = value {
-                    if uber_state.value.is_none() {
-                        let uber_identifier = uber_state.uber_identifier;
-                        return compiler.uber_state_type(uber_identifier, identifier);
+                    if uber_state.value.is_some() {
+                        return Some(UberStateType::Boolean);
                     }
+
+                    let uber_identifier = uber_state.uber_identifier;
+                    return compiler.uber_state_type(uber_identifier, identifier);
                 }
             }
             _ => {}
