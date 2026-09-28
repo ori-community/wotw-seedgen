@@ -87,8 +87,10 @@ pub struct UberStateDataEntry {
     ///
     /// These names are not always unique to the UberState
     pub name: String,
-    /// If one exists, the randomizer's custom identifier for this UberState, which is often more intuitive than the regular name
+    /// If one exists, the randomizer's custom name for this UberState, which is often more intuitive than the regular name
     pub rando_name: Option<String>,
+    /// All of the randomizer's named expression aliases referring to this UberState
+    pub expression_aliases: Vec<UberStateExpressionAlias>,
     /// Default `UberStateValue` of this UberState after starting a new save
     pub default_value: UberStateValue,
     /// If `true`, writing to this UberState manually will fail
@@ -100,6 +102,12 @@ impl UberStateDataEntry {
     pub fn preferred_name(&self) -> &String {
         self.rando_name.as_ref().unwrap_or(&self.name)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UberStateExpressionAlias {
+    pub name: String,
+    pub value: i32,
 }
 
 /// Typed value stored inside an UberState
@@ -265,6 +273,7 @@ impl UberStateData {
                     UberStateDataEntry {
                         name,
                         rando_name: None,
+                        expression_aliases: Vec::new(),
                         default_value,
                         readonly: dump_member.readonly,
                     },
@@ -274,7 +283,7 @@ impl UberStateData {
 
         for record in &loc_data.entries {
             uber_state_data.add_rando_name(
-                &record.identifier,
+                record.identifier.clone(),
                 record.uber_identifier,
                 record.value,
             );
@@ -282,7 +291,7 @@ impl UberStateData {
 
         for record in &state_data.entries {
             uber_state_data.add_rando_name(
-                &record.identifier,
+                record.identifier.clone(),
                 record.uber_identifier,
                 record.value,
             );
@@ -291,7 +300,12 @@ impl UberStateData {
         uber_state_data
     }
 
-    fn add_rando_name(&mut self, name: &str, uber_identifier: UberIdentifier, value: Option<i32>) {
+    fn add_rando_name(
+        &mut self,
+        name: String,
+        uber_identifier: UberIdentifier,
+        value: Option<i32>,
+    ) {
         let mut parts = name.split('.');
         let zone = parts.next().unwrap();
         let region_or_pickup = parts.next().expect("Invalid UberState name");
@@ -325,8 +339,19 @@ impl UberStateData {
             panic!("rando name \"{name}\" exceeds three parts");
         }
 
-        if value.is_none() {
-            self.id_lookup.get_mut(&uber_identifier).unwrap().rando_name = Some(name.to_string());
+        let entry = self.id_lookup.get_mut(&uber_identifier).unwrap();
+
+        match value {
+            None => entry.rando_name = Some(name),
+            Some(value) => {
+                let index = entry
+                    .expression_aliases
+                    .partition_point(|alias| alias.value < value);
+
+                entry
+                    .expression_aliases
+                    .insert(index, UberStateExpressionAlias { name, value });
+            }
         }
     }
 }
