@@ -10,7 +10,7 @@
 !config_boolean(eyes, true, "Eyes")
 !config_boolean(heart, true, "Heart")
 
-!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
+!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, add_missing_goal_in_zone, update_goals)
 !include("list_core", new_row, add_row_item, add_current_row)
 !include("wisp_count")
 
@@ -51,12 +51,12 @@ on spawn store(itemTracker.wispsRequired, wisps_required)
 
 !augment_fun(write_missing_goals(), if itemTracker.wispsCount < wisps_required write_missing_wisps())
 
-fun write_missing_wisps() { new_row("#Missing Wisps (" + (wisps_required - itemTracker.wispsCount) + ")#: ") }
-!if voice { !augment_fun(write_missing_wisps(), if EastHollow.ForestsVoice == false add_row_item("Voice")) }
-!if strength { !augment_fun(write_missing_wisps(), if WestPools.ForestsStrength == false add_row_item("Strength")) }
-!if memory { !augment_fun(write_missing_wisps(), if LowerReach.ForestsMemory == false add_row_item("Memory")) }
-!if eyes { !augment_fun(write_missing_wisps(), if UpperDepths.ForestsEyes == false add_row_item("Eyes")) }
-!if heart { !augment_fun(write_missing_wisps(), if WindtornRuins.Seir == false add_row_item("Heart")) }
+fun write_missing_wisps() { new_row("Missing Wisps (" + (wisps_required - itemTracker.wispsCount) + "): ") }
+!if voice { !augment_fun(write_missing_wisps(), if EastHollow.ForestsVoice == false add_missing_goal_in_zone("Voice", current_zone() == Hollow)) }
+!if strength { !augment_fun(write_missing_wisps(), if WestPools.ForestsStrength == false add_missing_goal_in_zone("Strength", current_zone() == Pools)) }
+!if memory { !augment_fun(write_missing_wisps(), if LowerReach.ForestsMemory == false add_missing_goal_in_zone("Memory", current_zone() == Reach)) }
+!if eyes { !augment_fun(write_missing_wisps(), if UpperDepths.ForestsEyes == false add_missing_goal_in_zone("Eyes", current_zone() == Depths)) }
+!if heart { !augment_fun(write_missing_wisps(), if WindtornRuins.Seir == false add_missing_goal_in_zone("Heart", current_zone() == Ruins)) }
 !augment_fun(write_missing_wisps(), add_current_row())
 
 on change itemTracker.wispsCount update_goals()

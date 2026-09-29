@@ -5,7 +5,7 @@
 !builtin_icon(message_icon, "icons/game/message.png")
 
 !include("progress_helper", write_progress_message, update_progress_message, disable_keybinds)
-!include("list_core", new_column, new_row, add_current_row)
+!include("list_core", new_column, new_row, add_row_item, add_current_row)
 
 !export(check_goals_completed)
 fun check_goals_completed() {
@@ -20,6 +20,12 @@ fun write_short_goals_row() {
 !export(write_missing_goals)
 fun write_missing_goals() {
     new_column("")
+}
+
+!export(add_missing_goal_in_zone)
+fun add_missing_goal_in_zone(name: String, is_current_zone: Boolean) {
+    if is_current_zone add_row_item("#" + name + "#")
+    if is_current_zone == false add_row_item(name)
 }
 
 !export(update_goals)
@@ -80,7 +86,9 @@ on reload {
     update_goals()
 }
 
-on change player.currentArea update_missing_goals() // Need this because the zone updates 1 frame delayed from the position change
+// Need this because the zone updates 1 frame delayed from the position change
+// It's also useful for snippets that highlight message parts based on the current zone
+on change player.currentArea update_missing_goals()
 fun update_missing_goals() {
     write_missing_goals()
     if get_boolean("in_shriek_room") set_string("column", "<s_0.9><ls_0.9>@" + get_string("column") + "@")

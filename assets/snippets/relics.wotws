@@ -7,7 +7,7 @@
 !config_integer_range(relic_count, 0, 0, 11, "Relic Count", "If not zero, overrides relic chance. How many relics to place")
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
-!include("goal_mode_core", check_goals_completed, write_missing_goals, update_goals)
+!include("goal_mode_core", check_goals_completed, write_missing_goals, add_missing_goal_in_zone, update_goals)
 !include("list_core", new_row, add_row_item, add_row, add_current_row)
 
 !let(marsh_relic_exists, false)
@@ -282,18 +282,18 @@ fun write_map_progress_for(collected: Boolean) {
 
 !augment_fun(write_missing_goals(), if itemTracker.relicsCount < itemTracker.relicsRequired write_missing_relics())
 
-fun write_missing_relics() { new_row("#Missing Relics (" + (itemTracker.relicsRequired - itemTracker.relicsCount) + ")#: ") }
-!if marsh_relic_exists { !augment_fun(write_missing_relics(), if marsh_relic_collected == false add_row_item("Marsh")) }
-!if hollow_relic_exists { !augment_fun(write_missing_relics(), if hollow_relic_collected == false add_row_item("Hollow")) }
-!if glades_relic_exists { !augment_fun(write_missing_relics(), if glades_relic_collected == false add_row_item("Glades")) }
-!if wellspring_relic_exists { !augment_fun(write_missing_relics(), if wellspring_relic_collected == false add_row_item("Wellspring")) }
-!if woods_relic_exists { !augment_fun(write_missing_relics(), if woods_relic_collected == false add_row_item("Woods")) }
-!if reach_relic_exists { !augment_fun(write_missing_relics(), if reach_relic_collected == false add_row_item("Reach")) }
-!if depths_relic_exists { !augment_fun(write_missing_relics(), if depths_relic_collected == false add_row_item("Depths")) }
-!if pools_relic_exists { !augment_fun(write_missing_relics(), if pools_relic_collected == false add_row_item("Pools")) }
-!if wastes_relic_exists { !augment_fun(write_missing_relics(), if wastes_relic_collected == false add_row_item("Wastes")) }
-!if willow_relic_exists { !augment_fun(write_missing_relics(), if willow_relic_collected == false add_row_item("Willow")) }
-!if burrows_relic_exists { !augment_fun(write_missing_relics(), if burrows_relic_collected == false add_row_item("Burrows")) }
+fun write_missing_relics() { new_row("Missing Relics (" + (itemTracker.relicsRequired - itemTracker.relicsCount) + "): ") }
+!if marsh_relic_exists { !augment_fun(write_missing_relics(), if marsh_relic_collected == false add_missing_goal_in_zone("Marsh", current_zone() == Marsh)) }
+!if hollow_relic_exists { !augment_fun(write_missing_relics(), if hollow_relic_collected == false add_missing_goal_in_zone("Hollow", current_zone() == Hollow)) }
+!if glades_relic_exists { !augment_fun(write_missing_relics(), if glades_relic_collected == false add_missing_goal_in_zone("Glades", current_zone() == Glades)) }
+!if wellspring_relic_exists { !augment_fun(write_missing_relics(), if wellspring_relic_collected == false add_missing_goal_in_zone("Wellspring", current_zone() == Wellspring)) }
+!if woods_relic_exists { !augment_fun(write_missing_relics(), if woods_relic_collected == false add_missing_goal_in_zone("Woods", current_zone() == Woods)) }
+!if reach_relic_exists { !augment_fun(write_missing_relics(), if reach_relic_collected == false add_missing_goal_in_zone("Reach", current_zone() == Reach)) }
+!if depths_relic_exists { !augment_fun(write_missing_relics(), if depths_relic_collected == false add_missing_goal_in_zone("Depths", current_zone() == Depths)) }
+!if pools_relic_exists { !augment_fun(write_missing_relics(), if pools_relic_collected == false add_missing_goal_in_zone("Pools", current_zone() == Pools)) }
+!if wastes_relic_exists { !augment_fun(write_missing_relics(), if wastes_relic_collected == false add_missing_goal_in_zone("Wastes", current_zone() == Wastes)) }
+!if willow_relic_exists { !augment_fun(write_missing_relics(), if willow_relic_collected == false add_missing_goal_in_zone("Willow", current_zone() == Willow)) }
+!if burrows_relic_exists { !augment_fun(write_missing_relics(), if burrows_relic_collected == false add_missing_goal_in_zone("Burrows", current_zone() == Burrows)) }
 !augment_fun(write_missing_relics(), add_current_row())
 
 on change itemTracker.relicsCount update_goals()

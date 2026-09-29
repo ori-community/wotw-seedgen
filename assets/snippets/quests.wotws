@@ -18,7 +18,7 @@
 !config_boolean(rebuilding_the_glades, true, "Rebuilding the Glades")
 !config_boolean(regrowing_the_glades, true, "Regrowing the Glades")
 
-!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, update_goals)
+!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, add_missing_goal_in_zone, update_goals)
 !include("list_core", new_row, add_row_item, add_current_row)
 
 !if randomize {
@@ -77,20 +77,70 @@ on spawn store(itemTracker.questsRequired, quests_required)
 
 !augment_fun(write_missing_goals(), if itemTracker.questsCount < quests_required write_missing_quests())
 
-fun write_missing_quests() { new_row("#Missing Quests (" + (quests_required - itemTracker.questsCount) + ")#: ") }
-!if silent_teeth { !augment_fun(write_missing_quests(), if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 add_row_item("Silent Teeth")) }
-!if missing_key { !augment_fun(write_missing_quests(), if MarshSpawn.TokkKeystoneQuest == false add_row_item("Missing Key")) }
-!if into_burrows { !augment_fun(write_missing_quests(), if MarshSpawn.TokkTabletQuest == false add_row_item("Into Burrows")) }
-!if lost_compass { !augment_fun(write_missing_quests(), if OuterWellspring.TheLostCompass == false add_row_item("Lost Compass")) }
-!if little_braver { !augment_fun(write_missing_quests(), if MarshSpawn.MokkFangQuest == false add_row_item("Little Braver")) }
-!if family_reunion { !augment_fun(write_missing_quests(), if GladesTown.FamilyReunion == false add_row_item("Family Reunion")) }
-!if tree_keeper { !augment_fun(write_missing_quests(), if GladesTown.LastTree == false add_row_item("Tree Keeper")) }
-!if rough_diamond { !augment_fun(write_missing_quests(), if questUberStateGroup.desertCogQuest < 5 add_row_item("Rough Diamond")) }
-!if hand_to_hand { !augment_fun(write_missing_quests(), if WindtornRuins.HandToHandComplete == false add_row_item("Hand to Hand")) }
-!if into_darkness { !augment_fun(write_missing_quests(), if GladesTown.MokiAcornQuest == false add_row_item("Into Darkness")) }
-!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwolokAmuletQuest == false add_row_item("Kwolok's Wisdom")) }
-!if rebuilding_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RebuildTheGlades == false add_row_item("Rebuilding the Glades")) }
-!if regrowing_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RegrowTheGlades == false add_row_item("Regrowing the Glades")) }
+fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - itemTracker.questsCount) + "): ") }
+!if silent_teeth { !augment_fun(write_missing_quests(), if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 add_missing_goal_in_zone(
+    "Silent Teeth",
+    (kwolokGroupDescriptor.cleanseWellspringQuestUberState != 3 && current_zone() == Wellspring)
+    || (kwolokGroupDescriptor.cleanseWellspringQuestUberState == 3 && current_zone() == Hollow)
+)) }
+!if missing_key { !augment_fun(write_missing_quests(), if MarshSpawn.TokkKeystoneQuest == false add_missing_goal_in_zone(
+    // TODO any other permanents Tokks? Or toggle this based on the conditions for the Tokks to appear? Also relevant in hand to hand
+    "Missing Key",
+    (npcsStateGroup.marshKeystoneQuest != 2 && current_zone() == Marsh)
+    || (npcsStateGroup.marshKeystoneQuest == 2 && (current_zone() == Marsh || current_zone() == Glades))
+)) }
+!if into_burrows { !augment_fun(write_missing_quests(), if MarshSpawn.TokkTabletQuest == false add_missing_goal_in_zone(
+    "Into Burrows",
+    (npcsStateGroup.inkwaterWellQuest != 3 && current_zone() == Burrows)
+    || (npcsStateGroup.inkwaterWellQuest == 3 && current_zone() == Marsh)
+)) }
+!if lost_compass { !augment_fun(write_missing_quests(), if OuterWellspring.TheLostCompass == false add_missing_goal_in_zone(
+    "Lost Compass", current_zone() == Wellspring
+)) }
+!if little_braver { !augment_fun(write_missing_quests(), if MarshSpawn.MokkFangQuest == false add_missing_goal_in_zone(
+    "Little Braver", current_zone() == Marsh
+)) }
+!if family_reunion { !augment_fun(write_missing_quests(), if GladesTown.FamilyReunion == false add_missing_goal_in_zone(
+    "Family Reunion",
+    (questUberStateGroup.familyReunionQuest != 2 && current_zone() == Glades)
+    || (questUberStateGroup.familyReunionQuest == 2 && current_zone() == Woods)
+)) }
+!if tree_keeper { !augment_fun(write_missing_quests(), if GladesTown.LastTree == false add_missing_goal_in_zone(
+    "Tree Keeper",
+    (questUberStateGroup.treeKeeperQuest != 1 && current_zone() == Woods)
+    || (questUberStateGroup.treeKeeperQuest == 1 && current_zone() == Glades)
+)) }
+!if rough_diamond { !augment_fun(write_missing_quests(), if questUberStateGroup.desertCogQuest < 5 add_missing_goal_in_zone(
+    "Rough Diamond",
+    (questUberStateGroup.desertCogQuest != 4 && current_zone() == Wastes)
+    || (questUberStateGroup.desertCogQuest == 4 && (current_zone() == Hollow || current_zone() == Glades))
+)) }
+!if hand_to_hand { !augment_fun(write_missing_quests(), if WindtornRuins.HandToHandComplete == false add_missing_goal_in_zone(
+    "Hand to Hand",
+    (questUberStateGroup.tradeSequenceQuest == 0 && current_zone() == Hollow)
+    || (questUberStateGroup.tradeSequenceQuest == 1 && (current_zone() == Marsh || current_zone() == Glades))
+    || (questUberStateGroup.tradeSequenceQuest == 2 && current_zone() == Wellspring)
+    || ((questUberStateGroup.tradeSequenceQuest == 3 || questUberStateGroup.tradeSequenceQuest == 5 || questUberStateGroup.tradeSequenceQuest == 8) && current_zone() == Glades)
+    || (questUberStateGroup.tradeSequenceQuest == 4 && current_zone() == Reach)
+    || (questUberStateGroup.tradeSequenceQuest == 6 && current_zone() == Depths)
+    || (questUberStateGroup.tradeSequenceQuest == 7 && current_zone() == Pools)
+    || (questUberStateGroup.tradeSequenceQuest == 9 && current_zone() == Wastes)
+    || (questUberStateGroup.tradeSequenceQuest == 10 && current_zone() == Ruins)
+)) }
+!if into_darkness { !augment_fun(write_missing_quests(), if GladesTown.MokiAcornQuest == false add_missing_goal_in_zone(
+    "Into Darkness", current_zone() == Glades
+)) }
+!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwolokAmuletQuest == false add_missing_goal_in_zone(
+    "Kwolok's Wisdom",
+    (questUberStateGroup.kwoloksWisdomQuest != 3 && current_zone() == Pools)
+    || (questUberStateGroup.kwoloksWisdomQuest == 3 && current_zone() == Hollow)
+)) }
+!if rebuilding_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RebuildTheGlades == false add_missing_goal_in_zone(
+    "Rebuilding the Glades", current_zone() == Glades
+)) }
+!if regrowing_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RegrowTheGlades == false add_missing_goal_in_zone(
+    "Regrowing the Glades", current_zone() == Glades
+)) }
 !augment_fun(write_missing_quests(), add_current_row())
 
 on change itemTracker.questsCount update_goals()
