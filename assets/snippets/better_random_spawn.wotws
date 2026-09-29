@@ -1,8 +1,8 @@
 #category("World Changes")
 #name("Better Random Spawn")
 #description(
-"Opens some doors so random spawn works better, especially with no teleporters:
-The lever door in upper wastes, the lever door at pools entry, the bone door above howl's den teleporter and the Howl fight.")
+"Removes some barriers so random spawn works better, especially with no teleporters:
+The lever door in upper wastes, the lever door at pools entry, the bone wall above howl's den teleporter, the Howl fight and the falling skull in Woods.")
 
 on spawn {
     // The only alternate path around this lever door would be through Ruins, which generally isn't open without all Wisps
