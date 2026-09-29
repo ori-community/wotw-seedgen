@@ -110,6 +110,7 @@ LowerReach.BearBridgeBroken, 28895, 49329,
 LowerReach.BearSneezed, 28895, 29098, 1
 LowerReach.BearFullyAwake, 28895, 29098, 3
 LowerReach.Lever, 28895, 62198,
+LowerReach.DoorSLCeiling, 28895, 8664,
 LowerReach.WindLantern, 28895, 59394,
 LowerReach.TPLantern, 28895, 48757,
 LowerReach.TeleporterActive, 28895, 54235,
