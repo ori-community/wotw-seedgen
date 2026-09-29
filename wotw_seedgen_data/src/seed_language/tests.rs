@@ -224,19 +224,19 @@ fn coersions() {
                 test_variants::<Zone>(|zone| format!("if current_zone() == {zone} {{}}"))
             }
             ConstantDiscriminants::GenericIcon => test_variants::<GenericIcon>(|generic_icon| {
-                format!("set_shop_item_icon(OpherShop.Slot9, {generic_icon})")
+                format!("set_shop_item_icon(Shop.Opher.Slot9, {generic_icon})")
             }),
             ConstantDiscriminants::OpherIcon => test_variants::<OpherIcon>(|opher_icon| {
-                format!("set_shop_item_icon(OpherShop.Slot9, {opher_icon})")
+                format!("set_shop_item_icon(Shop.Opher.Slot9, {opher_icon})")
             }),
             ConstantDiscriminants::LupoIcon => test_variants::<LupoIcon>(|lupo_icon| {
-                format!("set_shop_item_icon(OpherShop.Slot9, {lupo_icon})")
+                format!("set_shop_item_icon(Shop.Opher.Slot9, {lupo_icon})")
             }),
             ConstantDiscriminants::GromIcon => test_variants::<GromIcon>(|grom_icon| {
-                format!("set_shop_item_icon(OpherShop.Slot9, {grom_icon})")
+                format!("set_shop_item_icon(Shop.Opher.Slot9, {grom_icon})")
             }),
             ConstantDiscriminants::TuleyIcon => test_variants::<TuleyIcon>(|tuley_icon| {
-                format!("set_shop_item_icon(OpherShop.Slot9, {tuley_icon})")
+                format!("set_shop_item_icon(Shop.Opher.Slot9, {tuley_icon})")
             }),
             ConstantDiscriminants::MapIcon => {
                 test_variants_with_prefix::<MapIcon>("!if true", |map_icon| {

@@ -17,17 +17,17 @@ fun write_hints(zone: Integer) {
     set_string("hint", "")
 
     // TODO have to write the zone integers here, no way to pass the zone type around
-    if zone == 0 && MarshSpawn.LupoMap write_marsh_hint()
-    if zone == 1 && WestHollow.LupoMap write_hollow_hint()
-    if zone == 2 && LupoShop.Slot1 write_glades_hint()
-    if zone == 3 && InnerWellspring.LupoMap write_wellspring_hint()
-    if zone == 4 && LupoShop.Slot2 write_woods_hint()
-    if zone == 5 && LowerReach.LupoMap write_reach_hint()
-    if zone == 6 && LowerDepths.LupoMap write_depths_hint()
-    if zone == 7 && EastPools.LupoMap write_pools_hint()
-    if zone == 8 && LowerWastes.LupoMap write_wastes_hint()
-    if zone == 10 && WillowsEnd.LupoMap write_willow_hint()
-    if zone == 11 && MidnightBurrows.LupoMap write_burrows_hint()
+    if zone == 0 && Marsh.LupoMap write_marsh_hint()
+    if zone == 1 && Hollow.LupoMap write_hollow_hint()
+    if zone == 2 && Shop.Lupo.Slot1 write_glades_hint()
+    if zone == 3 && Wellspring.LupoMap write_wellspring_hint()
+    if zone == 4 && Shop.Lupo.Slot2 write_woods_hint()
+    if zone == 5 && Reach.LupoMap write_reach_hint()
+    if zone == 6 && Depths.LupoMap write_depths_hint()
+    if zone == 7 && Pools.LupoMap write_pools_hint()
+    if zone == 8 && Wastes.LupoMap write_wastes_hint()
+    if zone == 10 && Willow.LupoMap write_willow_hint()
+    if zone == 11 && Burrows.LupoMap write_burrows_hint()
 
     if get_string("hint") != "" add_row(get_string("hint"))
 }
@@ -213,7 +213,7 @@ fun write_burrows_hint() {}
 
 on spawn {
     set_shop_item_data(
-        LupoShop.Slot1,
+        Shop.Lupo.Slot1,
         200,
         "Glades Items Hint",
         "Reveals " + description + " in Glades",
@@ -221,86 +221,86 @@ on spawn {
     )
 
     set_shop_item_data(
-        LupoShop.Slot2,
+        Shop.Lupo.Slot2,
         200,
         "Woods Items Hint",
         "Reveals " + description + " in Woods",
         EnergyFragmentsMap,
     )
 
-    set_shop_item_price(MarshSpawn.LupoMap, 200)
-    set_shop_item_price(WestHollow.LupoMap, 150)
-    set_shop_item_price(InnerWellspring.LupoMap, 150)
-    set_shop_item_price(LowerReach.LupoMap, 150)
-    set_shop_item_price(LowerDepths.LupoMap, 150)
-    set_shop_item_price(EastPools.LupoMap, 150)
-    set_shop_item_price(LowerWastes.LupoMap, 150)
-    set_shop_item_price(WillowsEnd.LupoMap, 50)
-    set_shop_item_price(MidnightBurrows.LupoMap, 50)
+    set_shop_item_price(Marsh.LupoMap, 200)
+    set_shop_item_price(Hollow.LupoMap, 150)
+    set_shop_item_price(Wellspring.LupoMap, 150)
+    set_shop_item_price(Reach.LupoMap, 150)
+    set_shop_item_price(Depths.LupoMap, 150)
+    set_shop_item_price(Pools.LupoMap, 150)
+    set_shop_item_price(Wastes.LupoMap, 150)
+    set_shop_item_price(Willow.LupoMap, 50)
+    set_shop_item_price(Burrows.LupoMap, 50)
 }
 
-!remove_location(MarshSpawn.LupoMap)
-on MarshSpawn.LupoMap {
+!remove_location(Marsh.LupoMap)
+on Marsh.LupoMap {
     set_string("hint", "")
     write_marsh_hint()
     item_message(get_string("hint"))
 }
-!remove_location(WestHollow.LupoMap)
-on WestHollow.LupoMap {
+!remove_location(Hollow.LupoMap)
+on Hollow.LupoMap {
     set_string("hint", "")
     write_hollow_hint()
     item_message(get_string("hint"))
 }
-!remove_location(LupoShop.Slot1)
-on LupoShop.Slot1 {
+!remove_location(Shop.Lupo.Slot1)
+on Shop.Lupo.Slot1 {
     set_string("hint", "")
     write_glades_hint()
     item_message(get_string("hint"))
 }
-!remove_location(InnerWellspring.LupoMap)
-on InnerWellspring.LupoMap {
+!remove_location(Wellspring.LupoMap)
+on Wellspring.LupoMap {
     set_string("hint", "")
     write_wellspring_hint()
     item_message(get_string("hint"))
 }
-!remove_location(LupoShop.Slot2)
-on LupoShop.Slot2 {
+!remove_location(Shop.Lupo.Slot2)
+on Shop.Lupo.Slot2 {
     set_string("hint", "")
     write_woods_hint()
     item_message(get_string("hint"))
 }
-!remove_location(LowerReach.LupoMap)
-on LowerReach.LupoMap {
+!remove_location(Reach.LupoMap)
+on Reach.LupoMap {
     set_string("hint", "")
     write_reach_hint()
     item_message(get_string("hint"))
 }
-!remove_location(LowerDepths.LupoMap)
-on LowerDepths.LupoMap {
+!remove_location(Depths.LupoMap)
+on Depths.LupoMap {
     set_string("hint", "")
     write_depths_hint()
     item_message(get_string("hint"))
 }
-!remove_location(EastPools.LupoMap)
-on EastPools.LupoMap {
+!remove_location(Pools.LupoMap)
+on Pools.LupoMap {
     set_string("hint", "")
     write_pools_hint()
     item_message(get_string("hint"))
 }
-!remove_location(LowerWastes.LupoMap)
-on LowerWastes.LupoMap {
+!remove_location(Wastes.LupoMap)
+on Wastes.LupoMap {
     set_string("hint", "")
     write_wastes_hint()
     item_message(get_string("hint"))
 }
-!remove_location(WillowsEnd.LupoMap)
-on WillowsEnd.LupoMap {
+!remove_location(Willow.LupoMap)
+on Willow.LupoMap {
     set_string("hint", "")
     write_willow_hint()
     item_message(get_string("hint"))
 }
-!remove_location(MidnightBurrows.LupoMap)
-on MidnightBurrows.LupoMap {
+!remove_location(Burrows.LupoMap)
+on Burrows.LupoMap {
     set_string("hint", "")
     write_burrows_hint()
     item_message(get_string("hint"))

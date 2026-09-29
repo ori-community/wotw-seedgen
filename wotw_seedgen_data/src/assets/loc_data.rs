@@ -6,14 +6,14 @@
 //! use wotw_seedgen_data::{assets::{LocData, LocDataEntry}, MapIcon, Position, UberIdentifier, Zone};
 //!
 //! let input = "NodeIdentifier, Zone, PickupType, PickupDetails, UberGroup, UberId, UberStateValue, X, Y, MapX, MapY
-//! MarshSpawn.RockHF, Marsh, HealthFragment, , 21786, 60210, , -958.6, -4313.2, -958.6199, -4312.245
-//! GladesTown.MotayHutSL, Glades, SpiritLight, 100, 42178, 57455, , -172.7, -4583.2, -392.8, -4130.6";
+//! Marsh.Spawn.LeftHF, Marsh, HealthFragment, , 21786, 60210, , -958.6, -4313.2, -958.6199, -4312.245
+//! Glades.MotayHut.SL, Glades, SpiritLight, 100, 42178, 57455, , -172.7, -4583.2, -392.8, -4130.6";
 //! let loc_data = LocData::from_reader(input.as_bytes()).unwrap();
 //!
 // TODO excuse me why is this equal?
 //! assert_eq!(loc_data.entries, vec![
 //!     LocDataEntry {
-//!         identifier: "MarshSpawn.RockHF".to_string(),
+//!         identifier: "Marsh.Spawn.LeftHF".to_string(),
 //!         zone: Zone::Marsh,
 //!         map_icon: MapIcon::HealthFragment,
 //!         uber_identifier: UberIdentifier::new(21786, 60210),
@@ -22,7 +22,7 @@
 //!         map_position: Some(Position::new(-958., -4313.)),
 //!     },
 //!     LocDataEntry {
-//!         identifier: "GladesTown.MotayHutSL".to_string(),
+//!         identifier: "Glades.MotayHut.SL".to_string(),
 //!         zone: Zone::Glades,
 //!         map_icon: MapIcon::SpiritLight,
 //!         uber_identifier: UberIdentifier::new(42178, 57455),

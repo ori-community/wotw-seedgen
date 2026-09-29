@@ -6,14 +6,14 @@
 
 !include("list_core", new_column, add_row, add_current_row, new_row, add_row_item)
 
-!item_on(marsh_trial_item, MarshPastOpher.SpiritTrial)
-!item_on(hollow_trial_item, WestHollow.SpiritTrial)
-!item_on(wellspring_trial_item, OuterWellspring.SpiritTrial)
-!item_on(woods_trial_item, WoodsMain.SpiritTrial)
-!item_on(reach_trial_item, LowerReach.SpiritTrial)
-!item_on(depths_trial_item, LowerDepths.SpiritTrial)
-!item_on(pools_trial_item, EastPools.SpiritTrial)
-!item_on(wastes_trial_item, LowerWastes.SpiritTrial)
+!item_on(marsh_trial_item, Marsh.SpiritTrial)
+!item_on(hollow_trial_item, Hollow.SpiritTrial)
+!item_on(wellspring_trial_item, Wellspring.SpiritTrial)
+!item_on(woods_trial_item, Woods.SpiritTrial)
+!item_on(reach_trial_item, Reach.SpiritTrial)
+!item_on(depths_trial_item, Depths.SpiritTrial)
+!item_on(pools_trial_item, Pools.SpiritTrial)
+!item_on(wastes_trial_item, Wastes.SpiritTrial)
 
 on raceGroup.inkwaterMarshRace == 1 {
     set_trial_hint(raceGroup.inkwaterMarshRace, "Reward: " + marsh_trial_item)

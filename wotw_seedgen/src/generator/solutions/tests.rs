@@ -1216,25 +1216,25 @@ fn marsh_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // MarshSpawn.BridgeSL
+            // Marsh.CollapsingLog.HiddenSL
             [skill(DoubleJump)],
             [skill(Dash)],
             [skill(Glide)],
             [skill(Launch)],
             [skill(Sword)],
             [skill(Hammer)],
-            // MarshSpawn.LongSwimSL
+            // Marsh.LongSwimSL
             [clean_water()],
-            // MarshSpawn.BashEF
+            // Marsh.CollapsingLog.BashEF
             [skill(Bash)],
-            // MarshSpawn.ResilienceShard
+            // Marsh.CollapsingLog.Shard
             [skill(Bow)],
             [skill(Shuriken)],
             [skill(Blaze), (energy_fragment(), 2)],
             [skill(Grenade), (energy_fragment(), 2)],
             [skill(Spear), (energy_fragment(), 2)],
             // TODO should sentry be allowed? [skill(Sentry), (energy_fragment(), 2)],
-            // MarshSpawn.RegenTree
+            // Marsh.RegenerateTree
             [(keystone(), 2)]
         ]),
     );
@@ -1247,14 +1247,14 @@ fn den_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // HowlsDen.LaserKS
+            // Marsh.Den.LaserKS
             [skill(DoubleJump)],
             [skill(Bash), skill(Grenade)],
             [skill(Launch)],
-            // HowlsDen.DoubleJumpTree
+            // Marsh.DoubleJumpTree
             [skill(Dash), skill(Glide)],
             [skill(Hammer)],
-            // HowlsDen.AboveTPSL
+            // Marsh.Den.AboveTPSL
             [skill(Bash), skill(Sword)],
             [skill(Bash), skill(Bow)],
             [skill(Bash), skill(Shuriken)],
@@ -1271,13 +1271,13 @@ fn hollow_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // EastHollow.BashTree via EastHollow.VoiceDoorPlatform
+            // Hollow.BashTree via EastHollow.VoiceDoorPlatform
             [skill(Launch)],
             [skill(Bash), skill(DoubleJump)],
             [skill(Bash), skill(Dash)],
             [skill(Bash), skill(Glide)],
             [skill(Bash), skill(Sword)],
-            // EastHollow.BashTree via EastHollow.BeetleFight
+            // Hollow.BashTree via EastHollow.BeetleFight
             [
                 skill(Regenerate),
                 (health_fragment(), 2),
@@ -1302,7 +1302,7 @@ fn hollow_spawn_solutions() {
                 skill(Hammer),
                 skill(Dash)
             ],
-            // EastHollow.HornbugArenaSL
+            // Hollow.Hornbug.CeilingSL
             [skill(Bash), skill(Hammer), skill(Grenade)],
         ]),
     );
@@ -1315,13 +1315,13 @@ fn glades_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // GladesTown.LupoPotSL
+            // Glades.LupoHome.PotSL
             [clean_water()],
             [skill(Burrow)],
-            // GladesTown.TwillenOre
+            // Glades.Twillen.BreakFloorOre
             [skill(Hammer)],
             [skill(Spear), (energy_fragment(), 2)],
-            // GladesTown.UpdraftCeilingSL
+            // Glades.CoalUpdraft.CeilingSL
             [skill(Launch)],
             [skill(Flap), skill(Glide)],
             [skill(DoubleJump), shard(TripleJump)],
@@ -1336,7 +1336,7 @@ fn glades_spawn_solutions() {
             // [skill(DoubleJump), skill(Dash), skill(Glide), skill(Blaze), (energy_fragment(), 2)],
             // [skill(DoubleJump), skill(Dash), skill(Glide), skill(Grenade), (energy_fragment(), 2)],
             // [skill(DoubleJump), skill(Dash), skill(Glide), skill(Flash), (energy_fragment(), 2)],
-            // WestGlades.AboveTentacleSL
+            // Glades.LowerLake.CeilingSL
             [skill(DoubleJump), skill(Bash)],
             [skill(Bash), skill(Grenade), skill(Dash)],
             [
@@ -1354,7 +1354,7 @@ fn glades_spawn_solutions() {
             [skill(Bash), skill(Grenade), skill(Glide), skill(Bow)],
             [skill(Bash), skill(Grenade), skill(Glide), skill(WaterDash)],
             [skill(Bash), skill(Grenade), skill(Sword), skill(WaterDash)],
-            // WestGlades.GrappleSL
+            // Glades.LowerLake.GrappleSL
             [skill(Grapple), skill(Bash), skill(Grenade), skill(Glide)],
             [skill(Grapple), skill(Bash), skill(Grenade), skill(Sword)],
             [skill(Grapple), skill(DoubleJump), skill(Dash), skill(Sword)],
@@ -1408,9 +1408,9 @@ fn wellspring_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // InnerWellspring.SwimOre
+            // Wellspring.ThirdFloor.SwimOre
             [clean_water()],
-            // OuterWellspring.RightWallOre
+            // Wellspring.OutsideRight.Ore
             [skill(DoubleJump)],
             [skill(Dash)],
             [skill(Glide)],
@@ -1430,17 +1430,17 @@ fn woods_entrance_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // WoodsEntry.LeafPileSL
+            // Woods.Entrance.LeafPileSL
             [skill(Flap)],
-            // WoodsEntry.HutRightSL
+            // Woods.Entrance.AboveSwampSL
             [skill(DoubleJump)],
             [skill(Dash)],
             [skill(Glide)],
             [skill(Launch)],
             [skill(Bash), skill(Grenade)],
-            // EastHollow.ForestsVoice
+            // Hollow.Wisp
             [clean_water(), skill(Bash)],
-            // WoodsEntry.LowerKS
+            // Woods.FirstDoor.LowerKS
             [skill(Sword), skill(Bow)],
             [skill(Sword), skill(Shuriken)],
             [skill(Sword), skill(Grenade), (energy_fragment(), 2)],
@@ -1460,7 +1460,7 @@ fn woods_exit_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // WoodsMain.ShrineSL
+            // Woods.Shrine.SL
             [skill(Glide)],
             [skill(Launch)],
             // WoodsMain.LogBlobDestroyed + Combat=2xBalloon
@@ -1475,7 +1475,7 @@ fn woods_exit_spawn_solutions() {
             // [skill(Blaze), skill(Shuriken)],
             // [skill(Sentry), skill(Bow)],
             // [skill(Sentry), skill(Shuriken)],
-            // WoodsMain.CollapsingOwlSL
+            // Woods.CollapsingOwl.SL
             [skill(DoubleJump), skill(Sword), skill(Bow)],
             [skill(DoubleJump), skill(Sword), skill(Shuriken)],
             [skill(DoubleJump), skill(Hammer), skill(Bow)],
@@ -1555,21 +1555,21 @@ fn reach_spawn_solutions() {
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
             // TODO this is incorrect in paths.wotwl, the ice wall next to the teleporter should be a state
-            // if this was correct, LowerReach.MeltIceSL would be reachable on spawn and not considered here
+            // if this was correct, Reach.JuggleSoup.MeltIceSL would be reachable on spawn and not considered here
             // some solution below are commented out because they become redundant as a consequence
-            // LowerReach.MeltIceSL
+            // Reach.JuggleSoup.MeltIceSL
             [(energy_fragment(), 2)],
             [skill(Sword)],
             [skill(Bow)],
             [skill(Shuriken)],
-            // LowerReach.AboveDoorSL
+            // Reach.LeverDoor.CeilingSL
             [skill(Bash)],
             [skill(Hammer)],
             // [skill(Spear), (energy_fragment(), 2)],
             [skill(Launch)],
-            // LowerReach.BurrowSL
+            // Reach.JuggleSoup.SnowSL
             [skill(Burrow)],
-            // LowerReach.TPLeftSL
+            // Reach.BelowTPMortar.SL
             [skill(Glide)],
             [skill(DoubleJump), shard(TripleJump)],
             [skill(DoubleJump), skill(Dash)],
@@ -1590,7 +1590,7 @@ fn depths_spawn_solutions() {
             [skill(Spear), skill(Hammer)],
             [skill(Spear), skill(Sword)],
             [skill(Spear), skill(Blaze)],
-            // UpperDepths.RightHealthKS
+            // Depths.SecondKSRoom.RightKS
             [skill(Bow)],
             [skill(Shuriken)],
             [skill(Grenade)],
@@ -1602,7 +1602,7 @@ fn depths_spawn_solutions() {
             [skill(Launch), skill(Sword)],
             [skill(Launch), skill(Hammer)],
             [skill(Launch), skill(Blaze)],
-            // UpperDepths.HiveSL
+            // Depths.IlluminableTunnel.HiveSL
             [skill(Flash), skill(Bash)],
             [skill(Flash), skill(Launch)],
             [skill(Launch), skill(Dash)],
@@ -1642,9 +1642,9 @@ fn pools_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // EastPools.UltraBashShard
+            // Pools.CentralTPSwim.Shard
             [skill(Bash)],
-            // EastPools.AboveTPSL
+            // Pools.AboveCentralTP.SL
             [skill(WaterDash), skill(Grapple), skill(DoubleJump)],
             [skill(WaterDash), skill(Grapple), skill(Dash), skill(Sword)],
             [
@@ -1665,9 +1665,9 @@ fn feeding_grounds_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // LowerWastes.FeedingGroundsTPOre
+            // Wastes.FeedingGrounds.Ore
             [skill(Burrow)],
-            // LowerWastes.SunsetViewSL
+            // Wastes.TornBridge.HiddenSL
             [skill(DoubleJump), shard(TripleJump)],
             [skill(DoubleJump), skill(Grapple)],
             [skill(Bash), skill(Grenade), skill(DoubleJump)],
@@ -1687,9 +1687,9 @@ fn central_wastes_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // LowerWastes.UpperPathHF
+            // Wastes.TreeToCentralTPArc.SandHF
             [skill(Burrow)],
-            // LowerWastes.CentralTPOre
+            // Wastes.CentralTP.BreakWallOre
             [skill(DoubleJump), skill(Sword)],
             [skill(DoubleJump), skill(Hammer)],
             [skill(DoubleJump), skill(Bow)],
@@ -1717,9 +1717,9 @@ fn outer_ruins_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // UpperWastes.SpinLasersRightSL
+            // Wastes.BeforeSpinLasers.SandSL
             [skill(Burrow)],
-            // UpperWastes.FlowersSeed
+            // Wastes.Seed
             [
                 skill(Bash),
                 skill(Grenade),
@@ -1764,7 +1764,7 @@ fn outer_ruins_spawn_solutions() {
     );
 }
 
-// TODO outdated since the paths were analyzed when logic was rather incomplete around WillowsEnd.EntrySL, reanalyze
+// TODO outdated since the paths were analyzed when logic was rather incomplete around Willow.Entrance.SL, reanalyze
 // #[test]
 // fn willow_spawn_solutions() {
 //     test_logger();
@@ -1790,7 +1790,7 @@ fn outer_ruins_spawn_solutions() {
 //             // [skill(Bash), (health_fragment(), 3), skill(DoubleJump)],
 //             // [skill(Bash), (health_fragment(), 3), skill(Dash)],
 //             // [skill(Launch)],
-//             // WillowsEnd.EntrySL
+//             // Willow.Entrance.SL
 //             [
 //                 skill(Bash),
 //                 skill(Grenade),
@@ -1865,7 +1865,7 @@ fn outer_ruins_spawn_solutions() {
 //                 (health_fragment(), 3)
 //             ],
 //             [skill(Launch)],
-//             // WillowsEnd.SpikesOre
+//             // Willow.SecretPortal.Ore
 //             [
 //                 skill(Grapple),
 //                 skill(DoubleJump),
@@ -1883,7 +1883,7 @@ fn burrows_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // MidnightBurrows.LeftKS
+            // Burrows.SpikesKS
             [skill(DoubleJump)],
             [skill(Dash)],
             [skill(Glide)],

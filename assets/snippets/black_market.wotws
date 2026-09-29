@@ -17,26 +17,26 @@ Supply lasts indefinitely, but the price grows with the demand.")
     !let(base_price, 200)
 
     on spawn set_shop_item_data(
-        OpherShop.Slot12,
+        Shop.Opher.Slot12,
         base_price,
         "Black Market Keystone",
         "If anyone asks, you found it in a cave!",
         keystone_icon,
     )
 
-    on reload disable_server_sync(OpherShop.Slot12)
-    on OpherShop.Slot12 {
-        store(OpherShop.Slot12, false)
+    on reload disable_server_sync(Shop.Opher.Slot12)
+    on Shop.Opher.Slot12 {
+        store(Shop.Opher.Slot12, false)
         keystone()
 
         if keystone_price < 5 * base_price {
             store(keystone_price, keystone_price + base_price)
-            set_shop_item_price(OpherShop.Slot12, keystone_price)
+            set_shop_item_price(Shop.Opher.Slot12, keystone_price)
         }
     }
 
     !only_simulation {
-        on spawn store_without_triggers(OpherShop.Slot12, true)
+        on spawn store_without_triggers(Shop.Opher.Slot12, true)
     }
 }
 
@@ -45,25 +45,25 @@ Supply lasts indefinitely, but the price grows with the demand.")
     !let(base_price, 200)
 
     on spawn set_shop_item_data(
-        TwillenShop.Slot5,
+        Shop.Twillen.Slot5,
         base_price,
         "Black Market Ore",
         "If anyone asks, you found it in the Gorlek Mines!",
         ore_icon,
     )
 
-    on reload disable_server_sync(TwillenShop.Slot5)
-    on TwillenShop.Slot5 {
-        store(TwillenShop.Slot5, false)
+    on reload disable_server_sync(Shop.Twillen.Slot5)
+    on Shop.Twillen.Slot5 {
+        store(Shop.Twillen.Slot5, false)
         gorlek_ore()
 
         if ore_price < 5 * base_price {
             store(ore_price, ore_price + base_price)
-            set_shop_item_price(TwillenShop.Slot5, ore_price)
+            set_shop_item_price(Shop.Twillen.Slot5, ore_price)
         }
     }
 
     !only_simulation {
-        on spawn store_without_triggers(TwillenShop.Slot5, true)
+        on spawn store_without_triggers(Shop.Twillen.Slot5, true)
     }
 }

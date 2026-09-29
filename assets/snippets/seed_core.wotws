@@ -93,13 +93,13 @@ on gladesProjects.lightcatchersPlanted
 // In vanilla, the rain is lifted when getting the ability Sword.
 // In rando, we instead want the rain to be lifted when collecting the Sword tree location.
 on spawn store(randoConfig.useRainLiftedInMarshRandoState, true)
-on HowlsDen.SwordTree store(randoState.rainLiftedInMarsh, true)
+on Marsh.SwordTree store(randoState.rainLiftedInMarsh, true)
 // This progresses the Diamond in the Rough quest to 3 immediately after turning in the diamond at Twillen.
 // This prevents the black screen cutscene in Glades from ever playing. When you turn in the diamond in
 // Hollow, which is usually not possible in vanilla, and then walk into Glades, that cutscene would play otherwise.
 on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneState == 2 {
     store(hubUberStateGroup.craftCutsceneState, 3)
-    store(GladesTown.SecretShard, true)
+    store(Glades.RoughDiamond.Reward, true)
 }
 // In vanilla, completing the Wellspring escape increases the Silent Teeth quest uberstate by 1 instead of directly setting it to 3.
 // In vanilla, there is an additional check after watching the soggy cutscene, the quest state updating, and autosaving: if the quest's value is 2, it gets set to 3.
@@ -108,7 +108,7 @@ on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneS
 // To prevent quest softlocks, before the vanilla logic happens, we set the quest to 2 (cutscene outside watched) if it is 1 (quest started) or 0 (quest not started).
 // The vanilla logic then increases the quest to 3 (escape cleared) and saves properly.
 // This fix does not prevent abusing the glitch to benefit, for example by finishing the quest through multiple wellspring escapes (although no such OOB is known).
-on InnerWellspring.WaterEscapeReward if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store_without_triggers(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
+on Wellspring.EscapeReward if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store_without_triggers(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
 // No one remembers what this does anymore.
 on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState, 8)
 // This is presumed to fix some multiplayer bug but no one really knows.
@@ -120,7 +120,7 @@ on spawn store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
 on questUberStateGroup.familyReunionQuest == 2 {
     store(randoState.canOpenMokiFatherHut, true)
     // If DollQI is already collected and we have previously reverted this state, skip the DollQI quest step
-    if WoodsEntry.DollQI store(questUberStateGroup.familyReunionQuest, 3)
+    if Woods.FamilyReunion.Doll store(questUberStateGroup.familyReunionQuest, 3)
 }
 // If DollQI is collected without having opened the hut, revert the quest state to its previous value
 on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut == false {

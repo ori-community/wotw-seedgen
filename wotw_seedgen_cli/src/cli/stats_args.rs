@@ -70,7 +70,7 @@ pub enum Analyzer {
     ItemZone { item: String },
     #[command(about = format!(
         "Analyzes what item gets placed on a location\n\
-        Use '{literal}location-item:<location>{reset}' to specify which location to analyze (Example: '{literal}location-item:GladesTown.RebuildTheGlades{reset}')",
+        Use '{literal}location-item:<location>{reset}' to specify which location to analyze (Example: '{literal}location-item:Glades.RebuildGlades.Reward{reset}')",
         literal = LITERAL.render(),
         reset = Reset.render(),
     ))]

@@ -12,11 +12,11 @@
 !state(woods_visited, Boolean)
 !state(depths_visited, Boolean)
 
-!item_on(marsh_shrine_item, MarshPastOpher.CombatShrine)
-!item_on(den_shrine_item, HowlsDen.CombatShrine)
-!item_on(glades_shrine_item, WestGlades.CombatShrine)
-!item_on(woods_shrine_item, WoodsMain.CombatShrine)
-!item_on(depths_shrine_item, LowerDepths.CombatShrine)
+!item_on(marsh_shrine_item, Marsh.Trial.CombatShrine)
+!item_on(den_shrine_item, Marsh.Den.CombatShrine)
+!item_on(glades_shrine_item, Glades.CombatShrine)
+!item_on(woods_shrine_item, Woods.CombatShrine)
+!item_on(depths_shrine_item, Depths.CombatShrine)
 
 on shrines.marshWave == 1 {
     store(marsh_visited, true)

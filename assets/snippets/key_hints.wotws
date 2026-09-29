@@ -26,15 +26,15 @@ Twillen tells the zones holding Bow and Bash")
 !augment_fun(write_map_progress_message(), write_hints())
 
 fun write_hints() {
-    if LupoShop.Slot3 {
+    if Shop.Lupo.Slot3 {
         write_lupo_hint()
         add_row(get_string("hint"))
     }
-    if OpherShop.Slot11 {
+    if Shop.Opher.Slot11 {
         write_opher_hint()
         add_row(get_string("hint"))
     }
-    if TwillenShop.Slot8 {
+    if Shop.Twillen.Slot8 {
         write_twillen_hint()
         add_row(get_string("hint"))
     }
@@ -85,25 +85,25 @@ fun write_twillen_hint() {
 
 on spawn {
     set_shop_item_data(
-        LupoShop.Slot3,
+        Shop.Lupo.Slot3,
         4000,
         "Burrow, Water Dash, Grenade, Flash hint",
         "Costs 500 less for every item you found already",
         ShardsMap,
     )
     set_shop_item_data(
-        OpherShop.Slot11,
+        Shop.Opher.Slot11,
         2500,
         "Clean Water, Flap, Glide hint",
         "Costs 500 less for every item you found already",
         ShardsMap,
     )
-    if InnerWellspring.WaterEscapeReward == false {
-        set_shop_item_description(OpherShop.Slot11, "Complete the Wellspring escape to unlock")
-        set_shop_item_hidden(OpherShop.Slot11, true)
+    if Wellspring.EscapeReward == false {
+        set_shop_item_description(Shop.Opher.Slot11, "Complete the Wellspring escape to unlock")
+        set_shop_item_hidden(Shop.Opher.Slot11, true)
     }
     set_shop_item_data(
-        TwillenShop.Slot8,
+        Shop.Twillen.Slot8,
         1500,
         "Bash, Bow hint",
         "Costs 500 less for every item you found already",
@@ -113,9 +113,9 @@ on spawn {
     updateOpherHintPrice()
     updateTwillenHintPrice()
 }
-on InnerWellspring.WaterEscapeReward {
-    set_shop_item_description(OpherShop.Slot11, "Costs 500 less for every item you found already")
-    set_shop_item_hidden(OpherShop.Slot11, false)
+on Wellspring.EscapeReward {
+    set_shop_item_description(Shop.Opher.Slot11, "Costs 500 less for every item you found already")
+    set_shop_item_hidden(Shop.Opher.Slot11, false)
 }
 
 fun updateLupoHintPrice() {
@@ -125,7 +125,7 @@ fun updateLupoHintPrice() {
     if skills.grenade set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
     if skills.flash set_integer("lupo_hint_price", get_integer("lupo_hint_price") - 500)
     if get_integer("lupo_hint_price") == 2000 set_integer("lupo_hint_price", 0)
-    set_shop_item_price(LupoShop.Slot3, get_integer("lupo_hint_price"))
+    set_shop_item_price(Shop.Lupo.Slot3, get_integer("lupo_hint_price"))
 }
 fun updateOpherHintPrice() {
     set_integer("opher_hint_price", 2500)
@@ -133,14 +133,14 @@ fun updateOpherHintPrice() {
     if skills.flap set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
     if skills.glide set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
     if get_integer("opher_hint_price") == 1000 set_integer("opher_hint_price", 0)
-    set_shop_item_price(OpherShop.Slot11, get_integer("opher_hint_price"))
+    set_shop_item_price(Shop.Opher.Slot11, get_integer("opher_hint_price"))
 }
 fun updateTwillenHintPrice() {
     set_integer("twillen_hint_price", 1500)
     if skills.bash set_integer("twillen_hint_price", get_integer("twillen_hint_price") - 500)
     if skills.bow set_integer("twillen_hint_price", get_integer("twillen_hint_price") - 500)
     if get_integer("twillen_hint_price") == 500 set_integer("twillen_hint_price", 0)
-    set_shop_item_price(TwillenShop.Slot8, get_integer("twillen_hint_price"))
+    set_shop_item_price(Shop.Twillen.Slot8, get_integer("twillen_hint_price"))
 }
 
 on skills.burrow updateLupoHintPrice()
@@ -153,20 +153,20 @@ on skills.glide updateOpherHintPrice()
 on skills.bash updateTwillenHintPrice()
 on skills.bow updateTwillenHintPrice()
 
-!remove_location(LupoShop.Slot3)
-on LupoShop.Slot3 {
+!remove_location(Shop.Lupo.Slot3)
+on Shop.Lupo.Slot3 {
     create_stats_entry(Lupo, "Lupo Hint")
     write_lupo_hint()
     item_message(get_string("hint"))
 }
-!remove_location(OpherShop.Slot11)
-on OpherShop.Slot11 {
+!remove_location(Shop.Opher.Slot11)
+on Shop.Opher.Slot11 {
     create_stats_entry(Opher, "Opher Hint")
     write_opher_hint()
     item_message(get_string("hint"))
 }
-!remove_location(TwillenShop.Slot8)
-on TwillenShop.Slot8 {
+!remove_location(Shop.Twillen.Slot8)
+on Shop.Twillen.Slot8 {
     create_stats_entry(Twillen, "Twillen Hint")
     write_twillen_hint()
     item_message(get_string("hint"))

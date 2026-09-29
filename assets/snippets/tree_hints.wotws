@@ -33,63 +33,63 @@ The Clean Water Hint is on the Wellspring Escape")
 fun write_hints() {
     new_row("")
 
-    if MarshSpawn.RegenTree {
+    if Marsh.RegenerateTree {
         write_regenerate_hint()
         add_row_item(get_string("hint"))
     }
-    if HowlsDen.SwordTree {
+    if Marsh.SwordTree {
         write_sword_hint()
         add_row_item(get_string("hint"))
     }
-    if HowlsDen.DoubleJumpTree {
+    if Marsh.DoubleJumpTree {
         write_double_jump_hint()
         add_row_item(get_string("hint"))
     }
-    if MarshPastOpher.BowTree {
+    if Marsh.BowTree {
         write_bow_hint()
         add_row_item(get_string("hint"))
     }
-    if WestHollow.DashTree {
+    if Hollow.DashTree {
         write_dash_hint()
         add_row_item(get_string("hint"))
     }
-    if EastHollow.BashTree {
+    if Hollow.BashTree {
         write_bash_hint()
         add_row_item(get_string("hint"))
     }
-    if InnerWellspring.GrappleTree {
+    if Wellspring.GrappleTree {
         write_grapple_hint()
         add_row_item(get_string("hint"))
     }
-    if InnerWellspring.WaterEscapeReward {
+    if Wellspring.EscapeReward {
         write_clean_water_hint()
         add_row_item(get_string("hint"))
     }
-    if GladesTown.DamageTree {
+    if Glades.AncestralLightTree {
         write_flap_hint()
         add_row_item(get_string("hint"))
     }
-    if MarshSpawn.DamageTree {
+    if Marsh.AncestralLightTree {
         write_glide_hint()
         add_row_item(get_string("hint"))
     }
-    if UpperReach.GrenadeTree {
+    if Reach.GrenadeTree {
         write_grenade_hint()
         add_row_item(get_string("hint"))
     }
-    if LowerDepths.FlashTree {
+    if Depths.FlashTree {
         write_flash_hint()
         add_row_item(get_string("hint"))
     }
-    if UpperPools.WaterDashTree {
+    if Pools.WaterDashTree {
         write_water_dash_hint()
         add_row_item(get_string("hint"))
     }
-    if LowerWastes.BurrowTree {
+    if Wastes.BurrowTree {
         write_burrow_hint()
         add_row_item(get_string("hint"))
     }
-    if WeepingRidge.LaunchTree {
+    if Woods.LaunchTree {
         write_launch_hint()
         add_row_item(get_string("hint"))
     }
@@ -97,63 +97,63 @@ fun write_hints() {
     add_current_row()
 }
 
-on MarshSpawn.RegenTree {
+on Marsh.RegenerateTree {
     write_regenerate_hint()
     item_message(get_string("hint"))
 }
-on HowlsDen.SwordTree {
+on Marsh.SwordTree {
     write_sword_hint()
     item_message(get_string("hint"))
 }
-on HowlsDen.DoubleJumpTree {
+on Marsh.DoubleJumpTree {
     write_double_jump_hint()
     item_message(get_string("hint"))
 }
-on MarshPastOpher.BowTree {
+on Marsh.BowTree {
     write_bow_hint()
     item_message(get_string("hint"))
 }
-on WestHollow.DashTree {
+on Hollow.DashTree {
     write_dash_hint()
     item_message(get_string("hint"))
 }
-on EastHollow.BashTree {
+on Hollow.BashTree {
     write_bash_hint()
     item_message(get_string("hint"))
 }
-on InnerWellspring.GrappleTree {
+on Wellspring.GrappleTree {
     write_grapple_hint()
     item_message(get_string("hint"))
 }
-on InnerWellspring.WaterEscapeReward {
+on Wellspring.EscapeReward {
     write_clean_water_hint()
     item_message(get_string("hint"))
 }
-on GladesTown.DamageTree {
+on Glades.AncestralLightTree {
     write_flap_hint()
     item_message(get_string("hint"))
 }
-on MarshSpawn.DamageTree {
+on Marsh.AncestralLightTree {
     write_glide_hint()
     item_message(get_string("hint"))
 }
-on UpperReach.GrenadeTree {
+on Reach.GrenadeTree {
     write_grenade_hint()
     item_message(get_string("hint"))
 }
-on LowerDepths.FlashTree {
+on Depths.FlashTree {
     write_flash_hint()
     item_message(get_string("hint"))
 }
-on UpperPools.WaterDashTree {
+on Pools.WaterDashTree {
     write_water_dash_hint()
     item_message(get_string("hint"))
 }
-on LowerWastes.BurrowTree {
+on Wastes.BurrowTree {
     write_burrow_hint()
     item_message(get_string("hint"))
 }
-on WeepingRidge.LaunchTree {
+on Woods.LaunchTree {
     write_launch_hint()
     item_message(get_string("hint"))
 }

@@ -12,42 +12,42 @@ use crate::api::logic::{MapIconCondition, MapIconInfo, MapIcons};
 static SPIRIT_TRIAL_END_POSITIONS: LazyLock<FxHashMap<UberIdentifier, Position>> =
     LazyLock::new(|| {
         FxHashMap::from_iter([
-            // MarshPastOpher.SpiritTrial
+            // Marsh.SpiritTrial
             (
                 UberIdentifier::new(44964, 45951),
                 Position::new(-423.68, -4306.3604),
             ),
-            // WestHollow.SpiritTrial
+            // Hollow.SpiritTrial
             (
                 UberIdentifier::new(44964, 25545),
                 Position::new(-175.43, -4440.89),
             ),
-            // OuterWellspring.SpiritTrial
+            // Wellspring.SpiritTrial
             (
                 UberIdentifier::new(44964, 11512),
                 Position::new(-834.55005, -3893.5503),
             ),
-            // EastPools.SpiritTrial
+            // Pools.SpiritTrial
             (
                 UberIdentifier::new(44964, 54686),
                 Position::new(-1485.9731, -4059.728),
             ),
-            // WoodsMain.SpiritTrial
+            // Woods.SpiritTrial
             (
                 UberIdentifier::new(44964, 22703),
                 Position::new(859.62, -3938.6702),
             ),
-            // LowerReach.SpiritTrial
+            // Reach.SpiritTrial
             (
                 UberIdentifier::new(44964, 23661),
                 Position::new(101.933716, -4046.7227),
             ),
-            // LowerDepths.SpiritTrial
+            // Depths.SpiritTrial
             (
                 UberIdentifier::new(44964, 28552),
                 Position::new(573.47345, -4510.134),
             ),
-            // LowerWastes.SpiritTrial
+            // Wastes.SpiritTrial
             (
                 UberIdentifier::new(44964, 30767),
                 Position::new(1580.71, -3898.5503),

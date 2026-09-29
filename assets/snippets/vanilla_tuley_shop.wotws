@@ -4,12 +4,12 @@
 
 !include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
 
-on change UpperWastes.FlowersSeed store(sela_flowers, UpperWastes.FlowersSeed)
-on change EastPools.GrassSeed store(sticky_grass, EastPools.GrassSeed)
-on change UpperDepths.LightcatcherSeed store(lightcatchers, UpperDepths.LightcatcherSeed)
-on change InnerWellspring.BlueMoonSeed store(blue_moon, InnerWellspring.BlueMoonSeed)
-on change UpperReach.SpringSeed store(spring_plants, UpperReach.SpringSeed)
-on change WoodsEntry.TreeSeed store(last_tree, WoodsEntry.TreeSeed)
+on change Wastes.Seed store(sela_flowers, Wastes.Seed)
+on change Pools.Seed store(sticky_grass, Pools.Seed)
+on change Depths.Seed store(lightcatchers, Depths.Seed)
+on change Wellspring.ThirdFloor.Seed store(blue_moon, Wellspring.ThirdFloor.Seed)
+on change Reach.Seed store(spring_plants, Reach.Seed)
+on change Woods.TreeKeeper.Seed store(last_tree, Woods.TreeKeeper.Seed)
 
 on tuleyShop.selaFlowers store(gladesProjects.selaFlowersPlanted, true)
 on tuleyShop.stickyGrass store(gladesProjects.stickyGrassPlanted, true)

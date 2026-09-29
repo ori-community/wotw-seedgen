@@ -86,7 +86,7 @@ fn optimize_graph_nested_redundancy() {
     );
 }
 
-// EastPools.TPArea -> EastPools.AboveDoorOre
+// EastPools.TPArea -> Pools.CentralTPApproach.AboveDoorOre
 #[test]
 fn optimize_graph_above_door_ore() {
     test_logger();
@@ -213,7 +213,7 @@ fn optimize_graph_burrow_arena() {
     );
 }
 
-// UpperDepths.RightKeystonePath -> UpperDepths.RightEntryKS
+// UpperDepths.RightKeystonePath -> Depths.FirstKSRoom.RightKS
 #[test]
 fn optimize_graph_depths_right_entry_ks() {
     test_logger();

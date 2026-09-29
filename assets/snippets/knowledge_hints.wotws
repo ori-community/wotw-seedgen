@@ -22,7 +22,7 @@
 
         position_trigger_rectangle("voice_door", -102, -4200, -41, -4250)
         position_trigger_enter_callback("voice_door", {
-            if EastHollow.ForestsVoice == false && is_in_rectangle(-60, -4218, -41, -4200) == false
+            if Hollow.Wisp == false && is_in_rectangle(-60, -4218, -41, -4200) == false
                 item_message("#Motay's Note#\nThe moki will only open the door to Glades once you get the #Voice of the Forest# from Kwolok")
         })
     }

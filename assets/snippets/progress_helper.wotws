@@ -240,20 +240,20 @@ fun write_tree_progress() {
     set_string("tree_progress", get_string("row"))
 }
 
-on change MarshSpawn.RegenTree update_tree_progress()
-on change HowlsDen.SwordTree update_tree_progress()
-on change HowlsDen.DoubleJumpTree update_tree_progress()
-on change MarshPastOpher.BowTree update_tree_progress()
-on change WestHollow.DashTree update_tree_progress()
-on change EastHollow.BashTree update_tree_progress()
-on change InnerWellspring.GrappleTree update_tree_progress()
-on change MarshSpawn.DamageTree update_tree_progress()
-on change GladesTown.DamageTree update_tree_progress()
-on change LowerWastes.BurrowTree update_tree_progress()
-on change UpperReach.GrenadeTree update_tree_progress()
-on change LowerDepths.FlashTree update_tree_progress()
-on change UpperPools.WaterDashTree update_tree_progress()
-on change WeepingRidge.LaunchTree update_tree_progress()
+on change Marsh.RegenerateTree update_tree_progress()
+on change Marsh.SwordTree update_tree_progress()
+on change Marsh.DoubleJumpTree update_tree_progress()
+on change Marsh.BowTree update_tree_progress()
+on change Hollow.DashTree update_tree_progress()
+on change Hollow.BashTree update_tree_progress()
+on change Wellspring.GrappleTree update_tree_progress()
+on change Marsh.AncestralLightTree update_tree_progress()
+on change Glades.AncestralLightTree update_tree_progress()
+on change Wastes.BurrowTree update_tree_progress()
+on change Reach.GrenadeTree update_tree_progress()
+on change Depths.FlashTree update_tree_progress()
+on change Pools.WaterDashTree update_tree_progress()
+on change Woods.LaunchTree update_tree_progress()
 fun update_tree_progress() {
     write_tree_progress()
     set_message_text("tree_progress", get_string("tree_progress"))
@@ -261,20 +261,20 @@ fun update_tree_progress() {
 }
 
 fun tree_string(found: Boolean) {
-    if MarshSpawn.RegenTree == found add_colored_row_item("Regenerate")
-    if HowlsDen.SwordTree == found add_colored_row_item("Sword")
-    if HowlsDen.DoubleJumpTree == found add_colored_row_item("Double Jump")
-    if MarshPastOpher.BowTree == found add_colored_row_item("Bow")
-    if WestHollow.DashTree == found add_colored_row_item("Dash")
-    if EastHollow.BashTree == found add_colored_row_item("Bash")
-    if InnerWellspring.GrappleTree == found add_colored_row_item("Grapple")
-    if MarshSpawn.DamageTree == found add_colored_row_item("Marsh Ancestral Light")
-    if GladesTown.DamageTree == found add_colored_row_item("Glades Ancestral Light")
-    if LowerWastes.BurrowTree == found add_colored_row_item("Burrow")
-    if UpperReach.GrenadeTree == found add_colored_row_item("Grenade")
-    if LowerDepths.FlashTree == found add_colored_row_item("Flash")
-    if UpperPools.WaterDashTree == found add_colored_row_item("Water Dash")
-    if WeepingRidge.LaunchTree == found add_colored_row_item("Launch")
+    if Marsh.RegenerateTree == found add_colored_row_item("Regenerate")
+    if Marsh.SwordTree == found add_colored_row_item("Sword")
+    if Marsh.DoubleJumpTree == found add_colored_row_item("Double Jump")
+    if Marsh.BowTree == found add_colored_row_item("Bow")
+    if Hollow.DashTree == found add_colored_row_item("Dash")
+    if Hollow.BashTree == found add_colored_row_item("Bash")
+    if Wellspring.GrappleTree == found add_colored_row_item("Grapple")
+    if Marsh.AncestralLightTree == found add_colored_row_item("Marsh Ancestral Light")
+    if Glades.AncestralLightTree == found add_colored_row_item("Glades Ancestral Light")
+    if Wastes.BurrowTree == found add_colored_row_item("Burrow")
+    if Reach.GrenadeTree == found add_colored_row_item("Grenade")
+    if Depths.FlashTree == found add_colored_row_item("Flash")
+    if Pools.WaterDashTree == found add_colored_row_item("Water Dash")
+    if Woods.LaunchTree == found add_colored_row_item("Launch")
 
     if get_integer("next_item") == next_item_first set_string("row", get_string("row") + "None")
 }
@@ -289,11 +289,11 @@ fun write_wisp_progress() {
     set_string("wisp_progress", get_string("row"))
 }
 
-on change EastHollow.ForestsVoice update_wisp_progress()
-on change LowerReach.ForestsMemory update_wisp_progress()
-on change UpperDepths.ForestsEyes update_wisp_progress()
-on change WestPools.ForestsStrength update_wisp_progress()
-on change WindtornRuins.ForestsHeart update_wisp_progress()
+on change Hollow.Wisp update_wisp_progress()
+on change Reach.Wisp update_wisp_progress()
+on change Depths.Wisp update_wisp_progress()
+on change Pools.Wisp update_wisp_progress()
+on change Ruins.Wisp update_wisp_progress()
 fun update_wisp_progress() {
     write_wisp_progress()
     set_message_text("wisp_progress", get_string("wisp_progress"))
@@ -301,11 +301,11 @@ fun update_wisp_progress() {
 }
 
 fun wisp_string(found: Boolean) {
-    if EastHollow.ForestsVoice == found add_colored_row_item("Voice")
-    if LowerReach.ForestsMemory == found add_colored_row_item("Memory")
-    if UpperDepths.ForestsEyes == found add_colored_row_item("Eyes")
-    if WestPools.ForestsStrength == found add_colored_row_item("Strength")
-    if WindtornRuins.ForestsHeart == found add_colored_row_item("Heart")
+    if Hollow.Wisp == found add_colored_row_item("Voice")
+    if Reach.Wisp == found add_colored_row_item("Memory")
+    if Depths.Wisp == found add_colored_row_item("Eyes")
+    if Pools.Wisp == found add_colored_row_item("Strength")
+    if Ruins.Wisp == found add_colored_row_item("Heart")
 
     if get_integer("next_item") == next_item_first set_string("row", get_string("row") + "None")
 }
@@ -403,11 +403,11 @@ fun write_quest_progress() {
     if questUberStateGroup.kwoloksWisdomQuest == 3 set_string("quest_progress", get_string("quest_progress") + "Take the Amulet to Kwolok's Altar")
     if questUberStateGroup.kwoloksWisdomQuest == 4 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
     set_string("quest_progress", get_string("quest_progress") + "\n#Rebuilding the Glades# - ")
-    if GladesTown.RebuildTheGlades == false set_string("quest_progress", get_string("quest_progress") + "Help Grom rebuild the Wellspring Glades")
-    if GladesTown.RebuildTheGlades set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    if Glades.RebuildGlades.Reward == false set_string("quest_progress", get_string("quest_progress") + "Help Grom rebuild the Wellspring Glades")
+    if Glades.RebuildGlades.Reward set_string("quest_progress", get_string("quest_progress") + "$Complete$")
     set_string("quest_progress", get_string("quest_progress") + "\n#Regrowing the Glades# - ")
-    if GladesTown.RegrowTheGlades == false set_string("quest_progress", get_string("quest_progress") + "Help Tuley regrow the flora of the Wellspring Glades")
-    if GladesTown.RegrowTheGlades set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    if Glades.RegrowGlades.Reward == false set_string("quest_progress", get_string("quest_progress") + "Help Tuley regrow the flora of the Wellspring Glades")
+    if Glades.RegrowGlades.Reward set_string("quest_progress", get_string("quest_progress") + "$Complete$")
 }
 
 fun show_teleporter_progress() {

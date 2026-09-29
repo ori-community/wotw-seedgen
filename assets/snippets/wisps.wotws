@@ -52,17 +52,17 @@ on spawn store(itemTracker.wispsRequired, wisps_required)
 !augment_fun(write_missing_goals(), if itemTracker.wispsCount < wisps_required write_missing_wisps())
 
 fun write_missing_wisps() { new_row("Missing Wisps (" + (wisps_required - itemTracker.wispsCount) + "): ") }
-!if voice { !augment_fun(write_missing_wisps(), if EastHollow.ForestsVoice == false add_missing_goal_in_zone("Voice", current_zone() == Hollow)) }
-!if strength { !augment_fun(write_missing_wisps(), if WestPools.ForestsStrength == false add_missing_goal_in_zone("Strength", current_zone() == Pools)) }
-!if memory { !augment_fun(write_missing_wisps(), if LowerReach.ForestsMemory == false add_missing_goal_in_zone("Memory", current_zone() == Reach)) }
-!if eyes { !augment_fun(write_missing_wisps(), if UpperDepths.ForestsEyes == false add_missing_goal_in_zone("Eyes", current_zone() == Depths)) }
-!if heart { !augment_fun(write_missing_wisps(), if WindtornRuins.ForestsHeart == false add_missing_goal_in_zone("Heart", current_zone() == Ruins)) }
+!if voice { !augment_fun(write_missing_wisps(), if Hollow.Wisp == false add_missing_goal_in_zone("Voice", current_zone() == Hollow)) }
+!if strength { !augment_fun(write_missing_wisps(), if Pools.Wisp == false add_missing_goal_in_zone("Strength", current_zone() == Pools)) }
+!if memory { !augment_fun(write_missing_wisps(), if Reach.Wisp == false add_missing_goal_in_zone("Memory", current_zone() == Reach)) }
+!if eyes { !augment_fun(write_missing_wisps(), if Depths.Wisp == false add_missing_goal_in_zone("Eyes", current_zone() == Depths)) }
+!if heart { !augment_fun(write_missing_wisps(), if Ruins.Wisp == false add_missing_goal_in_zone("Heart", current_zone() == Ruins)) }
 !augment_fun(write_missing_wisps(), add_current_row())
 
 on change itemTracker.wispsCount update_goals()
 
-!if voice { on EastHollow.ForestsVoice create_stats_entry(Wisp, "Voice") }
-!if strength { on WestPools.ForestsStrength create_stats_entry(Wisp, "Strength") }
-!if memory { on LowerReach.ForestsMemory create_stats_entry(Wisp, "Memory") }
-!if eyes { on UpperDepths.ForestsEyes create_stats_entry(Wisp, "Eyes") }
-!if heart { on WindtornRuins.ForestsHeart create_stats_entry(Wisp, "Heart") }
+!if voice { on Hollow.Wisp create_stats_entry(Wisp, "Voice") }
+!if strength { on Pools.Wisp create_stats_entry(Wisp, "Strength") }
+!if memory { on Reach.Wisp create_stats_entry(Wisp, "Memory") }
+!if eyes { on Depths.Wisp create_stats_entry(Wisp, "Eyes") }
+!if heart { on Ruins.Wisp create_stats_entry(Wisp, "Heart") }

@@ -83,21 +83,21 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - ite
     (kwolokGroupDescriptor.cleanseWellspringQuestUberState != 3 && current_zone() == Wellspring)
     || (kwolokGroupDescriptor.cleanseWellspringQuestUberState == 3 && current_zone() == Hollow)
 )) }
-!if missing_key { !augment_fun(write_missing_quests(), if MarshSpawn.TokkKeystoneQuest == false add_missing_goal_in_zone(
+!if missing_key { !augment_fun(write_missing_quests(), if Marsh.MissingKey.Reward == false add_missing_goal_in_zone(
     // TODO any other permanents Tokks? Or toggle this based on the conditions for the Tokks to appear? Also relevant in hand to hand
     "Missing Key",
     (npcsStateGroup.marshKeystoneQuest != 2 && current_zone() == Marsh)
     || (npcsStateGroup.marshKeystoneQuest == 2 && (current_zone() == Marsh || current_zone() == Glades))
 )) }
-!if into_burrows { !augment_fun(write_missing_quests(), if MarshSpawn.TokkTabletQuest == false add_missing_goal_in_zone(
+!if into_burrows { !augment_fun(write_missing_quests(), if Marsh.IntoBurrows.Reward == false add_missing_goal_in_zone(
     "Into Burrows",
     (npcsStateGroup.inkwaterWellQuest != 3 && current_zone() == Burrows)
     || (npcsStateGroup.inkwaterWellQuest == 3 && current_zone() == Marsh)
 )) }
-!if lost_compass { !augment_fun(write_missing_quests(), if OuterWellspring.TheLostCompass == false add_missing_goal_in_zone(
+!if lost_compass { !augment_fun(write_missing_quests(), if Wellspring.LostCompass.Reward == false add_missing_goal_in_zone(
     "Lost Compass", current_zone() == Wellspring
 )) }
-!if little_braver { !augment_fun(write_missing_quests(), if MarshSpawn.MokkFangQuest == false add_missing_goal_in_zone(
+!if little_braver { !augment_fun(write_missing_quests(), if Marsh.LittleBraver.Reward == false add_missing_goal_in_zone(
     "Little Braver", current_zone() == Marsh
 )) }
 !if family_reunion { !augment_fun(write_missing_quests(), if GladesTown.FamilyReunion == false add_missing_goal_in_zone(
@@ -115,7 +115,7 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - ite
     (questUberStateGroup.desertCogQuest != 4 && current_zone() == Wastes)
     || (questUberStateGroup.desertCogQuest == 4 && (current_zone() == Hollow || current_zone() == Glades))
 )) }
-!if hand_to_hand { !augment_fun(write_missing_quests(), if WindtornRuins.HandToHandComplete == false add_missing_goal_in_zone(
+!if hand_to_hand { !augment_fun(write_missing_quests(), if Ruins.HandToHand.Reward == false add_missing_goal_in_zone(
     "Hand to Hand",
     (questUberStateGroup.tradeSequenceQuest == 0 && current_zone() == Hollow)
     || (questUberStateGroup.tradeSequenceQuest == 1 && (current_zone() == Marsh || current_zone() == Glades))
@@ -127,18 +127,18 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - ite
     || (questUberStateGroup.tradeSequenceQuest == 9 && current_zone() == Wastes)
     || (questUberStateGroup.tradeSequenceQuest == 10 && current_zone() == Ruins)
 )) }
-!if into_darkness { !augment_fun(write_missing_quests(), if GladesTown.MokiAcornQuest == false add_missing_goal_in_zone(
+!if into_darkness { !augment_fun(write_missing_quests(), if Glades.IntoDarkness.Reward == false add_missing_goal_in_zone(
     "Into Darkness", current_zone() == Glades
 )) }
-!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if EastHollow.KwoloksWisdomCompleted == false add_missing_goal_in_zone(
+!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if Hollow.KwoloksWisdom.Reward == false add_missing_goal_in_zone(
     "Kwolok's Wisdom",
     (questUberStateGroup.kwoloksWisdomQuest != 3 && current_zone() == Pools)
     || (questUberStateGroup.kwoloksWisdomQuest == 3 && current_zone() == Hollow)
 )) }
-!if rebuilding_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RebuildTheGlades == false add_missing_goal_in_zone(
+!if rebuilding_the_glades { !augment_fun(write_missing_quests(), if Glades.RebuildGlades.Reward == false add_missing_goal_in_zone(
     "Rebuilding the Glades", current_zone() == Glades
 )) }
-!if regrowing_the_glades { !augment_fun(write_missing_quests(), if GladesTown.RegrowTheGlades == false add_missing_goal_in_zone(
+!if regrowing_the_glades { !augment_fun(write_missing_quests(), if Glades.RegrowGlades.Reward == false add_missing_goal_in_zone(
     "Regrowing the Glades", current_zone() == Glades
 )) }
 !augment_fun(write_missing_quests(), add_current_row())
@@ -154,36 +154,36 @@ on change itemTracker.questsCount update_goals()
 }
 
 !if missing_key {
-    on MarshSpawn.TokkKeystoneQuest {
+    on Marsh.MissingKey.Reward {
         create_stats_entry(QuestEnd, "The Missing Key")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
     // TODO optimization for state > n == false?
-    on MarshSpawn.TokkKeystoneQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Marsh.MissingKey.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if into_burrows {
-    on MarshSpawn.TokkTabletQuest {
+    on Marsh.IntoBurrows.Reward {
         create_stats_entry(QuestEnd, "Into the Burrows")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on MarshSpawn.TokkTabletQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Marsh.IntoBurrows.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if lost_compass {
-    on OuterWellspring.TheLostCompass {
+    on Wellspring.LostCompass.Reward {
         create_stats_entry(QuestEnd, "The Lost Compass")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on OuterWellspring.TheLostCompass == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Wellspring.LostCompass.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if little_braver {
-    on MarshSpawn.MokkFangQuest {
+    on Marsh.LittleBraver.Reward {
         create_stats_entry(QuestEnd, "A Little Braver")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on MarshSpawn.MokkFangQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Marsh.LittleBraver.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if family_reunion {
@@ -212,41 +212,41 @@ on change itemTracker.questsCount update_goals()
 }
 
 !if hand_to_hand {
-    on WindtornRuins.HandToHandComplete {
+    on Ruins.HandToHand.Reward {
         create_stats_entry(QuestEnd, "Hand To Hand")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on WindtornRuins.HandToHandComplete == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Ruins.HandToHand.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if into_darkness {
-    on GladesTown.MokiAcornQuest {
+    on Glades.IntoDarkness.Reward {
         create_stats_entry(QuestEnd, "Into the Darkness")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on GladesTown.MokiAcornQuest == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.IntoDarkness.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if kwoloks_wisdom {
-    on EastHollow.KwoloksWisdomCompleted {
+    on Hollow.KwoloksWisdom.Reward {
         create_stats_entry(QuestEnd, "Kwolok's Wisdom")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on EastHollow.KwoloksWisdomCompleted == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Hollow.KwoloksWisdom.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if rebuilding_the_glades {
-    on GladesTown.RebuildTheGlades {
+    on Glades.RebuildGlades.Reward {
         create_stats_entry(QuestEnd, "Rebuilding the Glades")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on GladesTown.RebuildTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.RebuildGlades.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
 
 !if regrowing_the_glades {
-    on GladesTown.RegrowTheGlades {
+    on Glades.RegrowGlades.Reward {
         create_stats_entry(QuestEnd, "Regrowing the Glades")
         store(itemTracker.questsCount, itemTracker.questsCount + 1)
     }
-    on GladesTown.RegrowTheGlades == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.RegrowGlades.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
 }
