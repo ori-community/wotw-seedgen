@@ -294,7 +294,7 @@ impl CompletionInSpan for UberIdentifierNumeric {
 
 impl CompletionInSpan for UberIdentifierName<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        if index < self.group.span.end {
+        if index <= self.group.span.end {
             return Some(cache.uber_identifier_completion.name.groups.clone());
         }
 
@@ -304,7 +304,7 @@ impl CompletionInSpan for UberIdentifierName<'_> {
             .members
             .get(self.group.data.0)?;
 
-        if (self.group.span.end..self.member.span_end()).contains(&index) {
+        if (self.group.span.end..self.member.span_end()).contains(&(index - 1)) {
             return Some(member_completion.members.clone());
         }
 
