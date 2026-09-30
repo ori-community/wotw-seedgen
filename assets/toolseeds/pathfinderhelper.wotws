@@ -107,7 +107,7 @@ on reload {
         RightTop,
         "Toggle Glades Projects",
         "[Ability1]Toggle All\n[Ability2]Open Menu\nShortcut: [Binding4]",
-        wall_icon,
+        gears_icon,
     )
     set_wheel_item_action("root", RightTop, Ability1, toggle_glades_projects())
     set_wheel_item_action("root", RightTop, Ability2, switch_wheel("glades_projects"))
@@ -116,11 +116,20 @@ on reload {
     set_wheel_item_data(
         "root",
         Right,
+        "Toggle Marsh Weather",
+        "[Ability1]Toggle\nShortcut: [Binding4]",
+        gears_icon,
+    )
+    set_wheel_item_all_actions("root", Right, toggle_marsh_weather())
+
+    set_wheel_item_data(
+        "root",
+        RightBottom,
         "World Reset",
         "[Ability1]Reset\nShortcut: [Binding5]",
         wall_icon,
     )
-    set_wheel_item_all_actions("root", Right, world_reset())
+    set_wheel_item_all_actions("root", RightBottom, world_reset())
 
     set_wheel_item_data(
         "glades_projects",
@@ -413,16 +422,24 @@ on binding4 if get_integer("bind_pointer") == 0 {
     store(bind_pointer, select_major_state)
 
     open_dialogue()
-    set_message_text("dialogue", "Select toggle\n[Binding1]Clean Water\n[Binding2]Glades Projects")
+    set_message_text("dialogue", "Select toggle\n[Binding1]Clean Water\n[Binding2]Glades Projects\n[Binding3]Marsh Weather\n[Binding4]Cancel")
 }
 
 on binding1 if get_integer("bind_pointer") == select_major_state toggle_clean_water()
 on binding2 if get_integer("bind_pointer") == select_major_state toggle_glades_projects()
+on binding3 if get_integer("bind_pointer") == select_major_state toggle_marsh_weather()
+on binding4 if get_integer("bind_pointer") == select_major_state close_dialogue()
 
 fun toggle_clean_water() {
     store(randoState.cleanWater, randoState.cleanWater == false)
     if randoState.cleanWater respond(clean_water_string())
     if randoState.cleanWater == false respond(remove_clean_water_string())
+}
+
+fun toggle_marsh_weather() {
+    store(randoState.rainLiftedInMarsh, randoState.rainLiftedInMarsh == false)
+    if randoState.rainLiftedInMarsh respond("#Rain Lifted#")
+    if randoState.rainLiftedInMarsh == false respond("@Rain Reset@")
 }
 
 on binding5 if get_integer("bind_pointer") == 0 world_reset()
