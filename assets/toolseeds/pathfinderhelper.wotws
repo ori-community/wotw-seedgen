@@ -10,77 +10,77 @@
 on reload {
     set_wheel_item_data(
         "root",
-        Left,
-        "Toggle Clean Water",
-        "[Ability1]Toggle\nShortcut: [Binding1]",
-        clean_water_icon,
+        LeftBottom,
+        "Save",
+        "[Ability1]Save\nShortcut: [Binding1]",
+        save_icon,
     )
-    set_wheel_item_all_actions("root", Left, toggle_clean_water())
+    set_wheel_item_all_actions("root", LeftBottom, save_game())
+
+    set_wheel_item_data(
+        "root",
+        Left,
+        "Refill",
+        "[Ability1]Refill\nShortcut: [Binding1]",
+        health_icon,
+    )
+    set_wheel_item_all_actions("root", Left, refill())
 
     set_wheel_item_data(
         "root",
         LeftTop,
-        "Toggle Difficulty",
-        "[Ability1]Toggle\nShortcut: [Binding2]",
-        gears_icon,
+        "Choose target for Warp to x/y",
+        "[Ability1]Choose\nShortcut: [Binding2]",
+        teleporter_icon,
     )
-    set_wheel_item_all_actions("root", LeftTop, toggle_difficulty())
+    set_wheel_item_all_actions("root", LeftTop, choose_teleport_target())
 
     set_wheel_item_data(
         "root",
         TopLeft,
-        "Choose target for Warp to x/y",
-        "[Ability1]Choose\nShortcut: [Binding3]",
+        "Warp to x/y",
+        "[Ability1]Warp\nShortcut: [Binding2]",
         teleporter_icon,
     )
-    set_wheel_item_all_actions("root", TopLeft, choose_teleport_target())
+    set_wheel_item_all_actions("root", TopLeft, teleport())
 
     set_wheel_item_data(
         "root",
         Top,
-        "Warp to x/y",
-        "[Ability1]Warp\nShortcut: [Binding3]",
-        teleporter_icon,
+        "Toggle Difficulty",
+        "[Ability1]Toggle\nShortcut: [Binding3]",
+        gears_icon,
     )
-    set_wheel_item_all_actions("root", Top, teleport())
+    set_wheel_item_all_actions("root", Top, toggle_difficulty())
 
     set_wheel_item_data(
         "root",
         TopRight,
-        "Save",
-        "[Ability1]Save\nShortcut: [Binding4]",
-        save_icon,
+        "Toggle Clean Water",
+        "[Ability1]Toggle\nShortcut: [Binding4]",
+        clean_water_icon,
     )
-    set_wheel_item_all_actions("root", TopRight, save_game())
+    set_wheel_item_all_actions("root", TopRight, toggle_clean_water())
 
     set_wheel_item_data(
         "root",
         RightTop,
-        "Refill",
-        "[Ability1]Refill\nShortcut: [Binding4]",
-        health_icon,
-    )
-    set_wheel_item_all_actions("root", RightTop, refill())
-
-    set_wheel_item_data(
-        "root",
-        Right,
         "Toggle Glades Projects",
         "[Ability1]Toggle All\n[Ability2]Open Menu",
         wall_icon,
     )
-    set_wheel_item_action("root", Right, Ability1, toggle_glades_projects())
-    set_wheel_item_action("root", Right, Ability2, switch_wheel("glades_projects"))
-    set_wheel_item_action("root", Right, Ability3, switch_wheel("glades_projects"))
+    set_wheel_item_action("root", RightTop, Ability1, toggle_glades_projects())
+    set_wheel_item_action("root", RightTop, Ability2, switch_wheel("glades_projects"))
+    set_wheel_item_action("root", RightTop, Ability3, switch_wheel("glades_projects"))
 
     set_wheel_item_data(
         "root",
-        RightBottom,
+        Right,
         "World Reset",
         "[Ability1]Reset\nShortcut: [Binding5]",
         wall_icon,
     )
-    set_wheel_item_all_actions("root", RightBottom, world_reset())
+    set_wheel_item_all_actions("root", Right, world_reset())
 
     set_wheel_item_data(
         "glades_projects",
@@ -303,27 +303,24 @@ fun give_stuff() {
     store(WillowsEnd.ShriekTeleporterActive, true)
 }
 
-on binding1 toggle_clean_water()
-fun toggle_clean_water() {
-    if randoState.cleanWater item_message(remove_clean_water_string())
-    if randoState.cleanWater == false item_message(clean_water_string())
-    store(randoState.cleanWater, randoState.cleanWater == false)
+on binding1 {
+    save_game()
+    refill()
 }
-
-on binding2 toggle_difficulty()
-fun toggle_difficulty() {
-    store(gameStateGroup.gameDifficultyMode, gameStateGroup.gameDifficultyMode + 1)
-    if gameStateGroup.gameDifficultyMode == 3 store(gameStateGroup.gameDifficultyMode, 0)
-    if gameStateGroup.gameDifficultyMode == 0 set_string("difficulty", "#Easy#")
-    if gameStateGroup.gameDifficultyMode == 1 set_string("difficulty", "#Normal#")
-    if gameStateGroup.gameDifficultyMode == 2 set_string("difficulty", "#Hard#")
-    item_message("Difficulty changed to " + get_string("difficulty"))
+fun save_game() {
+    save()
+    item_message("Game Saved!")
+}
+fun refill() {
+    store(player.health, player.maxHealth)
+    store(player.energy, player.maxEnergy)
+    item_message("Health and Energy restored")
 }
 
 !state(x, Float)
 !state(y, Float)
 
-on binding3 {
+on binding2 {
     if get_boolean("choosing_target") == false {
         if x == 0. && y == 0. choose_teleport_target()
         if x != 0. || y != 0. teleport()
@@ -332,7 +329,7 @@ on binding3 {
         store(x, input.mouseWorldPositionX)
         store(y, input.mouseWorldPositionY)
         destroy_message("target")
-        item_message("Warp target set\n[Binding3]Warp to " + input.mouseWorldPositionX + ", " + input.mouseWorldPositionY)
+        item_message("Warp target set\n[Binding2]Warp to " + input.mouseWorldPositionX + ", " + input.mouseWorldPositionY)
         set_boolean("choosing_target", false)
     }
 }
@@ -349,21 +346,24 @@ fun choose_teleport_target() {
 on change input.mouseWorldPositionX update_target_message()
 on change input.mouseWorldPositionY update_target_message()
 fun update_target_message() {
-    set_message_text("target", input.mouseWorldPositionX + ", " + input.mouseWorldPositionY + "\n[Binding3]Confirm")
+    set_message_text("target", input.mouseWorldPositionX + ", " + input.mouseWorldPositionY + "\n[Binding2]Confirm")
 }
 
-on binding4 {
-    save_game()
-    refill()
+on binding3 toggle_difficulty()
+fun toggle_difficulty() {
+    store(gameStateGroup.gameDifficultyMode, gameStateGroup.gameDifficultyMode + 1)
+    if gameStateGroup.gameDifficultyMode == 3 store(gameStateGroup.gameDifficultyMode, 0)
+    if gameStateGroup.gameDifficultyMode == 0 set_string("difficulty", "#Easy#")
+    if gameStateGroup.gameDifficultyMode == 1 set_string("difficulty", "#Normal#")
+    if gameStateGroup.gameDifficultyMode == 2 set_string("difficulty", "#Hard#")
+    item_message("Difficulty changed to " + get_string("difficulty"))
 }
-fun save_game() {
-    save()
-    item_message("Game Saved!")
-}
-fun refill() {
-    store(player.health, player.maxHealth)
-    store(player.energy, player.maxEnergy)
-    item_message("Health and Energy restored")
+
+on binding4 toggle_clean_water()
+fun toggle_clean_water() {
+    if randoState.cleanWater item_message(remove_clean_water_string())
+    if randoState.cleanWater == false item_message(clean_water_string())
+    store(randoState.cleanWater, randoState.cleanWater == false)
 }
 
 on binding5 world_reset()
