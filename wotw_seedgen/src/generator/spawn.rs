@@ -1,3 +1,5 @@
+use std::iter;
+
 use arrayvec::ArrayVec;
 use itertools::Itertools;
 use log::{trace, warn};
@@ -9,18 +11,22 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use wotw_seedgen_data::{
     assets::LocDataEntry,
-    logic_language::output::Graph,
+    logic_language::output::{Graph, Node},
     seed_language::{
         ast::ClientEvent,
         compile::store_boolean,
-        output::{CommandVoid, Event, IntermediateOutput, Trigger},
+        output::{CommandBoolean, CommandVoid, Event, IntermediateOutput, Trigger},
         simulate::{Simulate, Simulation, Snapshot},
     },
     Difficulty, Spawn, UberIdentifier, DEFAULT_SPAWN,
 };
 use wotw_seedgen_log_capture::LogCapture;
 
-use crate::{generator::SEED_FAILED_MESSAGE, item_pool::ItemPool, LogicalDifficulty, World};
+use crate::{
+    generator::{format_pickups, SEED_FAILED_MESSAGE},
+    item_pool::ItemPool,
+    LogicalDifficulty, World,
+};
 
 pub fn choose_spawn<'graph, 'log>(
     rng: &mut Pcg64Mcg,
@@ -28,9 +34,10 @@ pub fn choose_spawn<'graph, 'log>(
     log_index: &str,
     item_pool: &ItemPool<'log>,
     output: &mut IntermediateOutput<'log>,
-) -> Result<Vec<&'graph LocDataEntry>, String> {
+) -> Result<SpawnOutput<'graph>, String> {
     let mut context = SpawnContext::new(rng, world, log_index, item_pool, output);
     context.choose_spawn()?;
+    context.postprocess();
     Ok(context.finish())
 }
 
@@ -41,7 +48,7 @@ struct SpawnContext<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'l
     item_pool: &'pool ItemPool<'log>,
     output: &'output mut IntermediateOutput<'log>,
     default_spawn: usize,
-    total_reach: Vec<&'graph LocDataEntry>,
+    spawn_output: SpawnOutput<'graph>,
 }
 
 impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
@@ -65,14 +72,23 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
             item_pool,
             output,
             default_spawn,
-            total_reach: Vec::new(),
+            spawn_output: SpawnOutput::default(),
         };
 
         context.world.snapshot();
 
         context.world.spawn = default_spawn;
         context.total_reach_check();
-        context.total_reach = context.world.reached_pickups().collect::<Vec<_>>();
+
+        for (index, node) in context.world.graph.nodes.iter().enumerate() {
+            let Node::Pickup(pickup) = node else { continue };
+
+            if context.world.has_reached(index) {
+                context.spawn_output.total_reach.push(pickup);
+            } else {
+                context.spawn_output.unreachable.push(pickup);
+            }
+        }
 
         context.world.restore_snapshot();
 
@@ -147,13 +163,13 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
                     spawn = self.world.graph.nodes[spawn].identifier(),
                     default_spawn = DEFAULT_SPAWN,
                 );
-            } else if reached_count != self.total_reach.len() {
+            } else if reached_count != self.spawn_output.total_reach.len() {
                 trace!(
                     logger: self.item_pool.log_capture,
                     "{log_index}Discarding spawn {spawn} since only {reached_count}/{total_count} locations were reached",
                     log_index = self.log_index,
                     spawn = self.world.graph.nodes[spawn].identifier(),
-                    total_count = self.total_reach.len(),
+                    total_count = self.spawn_output.total_reach.len(),
                 );
             } else {
                 trace!(
@@ -183,7 +199,68 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
         self.world.traverse_spawn(&self.output.commands);
     }
 
-    fn finish(self) -> Vec<&'graph LocDataEntry> {
+    fn postprocess(&mut self) {
+        filter_placement_locations(
+            &self.world,
+            &self.log_index,
+            &mut self.spawn_output.total_reach,
+            &self.output,
+            self.item_pool.log_capture,
+        );
+
+        trace!(
+            logger: self.item_pool.log_capture,
+            "{log_index}{amount} reachable placement location{s}: {total_reach}",
+            log_index = self.log_index,
+            amount = self.spawn_output.total_reach.len(),
+            s = if self.spawn_output.total_reach.len() == 1 { "" } else { "s" },
+            total_reach = format_pickups(&self.spawn_output.total_reach)
+        );
+
+        self.spawn_output.total_reach.shuffle(&mut self.rng);
+
+        let unexpected_unreachable = self.spawn_output.unreachable.len()
+            != self.world.settings.difficulty.expected_unreachable();
+
+        filter_placement_locations(
+            &self.world,
+            &self.log_index,
+            &mut self.spawn_output.unreachable,
+            &self.output,
+            self.item_pool.log_capture,
+        );
+
+        trace!(
+            logger: self.item_pool.log_capture,
+            "{log_index}{amount} unreachable placement location{s}: {unreachable}",
+            log_index = self.log_index,
+            amount = self.spawn_output.unreachable.len(),
+            s = if self.spawn_output.unreachable.len() == 1 { "" } else { "s" },
+            unreachable = format_pickups(&self.spawn_output.unreachable)
+        );
+
+        if unexpected_unreachable {
+            if self.spawn_output.unreachable.len() == 1 {
+                warn!(
+                    logger: self.item_pool.log_capture,
+                    "{log_index}{location} is unreachable on these settings!",
+                    log_index = self.log_index,
+                    location = self.spawn_output.unreachable.first().unwrap().identifier,
+                );
+            } else {
+                warn!(
+                    logger: self.item_pool.log_capture,
+                    "{log_index}{amount} locations are unreachable on these settings!",
+                    log_index = self.log_index,
+                    amount = self.spawn_output.unreachable.len(),
+                );
+            }
+        }
+
+        self.spawn_output.unreachable.shuffle(&mut self.rng);
+    }
+
+    fn finish(self) -> SpawnOutput<'graph> {
         let spawn_node = &self.world.graph.nodes[self.world.spawn];
 
         // TODO something less specialized?
@@ -226,16 +303,22 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
             }
         }
 
-        self.total_reach
+        self.spawn_output
     }
 }
 
-pub struct RandomSpawnGenerator {
+#[derive(Default)]
+pub struct SpawnOutput<'graph> {
+    pub total_reach: Vec<&'graph LocDataEntry>,
+    pub unreachable: Vec<&'graph LocDataEntry>,
+}
+
+struct RandomSpawnGenerator {
     spawns: arrayvec::IntoIter<usize, 13>,
 }
 
 impl RandomSpawnGenerator {
-    pub fn new(
+    fn new(
         rng: &mut Pcg64Mcg,
         graph: &Graph,
         difficulty: Difficulty,
@@ -285,7 +368,7 @@ impl Iterator for RandomSpawnGenerator {
     }
 }
 
-pub struct FullyRandomSpawnGenerator<'graph> {
+struct FullyRandomSpawnGenerator<'graph> {
     rng: Pcg64Mcg,
     graph: &'graph Graph,
     first: Option<usize>,
@@ -293,7 +376,7 @@ pub struct FullyRandomSpawnGenerator<'graph> {
 }
 
 impl<'graph> FullyRandomSpawnGenerator<'graph> {
-    pub fn new(rng: &mut Pcg64Mcg, graph: &'graph Graph) -> Result<Self, String> {
+    fn new(rng: &mut Pcg64Mcg, graph: &'graph Graph) -> Result<Self, String> {
         let mut rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
 
         // Postpone allocating indices because the size is big
@@ -337,4 +420,64 @@ impl Iterator for FullyRandomSpawnGenerator<'_> {
             spawns.pop()
         })
     }
+}
+
+fn filter_placement_locations<'a>(
+    world: &World,
+    log_index: &str,
+    placement_locations: &mut Vec<&'a LocDataEntry>,
+    output: &IntermediateOutput,
+    log_capture: &LogCapture,
+) {
+    let mut extra_slots = vec![];
+
+    placement_locations.retain(|pickup| {
+        let condition = CommandBoolean::loc_data_condition(pickup.uber_identifier, pickup.value);
+        // TODO remove by identifier instead?
+        if output.modifiers.removed_locations.contains(&condition) {
+            trace!(
+                logger: log_capture,
+                "{log_index}Manually removed {pickup} from placement locations",
+                pickup = pickup.identifier
+            );
+
+            return false;
+        }
+
+        if world.loc_data_condition_met(pickup.uber_identifier, pickup.value) {
+            trace!(
+                logger: log_capture,
+                "{log_index}Removing {pickup} from placement locations since the condition was met on spawn",
+                pickup = pickup.identifier
+            );
+
+            return false;
+        }
+
+        match output.modifiers.location_slots.get(&condition) {
+            None | Some(1) => {},
+            Some(0) => {
+                trace!(
+                    logger: log_capture,
+                    "{log_index}Removing {pickup} from placement locations since location slots were set to zero",
+                    pickup = pickup.identifier
+                );
+
+                return false;
+            }
+            Some(slots) => {
+                trace!(
+                    logger: log_capture,
+                    "{log_index}Increasing {pickup} slots to {slots}",
+                    pickup = pickup.identifier
+                );
+
+                extra_slots.extend(iter::repeat_n(pickup, (slots - 1) as usize));
+            }
+        }
+
+        true
+    });
+
+    placement_locations.append(&mut extra_slots);
 }

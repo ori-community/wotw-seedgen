@@ -4,11 +4,11 @@ use super::{
 use crate::{
     generator::{
         entrances::generate_entrances,
+        format_pickups,
         solutions::{solution_weights, Solution, SOLUTION_MAX_ITEMS},
-        spawn,
+        spawn::{choose_spawn, SpawnOutput},
     },
     item_pool::ItemPoolBuilder,
-    logical_difficulty::LogicalDifficulty,
     spoiler::{NodeSummary, SeedSpoiler, SpoilerGroup, SpoilerItem, SpoilerPlacement},
     World,
 };
@@ -22,7 +22,7 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
+use std::{cmp::Ordering, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     env_or,
@@ -79,6 +79,8 @@ pub struct WorldContext<'graph, 'settings, 'perf, 'log> {
     spirit_light_provider: SpiritLightProvider,
     /// all remaining pickups which need to be assigned random placements
     needs_placement: Vec<&'graph LocDataEntry>,
+    /// unreachable pickups which should be assigned extra spirit light
+    unreachable: Vec<&'graph LocDataEntry>,
     /// initial length of `needs_placement`
     total_pickups: f32,
     /// cost of ks doors already opened on spawn, which will be ignored for forced keystones
@@ -902,17 +904,10 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
         // TODO technically I think this should be after preplacements somehow?
         // Because this will make wrong assumptions about the total reach if important items are in preplacements.
-        let mut needs_placement =
-            spawn::choose_spawn(&mut rng, &mut world, &log_index, &item_pool, &mut output)?;
-        filter_needs_placement(
-            &world,
-            &log_index,
-            &mut needs_placement,
-            &output,
-            log_capture,
-        );
-
-        needs_placement.shuffle(&mut rng);
+        let SpawnOutput {
+            total_reach: needs_placement,
+            unreachable,
+        } = choose_spawn(&mut rng, &mut world, &log_index, &item_pool, &mut output)?;
 
         let total_pickups = needs_placement.len() as f32;
 
@@ -933,6 +928,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             item_pool,
             spirit_light_provider,
             needs_placement,
+            unreachable,
             total_pickups,
             initial_ks_cost,
             spirit_light_placements_remaining: 0,
@@ -1375,44 +1371,17 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             }
         }
 
-        let mut last_unreachable = None;
-        let mut unreachable_count = 0;
+        for pickup in mem::take(&mut self.unreachable) {
+            trace!(
+                logger: self.item_pool.log_capture,
+                "{log_index}Placing extra spirit light in unreachable location {location}",
+                log_index = self.log_index,
+                location = pickup.identifier,
+            );
 
-        for (index, node) in self.world.graph.nodes.iter().enumerate() {
-            if let Node::Pickup(pickup) = node {
-                if !self.world.has_reached(index) {
-                    trace!(
-                        logger: self.item_pool.log_capture,
-                        "{}Placing extra spirit light in unreachable location {}",
-                        self.log_index,
-                        pickup.identifier,
-                    );
-
-                    let amount = self.spirit_light_provider.take_exceed();
-                    let command = compile::spirit_light(amount.into(), &mut self.rng);
-                    self.place_without_simulation(pickup, command, placement_spoiler);
-
-                    last_unreachable = Some(pickup);
-                    unreachable_count += 1;
-                }
-            }
-        }
-
-        if unreachable_count != self.world.settings.difficulty.expected_unreachable() {
-            if unreachable_count == 1 {
-                warn!(
-                    logger: self.item_pool.log_capture,
-                    "{log_index}{location} is unreachable on these settings!",
-                    log_index = self.log_index,
-                    location = last_unreachable.unwrap().identifier,
-                );
-            } else {
-                warn!(
-                    logger: self.item_pool.log_capture,
-                    "{log_index}{unreachable_count} locations are unreachable on these settings!",
-                    log_index = self.log_index,
-                );
-            }
+            let amount = self.spirit_light_provider.take_exceed();
+            let command = compile::spirit_light(amount.into(), &mut self.rng);
+            self.place_without_simulation(pickup, command, placement_spoiler);
         }
     }
 
@@ -1591,77 +1560,4 @@ impl OrderingDistribution {
             _ => unreachable!(),
         }
     }
-}
-
-fn filter_needs_placement(
-    world: &World,
-    log_index: &str,
-    needs_placement: &mut Vec<&LocDataEntry>,
-    output: &IntermediateOutput,
-    log_capture: &LogCapture,
-) {
-    let mut extra_slots = vec![];
-
-    needs_placement.retain(|pickup| {
-        let condition = CommandBoolean::loc_data_condition(pickup.uber_identifier, pickup.value);
-        // TODO remove by identifier instead?
-        if output.modifiers.removed_locations.contains(&condition) {
-            trace!(
-                logger: log_capture,
-                "{log_index}Manually removed {pickup} from placement locations",
-                pickup = pickup.identifier
-            );
-
-            return false;
-        }
-
-        if world.loc_data_condition_met(pickup.uber_identifier, pickup.value) {
-            trace!(
-                logger: log_capture,
-                "{log_index}Removing {pickup} from placement locations since the condition was met on spawn",
-                pickup = pickup.identifier
-            );
-
-            return false;
-        }
-
-        match output.modifiers.location_slots.get(&condition) {
-            None | Some(1) => {},
-            Some(0) => {
-                trace!(
-                    logger: log_capture,
-                    "{log_index}Removing {pickup} from placement locations since location slots were set to zero",
-                    pickup = pickup.identifier
-                );
-
-                return false;
-            }
-            Some(slots) => {
-                trace!(
-                    logger: log_capture,
-                    "{log_index}Increasing {pickup} slots to {slots}",
-                    pickup = pickup.identifier
-                );
-
-                extra_slots.extend(iter::repeat_n(pickup, (slots - 1) as usize));
-            }
-        }
-
-        true
-    });
-
-    needs_placement.append(&mut extra_slots);
-
-    trace!(
-        logger: log_capture,
-        "{log_index}{amount} total locations that need placements: {needs_placement}",
-        amount = needs_placement.len(),
-        needs_placement = format_pickups(needs_placement)
-    );
-}
-
-fn format_pickups<'a, 'graph>(
-    pickups: &'a [&'graph LocDataEntry],
-) -> impl Display + use<'a, 'graph> {
-    pickups.iter().map(|pickup| &pickup.identifier).format(", ")
 }

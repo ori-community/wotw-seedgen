@@ -13,12 +13,13 @@ use crate::{
     perf_data::PerfData,
     world::World,
 };
+use itertools::Itertools;
 use log::{info, trace, warn};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
-use std::sync::LazyLock;
+use std::{fmt::Display, sync::LazyLock};
 use wotw_seedgen_data::{
-    assets::{ChainedSnippetAccess, LocData, SnippetAccess, UberStateData},
+    assets::{ChainedSnippetAccess, LocData, LocDataEntry, SnippetAccess, UberStateData},
     env_or,
     logic_language::output::Graph,
     seed_language::{compile::Compiler, output::IntermediateOutput, simulate::UberStates},
@@ -196,4 +197,10 @@ fn parse_snippets<'log>(
         .finish()
         .eprint_errors()
         .ok_or_else(|| "failed to compile snippets".to_string())
+}
+
+fn format_pickups<'a, 'graph>(
+    pickups: &'a [&'graph LocDataEntry],
+) -> impl Display + use<'a, 'graph> {
+    pickups.iter().map(|pickup| &pickup.identifier).format(", ")
 }
