@@ -1,6 +1,6 @@
 #hidden
-#name("Bonus Progress Helper")
-#description("Tracks Bonus Items and their effects in a progress helper wheel item")
+#name("Upgrade Progress Helper")
+#description("Tracks vanilla and bonus upgrades in a progress helper wheel item")
 
 !builtin_icon(message_icon, "icons/game/message.png")
 
@@ -8,137 +8,148 @@
 !include("list_core", default_color, new_column, add_row, add_current_colored_row, next_item_first, next_item_colored, next_item_uncolored, new_colored_row, add_colored_row_item_with, auto_negative_margin)
 !include("regeneration_core", energy_per_second, health_per_second)
 
-!export(write_bonus_items)
-fun write_bonus_items(relevant: Boolean) {}
+!export(write_upgrades)
+fun write_upgrades(relevant: Boolean) {
+    if skills.spear == relevant add_upgrade("Exploding Spear")
+    if skills.hammer == relevant add_upgrade("Hammer Shockwave")
+    if skills.shuriken == relevant add_upgrade("Static Shuriken")
+    if skills.blaze == relevant add_upgrade("Charge Blaze")
+    if skills.sentry == relevant add_upgrade("Rapid Sentry")
+}
 
-!export(add_bonus_item)
-fun add_bonus_item(item: String) {
+!export(add_upgrade)
+fun add_upgrade(item: String) {
     add_colored_row_item_with(item, get_string("row_item_color"))
 }
 
-!export(update_bonus_items)
-fun update_bonus_items() {
-    bonus_items_row()
-    set_message_text("bonus_items", get_string("row"))
+!export(update_upgrades)
+fun update_upgrades() {
+    upgrades_row()
+    set_message_text("upgrades", get_string("row"))
 }
 
-fun bonus_items_row() {
+fun upgrades_row() {
     new_colored_row("")
 
     set_string("row_item_color", default_color)
-    write_bonus_items(true)
+    write_upgrades(true)
 
     set_string("row", get_string("row") + transparent)
 
     set_string("row_item_color", transparent)
-    write_bonus_items(false)
+    write_upgrades(false)
 
-    if get_integer("next_item") == next_item_first set_string("row", "No Bonus Items")
+    if get_integer("next_item") == next_item_first set_string("row", "No Upgrades")
 }
 
 on reload {
     set_wheel_item_data(
         "progress_helper",
         TopLeft,
-        "Bonus Items",
-        "[Ability1]View Bonus Items\n[Ability2]View Effects",
+        "Upgrades",
+        "[Ability1]View Upgrades\n[Ability2]View Effects",
         message_icon,
     )
     set_wheel_item_action("progress_helper", TopLeft, Ability1, {
-        bonus_items_row()
-        controlled_priority_message("bonus_items", get_string("row"), 4)
+        upgrades_row()
+        controlled_priority_message("upgrades", get_string("row"), 4)
     })
-    set_wheel_item_action("progress_helper", TopLeft, Ability2, show_bonus_item_effects())
-    set_wheel_item_action("progress_helper", TopLeft, Ability3, show_bonus_item_effects())
+    set_wheel_item_action("progress_helper", TopLeft, Ability2, show_upgrade_effects())
+    set_wheel_item_action("progress_helper", TopLeft, Ability3, show_upgrade_effects())
 }
 
-fun show_bonus_item_effects() {
-    write_bonus_item_effects()
-    controlled_priority_message("bonus_item_effects", get_string("column"), 6.0)
+fun show_upgrade_effects() {
+    write_upgrade_effects()
+    controlled_priority_message("upgrade_effects", get_string("column"), 6.0)
 }
 
-on change randoUpgrades.swordSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.swordAsFireSource update_bonus_item_effects()
-on change randoUpgrades.bowCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.bowRapidFireIntervalDurationMultiplier update_bonus_item_effects()
-on change randoUpgrades.bowAsFireSource update_bonus_item_effects()
-on change randoUpgrades.spearCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.spearSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.spearAsFireSource update_bonus_item_effects()
-on change randoUpgrades.hammerSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.hammerAsFireSource update_bonus_item_effects()
-on change randoUpgrades.shurikenCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.shurikenDamageMultiplier update_bonus_item_effects()
-on change randoUpgrades.shurikenAsFireSource update_bonus_item_effects()
-on change randoUpgrades.shurikenBashable update_bonus_item_effects()
-on change randoUpgrades.extraShurikens update_bonus_item_effects()
-on change randoUpgrades.shurikenMultishotCount update_bonus_item_effects()
-on change randoUpgrades.grenadeCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.grenadeChargeDurationMultiplier update_bonus_item_effects()
-on change randoUpgrades.unchargedGrenadesBashable update_bonus_item_effects()
-on change randoUpgrades.extraGrenades update_bonus_item_effects()
-on change randoUpgrades.grenadeMultishotCount update_bonus_item_effects()
-on change randoUpgrades.unchargedGrenadesBashable update_bonus_item_effects()
-on change randoUpgrades.grenadesExplodeOnCollision update_bonus_item_effects()
-on change randoUpgrades.regenerateCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.regenerateSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.flapDamage update_bonus_item_effects()
-on change randoUpgrades.blazeCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.blazeAsFireSource update_bonus_item_effects()
-on change randoUpgrades.flashCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.flashTickInterval update_bonus_item_effects()
-on change randoUpgrades.flashDamageMultiplier update_bonus_item_effects()
-on change randoUpgrades.sentryCostMultiplier update_bonus_item_effects()
-on change randoUpgrades.sentryFireRateSpeed update_bonus_item_effects()
-on change randoUpgrades.sentryShots update_bonus_item_effects()
-on change randoUpgrades.extraSentries update_bonus_item_effects()
-on change randoUpgrades.extraDoubleJumps update_bonus_item_effects()
-on change randoUpgrades.jumpHeightMultiplier update_bonus_item_effects()
-on change randoUpgrades.wallJumpHeightMultiplier update_bonus_item_effects()
-on change randoUpgrades.doubleJumpHeightMultiplier update_bonus_item_effects()
-on change randoUpgrades.extraDashes update_bonus_item_effects()
-on change randoUpgrades.dashDistanceMultiplier update_bonus_item_effects()
-on change randoUpgrades.bashSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.grappleSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.launchSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.burrowSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.burrowDashSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.swimSpeedMultiplier update_bonus_item_effects()
-on change randoUpgrades.waterDashSpeedMultiplier update_bonus_item_effects()
-on change energy_per_second update_bonus_item_effects()
-on change health_per_second update_bonus_item_effects()
-fun update_bonus_item_effects() {
-    write_bonus_item_effects()
-    set_message_text("bonus_item_effects", get_string("column"))
+on change playerUberStateGroupDescriptor.spikeExplosiveUpgradeLevel update_upgrade_effects()
+on change playerUberStateGroupDescriptor.hammerStompUpgradeLevel update_upgrade_effects()
+on change playerUberStateGroupDescriptor.chakramSpinUpgradeLevel update_upgrade_effects()
+on change playerUberStateGroupDescriptor.blazeChargeUpgradeLevel update_upgrade_effects()
+on change playerUberStateGroupDescriptor.sentrySpeedUpgradeLevel update_upgrade_effects()
+on change randoUpgrades.swordSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.swordAsFireSource update_upgrade_effects()
+on change randoUpgrades.bowCostMultiplier update_upgrade_effects()
+on change randoUpgrades.bowRapidFireIntervalDurationMultiplier update_upgrade_effects()
+on change randoUpgrades.bowAsFireSource update_upgrade_effects()
+on change randoUpgrades.spearCostMultiplier update_upgrade_effects()
+on change randoUpgrades.spearSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.spearAsFireSource update_upgrade_effects()
+on change randoUpgrades.hammerSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.hammerAsFireSource update_upgrade_effects()
+on change randoUpgrades.shurikenCostMultiplier update_upgrade_effects()
+on change randoUpgrades.shurikenDamageMultiplier update_upgrade_effects()
+on change randoUpgrades.shurikenAsFireSource update_upgrade_effects()
+on change randoUpgrades.shurikenBashable update_upgrade_effects()
+on change randoUpgrades.extraShurikens update_upgrade_effects()
+on change randoUpgrades.shurikenMultishotCount update_upgrade_effects()
+on change randoUpgrades.grenadeCostMultiplier update_upgrade_effects()
+on change randoUpgrades.grenadeChargeDurationMultiplier update_upgrade_effects()
+on change randoUpgrades.unchargedGrenadesBashable update_upgrade_effects()
+on change randoUpgrades.extraGrenades update_upgrade_effects()
+on change randoUpgrades.grenadeMultishotCount update_upgrade_effects()
+on change randoUpgrades.unchargedGrenadesBashable update_upgrade_effects()
+on change randoUpgrades.grenadesExplodeOnCollision update_upgrade_effects()
+on change randoUpgrades.regenerateCostMultiplier update_upgrade_effects()
+on change randoUpgrades.regenerateSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.flapDamage update_upgrade_effects()
+on change randoUpgrades.blazeCostMultiplier update_upgrade_effects()
+on change randoUpgrades.blazeAsFireSource update_upgrade_effects()
+on change randoUpgrades.flashCostMultiplier update_upgrade_effects()
+on change randoUpgrades.flashTickInterval update_upgrade_effects()
+on change randoUpgrades.flashDamageMultiplier update_upgrade_effects()
+on change randoUpgrades.sentryCostMultiplier update_upgrade_effects()
+on change randoUpgrades.sentryFireRateSpeed update_upgrade_effects()
+on change randoUpgrades.sentryShots update_upgrade_effects()
+on change randoUpgrades.extraSentries update_upgrade_effects()
+on change randoUpgrades.extraDoubleJumps update_upgrade_effects()
+on change randoUpgrades.jumpHeightMultiplier update_upgrade_effects()
+on change randoUpgrades.wallJumpHeightMultiplier update_upgrade_effects()
+on change randoUpgrades.doubleJumpHeightMultiplier update_upgrade_effects()
+on change randoUpgrades.extraDashes update_upgrade_effects()
+on change randoUpgrades.dashDistanceMultiplier update_upgrade_effects()
+on change randoUpgrades.bashSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.grappleSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.launchSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.burrowSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.burrowDashSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.swimSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.waterDashSpeedMultiplier update_upgrade_effects()
+on change energy_per_second update_upgrade_effects()
+on change health_per_second update_upgrade_effects()
+fun update_upgrade_effects() {
+    write_upgrade_effects()
+    set_message_text("upgrade_effects", get_string("column"))
 }
 
-fun write_bonus_item_effects() {
+fun write_upgrade_effects() {
     new_column("")
 
     set_string("skill_color", "#")
     set_string("row_item_color", default_color)
-    bonus_item_effects_half(true)
+    upgrade_effects_half(true)
 
     set_string("column", get_string("column") + transparent)
 
     set_string("skill_color", "")
     set_string("row_item_color", transparent)
-    bonus_item_effects_half(false)
+    upgrade_effects_half(false)
 
-    if get_integer("lines") == 0 set_string("column", "No Bonus Item Effects")
+    if get_integer("lines") == 0 set_string("column", "No Upgrade Effects")
     auto_negative_margin()
 }
 
-fun bonus_item_effects_half(relevant: Boolean) {
+fun upgrade_effects_half(relevant: Boolean) {
     if skills.sword == relevant {
-        new_bonus_item_effect_row("Sword")
+        new_upgrade_effect_row("Sword")
         multiplier_row_item(randoUpgrades.swordSpeedMultiplier, "x Speed")
         melting_row_item(randoUpgrades.swordAsFireSource)
         add_current_colored_row()
     }
 
     if skills.bow == relevant {
-        new_bonus_item_effect_row("Bow")
+        new_upgrade_effect_row("Bow")
         multiplier_row_item(randoUpgrades.bowCostMultiplier, "x Cost")
         multiplier_row_item(1 / randoUpgrades.bowRapidFireIntervalDurationMultiplier, "x Quickshot Speed")
         melting_row_item(randoUpgrades.bowAsFireSource)
@@ -146,24 +157,27 @@ fun bonus_item_effects_half(relevant: Boolean) {
     }
 
     if skills.spear == relevant {
-        new_bonus_item_effect_row("Spear")
+        new_upgrade_effect_row("Spear")
         multiplier_row_item(randoUpgrades.spearCostMultiplier, "x Cost")
         multiplier_row_item(randoUpgrades.spearSpeedMultiplier, "x Speed")
+        toggle_row_item(playerUberStateGroupDescriptor.spikeExplosiveUpgradeLevel > 0, "Exploding")
         melting_row_item(randoUpgrades.spearAsFireSource)
         add_current_colored_row()
     }
 
     if skills.hammer == relevant {
-        new_bonus_item_effect_row("Hammer")
+        new_upgrade_effect_row("Hammer")
         multiplier_row_item(randoUpgrades.hammerSpeedMultiplier, "x Speed")
+        toggle_row_item(playerUberStateGroupDescriptor.hammerStompUpgradeLevel > 0, "Shockwave")
         melting_row_item(randoUpgrades.hammerAsFireSource)
         add_current_colored_row()
     }
 
     if skills.shuriken == relevant {
-        new_bonus_item_effect_row("Shuriken")
+        new_upgrade_effect_row("Shuriken")
         multiplier_row_item(randoUpgrades.shurikenCostMultiplier, "x Cost")
         multiplier_row_item(randoUpgrades.shurikenDamageMultiplier, "x Damage")
+        toggle_row_item(playerUberStateGroupDescriptor.chakramSpinUpgradeLevel > 0, "Static")
         melting_row_item(randoUpgrades.shurikenAsFireSource)
         toggle_row_item(randoUpgrades.shurikenBashable, "Bashable")
         extra_row_item(randoUpgrades.extraShurikens, " Max")
@@ -172,7 +186,7 @@ fun bonus_item_effects_half(relevant: Boolean) {
     }
 
     if skills.grenade == relevant {
-        new_bonus_item_effect_row("Grenade")
+        new_upgrade_effect_row("Grenade")
         multiplier_row_item(randoUpgrades.grenadeCostMultiplier, "x Cost")
         multiplier_row_item(1 / randoUpgrades.grenadeChargeDurationMultiplier, "x Charge Speed")
         toggle_row_item(randoUpgrades.unchargedGrenadesBashable, "Uncharged Bashable")
@@ -184,7 +198,7 @@ fun bonus_item_effects_half(relevant: Boolean) {
     }
 
     if skills.regenerate == relevant {
-        new_bonus_item_effect_row("Regenerate")
+        new_upgrade_effect_row("Regenerate")
         multiplier_row_item(randoUpgrades.regenerateCostMultiplier, "x Cost")
         multiplier_row_item(randoUpgrades.regenerateSpeedMultiplier, "x Speed")
         add_current_colored_row()
@@ -195,14 +209,15 @@ fun bonus_item_effects_half(relevant: Boolean) {
     }
 
     if skills.blaze == relevant {
-        new_bonus_item_effect_row("Blaze")
+        new_upgrade_effect_row("Blaze")
         multiplier_row_item(randoUpgrades.blazeCostMultiplier, "x Cost")
+        toggle_row_item(playerUberStateGroupDescriptor.blazeChargeUpgradeLevel > 0, "Charge")
         melting_row_item(randoUpgrades.blazeAsFireSource)
         add_current_colored_row()
     }
 
     if skills.flash == relevant {
-        new_bonus_item_effect_row("Flash")
+        new_upgrade_effect_row("Flash")
         multiplier_row_item(randoUpgrades.flashCostMultiplier, "x Cost")
         multiplier_row_item(1 / randoUpgrades.flashTickInterval, "x Speed")
         multiplier_row_item(randoUpgrades.flashDamageMultiplier, "x Damage")
@@ -210,9 +225,10 @@ fun bonus_item_effects_half(relevant: Boolean) {
     }
 
     if skills.sentry == relevant {
-        new_bonus_item_effect_row("Sentry")
+        new_upgrade_effect_row("Sentry")
         multiplier_row_item(randoUpgrades.sentryCostMultiplier, "x Cost")
         multiplier_row_item(randoUpgrades.sentryFireRateSpeed, "x Fire Rate")
+        toggle_row_item(playerUberStateGroupDescriptor.sentrySpeedUpgradeLevel > 0, "Rapid")
         integer_row_item(randoUpgrades.sentryShots, " Sentry Burst Shots", 3)
         extra_row_item(randoUpgrades.extraSentries, " Max")
         add_current_colored_row()
@@ -224,20 +240,20 @@ fun bonus_item_effects_half(relevant: Boolean) {
         multiplier_row_item(randoUpgrades.wallJumpHeightMultiplier, "x Wall Jump Height")
         add_current_colored_row()
 
-        if randoUpgrades.swimSpeedMultiplier != 1 add_bonus_item("#Swimming#: " + randoUpgrades.swimSpeedMultiplier + "x Speed")
+        if randoUpgrades.swimSpeedMultiplier != 1 add_upgrade("#Swimming#: " + randoUpgrades.swimSpeedMultiplier + "x Speed")
     }
 
     set_string("left_row", "")
 
     if skills.doubleJump == relevant {
-        new_bonus_item_effect_row("Double Jump")
+        new_upgrade_effect_row("Double Jump")
         extra_row_item(randoUpgrades.extraDoubleJumps, " Double Jumps")
         multiplier_row_item(randoUpgrades.doubleJumpHeightMultiplier, "x Height")
         add_current_half_row()
     }
 
     if skills.dash == relevant {
-        new_bonus_item_effect_row("Dash")
+        new_upgrade_effect_row("Dash")
         extra_row_item(randoUpgrades.extraDashes, " Air Dashes")
         multiplier_row_item(randoUpgrades.dashDistanceMultiplier, "x Distance")
         add_current_half_row()
@@ -259,7 +275,7 @@ fun bonus_item_effects_half(relevant: Boolean) {
     }
 
     if skills.burrow == relevant {
-        new_bonus_item_effect_row("Burrow")
+        new_upgrade_effect_row("Burrow")
         multiplier_row_item(randoUpgrades.burrowSpeedMultiplier, "x Speed")
         multiplier_row_item(randoUpgrades.burrowDashSpeedMultiplier, "x Dash Speed")
         add_current_half_row()
@@ -274,22 +290,18 @@ fun bonus_item_effects_half(relevant: Boolean) {
 
     if relevant {
         new_colored_row("#Passive Regeneration#: ")
-        if energy_per_second != 0 add_bonus_item(energy_per_second + " Energy/s")
-        if health_per_second != 0 add_bonus_item(health_per_second + " Health/s")
+        if energy_per_second != 0 add_upgrade(energy_per_second + " Energy/s")
+        if health_per_second != 0 add_upgrade(health_per_second + " Health/s")
         add_current_colored_row()
     }
-
-    // TODO remove?
-    // randoUpgrades.healthRegenerationPerMinute
-    // randoUpgrades.energyRegenerationPerMinute
 }
 
-fun new_bonus_item_effect_row(skill: String) {
+fun new_upgrade_effect_row(skill: String) {
     new_colored_row(get_string("skill_color") + skill + get_string("skill_color") + ": ")
 }
 
 fun multiplier_row_item(value: Float, name: String) {
-    if value != 1 add_bonus_item(value + name)
+    if value != 1 add_upgrade(value + name)
 }
 
 fun melting_row_item(value: Boolean) {
@@ -297,15 +309,15 @@ fun melting_row_item(value: Boolean) {
 }
 
 fun toggle_row_item(value: Boolean, name: String) {
-    if value add_bonus_item(name)
+    if value add_upgrade(name)
 }
 
 fun extra_row_item(value: Integer, name: String) {
-   if value != 0 add_bonus_item((1 + value) + name)
+   if value != 0 add_upgrade((1 + value) + name)
 }
 
 fun integer_row_item(value: Integer, name: String, default: Integer) {
-    if value != default add_bonus_item(value + name)
+    if value != default add_upgrade(value + name)
 }
 
 fun add_current_half_row() {
@@ -321,7 +333,7 @@ fun add_current_half_row_unchecked() {
         set_string("left_row", "")
 
         if get_integer("next_item") == next_item_colored set_integer("next_item", next_item_uncolored)
-        add_bonus_item(get_string("right_row"))
+        add_upgrade(get_string("right_row"))
 
         add_current_colored_row()
     }
