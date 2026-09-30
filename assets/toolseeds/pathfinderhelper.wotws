@@ -382,7 +382,7 @@ on binding1 if get_integer("bind_pointer") == choose_teleport_target {
 on binding2 if get_integer("bind_pointer") == choose_teleport_target close_dialogue()
 
 fun teleport() {
-    warp(warp_x, warp_y)
+    instant_warp(warp_x, warp_y)
 }
 
 on binding3 if get_integer("bind_pointer") == 0 toggle_difficulty()
