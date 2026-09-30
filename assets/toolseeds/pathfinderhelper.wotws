@@ -52,13 +52,15 @@ on reload {
         "root",
         Left,
         "Refill",
-        "[Ability1]Refill\nShortcut: [Binding1]",
+        "[Ability1]Refill\n[Ability2]Toggle Auto-Refill\nShortcut: [Binding1]",
         health_icon,
     )
-    set_wheel_item_all_actions("root", Left, {
+    set_wheel_item_action("root", Left, Ability1, {
         refill()
         respond("Health and Energy restored")
     })
+    set_wheel_item_action("root", Left, Ability2, toggle_auto_refill())
+    set_wheel_item_action("root", Left, Ability3, toggle_auto_refill())
 
     set_wheel_item_data(
         "root",
@@ -349,6 +351,16 @@ fun refill() {
     store(player.health, player.maxHealth)
     store(player.energy, player.maxEnergy)
 }
+
+!state(auto_refill, Boolean)
+
+fun toggle_auto_refill() {
+    store(auto_refill, auto_refill == false)
+    if auto_refill respond("#Auto-Refill enabled#")
+    if auto_refill == false respond("@Auto-Refill disabled@")
+}
+
+on tick if auto_refill refill()
 
 !let(bind_counter, bind_counter + 1)
 !let(choose_teleport_target, bind_counter)
