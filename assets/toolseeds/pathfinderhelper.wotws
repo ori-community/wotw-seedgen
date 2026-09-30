@@ -7,6 +7,34 @@
 !builtin_icon(wall_icon, "map_icons/blocked_wall.png")
 !builtin_icon(gears_icon, "icons/wheel/toggle_debug.png")
 
+!state(warp_x, Float)
+!state(warp_y, Float)
+
+!state(bind_pointer, Integer)
+!let(bind_counter, 0)
+
+on binding1 set_integer("bind_pointer", bind_pointer)
+on binding2 set_integer("bind_pointer", bind_pointer)
+on binding3 set_integer("bind_pointer", bind_pointer)
+on binding4 set_integer("bind_pointer", bind_pointer)
+on binding5 set_integer("bind_pointer", bind_pointer)
+
+fun open_dialogue() {
+    destroy_message("response")
+    free_message_uninitialized("dialogue")
+    free_message_show("dialogue", true, true)
+}
+
+fun close_dialogue() {
+    store(bind_pointer, 0)
+    destroy_message("dialogue")
+}
+
+fun respond(message: String) {
+    close_dialogue()
+    controlled_priority_message("response", message, 4)
+}
+
 on reload {
     set_wheel_item_data(
         "root",
@@ -15,7 +43,10 @@ on reload {
         "[Ability1]Save\nShortcut: [Binding1]",
         save_icon,
     )
-    set_wheel_item_all_actions("root", LeftBottom, save_game())
+    set_wheel_item_all_actions("root", LeftBottom, {
+        save()
+        respond("Game Saved!")
+    })
 
     set_wheel_item_data(
         "root",
@@ -24,7 +55,10 @@ on reload {
         "[Ability1]Refill\nShortcut: [Binding1]",
         health_icon,
     )
-    set_wheel_item_all_actions("root", Left, refill())
+    set_wheel_item_all_actions("root", Left, {
+        refill()
+        respond("Health and Energy restored")
+    })
 
     set_wheel_item_data(
         "root",
@@ -42,7 +76,11 @@ on reload {
         "[Ability1]Warp\nShortcut: [Binding2]",
         teleporter_icon,
     )
-    set_wheel_item_all_actions("root", TopLeft, teleport())
+    set_wheel_item_all_actions("root", TopLeft, {
+        set_boolean("warp_set", warp_x != 0 || warp_y != 0)
+        if get_boolean("warp_set") teleport()
+        if get_boolean("warp_set") == false respond("No warp target set")
+    })
 
     set_wheel_item_data(
         "root",
@@ -66,7 +104,7 @@ on reload {
         "root",
         RightTop,
         "Toggle Glades Projects",
-        "[Ability1]Toggle All\n[Ability2]Open Menu",
+        "[Ability1]Toggle All\n[Ability2]Open Menu\nShortcut: [Binding4]",
         wall_icon,
     )
     set_wheel_item_action("root", RightTop, Ability1, toggle_glades_projects())
@@ -303,70 +341,80 @@ fun give_stuff() {
     store(WillowsEnd.ShriekTeleporterActive, true)
 }
 
-on binding1 {
-    save_game()
-    refill()
-}
-fun save_game() {
+on binding1 if get_integer("bind_pointer") == 0 {
     save()
-    item_message("Game Saved!")
+    refill()
+    controlled_priority_message("response", "Game Saved!\nHealth and Energy restored", 4)
 }
 fun refill() {
     store(player.health, player.maxHealth)
     store(player.energy, player.maxEnergy)
-    item_message("Health and Energy restored")
 }
 
-!state(x, Float)
-!state(y, Float)
+!let(bind_counter, bind_counter + 1)
+!let(choose_teleport_target, bind_counter)
 
-on binding2 {
-    if get_boolean("choosing_target") == false {
-        if x == 0. && y == 0. choose_teleport_target()
-        if x != 0. || y != 0. teleport()
-    }
-    if get_boolean("choosing_target") {
-        store(x, input.mouseWorldPositionX)
-        store(y, input.mouseWorldPositionY)
-        destroy_message("target")
-        item_message("Warp target set\n[Binding2]Warp to " + input.mouseWorldPositionX + ", " + input.mouseWorldPositionY)
-        set_boolean("choosing_target", false)
-    }
-}
-fun teleport() {
-    warp(x, y)
+on binding2 if get_integer("bind_pointer") == 0 {
+    set_boolean("warp_set", warp_x != 0 || warp_y != 0)
+    if get_boolean("warp_set") teleport()
+    if get_boolean("warp_set") == false choose_teleport_target()
 }
 
 fun choose_teleport_target() {
-    set_boolean("choosing_target", true)
-    free_message("target", "")
+    store(bind_pointer, choose_teleport_target)
+
+    open_dialogue()
     update_target_message()
 }
 
-on change input.mouseWorldPositionX update_target_message()
-on change input.mouseWorldPositionY update_target_message()
+on tick if bind_pointer == choose_teleport_target update_target_message()
 fun update_target_message() {
-    set_message_text("target", input.mouseWorldPositionX + ", " + input.mouseWorldPositionY + "\n[Binding2]Confirm")
+    set_message_text("dialogue", input.mouseWorldPositionX + ", " + input.mouseWorldPositionY + "\n[Binding1]Confirm [Binding2]Cancel")
 }
 
-on binding3 toggle_difficulty()
+on binding1 if get_integer("bind_pointer") == choose_teleport_target {
+    store(warp_x, input.mouseWorldPositionX)
+    store(warp_y, input.mouseWorldPositionY)
+
+    respond("Warp target set\n[Binding2]Warp to " + input.mouseWorldPositionX + ", " + input.mouseWorldPositionY)
+}
+
+on binding2 if get_integer("bind_pointer") == choose_teleport_target close_dialogue()
+
+fun teleport() {
+    warp(warp_x, warp_y)
+}
+
+on binding3 if get_integer("bind_pointer") == 0 toggle_difficulty()
 fun toggle_difficulty() {
     store(gameStateGroup.gameDifficultyMode, gameStateGroup.gameDifficultyMode + 1)
     if gameStateGroup.gameDifficultyMode == 3 store(gameStateGroup.gameDifficultyMode, 0)
     if gameStateGroup.gameDifficultyMode == 0 set_string("difficulty", "#Easy#")
     if gameStateGroup.gameDifficultyMode == 1 set_string("difficulty", "#Normal#")
     if gameStateGroup.gameDifficultyMode == 2 set_string("difficulty", "#Hard#")
-    item_message("Difficulty changed to " + get_string("difficulty"))
+    controlled_priority_message("response", "Difficulty changed to " + get_string("difficulty"), 4)
 }
 
-on binding4 toggle_clean_water()
+!let(bind_counter, bind_counter + 1)
+!let(select_major_state, bind_counter)
+
+on binding4 if get_integer("bind_pointer") == 0 {
+    store(bind_pointer, select_major_state)
+
+    open_dialogue()
+    set_message_text("dialogue", "Select toggle\n[Binding1]Clean Water\n[Binding2]Glades Projects")
+}
+
+on binding1 if get_integer("bind_pointer") == select_major_state toggle_clean_water()
+on binding2 if get_integer("bind_pointer") == select_major_state toggle_glades_projects()
+
 fun toggle_clean_water() {
-    if randoState.cleanWater item_message(remove_clean_water_string())
-    if randoState.cleanWater == false item_message(clean_water_string())
     store(randoState.cleanWater, randoState.cleanWater == false)
+    if randoState.cleanWater respond(clean_water_string())
+    if randoState.cleanWater == false respond(remove_clean_water_string())
 }
 
-on binding5 world_reset()
+on binding5 if get_integer("bind_pointer") == 0 world_reset()
 fun world_reset() {
     store_defaults_exclude(
         "^("
@@ -398,7 +446,7 @@ fun world_reset() {
         + ")"
     )
     trigger_client_event(spawn)
-    item_message("@World Reset@")
+    controlled_priority_message("response", "@World Reset@", 4)
 }
 
 fun toggle_glades_projects() {
@@ -429,6 +477,7 @@ fun toggle_glades_projects() {
         store(gladesProjects.lightcatchersPlanted, false)
         store(gladesProjects.selaFlowersPlanted, false)
         store(gladesProjects.lastTreePlanted, false)
+        respond("@Glades Projects Reset@")
     }
     if get_boolean("all_built") == false {
         store(gladesProjects.housesABuilt, true)
@@ -443,6 +492,7 @@ fun toggle_glades_projects() {
         store(gladesProjects.lightcatchersPlanted, true)
         store(gladesProjects.selaFlowersPlanted, true)
         store(gladesProjects.lastTreePlanted, true)
+        respond("#Glades Projects Completed#")
     }
 }
 
