@@ -16,6 +16,7 @@ use std::{
 
 use heck::ToTitleCase;
 use itertools::Itertools;
+use log::warn;
 use rand::{distributions::Open01, seq::SliceRandom, Rng};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
@@ -24,6 +25,7 @@ use utoipa::{
     openapi::{ObjectBuilder, RefOr, Schema, Type},
     PartialSchema, ToSchema,
 };
+use wotw_seedgen_log_capture::LogCapture;
 
 use crate::{
     assets::{InlineSnippets, SnippetAccess},
@@ -77,6 +79,16 @@ impl UniverseSettings {
     /// Returns the number of worlds
     pub fn world_count(&self) -> usize {
         self.world_settings.len()
+    }
+
+    pub fn check_configs_exist<'s, 'm, F>(&'s self, mut metadata: F, log_capture: &LogCapture)
+    where
+        's: 'm,
+        F: FnMut(&'m str) -> Option<&'m Metadata>,
+    {
+        for world_settings in &self.world_settings {
+            world_settings.check_configs_exist(&mut metadata, log_capture);
+        }
     }
 }
 
@@ -277,6 +289,25 @@ impl WorldSettings {
             randomize_entrances,
             snippets,
             snippet_config,
+        }
+    }
+
+    pub fn check_configs_exist<'s, 'm, F>(&'s self, mut metadata: F, log_capture: &LogCapture)
+    where
+        's: 'm,
+        F: FnMut(&'m str) -> Option<&'m Metadata>,
+    {
+        for (snippet, configs) in &self.snippet_config {
+            let Some(metadata) = metadata(snippet) else {
+                warn!(logger: log_capture, "unknown snippet {snippet} referenced by snippet config");
+                continue;
+            };
+
+            for config in configs.keys() {
+                if !metadata.config.contains_key(config) {
+                    warn!(logger: log_capture, "unknown config value {snippet}.{config}");
+                };
+            }
         }
     }
 

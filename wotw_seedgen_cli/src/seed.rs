@@ -6,11 +6,14 @@ use std::{
 };
 
 use crate::{
-    cli::{CompileArgs, GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs},
+    cli::{
+        CompileArgs, GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs, AVAILABLE_SNIPPETS,
+    },
     log_config::LogConfig,
     Error,
 };
 use rand::{distributions::Uniform, prelude::Distribution};
+use rustc_hash::FxHashMap;
 use wotw_seedgen::{
     data::{
         assets::{
@@ -21,6 +24,7 @@ use wotw_seedgen::{
         parse::Source,
         UniverseSettings, WorldSettings,
     },
+    log_capture::NO_LOG_CAPTURE,
     spoiler::SeedSpoiler,
     Generator, SeedUniverse,
 };
@@ -79,6 +83,16 @@ impl SeedSettingsArgs {
         settings
             .0
             .apply(&mut universe_settings, &DefaultFileAccess)?;
+
+        let metadata_map = AVAILABLE_SNIPPETS
+            .iter()
+            .map(|snippet| (snippet.identifier.as_str(), &snippet.metadata))
+            .collect::<FxHashMap<_, _>>();
+
+        universe_settings.check_configs_exist(
+            |identifier| metadata_map.get(identifier).copied(),
+            &NO_LOG_CAPTURE,
+        );
 
         Ok(universe_settings)
     }

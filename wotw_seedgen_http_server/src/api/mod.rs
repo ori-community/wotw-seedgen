@@ -197,6 +197,15 @@ pub enum SchemaResult<T, E> {
     Err(E),
 }
 
+impl<T, E> SchemaResult<T, E> {
+    pub fn as_result(&self) -> Result<&T, &E> {
+        match self {
+            Self::Ok(t) => Ok(t),
+            Self::Err(e) => Err(e),
+        }
+    }
+}
+
 impl<T, E> From<Result<T, E>> for SchemaResult<T, E> {
     fn from(value: Result<T, E>) -> Self {
         match value {

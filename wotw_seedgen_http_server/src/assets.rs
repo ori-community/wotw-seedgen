@@ -58,6 +58,20 @@ impl CacheValues {
 
         let log_capture = LogCapture::new().with_max_level(log_level);
 
+        settings.check_configs_exist(
+            |identifier| {
+                Some(
+                    &self
+                        .snippet_info
+                        .get(identifier)?
+                        .as_result()
+                        .ok()?
+                        .metadata,
+                )
+            },
+            &log_capture,
+        );
+
         let result = generator.with_log_capture(&log_capture).generate();
         let logs = log_capture.finish();
 
