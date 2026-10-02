@@ -81,6 +81,7 @@ async fn tricks() -> Json<Vec<TrickInfo>> {
 }
 
 #[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct TrickInfo {
     pub name: Trick,
     pub description: &'static str,
