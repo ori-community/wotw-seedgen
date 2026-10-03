@@ -6,7 +6,7 @@ use wotw_seedgen::data::{
     assets::{LocData, StateData},
 };
 
-use crate::api::logic::RelevantUberStates;
+use crate::api::{Hash, logic::RelevantUberStates};
 
 impl RelevantUberStates {
     pub fn new(loc_data: &LocData, state_data: &StateData) -> Self {
@@ -107,7 +107,7 @@ impl RelevantUberStates {
             .chain(INVENTORY)
             .collect();
 
-        let hash = FxBuildHasher.hash_one(&identifiers);
+        let hash = Hash(FxBuildHasher.hash_one(&identifiers));
 
         Self { identifiers, hash }
     }

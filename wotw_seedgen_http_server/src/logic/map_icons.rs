@@ -7,7 +7,10 @@ use wotw_seedgen::data::{
     seed_language::ast::Comparator,
 };
 
-use crate::api::logic::{MapIconCondition, MapIconInfo, MapIcons};
+use crate::api::{
+    Hash,
+    logic::{MapIconCondition, MapIconInfo, MapIcons},
+};
 
 static SPIRIT_TRIAL_END_POSITIONS: LazyLock<FxHashMap<UberIdentifier, Position>> =
     LazyLock::new(|| {
@@ -142,7 +145,7 @@ impl MapIcons {
             },
         ]);
 
-        let hash = FxBuildHasher.hash_one(&map_icons);
+        let hash = Hash(FxBuildHasher.hash_one(&map_icons));
 
         Self { map_icons, hash }
     }

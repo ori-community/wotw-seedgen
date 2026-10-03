@@ -17,6 +17,7 @@ use wotw_seedgen::{
 
 use crate::{
     RouterState,
+    api::Hash,
     error::{Error, Result},
     logic::reachable,
 };
@@ -75,7 +76,7 @@ pub struct MapIcons {
     /// List of logically relevant map icons
     pub map_icons: Vec<MapIconInfo>,
     /// Hash of `map_icons`
-    pub hash: u64,
+    pub hash: Hash,
 }
 
 #[derive(Clone, Hash, Serialize, ToSchema)]
@@ -117,7 +118,7 @@ pub struct RelevantUberStates {
     /// List of logically relevant UberStates
     pub identifiers: Vec<UberIdentifier>,
     /// Hash of `identifiers`
-    pub hash: u64,
+    pub hash: Hash,
 }
 
 /// Get a list of spawnable anchor identifiers
@@ -189,7 +190,7 @@ struct ReachCheck {
     /// List of indices into logically reachable map icons
     reachable: Vec<usize>,
     /// Current hash of logically relevant map icons
-    map_icons_hash: u64,
+    map_icons_hash: Hash,
     /// Current hash of logically relevant UberStates
-    relevant_uber_states_hash: u64,
+    relevant_uber_states_hash: Hash,
 }

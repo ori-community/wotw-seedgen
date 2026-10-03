@@ -1,3 +1,8 @@
+use std::borrow::Cow;
+use std::fmt::{self, Display};
+use std::num::ParseIntError;
+use std::str::FromStr;
+
 use axum::extract::DefaultBodyLimit;
 use axum::response::IntoResponse;
 use axum::{
@@ -5,9 +10,9 @@ use axum::{
     extract::{Query, State},
     routing::post,
 };
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Error};
 use tower_http::cors::{Any, CorsLayer};
-use utoipa::{IntoParams, OpenApi, ToSchema, openapi};
+use utoipa::{IntoParams, OpenApi, PartialSchema, ToSchema, openapi};
 use utoipa_swagger_ui::SwaggerUi;
 use wotw_seedgen::data::UniverseSettings;
 use wotw_seedgen::data::seed_language::output::{CommandZone, Trigger};
@@ -212,6 +217,55 @@ impl<T, E> From<Result<T, E>> for SchemaResult<T, E> {
             Ok(t) => Self::Ok(t),
             Err(e) => Self::Err(e),
         }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub struct Hash(pub u64);
+
+impl Display for Hash {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:x}", self.0)
+    }
+}
+
+impl FromStr for Hash {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        u64::from_str_radix(s, 16).map(Self)
+    }
+}
+
+impl Serialize for Hash {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        self.to_string().serialize(serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for Hash {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        <&str>::deserialize(deserializer)?
+            .parse()
+            .map_err(|err| D::Error::custom(err))
+    }
+}
+
+impl PartialSchema for Hash {
+    fn schema() -> openapi::RefOr<openapi::schema::Schema> {
+        String::schema()
+    }
+}
+
+impl ToSchema for Hash {
+    fn name() -> Cow<'static, str> {
+        String::name()
     }
 }
 
