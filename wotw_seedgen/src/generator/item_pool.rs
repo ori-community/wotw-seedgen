@@ -127,11 +127,14 @@ impl<'log> ItemPoolBuilder<'log> {
 
         builder
     }
-}
 
-impl<'log> ItemPoolBuilder<'log> {
     pub fn with_log_capture(mut self, log_capture: &'log LogCapture) -> Self {
         self.item_pool.log_capture = log_capture;
+        self
+    }
+
+    pub fn with_log_index(mut self, log_index: String) -> Self {
+        self.item_pool.log_index = log_index;
         self
     }
 
@@ -171,6 +174,8 @@ pub struct ItemPool<'log> {
     items: Vec<Item>,
     #[derivative(PartialEq = "ignore")]
     pub(super) log_capture: &'log LogCapture,
+    #[derivative(PartialEq = "ignore")]
+    log_index: String,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -246,6 +251,7 @@ impl ItemPool<'static> {
             rng,
             items,
             log_capture: &NO_LOG_CAPTURE,
+            log_index: String::new(),
         }
     }
 }
@@ -292,10 +298,16 @@ impl<'log> ItemPool<'log> {
     fn log_find_remove_failed(&self, item: &CommandVoid, output: &IntermediateOutput) {
         warn!(
             logger: self.log_capture,
-            "Attempted to remove {item} from the item pool, but it didn't exist",
+            "{log_index}Attempted to remove {item} from the item pool, but it didn't exist",
+            log_index = self.log_index,
             item = output.modifiers.item_metadata.get(item).log_name(&output.commands)
         );
-        trace!(logger: self.log_capture, "Current item pool: {self}");
+
+        trace!(
+            logger: self.log_capture,
+            "{log_index}Current item pool: {self}",
+            log_index = self.log_index,
+        );
     }
 
     pub fn remove(&mut self, index: usize) -> CommandVoid {
@@ -317,7 +329,8 @@ impl<'log> ItemPool<'log> {
                     if !choose {
                         trace!(
                             logger: self.log_capture,
-                            "Rerolling random placement {item}",
+                            "{log_index}Rerolling random placement {item}",
+                            log_index = self.log_index,
                             item = item_metadata.get(&item.command).log_name(commands),
                         );
                     }

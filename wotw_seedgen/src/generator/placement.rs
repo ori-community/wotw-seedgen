@@ -879,8 +879,9 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
         let log_capture = world.log_capture;
 
-        let mut item_pool =
-            ItemPoolBuilder::new(&mut rng, &output.commands).with_log_capture(log_capture);
+        let mut item_pool = ItemPoolBuilder::new(&mut rng, &output.commands)
+            .with_log_capture(log_capture)
+            .with_log_index(log_index.clone());
 
         for (command, amount) in mem::take(&mut output.modifiers.item_pool_changes) {
             if amount >= 0 {
