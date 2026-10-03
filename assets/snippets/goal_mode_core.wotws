@@ -95,5 +95,5 @@ fun update_missing_goals() {
     set_message_text("missing_goals", get_string("column"))
 }
 
-on player.currentMapArea < 12 free_message_hide("missing_goals", false)
-on player.currentMapArea >= 12 free_message_show("missing_goals", true, false)
+on player.currentMapArea != -1 free_message_hide("missing_goals", false)
+on player.currentMapArea == -1 free_message_show("missing_goals", false, false)

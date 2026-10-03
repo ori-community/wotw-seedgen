@@ -200,7 +200,7 @@ on reload {
 
 // TODO we call this "zone", not "area"
 on change player.currentMapArea {
-    if player.currentMapArea < 12 {
+    if player.currentMapArea != -1 {
         write_map_progress_message()
         set_integer("length", string_length(get_string("column")))
 
@@ -215,7 +215,7 @@ on change player.currentMapArea {
 
         set_message_text("map_message", get_string("column"))
     }
-    if player.currentMapArea >= 12 set_message_text("map_message", "")
+    if player.currentMapArea == -1 set_message_text("map_message", "")
 }
 
 on binding2 if disable_keybinds == false {
