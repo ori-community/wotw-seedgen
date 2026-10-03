@@ -81,6 +81,12 @@ impl UniverseSettings {
         self.world_settings.len()
     }
 
+    pub fn verify(&self) -> Result<(), String> {
+        self.world_settings
+            .iter()
+            .try_for_each(WorldSettings::verify)
+    }
+
     pub fn check_configs_exist<'s, 'm, F>(&'s self, mut metadata: F, log_capture: &LogCapture)
     where
         's: 'm,
@@ -290,6 +296,10 @@ impl WorldSettings {
             snippets,
             snippet_config,
         }
+    }
+
+    pub fn verify(&self) -> Result<(), String> {
+        self.game_difficulties.verify()
     }
 
     pub fn check_configs_exist<'s, 'm, F>(&'s self, mut metadata: F, log_capture: &LogCapture)
@@ -655,11 +665,37 @@ impl GameDifficulties {
     };
 
     fn random<R: Rng>(rng: &mut R) -> Self {
-        Self {
-            easy: rng.gen(),
-            normal: rng.gen(),
-            hard: rng.gen(),
-            only_show_selected: rng.gen(),
+        loop {
+            let attempt = Self {
+                easy: rng.gen(),
+                normal: rng.gen(),
+                hard: rng.gen(),
+                only_show_selected: rng.gen(),
+            };
+
+            if attempt.any_enabled() {
+                return attempt;
+            }
+        }
+    }
+
+    fn verify(&self) -> Result<(), String> {
+        if self.any_enabled() {
+            Ok(())
+        } else {
+            Err("No game difficulties were enabled".to_string())
+        }
+    }
+
+    fn any_enabled(&self) -> bool {
+        match self {
+            Self {
+                easy: false,
+                normal: false,
+                hard: false,
+                ..
+            } => false,
+            _ => true,
         }
     }
 

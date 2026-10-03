@@ -86,6 +86,8 @@ where
     }
 
     pub fn generate(&self) -> Result<SeedUniverse, String> {
+        self.settings.verify()?;
+
         let mut rng: Pcg64Mcg = Seeder::from(&self.settings.seed).make_rng();
         trace!(
             logger: self.log_capture,
