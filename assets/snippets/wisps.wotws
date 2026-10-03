@@ -12,7 +12,6 @@
 
 !include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, add_missing_goal_in_zone, update_goals)
 !include("list_core", new_row, add_row_item, add_current_row)
-!include("wisp_count")
 
 !if randomize {
     !random_boolean(voice)
@@ -61,8 +60,42 @@ fun write_missing_wisps() { new_row("Missing Wisps (" + (wisps_required - itemTr
 
 on change itemTracker.wispsCount update_goals()
 
-!if voice { on Hollow.Wisp create_stats_entry(Wisp, "Voice") }
-!if strength { on Pools.Wisp create_stats_entry(Wisp, "Strength") }
-!if memory { on Reach.Wisp create_stats_entry(Wisp, "Memory") }
-!if eyes { on Depths.Wisp create_stats_entry(Wisp, "Eyes") }
-!if heart { on Ruins.Wisp create_stats_entry(Wisp, "Heart") }
+!if voice {
+    on Hollow.Wisp {
+        create_stats_entry(Wisp, "Voice")
+        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+    }
+    on Hollow.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+}
+
+!if strength {
+    on Pools.Wisp {
+        create_stats_entry(Wisp, "Strength")
+        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+    }
+    on Pools.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+}
+
+!if memory {
+    on Reach.Wisp {
+        create_stats_entry(Wisp, "Memory")
+        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+    }
+    on Reach.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+}
+
+!if eyes {
+    on Depths.Wisp {
+        create_stats_entry(Wisp, "Eyes")
+        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+    }
+    on Depths.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+}
+
+!if heart {
+    on Ruins.Wisp {
+        create_stats_entry(Wisp, "Heart")
+        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+    }
+    on Ruins.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+}

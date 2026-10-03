@@ -4,7 +4,6 @@
 
 !config_boolean(autoplant, true, "Autoplant", "Automatically plant seeds if Tuley is in Glades")
 
-!include("wisp_count")
 !include("tuley_shop_core", lightcatchers, sela_flowers, blue_moon, sticky_grass, spring_plants, last_tree)
 
 on spawn {
@@ -83,7 +82,22 @@ on gladesProjects.removeThornsBuilt if hubUberStateGroup.builderProjectOpenCave 
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3) // Skip talking to the moki again after completing the pools wisp quest
 on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)
 
-on itemTracker.wispsCount >= 4 store(windtornRuinsGroup.openedDesertRuins, true)
+on Hollow.Wisp check_ruins_door()
+on Pools.Wisp check_ruins_door()
+on Reach.Wisp check_ruins_door()
+on Depths.Wisp check_ruins_door()
+on Ruins.Wisp check_ruins_door()
+fun check_ruins_door() {
+    if windtornRuinsGroup.openedDesertRuins == false {
+        set_integer("wisp_count", 0)
+        if Hollow.Wisp set_integer("wisp_count", 1)
+        if Pools.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
+        if Reach.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
+        if Depths.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
+        if Ruins.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
+        if get_integer("wisp_count") >= 4 store(windtornRuinsGroup.openedDesertRuins, true)
+    }
+}
 
 !if autoplant {
     on lightcatchers if GladesTown.TuleySpawned store(tuleyShop.lightcatchers, true)
