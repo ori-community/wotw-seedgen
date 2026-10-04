@@ -2538,7 +2538,7 @@ anchor WestHollow.Entrance at -303, -4238:  # At Twillen
       Sword  # pogo the slime
       DoubleJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       GrenadeJump OR GlideJump OR AbilitySwap=1
-  conn WestHollow.InFrontPurpleDoorEnemyPaths:  # check for redundancies with MokiByTwillen
+  conn WestHollow.InFrontPurpleDoor:  # check for redundancies with MokiByTwillen
     # using the dirty water may be softlockable if you drain the water. Currently draining the water provides no advantage for this connection, so no paths using the water can exist
     moki:
       Combat=2xSlug, Bow=1, DoubleJump OR Dash  # the camera only reliably moves to the tongue if you can kill the slug
@@ -2582,13 +2582,12 @@ anchor WestHollow.MokiByTwillen at -230, -4229:  # The moki to the upper left of
       GrenadeJump, Flash=1 OR Sentry=1  # Wall grenade jump for a better angle
 
   conn WestHollow.Entrance: free
-  conn WestHollow.InFrontPurpleDoorEnemyPaths:
+  conn WestHollow.InFrontPurpleDoor:
     moki: Combat=BombSlug OR DoubleJump OR Dash OR Glide OR Launch
     gorlek: Damage=10
     kii: free  # bait the bombslug
 
 anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple door, before the TP
-# Paths using the slime originate from WestHollow.InFrontPurpleDoorEnemyPaths because it doesn't appear if you spawned at this anchor
   state WestHollow.PurpleDoorOpen:  # Be carefull it's not redundant with paths from Entrance
     kii, Bow=1, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Dash, Sword OR Shuriken=1
@@ -2597,8 +2596,11 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
     unsafe: Bow=1  # Drop shot
       # Bow=1, DoubleJump, Shuriken=1
       # Bow=1, Sword, Hammer
+  state WestHollow.UpperDrainLeverPulled:
+    kii: Bash, Grenade=1  # Bash the slime on the floating platform. Throw your grenade and bash the slime again to reach your grenade.
+    unsafe: Bash  # Bash the slime on the floating platform. From here, bash it against the ground and sometimes it flies off with you
 
-  conn WestHollow.MokiByTwillen:  # Make sure it's not redundant with WestHollow.InFrontPurpleDoorEnemyPaths->WestHollow.Entrance->WestHollow.MokiByTwillen
+  conn WestHollow.MokiByTwillen:
     moki:
       Bow=1, Combat=Slug OR Bash
       Bash, Grenade=1
@@ -2611,11 +2613,11 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       Dash, Hammer OR Damage=10
       DoubleJump, Glide OR Shuriken=1 OR Flash=1 OR Sentry=1
       DoubleJump, Damage=10, Spear=1 OR Blaze=1
-      GlideJump
+      Bash OR GlideJump
     unsafe:
       Dash OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap OR CoyoteHammerJump OR WallHammerJump
       Damage=10, DoubleJump OR PauseFloat
-  conn WestHollow.Entrance:  # check for redundancies with MokiByTwillen. Slime don't spawn when strating at this anchor
+  conn WestHollow.Entrance:  # check for redundancies with MokiByTwillen
     moki:
       Combat=2xSlug, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained OR DoubleJump OR Dash OR Glide
       Bash, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained OR DoubleJump OR Dash OR Glide
@@ -2630,23 +2632,11 @@ anchor WestHollow.InFrontPurpleDoor at -181, -4240:  # In front of the purple do
       # Dash swim
       Damage=60
       WaterDash, Damage=20
-  conn EastHollow.Teleporter:
-    moki: WestHollow.PurpleDoorOpen
-
-anchor WestHollow.InFrontPurpleDoorEnemyPaths at -181, -4240:  # Variant of WestHollow.InFrontPurpleDoorEnemyPaths which are using the slime
-  nospawn
-
-  state WestHollow.UpperDrainLeverPulled:
-    kii: Bash, Grenade=1  # Bash the slime on the floating platform. Throw your grenade and bash the slime again to reach your grenade.
-    unsafe: Bash  # Bash the slime on the floating platform. From here, bash it against the ground and sometimes it flies off with you
-
-  conn WestHollow.InFrontPurpleDoor: free
-  conn WestHollow.MokiByTwillen:
-    kii: Bash
-  conn WestHollow.HollowDrainMiddle:
-    unsafe:  # Mid-air regen down swim. Use the slime because in hard you need to pre-damaged on its projectile instead of the spikes in order to fullfill the path
+      # Mid-air regen down swim. In hard you need to pre-damage on the slug's projectile instead of the spikes
       Regenerate, Damage=40
       WaterDash, Regenerate, Damage=20
+  conn EastHollow.Teleporter:
+    moki: WestHollow.PurpleDoorOpen
 
 anchor WestHollow.HollowDrainMiddle at -197, -4275:  # At the crystal below the purple eye
   # this anchor doesn't assume drained water because it's usable for weird dirty water swim paths
@@ -2755,7 +2745,7 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
       WestHollow.UpperDrainLeverPulled, Damage=40
       WestHollow.UpperDrainLeverPulled, WaterDash, Damage=20
 
-  conn WestHollow.PastRockPuzzleDoorEnemyPaths:
+  conn WestHollow.PastRockPuzzleDoor:
     moki: WestHollow.RockPuzzleSolved, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
     unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Launch  # https://youtu.be/guXiDCKM18I
@@ -2792,58 +2782,38 @@ anchor WestHollow.RockPuzzle at -249, -4275:  # At the right ledge of the rock p
     unsafe:
       WestHollow.FullyDrained, Bash  # Place an enemy on HollowDrainMiddle and Bash off of it. There are multiple ways to do this, and none of them are fun. The Skeeto on the left is probably the most cooperative. This kinda looks possible from HollowDrainLower as well, but the Skeetos don't seem to have enough of an attention span to make it work.
 
-anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puzzle door. Paths using the skeeto should use WestHollow.PastRockPuzzleDoorEnemyPaths instead
+anchor WestHollow.PastRockPuzzleDoor at -322, -4276:  # Right after the rock puzzle door
   tprestriction:
     moki: WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained
     gorlek: free
   refill Checkpoint
 
-  conn WestHollow.PastRockPuzzleDoorEnemyPaths:
-    unsafe: free  # precise walljumps to die on the left and spawn the skeeto https://youtu.be/rY7TwMvXK0U. Free because if there's water, it'll kill you without needing to do anything.
+  state WestHollow.FullyDrained:  # Watch out for redundancy with going to WestHollow.FarLeftRoom first
+    unsafe: WestHollow.UpperDrainLeverPulled, Bash  # Move the skeeto between the semisolid and the spikes - https://youtu.be/HEL2gvKB92A
 
   conn WestHollow.FarLeftRoom:
     moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Combat=Skeeto+Slug, Bow=1, DoubleJump OR Dash
-      Launch
+      Launch OR Bash
     gorlek, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Combat=Skeeto+Slug, Bow=1, Glide OR Sword
       SentryJump=1
       DoubleJump, Combat=Slug OR Damage=10  # Jump to the left wall and wrap around to the top
     kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       Bow=1, Dash OR Glide OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      DoubleJump
+      DoubleJump OR Sword
       GlideJump, Dash OR Sword OR Hammer  # Glide jump from under the frog statue. Could glidejump to climb it but you can bonk on the ceiling, making that option maybe a bit too obscure for kii?
       # GrenadeJump=1
     unsafe:
-      WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained  # same as connection towards PastRockPuzzleDoorEnemyPaths but you don't have to die
+      WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained  # https://youtu.be/rY7TwMvXK0U
       # WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
       #  Hammer OR Spear=1 OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR FlashSwap  # Jump to the left wall and wrap around to the top
       #  Bow=1, PauseFloat
-      #   below are currently redundant with PastRockPuzzleDoorEnemyPaths
-      #   Bash  # Bash off the slug when it reaches the ledge. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
-      #   Sword  # Upslash the slug to make it fall next to you + pogo. It always spawns if you walk to the door, so it doesn't need to be in PastRockPuzzleDoorEnemyPaths
+      #  Grapple, UltraGrapple  # Bait the skeeto to lunge above the slug, or get lucky with the skeeto movement
 
   # note for backwards connection: while the RockPuzzleSolved state can be initially set via header, the rock doesn't appear on top of the
   # pressure plate until the player is far enough from it. Stepping on the pressure plate before the rock has appeared unsets the state and
   # can create a softlock
-
-anchor WestHollow.PastRockPuzzleDoorEnemyPaths at -322, -4276:  # Variant of WestHollow.PastRockPuzzleDoor that uses the Skeeto in the room
-  nospawn
-  # Because nospawn ensure moki players need to lower the water level to reach that anchor, we don't need to add a tprestiction
-  refill Checkpoint
-
-  state WestHollow.FullyDrained:  # Watch out for redundancy with going to WestHollow.FarLeftRoom first
-    unsafe: WestHollow.UpperDrainLeverPulled, Bash  # Move the skeeto between the semisolid and the spikes - https://youtu.be/HEL2gvKB92A
-
-  conn WestHollow.PastRockPuzzleDoor: free
-  conn WestHollow.FarLeftRoom:
-    moki, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Bash  # The skeeto, or the slug when it reaches the ledge
-    kii, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-      Sword  # Pogo the skeeto
-    # Unsafe can do that connection for free from the regular anchor so every paths from that anchor would be redundant
-    # unsafe, WestHollow.UpperDrainLeverPulled OR WestHollow.FullyDrained:
-    #  Grapple, UltraGrapple  # Bait the skeeto to lunge above the slug, or get lucky with the skeeto movement
 
 anchor WestHollow.FarLeftRoom at -357, -4284:  # ledge below and to the right of second drain lever
   tprestriction:
@@ -3432,7 +3402,7 @@ anchor EastHollow.Teleporter at -150, -4237:  # the teleporter
       SwordJump, TripleJump
       GlideJump, DoubleJump, TripleJump
       GlideHammerJump OR CoyoteHammerJump OR WallHammerJump OR GrenadeJump OR AbilitySwap=2
-  conn WestHollow.InFrontPurpleDoorEnemyPaths:
+  conn WestHollow.InFrontPurpleDoor:
     moki: WestHollow.PurpleDoorOpen
 
 anchor BeetleFight at -81, -4243:
@@ -9095,7 +9065,7 @@ anchor LowerReach.AboveEntry at -401, -4000:  # On the platform above Baur insid
       Sword OR Hammer OR Shuriken=2 OR Sentry=2  # with hammer/sword: upslash before grabing the frozen tongue, jump out of it then weapon stall
     unsafe:
       Bash  # jump to aggro the spitter and catch high up on the frozen tongue, then jump off quickly
-  conn LowerReach.CentralEnemyPaths:
+  conn LowerReach.Central:
     moki, LowerReach.Lever:
       Bash, DoubleJump OR Dash OR Glide
       Launch
@@ -9224,32 +9194,7 @@ anchor LowerReach.Icefall at -448, -3999:  # Where you drop the rock on Baur's n
     unsafe: Bash  # Bait a skeeto
   conn LowerReach.Entry: free
 
-anchor LowerReach.CentralEnemyPaths at -335, -4009:  # Enemy path counterpart for LowerReach.Central
-  nospawn
-  # these are exclusively non-redundant paths relying on the slug enemy that despawns if you spawn on this anchor
-  # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
-  refill Checkpoint
-
-  pickup Reach.LeverDoor.CeilingSL:
-    kii:
-      Bash
-      DoubleJump, Sword
-  pickup Reach.LupoMap:
-    kii: SpiritLight=150, Bash
-
-  conn LowerReach.Central: free  # connection to non-enemy reliant paths
-  conn LowerReach.OutsideTPRoom:
-    kii:
-      Bash, Hammer OR Spear=1
-      Sword, DoubleJump, TripleJump, Spear=1
-      LowerReach.ThawCentralFurnace, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
-    unsafe: Sword, DoubleJump, Hammer
-  conn LowerReach.Entry:
-    unsafe: LowerReach.Lever, Bash  # bash the slime near the spikes then bash glide to the lantern
-
 anchor LowerReach.Central at -335, -4009:  # After the lever door
-  # the slug despawns if you spawn on this anchor, paths using it have to be in the LowerReach.CentralEnemyPaths counterpart
-  # check paths for redundancies with going to a neighbouring anchor and then to the EnemyPaths counterpart, in particular with SecondSoup
   state LowerReach.DoorSLCeiling:
     moki:
       Spear=1
@@ -9273,13 +9218,15 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
       SentryJump=1
       LowerReach.Lever, DoubleJump, TripleJump
     kii:
-      LowerReach.Lever, DoubleJump, Sword OR Hammer OR Spear=1
-      LowerReach.ThawCentralFurnace, DoubleJump, Glide, Hammer
-      LowerReach.ThawCentralFurnace, DoubleJump, Glide, Spear=1, Shuriken=1 OR Sentry=1 OR Flash=1
-      LowerReach.ThawCentralFurnace, DoubleJump, Glide, Spear=2
-      LowerReach.ThawCentralFurnace, DoubleJump, Sentry=2, Hammer OR Spear=1
-      LowerReach.ThawCentralFurnace, Dash, Hammer
-      GrenadeJump=1
+      LowerReach.Lever, DoubleJump, Hammer OR Spear=1
+      LowerReach.ThawCentralFurnace:
+        DoubleJump, Glide, Hammer
+        DoubleJump, Glide, Spear=1, Shuriken=1 OR Sentry=1 OR Flash=1
+        DoubleJump, Glide, Spear=2
+        DoubleJump, Sentry=2, Hammer OR Spear=1
+        Dash, Hammer
+      Bash OR GrenadeJump=1
+      DoubleJump, Sword
     unsafe:
       DoubleJump, TripleJump
       Sword, Hammer, Flash=1 OR Sentry=1 OR Spear=1
@@ -9297,6 +9244,7 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
       SentryJump=1  # from the snaptrap
       LowerReach.ThawCentralFurnace, Bash, Grenade=1  # just land on the little wall first
     kii, SpiritLight=150:
+      Bash
       DoubleJump, Sword OR Hammer
       DoubleJump, Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
       DoubleJump, Sentry=2
@@ -9345,17 +9293,19 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
         LowerReach.Lever, DoubleJump, TripleJump, Bash
       LowerReach.ThawCentralFurnace, DoubleJump, TripleJump OR Dash
     kii:
+      Sword, DoubleJump, TripleJump, Spear=1  # Spear might have been to break the ceiling? Keeping it for now but needs to be checked again
       LowerReach.DoorSLCeiling:  # go up through the breakable ceiling
         DoubleJump, TripleJump, Dash
-        Bash, Grenade=1
+        Bash
         LowerReach.Lever:
           DoubleJump, TripleJump
           DoubleJump, Dash, Hammer          
       LowerReach.ThawCentralFurnace:
+        Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
         DoubleJump, Sword OR Hammer
         DoubleJump, Glide, Shuriken=2
-        Dash, Bash, Hammer
     unsafe:
+      Sword, DoubleJump, Hammer  # Hammer might have been to break the ceiling? Keeping it for now but needs to be checked again
       GrenadeJump, LowerReach.DoorSLCeiling OR LowerReach.ThawCentralFurnace  # gjump on top of the tongue plant, get on the wall above it then grenade cancel to get to the mortar 
       SentryJump=2, LowerReach.DoorSLCeiling OR LowerReach.ThawCentralFurnace
       LowerReach.DoorSLCeiling, LowerReach.Lever, DoubleJump, Dash
@@ -9371,7 +9321,7 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
       Hammer OR Shuriken=1
       Glide, Sword
     unsafe, LowerReach.Lever:
-      Sword
+      Bash OR Sword
       Glide, Spear=1 OR Flash=1 OR Sentry=1
   conn LowerReach.AboveEntry:  # check for redundancies with LowerReach.Entry
     gorlek: LowerReach.Lever, DoubleJump, TripleJump, Dash, Sword
@@ -9432,7 +9382,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       LowerReach.ThawCentralFurnace, Bash  # stand beside the spitter, bash off it once it shoots, then again off the projectile
 
   conn LowerReach.SecondSoup: free
-  conn LowerReach.CentralEnemyPaths:
+  conn LowerReach.Central:
     moki: DoubleJump OR Dash OR Glide OR Launch OR LowerReach.DoorSLCeiling
     gorlek: free
   conn LowerReach.Teleporter:
@@ -9486,7 +9436,7 @@ anchor LowerReach.Teleporter at -259, -3962:
   conn LowerReach.OutsideTPRoom:
     moki: Grenade=1
     gorlek: SentryBurn=1
-  conn LowerReach.EastEnemyPaths:
+  conn LowerReach.East:
     moki: LowerReach.TPLantern
 
 # checkpoint at -296, -3944
@@ -9510,7 +9460,7 @@ anchor LowerReach.SecondSoup at -316, -4037:  # Next to the soup below the telep
   pickup Reach.GorlekFurnace.SL:
     unsafe: Flap, Bash, DoubleJump OR Dash OR Glide OR Sword OR Damage=20
 
-  conn LowerReach.CentralEnemyPaths:
+  conn LowerReach.Central:
     moki:
       DoubleJump, Bash, Flap OR Grenade=1
       DoubleJump, Burrow
@@ -9680,7 +9630,7 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
     gorlek: DoubleJump OR Dash OR Launch OR Sword OR Hammer OR Damage=20
     kii: Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
     unsafe: free
-  conn LowerReach.EastEnemyPaths:
+  conn LowerReach.East:
     moki:
       Bash, Grenade=1, DoubleJump, Dash
       Launch
@@ -9701,29 +9651,17 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
       DoubleJump, TripleJump, Dash  # climb the wall near the moki, dash then triple jump to the wall to reset your jumps and dash + triple jump to reach the plant.
       SwordJump, TripleJump  # pogo the fire, triple jump + upslash to reach the wall to reset your jumps then sword jump to the plant
       SpearJump=2, DoubleJump
-  conn LowerReach.SnowballEnemyPaths:  # check for redundancies with LowerReach.East
+  conn LowerReach.Snowball:  # check for redundancies with LowerReach.East
     kii: LowerReach.FreezeCentralFurnace, Bash, Grenade=1
 
-anchor LowerReach.EastEnemyPaths at -223, -3967:  # Enemy path counterpart for LowerReach.East
-  nospawn
-  # these are exclusively non-redundant paths relying on the slug enemy that despawns if you spawn on this anchor
-  # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
-  refill Full:  # use the teleporter
-    moki: LowerReach.TPLantern
-
-  conn LowerReach.East: free
-  conn LowerReach.SnowballEnemyPaths:
-    kii: DoubleJump, TripleJump, Bash
-
 anchor LowerReach.East at -223, -3966:  # To the right side outside the teleporter
-  # the slug despawns if you spawn on this anchor, paths using it have to be in the LowerReach.EastEnemyPaths counterpart
 
   state LowerReach.TPLantern:  # Most paths redundant with Snowball
     kii: Grenade=1  # Climb up from the closed door
 
   conn LowerReach.Teleporter:
     moki: LowerReach.TPLantern
-  conn LowerReach.SnowballEnemyPaths:
+  conn LowerReach.Snowball:
     moki:
       Bash, Grenade=2, DoubleJump, Dash OR Glide  # The first Grenade may hit the enemy
       Launch
@@ -9733,6 +9671,7 @@ anchor LowerReach.East at -223, -3966:  # To the right side outside the teleport
       SentryJump=1, DoubleJump, Dash, Grenade=1 OR Spear=1  # drop the slime for leniency
     kii:
       Bash, Grenade=1
+      DoubleJump, TripleJump, Bash
       DoubleJump, TripleJump, Combat=WeakSlug, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
       DoubleJump, TripleJump, Bash, Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=2
     unsafe:
@@ -9741,21 +9680,7 @@ anchor LowerReach.East at -223, -3966:  # To the right side outside the teleport
       DoubleJump, Dash, Spear=1
   conn LowerReach.SoupMoki: free
 
-anchor LowerReach.SnowballEnemyPaths at -182, -3968:  # Enemy path counterpart for LowerReach.Snowball
-  nospawn
-  # these are exclusively non-redundant paths relying on the slug enemy that despawns if you spawn on this anchor
-  # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
-  refill Checkpoint
-
-  state LowerReach.TPLantern:
-    kii: SentryBurn=1, Bash
-
-  conn LowerReach.Snowball: free
-  conn LowerReach.EastEnemyPaths:
-    kii: Bash
-
 anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ice wall
-  # the slug despawns if you spawn on this anchor, paths using it have to be in the LowerReach.SnowballEnemyPaths counterpart
   state LowerReach.TPLantern:
     moki: Grenade=1, Combat=WeakSlug OR Bash
     gorlek:
@@ -9765,6 +9690,7 @@ anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ic
       SentryBurn=1, Launch
     kii:
       SentryBurn=1, DoubleJump, Hammer  # djump+upslash+sentry
+      SentryBurn=1, Bash
     unsafe:
       SentryBurn=1, DoubleJump, Sword  # The slime won't respawn if you activated the checkpoint
   state LowerReach.RolledSnowball:
@@ -9784,9 +9710,9 @@ anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ic
     moki: LowerReach.RolledSnowball, Burrow, DoubleJump OR Dash OR Glide OR Launch OR Damage=20
     gorlek: LowerReach.RolledSnowball, Burrow  # Dash in the snow before exiting the burrow section to get momentum
 
-  conn LowerReach.SnowballEnemyPaths:  # respawn the enemy if needed by leaving the area
+  conn LowerReach.Snowball:  # respawn the enemy if needed by leaving the area
     kii: LowerReach.ThawCentralFurnace OR DoubleJump
-  conn LowerReach.EastEnemyPaths:
+  conn LowerReach.East:
     moki:
       Combat=WeakSlug, DoubleJump OR Dash OR Glide
       Bash, DoubleJump OR Dash OR Glide
@@ -9795,7 +9721,7 @@ anchor LowerReach.Snowball at -182, -3968:  # At the ledge above the snowball ic
       Bash, Grenade=1
       Sword OR Hammer
     kii:
-      DoubleJump OR Dash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump OR Dash OR Bash OR Glide OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
   conn LowerReach.SoupMoki: free
   conn LowerReach.PastSnowball:
     moki, LowerReach.RolledSnowball:
@@ -9844,7 +9770,7 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
   conn LowerReach.EastFurnace:
     gorlek: ShurikenBreak=20
     kii: SentryBreak=20
-  conn LowerReach.SnowballEnemyPaths:
+  conn LowerReach.Snowball:
     moki, LowerReach.RolledSnowball:
       LowerReach.ThawCentralFurnace, Combat=Lizard OR Bash
       Launch
@@ -14912,7 +14838,7 @@ anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitSL
 anchor LowerWastes.BeforeMinesEntrance at 1849, -3986:  # To the right of the breakable wall leading to the Wooden Bridge
   pickup Wastes.RuinsShortcut.HF: free
 
-  conn LowerWastes.MinesEntranceEnemyPaths:
+  conn LowerWastes.MinesEntrance:
     moki:
       Combat=MaceMiner+Mantis, DoubleJump OR Dash OR Glide OR Grapple
       Bash, DoubleJump OR Dash OR Glide OR Grapple
@@ -14937,17 +14863,6 @@ anchor LowerWastes.BeforeMinesEntrance at 1849, -3986:  # To the right of the br
       Launch
     kii: Bash, Grenade=1  # if the wall is broken, go through WoodenBridge
 
-anchor LowerWastes.MinesEntranceEnemyPaths at 1921, -4001:  # Enemy path counterpart for LowerWastes.MinesEntrance
-  nospawn
-  # these are exclusively non-redundant paths relying on the mantis enemy that despawns if you spawn on this anchor
-  # since checkpoint-despawning enemies are generally not gorlek, paths are only kii and upwards
-
-  pickup Wastes.RuinsShortcut.SL:  # Make sure it solves even after destroying the breakable wall
-    kii: Bash  # Bash the gorlek to reach the mantis when it jumps
-    unsafe: Combat=MaceMiner, Bash  # bash glide from the mantis
-
-  conn LowerWastes.MinesEntrance: free  # connection to non-enemy reliant paths
-
 anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins breakable wall
   pickup Wastes.RuinsShortcut.SL:  # Make sure it solves even after destroying the breakable wall
     moki:
@@ -14960,7 +14875,7 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Bash, Grenade=1 OR DoubleJump OR Glide
       Bash, Dash OR Sword OR Hammer  # the Miner enemy here doesn't despawn, even if this is your spawn anchor
     kii:
-      Grapple
+      Bash OR Grapple
       Sword, DoubleJump  # pogo (needed if the wall is broken)
       Combat=MaceMiner+Mantis, DoubleJump, TripleJump, Spear=1
     unsafe:
@@ -15874,7 +15789,7 @@ anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedesta
     unsafe, WindtornRuins.EscapeCompleted:
       Dash OR DoubleJump OR PauseFloat OR AbilitySwap=1 OR Burrow OR Sentry=3
       Sword, Shuriken=1  # Pogo
-  conn LowerWastes.MinesEntranceEnemyPaths:
+  conn LowerWastes.MinesEntrance:
     moki: Burrow, BreakWall=20
 
 region WeepingRidge:
