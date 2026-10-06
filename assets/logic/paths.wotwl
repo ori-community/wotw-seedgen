@@ -2048,7 +2048,11 @@ anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bell
       DashBashChain  # https://youtu.be/H0tGcrzQW1o
       Sword OR Wavedash OR PauseFloat:  # sword downslash at the end
         Hammer OR Spear=1
-      
+  state Marsh.UpperPoolsPath.ShortcutWall:  # Ranged breaks that cannot reach MarshPastOpher.PoolsPathOneWayWall
+    unsafe:
+      # BreakWall=20 with Bow
+      Bow=5  # workaround to partially express the above
+
   conn MarshPastOpher.PoolsPathOneWayWall:
     moki: Bash OR Launch
     gorlek: SentryJump=1
@@ -2098,6 +2102,8 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of Marsh.Upp
   state Marsh.UpperPoolsPath.PoolsWall:
     gorlek: ShurikenBreak=20
     kii: SentryBreak=20
+  state Marsh.UpperPoolsPath.ShortcutWall:  # Ranged breaks that cannot reach MarshPastOpher.PoolsPathOneWayWall or break from MarshPastOpher.PoolsPathBellowOneWayWall
+    unsafe: Dash, Spear=1  # https://www.twitch.tv/siriusashling/clip/ConcernedExuberantLyrebirdCopyThis-W5rlkgDhUvOI4jTw
 
   pickup Marsh.UpperPoolsPath.SL: free
 
@@ -2172,6 +2178,7 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of Marsh.Upp
       SwordSJump=1
       PauseFloat
       GlideJump, DoubleJump OR Dash
+      SpearJump=1, Dash  # https://www.twitch.tv/siriusashling/clip/BlueTolerantCourgetteCoolStoryBro-JE02BdW48lZnX89T
   conn PoolsApproach.MarshBreakableWall:
     moki: Marsh.UpperPoolsPath.PoolsWall
 
@@ -12305,10 +12312,12 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
         DoubleJump, Hammer, Grapple OR Glide
       Damage=140:
         DoubleJump, Hammer, Dash OR TripleJump
+      # TODO these look like they assume 3 water ticks, but you only need 2
       WaterDash, Damage=60:
         Launch
         Grapple, Sentry=3  # Nedd to grapple the plant multiple time so you get a better angle
         Grapple, Sword, Spear=1 OR Blaze=1
+        Dash, SpearJump=1  # https://www.twitch.tv/siriusashling/clip/BelovedFuriousEggnogDatSheffy-1Cdk106tpfBinvZZ (but catch the wall instead of landing in the water)
       WaterDash, Damage=80, Grapple, Blaze=3
       WaterDash, Damage=100:
         Sword OR Blaze=1
@@ -12505,6 +12514,8 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       WaterDash, Damage=80  # Take an intentionnal death to start further away in the water
       Water
       Bash, Damage=160
+  state Marsh.UpperPoolsPath.PoolsWall:  # Ranged breaks that cannot reach PoolsApproach.MarshBreakableWall
+    unsafe: Spear=1, Dash, WaterDash, Water OR Damage=60  # https://www.twitch.tv/siriusashling/clip/MotionlessCourageousBatteryAsianGlow-ygJlHxbbNPhDBCm3
 
   pickup Pools.Wheel.HiddenSL:
     moki:
@@ -12575,6 +12586,7 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
       Water, AerialHammerJump, Dash OR TripleJump OR Sword OR Glide OR Grapple OR Damage=20
       Water, Bash, Damage=20, Hammer, Sword
 
+  # TODO the dirty water paths are all not accounting for an augmented dboost, but the nesting here is unmaintainable so not adding any of that for now
   conn PoolsApproach.MarshBreakableWall:
     moki, Water:
       WaterDash, DoubleJump, Dash, Grapple
@@ -12679,7 +12691,8 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
         Grapple, Hammer OR Sword  # Need an upslash but you can't refill it anywhere near
         Hammer, Damage=20, Glide OR Sword OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
         Sword, Glide, Damage=20
-        DoubleJump, Dash, SpearJump=1
+        # DoubleJump, Dash, SpearJump=1
+        Dash, SpearJump=1  # https://www.twitch.tv/siriusashling/clip/BelovedFuriousEggnogDatSheffy-1Cdk106tpfBinvZZ
       Water, Bash:
         Grapple, DoubleJump OR Sword OR Hammer  # Need an upslash but you can't refill it anywhere near
         Grapple, Flash=2, Damage=20
@@ -12694,7 +12707,10 @@ anchor PoolsApproach.OnTopOfWheel at -971, -4164:  # Highest point on the wheel
         Launch
         # Spear=1 OR Blaze=1  # ????????????? There's no way that works
         Hammer, Shuriken=1
-      Damage=80, WaterDash, DoubleJump, Glide OR Sword OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2  # walljump of the wall bellow the spikes at the end
+      # Damage=80, WaterDash, DoubleJump, Glide OR Sword OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2  # walljump of the wall bellow the spikes at the end
+      Damage=60, WaterDash:  # Saving a dboost over the above requires catching the wall below the spiks while falling, then using the friendly spike to get across, but it is possible
+        DoubleJump, Glide OR Sword OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2
+        Dash, SpearJump=1
       Damage=100, WaterDash:
         Dash, Spear=1 OR Blaze=1
         Sword, Flash=1 OR Sentry=1
