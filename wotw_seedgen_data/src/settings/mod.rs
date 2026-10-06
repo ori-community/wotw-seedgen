@@ -254,34 +254,35 @@ impl WorldSettings {
                     return None;
                 }
 
-                snippet_config.insert(
-                    identifier.clone(),
-                    metadata
-                        .config
-                        .iter()
-                        .filter_map(|(identifier, arg)| match arg.value {
-                            ConfigValue::Boolean { default } => rng
-                                .gen::<bool>()
-                                .then(|| (identifier.clone(), (!default).to_string())),
-                            ConfigValue::Integer { default } => {
-                                let value = i32::max(default + gen_config_deviation(rng) as i32, 0);
-                                filter_default(identifier, value, default)
-                            }
-                            ConfigValue::IntegerRange { default, min, max } => {
-                                let value = (min <= max).then(|| rng.gen_range(min..=max))?;
-                                filter_default(identifier, value, default)
-                            }
-                            ConfigValue::Float { default } => {
-                                let value = default + gen_config_deviation(rng);
-                                filter_default(identifier, value, default)
-                            }
-                            ConfigValue::FloatRange { default, min, max } => {
-                                let value = (min <= max).then(|| rng.gen_range(*min..=*max))?;
-                                filter_default(identifier, value, *default)
-                            }
-                        })
-                        .collect(),
-                );
+                let config = metadata
+                    .config
+                    .iter()
+                    .filter_map(|(identifier, arg)| match arg.value {
+                        ConfigValue::Boolean { default } => rng
+                            .gen::<bool>()
+                            .then(|| (identifier.clone(), (!default).to_string())),
+                        ConfigValue::Integer { default } => {
+                            let value = i32::max(default + gen_config_deviation(rng) as i32, 0);
+                            filter_default(identifier, value, default)
+                        }
+                        ConfigValue::IntegerRange { default, min, max } => {
+                            let value = (min <= max).then(|| rng.gen_range(min..=max))?;
+                            filter_default(identifier, value, default)
+                        }
+                        ConfigValue::Float { default } => {
+                            let value = default + gen_config_deviation(rng);
+                            filter_default(identifier, value, default)
+                        }
+                        ConfigValue::FloatRange { default, min, max } => {
+                            let value = (min <= max).then(|| rng.gen_range(*min..=*max))?;
+                            filter_default(identifier, value, *default)
+                        }
+                    })
+                    .collect::<FxHashMap<String, String>>();
+
+                if !config.is_empty() {
+                    snippet_config.insert(identifier.clone(), config);
+                }
 
                 Some(identifier.clone())
             })
