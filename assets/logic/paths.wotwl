@@ -15775,7 +15775,8 @@ anchor WindtornRuins.Escape at 2021, -4026:
         Burrow, Dash, Damage=40, Sentry=1 OR Flash=1
         Burrow, FlashSwap
         Burrow, SentryJump=3  # This is pain. Should have jumped over the worm instead
-        Burrow, DoubleJump, TripleJump
+        Burrow, DoubleJump  # https://youtu.be/sscyqRPz2Ig
+        # Burrow, DoubleJump, TripleJump
       UpperWastes.WormEscapeEnd:  # escape the escape and touch the end from outside ruins. This needs to solve with the pillar destroyed to avoid softlocks
         Burrow, Launch OR SentryJump=1 OR AbilitySwap=4
         Burrow, Bash, Grenade=1, DoubleJump  # you should have rolled this path before I got rid of triplejump https://youtu.be/TMWmknRqCIM
