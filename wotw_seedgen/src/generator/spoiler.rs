@@ -6,6 +6,7 @@ use wotw_seedgen_data::{assets::LocDataEntry, seed_language::output::CommandVoid
 
 /// Complete data to create a logic spoiler for the seed
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct SeedSpoiler {
     /// Anchor identifier of all the spawn locations
     pub spawns: Vec<String>,
@@ -85,6 +86,7 @@ pub struct SpoilerItem {
 
 /// Select data from a [`LocDataEntry`]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct NodeSummary {
     /// The identifier
     pub identifier: String,

@@ -12,6 +12,7 @@ use utoipa::ToSchema;
 
 /// An Operation performed on two values
 #[derive(Debug, Serialize, Deserialize, ToSchema, Clone, Copy, PartialEq, Eq, Hash)]
+#[serde(rename_all = "camelCase")]
 #[schema(bound = "Item: ToSchema + ForceUtoipaRef<This = Item>, Operator: ToSchema")]
 pub struct Operation<Item, Operator> {
     #[schema(no_recursion, value_type = Item::This)]

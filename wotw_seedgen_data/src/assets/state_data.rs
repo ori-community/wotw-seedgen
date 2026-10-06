@@ -32,7 +32,7 @@ use utoipa::ToSchema;
 /// Does not contain information about world states already present in [`LocData`]
 ///
 /// [`Locdata`]: crate::LocData
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct StateData {
     /// List of individual world states
     pub entries: Vec<StateDataEntry>,
@@ -40,7 +40,8 @@ pub struct StateData {
 
 // TODO maybe a custom deserialize could eliminate the need for separate input/output structs?
 /// Information about an obtainable world state
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct StateDataEntry {
     /// Unique identifier for this world state which is used in `paths.wotwl`
     pub identifier: String,

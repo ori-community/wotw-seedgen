@@ -81,6 +81,7 @@ async fn apply(
 }
 
 #[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct WorldPresetApplyBody {
     /// World settings to apply presets on.
     /// Omit to use default world settings.

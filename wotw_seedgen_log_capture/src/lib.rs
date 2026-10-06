@@ -79,6 +79,7 @@ impl Log for LogCapture {
 }
 
 #[derive(Debug, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Record {
     #[schema(value_type = LevelSchema)]
     pub level: Level,

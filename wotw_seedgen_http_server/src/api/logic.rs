@@ -177,6 +177,7 @@ async fn reach_check(
 }
 
 #[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct ReachCheckBody {
     /// Current values of logically relevant UberStates
     #[schema(value_type = Vec<(UberIdentifier, f32)>)]
@@ -186,6 +187,7 @@ pub struct ReachCheckBody {
 }
 
 #[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 struct ReachCheck {
     /// List of indices into logically reachable map icons
     reachable: Vec<usize>,

@@ -71,6 +71,7 @@ pub struct PreloadOutput {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
+#[serde(rename_all = "camelCase")]
 pub struct GameDifficultyConfigs {
     pub easy: GameDifficultyConfig,
     pub normal: GameDifficultyConfig,
@@ -186,12 +187,14 @@ impl AssetsOutput {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DebugOutput {
     pub snippets: FxHashMap<String, SnippetDebugOutput>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SnippetDebugOutput {
     pub variables: FxHashMap<String, String>,
     pub function_indices: FxHashMap<String, usize>,

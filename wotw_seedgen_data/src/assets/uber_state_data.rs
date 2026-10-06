@@ -12,7 +12,7 @@ use std::{
 };
 
 /// Information about all UberStates used by the game
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct UberStateData {
     /// Nested lookup to resolve UberStates by name.
     ///
@@ -30,7 +30,7 @@ pub struct UberStateData {
 }
 
 /// Successful resolution of two UberState name parts
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum UberStateNameEntry {
     /// Vanilla names are always two-parted and resolve directly to [`UberIdentifier`]s, but multiple may have the same name.
     Vanilla(Vec<UberIdentifier>),
@@ -39,7 +39,7 @@ pub enum UberStateNameEntry {
 }
 
 /// Successful resolution of two name parts of a rando UberState
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct RandoUberStateGroup {
     /// Two-parted rando names will be found here.
     pub root_member: Option<UberStateAlias>,
@@ -48,7 +48,7 @@ pub struct RandoUberStateGroup {
 }
 
 /// Successful Resolution of a rando UberState name
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UberStateAlias {
     /// The unique `UberIdentifier` corresponding to this name
     pub uber_identifier: UberIdentifier,
@@ -81,7 +81,7 @@ impl Display for UberStateAlias {
 }
 
 /// Information about an UberState
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct UberStateDataEntry {
     /// Regular name of this UberState as defined by the base game
     ///
@@ -104,7 +104,7 @@ impl UberStateDataEntry {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct UberStateExpressionAlias {
     pub name: String,
     pub value: i32,
@@ -113,7 +113,7 @@ pub struct UberStateExpressionAlias {
 /// Typed value stored inside an UberState
 ///
 /// The types are simplified since a lot of the used types are similar in nature
-#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum UberStateValue {
     Boolean(bool),
     Integer(i32),

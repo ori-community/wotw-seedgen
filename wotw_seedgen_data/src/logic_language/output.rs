@@ -14,6 +14,7 @@ use utoipa::ToSchema;
 pub type EntranceId = i32;
 
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Graph {
     pub nodes: Vec<Node>,
     pub extern_requirements: Vec<Requirement>,
@@ -127,6 +128,7 @@ impl Node {
 }
 
 #[derive(Debug, Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Anchor {
     pub identifier: String,
     pub position: Option<Position>,
@@ -162,6 +164,7 @@ impl PartialEq for Anchor {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Entrance {
     pub id: EntranceId,
     pub target: String,
@@ -169,6 +172,7 @@ pub struct Entrance {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Connection {
     pub to: usize,
     pub requirement: Requirement,
@@ -177,6 +181,7 @@ pub struct Connection {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Refill {
     pub value: RefillValue,
     pub requirement: Requirement,

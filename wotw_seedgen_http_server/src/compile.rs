@@ -26,6 +26,7 @@ use crate::{api::plando::CompileQuery, assets::Cache};
 pub type CompileResult = Result<Vec<u8>, CompileError>;
 
 #[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct CompileError {
     pub errors: Vec<String>,
     pub logs: Vec<Record>,
@@ -38,6 +39,7 @@ impl IntoResponse for CompileError {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CompileOutput {
     pub seed: ciborium::Value,
     pub logs: Vec<Record>,

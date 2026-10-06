@@ -4,6 +4,7 @@ pub const GIT_HEAD: &str = env!("GIT_HEAD");
 pub const GIT_STATUS: &str = env!("GIT_STATUS");
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct GitInfo {
     pub head: String,
     pub status: String,

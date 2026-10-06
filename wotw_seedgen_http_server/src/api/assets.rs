@@ -3,7 +3,7 @@ use utoipa::ToSchema;
 
 /// Origin of an asset
 #[derive(Clone, Serialize, ToSchema)]
-#[serde(tag = "kind")]
+#[serde(tag = "kind", rename_all_fields = "camelCase")]
 pub enum AssetOrigin {
     /// This asset was found within the seedgen executable's parent directory
     ExecutableDir,

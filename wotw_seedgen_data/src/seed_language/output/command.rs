@@ -46,6 +46,7 @@ pub trait IntoConstant: Sized {
 
 /// Command which returns [`bool`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum CommandBoolean {
     /// Return `value`
     Constant { value: bool },
@@ -150,6 +151,7 @@ impl From<bool> for CommandBoolean {
 
 /// Command which returns [`i32`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum CommandInteger {
     /// Return `value`
     Constant { value: i32 },
@@ -207,6 +209,7 @@ impl From<i32> for CommandInteger {
 
 /// Command which returns [`f32`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum CommandFloat {
     /// Return `value`
     Constant {
@@ -273,6 +276,7 @@ impl From<f32> for CommandFloat {
 
 /// Command which returns [`StringOrPlaceholder`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum CommandString {
     /// Return `value`
     Constant { value: StringOrPlaceholder },
@@ -378,6 +382,7 @@ impl From<&str> for CommandString {
 
 /// Command which returns [`Zone`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum CommandZone {
     /// Return `value`
     Constant { value: Zone },
@@ -424,6 +429,7 @@ impl From<Zone> for CommandZone {
 
 /// Command which returns nothing
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all_fields = "camelCase")]
 pub enum CommandVoid {
     /// Execute `commands`
     Multi {

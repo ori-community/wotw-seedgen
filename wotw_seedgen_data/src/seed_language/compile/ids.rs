@@ -213,6 +213,7 @@ impl Drop for IdResolver<'_> {
 }
 
 #[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     boolean: IdMap<FREE_MEMORY_START>,
@@ -271,6 +272,7 @@ impl Ids {
 }
 
 #[derive(Derivative, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[derivative(Debug(bound = ""), PartialEq(bound = ""), Eq(bound = ""))]
 pub struct IdMap<const OFFSET: usize, const LIMIT: usize = { usize::MAX }, S = IdMapEmpty> {
     /// Ids which have become unused and may be reassigned

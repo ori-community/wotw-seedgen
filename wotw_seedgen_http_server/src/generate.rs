@@ -71,6 +71,7 @@ pub fn generate(
 pub type GenerateResult<T> = Result<T, GenerateError>;
 
 #[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct GenerateError {
     pub message: String,
     pub logs: Vec<Record>,

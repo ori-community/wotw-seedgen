@@ -14,6 +14,7 @@ use utoipa::ToSchema;
 /// The main event (:badumtsss:)
 // TODO improve documentation
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Event {
     /// The Trigger defines when to give the Action
     pub trigger: Trigger,
@@ -86,6 +87,7 @@ impl Trigger {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct TriggerCondition {
     #[schema(value_type = Option<usize>)]
     pub id: EqIgnore<Option<usize>>,

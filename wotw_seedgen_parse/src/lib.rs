@@ -64,6 +64,7 @@ pub use tokenizer::{Tokenize, TokenizeOutput};
 
 /// Representation of a source file with the necessary information to display useful error messages.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct Source {
     /// An identifier to be used in error messages that should allow the reader to determine which file the error originated from.
     ///

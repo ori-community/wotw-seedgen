@@ -4,6 +4,7 @@ use wotw_seedgen_data::UniverseSettings;
 use wotw_seedgen_git_info::GitInfo;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SeedgenInfo {
     pub universe_settings: UniverseSettings,
     pub world_index: usize,

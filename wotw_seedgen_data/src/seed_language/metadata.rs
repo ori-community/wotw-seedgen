@@ -34,6 +34,7 @@ pub struct Metadata {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct ConfigArg {
     pub name: String,
     pub description: Option<String>,
@@ -41,7 +42,7 @@ pub struct ConfigArg {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, ToSchema)]
-#[serde(tag = "type")]
+#[serde(tag = "type", rename_all_fields = "camelCase")]
 pub enum ConfigValue {
     Boolean {
         default: bool,

@@ -91,7 +91,7 @@ impl Seed {
 }
 
 /// Contains information relevant while still in the main menu.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Preload {
     /// May be displayed as brief summary of the settings
@@ -117,6 +117,7 @@ impl Preload {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
 struct DebugData {
     compiler_data: DebugOutput,
     indexed_lookup: IndexMap<usize, Vec<Command>, FxBuildHasher>,

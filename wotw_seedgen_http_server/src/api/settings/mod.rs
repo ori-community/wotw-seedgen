@@ -51,6 +51,7 @@ async fn difficulties() -> Json<Vec<DifficultyInfo>> {
 }
 
 #[derive(Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct DifficultyInfo {
     pub name: Difficulty,
     pub description: &'static str,

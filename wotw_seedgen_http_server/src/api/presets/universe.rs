@@ -82,6 +82,7 @@ async fn apply(
 }
 
 #[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UniversePresetApplyBody {
     /// Current settings
     #[serde(flatten)]
@@ -98,11 +99,13 @@ pub enum UniversePresetApplyBodySettings {
 }
 
 #[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UniversePresetApplyBodySettingsFull {
     pub settings: UniverseSettings,
 }
 
 #[derive(Deserialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct UniversePresetApplyBodySettingsSeed {
     pub seed: String,
 }

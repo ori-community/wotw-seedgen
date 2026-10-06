@@ -40,7 +40,7 @@ use std::io::Read;
 use utoipa::ToSchema;
 
 /// Information about all pickup locations which should be filled by the randomizer
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub struct LocData {
     /// List of individual pickup locations
     pub entries: Vec<LocDataEntry>,
@@ -48,7 +48,8 @@ pub struct LocData {
 
 // TODO while breaking everything could also just change the loc data format to save this transformation
 /// Information about a pickup location
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct LocDataEntry {
     /// Unique identifier for this pickup location which is used in `paths.wotwl`
     pub identifier: String,

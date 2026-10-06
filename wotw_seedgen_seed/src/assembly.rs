@@ -9,6 +9,7 @@ use wotw_seedgen_data::{
 
 /// Contains the compiled seedgen output that makes up the seed.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Assembly {
     /// Events from generation and snippets
     pub events: Vec<Event>,
