@@ -85,8 +85,11 @@ impl BestOrbs {
         Self::new(orb_variants![])
     }
 
-    fn do_not_clear(&mut self) {
-        self.do_not_clear = true;
+    fn permanent_placeholder() -> Self {
+        Self {
+            do_not_clear: true,
+            ..Self::placeholder()
+        }
     }
 }
 
@@ -508,8 +511,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
                 if self.graph.nodes[index].is_anchor() {
                     warn!(logger: self.log_capture, "Attempted to set anchor \"{identifier}\" as logical state");
                 } else {
-                    let mut best_orbs = BestOrbs::placeholder();
-                    best_orbs.do_not_clear();
+                    let best_orbs = BestOrbs::permanent_placeholder();
                     self.reach.state.best_orbs.insert(index, best_orbs);
                 }
             }
@@ -720,10 +722,8 @@ impl<'graph> World<'graph, '_, '_, '_> {
             };
 
             if met {
-                self.reach
-                    .state
-                    .best_orbs
-                    .insert(index, BestOrbs::placeholder());
+                let best_orbs = BestOrbs::permanent_placeholder();
+                self.reach.state.best_orbs.insert(index, best_orbs);
             }
         }
     }

@@ -1843,7 +1843,29 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
                 self.world
                     .simulate_solution(solution, self.item_pool, &self.output.commands);
 
-                let new_reached = self.world.reached_pickup_count() - self.initial_pickup_count;
+                let Some(new_reached) = self
+                    .world
+                    .reached_pickup_count()
+                    .checked_sub(self.initial_pickup_count)
+                else {
+                    let solution_reached = self.world.reached_indices().collect::<FxHashSet<_>>();
+
+                    self.world.restore_snapshot();
+                    let lost_locations = self
+                        .world
+                        .reached_indices()
+                        .filter(|index| !solution_reached.contains(index))
+                        .map(|index| self.world.graph.nodes[index].identifier())
+                        .collect::<Vec<_>>();
+
+                    panic!(
+                        "solution {solution} removed {amount} previously reachable node{s}: {lost_locations}",
+                        solution = solution.display(self.item_pool, self.output),
+                        amount = lost_locations.len(),
+                        s = if lost_locations.len() == 1 { "" } else { "s" },
+                        lost_locations = lost_locations.iter().format(", "),
+                    );
+                };
 
                 self.world.restore_snapshot();
 
