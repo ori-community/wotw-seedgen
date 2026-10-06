@@ -9651,6 +9651,7 @@ anchor LowerReach.SoupMoki at -240, -3989:  # Below the reach teleporter, where 
       DoubleJump, TripleJump, Dash  # climb the wall near the moki, dash then triple jump to the wall to reset your jumps and dash + triple jump to reach the plant.
       SwordJump, TripleJump  # pogo the fire, triple jump + upslash to reach the wall to reset your jumps then sword jump to the plant
       SpearJump=2, DoubleJump
+      DoubleJump, Damage=20  # https://youtu.be/bi7Y77qEbQ0
   conn LowerReach.Snowball:  # check for redundancies with LowerReach.East
     kii: LowerReach.FreezeCentralFurnace, Bash, Grenade=1
 
@@ -11463,7 +11464,8 @@ anchor MoraEscape at 712, -4482:
       Launch, DoubleJump  # Multiple solutions: refresh your launch on the right ceiling, jump when the ground is moving up or use the right platform before the rock starts falling on it
     unsafe:
       Bash, Grapple
-      Bash, Dash, DoubleJump, SpearJump=2, Damage=30  # https://youtu.be/6MUzFxnUupQ technically spearjump+damage+spear
+      Dash, DoubleJump, SpearJump=4, Damage=30  # https://youtu.be/gNienFvtaek technically spear=2+spearjump=1+damage=30+spear=1
+      Bash, Dash, DoubleJump, SpearJump=2, Damage=30
       Launch
       FlashSwap  # Yes, it works on hard mode.
 
