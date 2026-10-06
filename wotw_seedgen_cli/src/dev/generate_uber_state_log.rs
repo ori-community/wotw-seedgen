@@ -18,7 +18,14 @@ use crate::{cli::LaunchArgs, seed::launch_seed, Error};
 pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
     let start = Instant::now();
 
-    let mut source = String::new();
+    let mut source = concat!(
+        "fun uber_state_log_message(message: String) {\n",
+        "    item_message(message)\n",
+        "    debug_log(message)\n",
+        "}\n",
+        "\n",
+    )
+    .to_string();
 
     let uber_state_dump = DefaultFileAccess.uber_state_dump().unwrap();
 
@@ -38,7 +45,7 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
 
             writeln!(
                 &mut source,
-                "on change {group_id}|{state_id} item_message(\"#{group_name}.{state_name}# ({group_id}|{state_id}) -> \" + {group_id}|{state_id})",
+                "on change {group_id}|{state_id} uber_state_log_message(\"#{group_name}.{state_name}# ({group_id}|{state_id}) -> \" + {group_id}|{state_id})",
                 group_name = group.name,
                 state_name = state.name
             ).unwrap();
