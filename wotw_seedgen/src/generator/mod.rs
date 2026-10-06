@@ -88,12 +88,13 @@ where
     pub fn generate(&self) -> Result<SeedUniverse, String> {
         self.settings.verify()?;
 
-        let mut rng: Pcg64Mcg = Seeder::from(&self.settings.seed).make_rng();
         trace!(
             logger: self.log_capture,
-            "Seeded RNG with \"{}\"",
-            self.settings.seed
+            "Generating with settings: {}",
+            serde_json::to_string(self.settings).unwrap(),
         );
+
+        let mut rng: Pcg64Mcg = Seeder::from(&self.settings.seed).make_rng();
 
         let snippet_outputs = self
             .settings
