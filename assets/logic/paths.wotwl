@@ -1915,6 +1915,9 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
     unsafe:
       Deflector, Sword
       GrenadeRedirect=1 OR SentryRedirect=1  # Throw grenade near the tentacle and reactivate as the shot get shot / time your sentry as the mortar reenter its hole from the previous shot
+  state Marsh.UpperPoolsPath.ShortcutWall:
+    gorlek: ShurikenBreak=20
+    kii: SentryBreak=20
 
   pickup Marsh.UpperPoolsPath.EF:
     moki:
@@ -1936,14 +1939,12 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
       Hammer OR Sentry=2 OR PauseFloat OR AbilitySwap=1 OR GrenadeJump
 
   conn MarshPastOpher.PoolsPathOneWayWall:
-    gorlek, ShurikenBreak=20:
+    gorlek, Marsh.UpperPoolsPath.ShortcutWall:
       Bash OR Launch OR SentryJump=1
       DoubleJump, TripleJump
-    kii:
-      SentryBreak=20, Bash OR Launch OR SentryJump=1  # gorlek paths but with sentry break
-      ShurikenBreak=20 OR SentryBreak=20:
-        DoubleJump OR GlideJump  # OR GrenadeJump=1
-    unsafe, ShurikenBreak=20 OR SentryBreak=20:
+    kii, Marsh.UpperPoolsPath.ShortcutWall:
+      DoubleJump OR GlideJump  # OR GrenadeJump=1
+    unsafe, Marsh.UpperPoolsPath.ShortcutWall:
       Sword  # Pogo the mortar projectile
       Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR SwordSJump=1 OR BlazeSwap=1 OR FlashSwap OR GrenadeJump
   conn MarshPastOpher.PoolsPathBellowOneWayWall:
@@ -1986,10 +1987,13 @@ anchor MarshPastOpher.PoolsPathMiddle at -709, -4181:  # Next to the breakable f
 
 anchor MarshPastOpher.PoolsPathOneWayWall at -744, -4173:  # Left of the one way wall next to the mortar
   refill Checkpoint:
-    moki: BreakWall=20  # Checkpoint accessible without breaking the wall but it'll trap you in
+    moki: Marsh.UpperPoolsPath.ShortcutWall  # Checkpoint accessible without breaking the wall but it'll trap you in
+
+  state Marsh.UpperPoolsPath.ShortcutWall:
+    moki: BreakWall=20
 
   conn MarshPastOpher.PoolsPathMiddle:
-    moki: BreakWall=20
+    moki: Marsh.UpperPoolsPath.ShortcutWall
   conn MarshPastOpher.PoolsPathBellowOneWayWall: free
   conn MarshPastOpher.PoolsPathWest:
     moki: Bash, DoubleJump OR Launch
@@ -2091,6 +2095,10 @@ anchor MarshPastOpher.PoolsPathBellowOneWayWall at -754, -4187:  # Platform bell
 anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of Marsh.UpperPoolsPath.SL
   refill Checkpoint
 
+  state Marsh.UpperPoolsPath.PoolsWall:
+    gorlek: ShurikenBreak=20
+    kii: SentryBreak=20
+
   pickup Marsh.UpperPoolsPath.SL: free
 
   conn MarshPastOpher.PoolsPathBellowOneWayWall:  # If you can reach the one way wall with that skillset add the path here anyway unless you can't do PoolsPathBellowOneWayWall->PoolsPathOneWayWall
@@ -2165,8 +2173,7 @@ anchor MarshPastOpher.PoolsPathWest at -803, -4187:  # Right on top of Marsh.Upp
       PauseFloat
       GlideJump, DoubleJump OR Dash
   conn PoolsApproach.MarshBreakableWall:
-    gorlek: ShurikenBreak=20
-    kii: SentryBreak=20
+    moki: Marsh.UpperPoolsPath.PoolsWall
 
 region MidnightBurrows:
   # Burrows spikes deal 15 damage, enemies 10 with either contact or projectile damage.
@@ -12309,8 +12316,10 @@ anchor PoolsApproach.MillPath at -873, -4146:  # above the water where the three
       Bash, Damage=200, Grapple, DoubleJump
 
 anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall on the way to MarshPastOpher
-# This anchor helps with pathfinding for Pools.WellspringPath.MunchersHF, especially in kii and above because of dirty swims, spikes dboosts and regen
+  # This anchor helps with pathfinding for Pools.WellspringPath.MunchersHF, especially in kii and above because of dirty swims, spikes dboosts and regen
 
+  state Marsh.UpperPoolsPath.PoolsWall:
+    moki: BreakWall=20
   state PoolsApproach.UnderwaterWallBroken:  # Only for dirty swims, clean water one originate from OnTopOfWheel
     kii:
       Spear=1, Damage=20:
@@ -12376,7 +12385,7 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       Damage=80, Launch
 
   conn MarshPastOpher.PoolsPathWest:
-    moki: BreakWall=20
+    moki: Marsh.UpperPoolsPath.PoolsWall
   conn PoolsApproach.OnTopOfWheel:
     moki, Water:
       Grapple, Launch
@@ -12420,7 +12429,7 @@ anchor PoolsApproach.MarshBreakableWall at -820, -4185:  # At the breakable wall
       DoubleJump, Damage=200, TripleJump OR Dash
       DoubleJump, Sword, Hammer, Damage=200
     unsafe:
-      Water, BreakWall=20, Bash, Grenade=1, Dash, DoubleJump OR Glide OR Sword OR Hammer OR Damage=20
+      Marsh.UpperPoolsPath.PoolsWall, Water, Bash, Grenade=1, Dash, DoubleJump OR Glide OR Sword OR Hammer OR Damage=20
       Water, DoubleJump, Damage=40
       Water, Launch
       Water, Damage=80, Sword

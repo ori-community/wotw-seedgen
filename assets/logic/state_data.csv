@@ -15,6 +15,8 @@ MarshSpawn.MissingKeyQICollected, 48248, 51645, 2
 MarshSpawn.CaveFight, 21786, 35598,
 MarshSpawn.BurrowArena, 9593, 59418,
 MarshPastOpher.PoolsPathFloor, 9593, 17659,
+Marsh.UpperPoolsPath.ShortcutWall, 9593, 34704,
+Marsh.UpperPoolsPath.PoolsWall, 945, 43451,
 HowlsDen.LowerLoopExitBarrier, 21786, 29636,
 HowlsDen.UpperLoopEntranceBarrier, 21786, 876,
 HowlsDen.UpperLoopExitBarrier, 21786, 25291,
