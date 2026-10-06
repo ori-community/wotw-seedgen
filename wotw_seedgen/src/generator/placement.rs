@@ -36,7 +36,7 @@ use wotw_seedgen_data::{
         },
         simulate::{Simulate, Simulation},
     },
-    UberIdentifier, UniverseSettings,
+    UberIdentifier, UniverseSettings, Zone,
 };
 use wotw_seedgen_log_capture::LogCapture;
 use wotw_seedgen_seed::SeedgenInfo;
@@ -253,7 +253,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         loc_data: &LocData,
         debug: bool,
     ) -> Result<SeedUniverse, String> {
-        self.preplacements();
+        self.preplacements()?;
 
         loop {
             self.next_step();
@@ -280,10 +280,12 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         Ok(self.finish(loc_data, debug))
     }
 
-    fn preplacements(&mut self) {
+    fn preplacements(&mut self) -> Result<(), String> {
         for world_context in &mut self.worlds {
-            world_context.preplacements(&mut self.spoiler.preplacements);
+            world_context.preplacements(&mut self.spoiler.preplacements)?;
         }
+
+        Ok(())
     }
 
     fn next_step(&mut self) {
@@ -952,36 +954,103 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         })
     }
 
-    fn preplacements(&mut self, preplacement_spoiler: &mut Vec<SpoilerPlacement>) {
+    fn preplacements(
+        &mut self,
+        preplacement_spoiler: &mut Vec<SpoilerPlacement>,
+    ) -> Result<(), String> {
         trace!(logger: self.item_pool.log_capture, "{}Generating preplacements", self.log_index);
 
         self.hi_torin(preplacement_spoiler);
 
-        let mut zone_needs_placement = FxHashMap::default();
+        let mut zone_reachable = FxHashMap::default();
+        let mut zone_unreachable = FxHashMap::default();
 
         for (command, zone) in mem::take(&mut self.output.modifiers.preplacements) {
-            let pickup_indices = zone_needs_placement.entry(zone).or_insert_with(|| {
-                self.needs_placement
+            let pickup = self.choose_preplacement_location(
+                &command,
+                &mut zone_reachable,
+                &mut zone_unreachable,
+                zone,
+            )?;
+
+            self.preplace(pickup, command, preplacement_spoiler);
+        }
+
+        Ok(())
+    }
+
+    fn choose_preplacement_location(
+        &mut self,
+        command: &CommandVoid,
+        zone_reachable: &mut FxHashMap<Zone, Vec<usize>>,
+        zone_unreachable: &mut FxHashMap<Zone, Vec<usize>>,
+        zone: Zone,
+    ) -> Result<&'graph LocDataEntry, String> {
+        fn zone_pickups<'a>(
+            zone_pickups: &'a mut FxHashMap<Zone, Vec<usize>>,
+            zone: Zone,
+            pickups: &[&LocDataEntry],
+        ) -> &'a mut Vec<usize> {
+            zone_pickups.entry(zone).or_insert_with(|| {
+                pickups
                     .iter()
                     .enumerate()
                     .filter(|(_, pickup)| pickup.zone == zone)
                     .map(|(index, _)| index)
-                    .collect::<Vec<_>>()
-            });
+                    .collect()
+            })
+        }
 
-            let Some(pickup_index) = pickup_indices.pop() else {
+        let zone_reachable = zone_pickups(zone_reachable, zone, &self.needs_placement);
+
+        if let Some(index) = zone_reachable.pop() {
+            return Ok(self.needs_placement.swap_remove(index));
+        }
+
+        let zone_unreachable = zone_pickups(zone_unreachable, zone, &self.unreachable);
+
+        if let Some(index) = zone_unreachable.pop() {
+            let pickup = self.unreachable.swap_remove(index);
+
+            warn!(
+                logger: self.item_pool.log_capture,
+                "{log_index}No reachable locations to preplace {command} in {zone}. Forcing into unreachable location {pickup}",
+                log_index = self.log_index,
+                command = self.log_name(command),
+                pickup = pickup.identifier,
+            );
+
+            return Ok(pickup);
+        }
+
+        let zone_disabled =
+            self.world
+                .graph
+                .nodes
+                .choose_weighted(&mut self.rng, |node| match node {
+                    Node::Pickup(pickup) if pickup.zone == zone => 1,
+                    _ => 0,
+                });
+
+        match zone_disabled {
+            Ok(node) => {
+                let pickup = node.expect_pickup();
+
                 warn!(
                     logger: self.item_pool.log_capture,
-                    "{index}Failed to preplace {name} in {zone} since no free placement location was available",
-                    index = self.log_index,
-                    name = self.log_name(&command),
+                    "{log_index}No locations to preplace {command} in {zone}. Forcing into disabled location {pickup}",
+                    log_index = self.log_index,
+                    command = self.log_name(command),
+                    pickup = pickup.identifier,
                 );
 
-                continue;
-            };
-
-            let pickup = self.needs_placement.swap_remove(pickup_index);
-            self.preplace(pickup, command, preplacement_spoiler);
+                Ok(pickup)
+            }
+            Err(_) => Err(format!(
+                "{log_index}No locations exist to preplace {command} in {zone}",
+                log_index = self.log_index,
+                command = self.log_name(command),
+            )),
         }
     }
 
