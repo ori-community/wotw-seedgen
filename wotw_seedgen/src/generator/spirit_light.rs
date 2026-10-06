@@ -5,7 +5,7 @@ use rand_pcg::Pcg64Mcg;
 const NOISE: f32 = 0.25;
 
 /// We want spirit_light(i) = ai² + b (quadratic growth)
-/// And b = `MIN_SPIRIT_LIGHT` (start above zero) with some random noise
+/// And b = <some low value above zero>
 /// And ₀∫ᵖ spirit_light(i) di = t (place the total amount)
 ///
 /// SPIRIT_LIGHT(i) = ai³/3 + bi
@@ -34,8 +34,20 @@ impl SpiritLightProvider {
     }
 
     pub fn init(&mut self, total_spirit_light: i32, total_placements: usize) {
+        debug_assert!(total_placements > 0);
+
+        if total_placements == 1 {
+            // In this case we do not have the luxury of starting at a low value
+            let t = total_spirit_light as f32;
+            self.b = t;
+            self.p = total_placements as f32;
+            self.a = 0.;
+            self.b_noisy = Uniform::new_inclusive(t - t / 100., t + t / 100.);
+            return;
+        }
+
         let t = total_spirit_light as f32;
-        self.b = t / 400.;
+        self.b = t / 400.; // default: 20000 / 400 = 50
         self.p = total_placements as f32;
         self.a = 3. * (t - self.b * self.p) / (self.p * self.p * self.p);
         self.b_noisy = Uniform::new_inclusive(self.b * (1. - NOISE), self.b * (1. + NOISE));

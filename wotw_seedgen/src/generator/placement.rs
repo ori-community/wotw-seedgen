@@ -131,6 +131,12 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 world.item_pool.len() + world.output.modifiers.preplacements.len() + 1;
         }
 
+        if universe_item_count >= universe_placements {
+            warn!(
+                "{universe_item_count} total items but only {universe_placements} total placements"
+            );
+        }
+
         let mut universe_spirit_light_placements =
             universe_placements.saturating_sub(universe_item_count) as f32;
         let mut universe_placements = universe_placements as f32;
@@ -149,15 +155,19 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             universe_spirit_light_placements -= world_spirit_light_placements;
             universe_placements -= world_placements;
 
-            trace!(
-                logger: log_capture,
-                "{log_index}Assigned {world_spirit_light_placements}/{world_placements} placements for spirit light",
-                log_index = world.log_index,
-            );
-
             debug_assert!(world_spirit_light_placements <= world_placements);
 
-            world.spirit_light_placements_remaining = world_spirit_light_placements as usize;
+            world.spirit_light_placements_remaining =
+                usize::max(world_spirit_light_placements as usize, 1);
+
+            trace!(
+                logger: log_capture,
+                "{log_index}Assigned {spirit_light_placements}/{placements} placements for spirit light",
+                log_index = world.log_index,
+                spirit_light_placements = world.spirit_light_placements_remaining,
+                placements = world_placements,
+            );
+
             // TODO how should !add_item(spirit_light(100)) behave?
             world.spirit_light_provider.init(
                 world.output.modifiers.total_spirit_light(),
