@@ -11,7 +11,7 @@ pub use seedgen_info::SeedgenInfo;
 use assembly::{Assembly, Command};
 use indexmap::IndexMap;
 use rustc_hash::{FxBuildHasher, FxHashMap};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::error::Error;
 use wotw_seedgen_data::seed_language::output::{
     DebugOutput, GameDifficultyConfigs, IntermediateOutput, PlaceholderMap, PreloadOutput,

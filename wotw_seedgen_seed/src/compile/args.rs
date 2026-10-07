@@ -1,6 +1,5 @@
 use super::{command::MemoryUsed, Compile};
 use crate::{assembly::Command, compile::CompileContext};
-use arrayvec::ArrayVec;
 use wotw_seedgen_data::seed_language::{
     compile::RESERVED_MEMORY,
     output::{CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone},
@@ -8,7 +7,7 @@ use wotw_seedgen_data::seed_language::{
 
 pub struct Args<'a> {
     context: &'a mut CompileContext,
-    args: ArrayVec<Arg, 4>,
+    args: Vec<Arg>,
     args_in_progress: Vec<ArgDestination>,
 }
 
@@ -16,7 +15,7 @@ impl<'a> Args<'a> {
     pub fn new(context: &'a mut CompileContext) -> Self {
         Self {
             context,
-            args: ArrayVec::new(),
+            args: Vec::new(),
             args_in_progress: Vec::new(),
         }
     }
@@ -140,7 +139,7 @@ impl<'a> Args<'a> {
 struct Arg {
     destination: ArgDestination,
     compile_output: (Vec<Command>, MemoryUsed),
-    gets_overwritten_by: ArrayVec<ArgDestination, 4>,
+    gets_overwritten_by: Vec<ArgDestination>,
 }
 
 impl Arg {
@@ -148,7 +147,7 @@ impl Arg {
         Self {
             destination,
             compile_output,
-            gets_overwritten_by: ArrayVec::new(),
+            gets_overwritten_by: Vec::new(),
         }
     }
 }
