@@ -62,6 +62,8 @@ anchor ExternalStates:  # States that can't be solved from this file. They are u
     moki: Impossible
   state SkipMora2:  # Used to logically support skipping Mora's second combat phase
     moki: Impossible
+  state SkipWillowStone:
+    moki: Impossible
   state RemoveTPLocks:  # Used to logically remove the skills requirement for teleporters
     moki: Impossible
   state RemoveRegionRegen:
@@ -16940,7 +16942,9 @@ anchor WillowsEnd.MiniBossFight at 361, -3740: # Above mini boss fight room
 
   # TODO this doesn't really represent the fact that rock boss is flying or that you might have to destroy shields
   state WillowsEnd.MinibossHeart:
-    moki: Boss=300, Damage=60, Regenerate, Bash, Dash, DoubleJump, Launch
+    moki:
+      SkipWillowStone
+      Boss=300, Damage=60, Regenerate, Bash, Dash, DoubleJump, Launch
     gorlek: Boss=300, Damage=60, Regenerate, Launch, Bash, DoubleJump OR Dash
     kii: Boss=300, Damage=60, Regenerate, Launch, DoubleJump OR Dash OR Glide
     unsafe:

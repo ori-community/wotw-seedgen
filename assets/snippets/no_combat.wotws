@@ -4,11 +4,22 @@
 Skip all combat heavy parts. Shrines have their reward available for pickup right away,
 all arenas are completed and all boss combat phases are skipped")
 
-// TODO port https://github.com/SiriusAshling/wotw-seedgen/commit/ce324788abdd79ba7be5b9aa5fedc48ac2ad7dee
-
-!tags("No Combat")
 !config_boolean(skip_arenas, true, "Skip Arenas", "Skips Combat Shrines and Fight Rooms")
 !config_boolean(skip_bosses, true, "Skip Bosses", "Skips Howl, Hornbug, Mora, Kwolok, Flying Rock and Shriek")
+
+!if skip_arenas {
+    !if skip_bosses {
+        !tags("No Combat")
+    }
+    !if skip_bosses == false {
+        !tags("No Combat Arenas")
+    }
+}
+!if skip_arenas == false {
+    !if skip_bosses {
+        !tags("No Boss Combat")
+    }
+}
 
 !if skip_arenas {
     on spawn {
@@ -17,42 +28,52 @@ all arenas are completed and all boss combat phases are skipped")
         store(LowerDepths.CombatShrineCompleted, true)
         store(WoodsMain.CombatShrineCompleted, true)
         store(WestGlades.CombatShrineCompleted, true)
+
         store(MarshSpawn.CaveFight, true)
-        store(LowerReach.ArenaBeaten, true)
-        store(MarshSpawn.BurrowArena, true)
         store(inkwaterMarshStateGroup.lizardMultiWaveArenaInt, 3)
-        store(WeepingRidge.ElevatorFightCompleted, true)
+        store(MarshSpawn.BurrowArena, true)
         store(waterMillStateGroupDescriptor.rotatingEnemyArenaStates, 5)
+        // TODO no state change to detect :(
+        store(LowerReach.ArenaBeaten, true)
         store(lumaPoolsStateGroup.arenaByteStateSerialized, 4)
         store(lumaPoolsStateGroup.arenaBByteStateSerialized, 4)
+        store(WeepingRidge.ElevatorFightCompleted, true)
     }
 }
 
 !if skip_bosses {
     on spawn {
+        // TODO no state change to detect :(
         store(swampStateGroup.nightCrawlerChaseStarted, true)
         store(MarshSpawn.HowlBurnt, true)
         store(swampStateGroup.nightCrawlerEscaped, true)
+        // TODO immune to debug damage?!?
         store(EastHollow.BeetleDefeated, true)
         store(kwolokGroupDescriptor.hornBugBossState, 4)
-        store(WillowsEnd.MinibossHeart, true)
-        store(willowsEndGroup.laserShooterBossState, 4)
     }
-    on lagoonStateGroup.kwolokBossState == 3 {
-        store(lagoonStateGroup.kwolokBossState, 6)
-        instant_warp(-1974, -4073)
-    }
+
+    // on kwolokGroupDescriptor.hornBugBossState == 2 force_deal_enemy_damage(10000)
+    // !set_logic_state("EastHollow.BeetleDefeated")
+
+    on lagoonStateGroup.kwolokBossState == 3 force_deal_enemy_damage(10000)
     !set_logic_state("SkipKwolok")
+
     on mouldwoodDepthsGroup.spiderBossState == 2 store(mouldwoodDepthsGroup.spiderBossState, 4)
     !set_logic_state("SkipMora1")
-    on mouldwoodDepthsGroup.spiderBossState == 5 store(mouldwoodDepthsGroup.spiderBossState, 7)
+
+    on mouldwoodDepthsGroup.spiderBossState == 5 force_deal_enemy_damage(10000)
     !set_logic_state("SkipMora2")
-    on willowsEndGroup.petrifiedOwlBossState == 1 {
-        store(willowsEndGroup.petrifiedOwlBossState, 2)
+
+    on willowsEndGroup.laserShooterBossState == 2 force_deal_enemy_damage(10000)
+    !set_logic_state("SkipWillowStone")
+
+    on willowsEndGroup.petrifiedOwlBossState == 1 store(willowsEndGroup.petrifiedOwlBossState, 2)
+
+    // Manual escape refill since we miss the vanilla one somehow
+    on respawn if willowsEndGroup.petrifiedOwlBossState == 2 {
         store(player.health, player.maxHealth)
         store(player.energy, player.maxEnergy)
     }
-    on willowsEndGroup.petrifiedOwlBossState == 3 {
-        force_deal_enemy_damage(10000)
-    }
+
+    on willowsEndGroup.petrifiedOwlBossState == 3 force_deal_enemy_damage(10000)
 }
