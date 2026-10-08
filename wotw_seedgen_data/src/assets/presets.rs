@@ -6,7 +6,8 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 use std::{cmp::Ordering, iter};
-use utoipa::ToSchema;
+use utoipa::openapi::{RefOr, Schema};
+use utoipa::{PartialSchema, ToSchema};
 
 /// The current version number for the assets directory.
 /// Presets targetting older versions may throw an error if they're affected by breaking changes.
@@ -545,11 +546,35 @@ fn include_world_preset<A: PresetAccess + SnippetAccess>(
     preset.apply_impl(settings, already_applied, file_access)
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Tricks {
     All,
     #[serde(untagged)]
     Some(FxHashSet<Trick>),
+}
+
+impl PartialSchema for Tricks {
+    fn schema() -> RefOr<Schema> {
+        RefOr::T(Schema::OneOf(
+            utoipa::openapi::OneOfBuilder::new()
+                .item(
+                    utoipa::openapi::ObjectBuilder::new()
+                        .schema_type(utoipa::openapi::Type::String)
+                        .enum_values(Some(["All"]))
+                        .build(),
+                )
+                .item(utoipa::schema!(FxHashSet<Trick>))
+                .build(),
+        ))
+    }
+}
+
+impl ToSchema for Tricks {
+    fn schemas(schemas: &mut Vec<(String, RefOr<Schema>)>) {
+        schemas.push((Tricks::name().into(), Tricks::schema()));
+        <FxHashSet<Trick> as ToSchema>::schemas(schemas);
+        <String as ToSchema>::schemas(schemas);
+    }
 }
 
 impl Tricks {
