@@ -9,8 +9,8 @@ wotw_seedgen_server_shared = { path = "../wotw_seedgen_server_shared" }
 axum = { version = "0.8.7", default-features = false, features = ["http1", "http2", "json", "query", "tokio", "tower-log", "tracing"] }
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.37.0", features = ["rt-multi-thread"] }
-utoipa = { version = "5.4.0", features = ["axum_extras"] }
-utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+utoipa = { version = "6.0.0", features = ["axum_extras"] }
+utoipa-swagger-ui = { version = "10.0.1", features = ["axum"] }
 notify-debouncer-full = { version = "0.6.0", default-features = false }
 dirs = "6.0.0"
 itertools = "0.13"

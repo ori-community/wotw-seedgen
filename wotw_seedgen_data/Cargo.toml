@@ -36,7 +36,7 @@ strsim = "0.11"
 strum = { version = "0.26", features = ["derive"] }
 thiserror = "2.0.17"
 ordered-float = { version = "4.2", features = ["serde"]}
-utoipa = { version = "5.4.0", features = ["repr"] }
+utoipa = { version = "6.0.0", features = ["repr"] }
 
 [dev-dependencies]
 criterion = "0.5"
