@@ -71,7 +71,7 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
                 EventKind::Modify(ModifyKind::Name(RenameMode::To)) => changed.create(paths, &self.file_access),
                 EventKind::Modify(ModifyKind::Name(RenameMode::From)) => changed.remove(paths, &self.file_access),
                 EventKind::Modify(ModifyKind::Name(RenameMode::Both)) => changed.rename(paths, &self.file_access),
-                EventKind::Remove(RemoveKind::File) => changed.remove(paths, &self.file_access),
+                EventKind::Remove(RemoveKind::Any | RemoveKind::File) => changed.remove(paths, &self.file_access),
                 EventKind::Access(_)
                 | EventKind::Create(CreateKind::Folder)
                 | EventKind::Modify(ModifyKind::Data(DataChange::Size) | ModifyKind::Metadata(_))
@@ -85,7 +85,7 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
                     | ModifyKind::Name(RenameMode::Any | RenameMode::Other)
                     | ModifyKind::Other,
                 )
-                | EventKind::Remove(RemoveKind::Any | RemoveKind::Other) => {
+                | EventKind::Remove(RemoveKind::Other) => {
                     warn!("unprocessable file event {kind:?}");
 
                     continue;
@@ -334,16 +334,44 @@ impl PathKind {
     }
 }
 
-fn is_in_folders(path: &Path, mut folders: impl Iterator<Item = impl AsRef<Path>>) -> bool {
-    let canonicalized_path = path.canonicalize();
+fn is_in_folders_canonicalized(
+    path: &Path,
+    folders: impl Iterator<Item=impl AsRef<Path>>,
+) -> Result<bool, io::Error> {
+    let canonicalized_path = path.canonicalize()?;
 
-    folders.any(|folder| {
-        fs::canonicalize(folder).is_ok_and(|folder| {
-            canonicalized_path
-                .as_ref()
-                .is_ok_and(|path| path.starts_with(folder))
-        })
-    })
+    for folder in folders {
+        let canonicalized_folder = fs::canonicalize(folder)?;
+        if canonicalized_path.starts_with(canonicalized_folder) {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
+fn is_in_folders_duncified(path: &Path, folders: impl Iterator<Item=impl AsRef<Path>>) -> bool {
+    let duncified_path = dunce::simplified(path);
+
+    for folder in folders {
+        let duncified_folder = dunce::simplified(folder.as_ref());
+        if duncified_path.starts_with(duncified_folder) {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn is_in_folders(path: &Path, mut folders: impl Iterator<Item = impl AsRef<Path>>) -> bool {
+    // On Windows there are multiple path formats, including the legacy one ("C:\File.txt") and UNC
+    // paths ("\\?\C:\File.txt"). Because of this, a simple starts_with doesn't work here.
+    // `std::canonicalize` always returns UNC paths, but it only works for files that actually
+    // exist, so it doesn't work if we want to check whether it was likely that a file was inside
+    // a folder before.
+
+    is_in_folders_canonicalized(path, &mut folders)
+        .unwrap_or_else(|_| is_in_folders_duncified(path, &mut folders))
 }
 
 fn to_identifier(path: &Path) -> String {
