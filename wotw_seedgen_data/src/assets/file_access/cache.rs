@@ -65,6 +65,11 @@ impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheVal
         for debounced in events {
             let Event { kind, paths, .. } = debounced.event;
 
+            let paths = paths
+                .into_iter()
+                .filter_map(|p| p.canonicalize().ok())
+                .collect();
+
             match kind {
                 EventKind::Create(CreateKind::Any | CreateKind::File) => changed.create(paths, &self.file_access),
                 EventKind::Modify(ModifyKind::Data(DataChange::Any | DataChange::Content) | ModifyKind::Any) => changed.modify(paths, &self.file_access),
@@ -335,7 +340,12 @@ impl PathKind {
 }
 
 fn is_in_folders(path: &Path, mut folders: impl Iterator<Item = impl AsRef<Path>>) -> bool {
-    folders.any(|folder| fs::canonicalize(folder).is_ok_and(|folder| path.starts_with(folder)))
+    folders.any(|folder| {
+        fs::canonicalize(folder).is_ok_and(|folder| {
+            path.canonicalize()
+                .is_ok_and(|path| path.starts_with(folder))
+        })
+    })
 }
 
 fn to_identifier(path: &Path) -> String {
