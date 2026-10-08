@@ -207,6 +207,14 @@ impl AssetCacheValues for CacheValues {
         if !changed.snippets.is_empty() {
             self.snippet_info = snippet_info(&self.base.snippets);
         }
+
+        if !changed.world_presets.is_empty() {
+            self.world_preset_info = world_preset_info(&self.base.world_presets);
+        }
+
+        if !changed.universe_presets.is_empty() {
+            self.universe_preset_info = universe_preset_info(&self.base.universe_presets);
+        }
     }
 }
 
