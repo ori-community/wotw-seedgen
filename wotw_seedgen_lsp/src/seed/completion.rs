@@ -663,8 +663,9 @@ fn string_literal_completion(
     literal_start: usize,
     index: usize,
 ) -> Option<Vec<CompletionItem>> {
-    let index_in_string = index - literal_start - 1;
-    let string_until_index = &string[..index_in_string];
+    // 1 is for the string delimiter
+    let index_in_string = index - (literal_start + 1);
+    let string_until_index = string.get(..index_in_string)?;
 
     let action_start = string_until_index.rfind('[')? + 1;
 
