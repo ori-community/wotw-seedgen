@@ -9774,8 +9774,8 @@ anchor LowerReach.PastSnowball at -99, -3982:  # At the bashnade pedestal after 
       GrenadeJump, DoubleJump  # grenade wall jump off of the microwall under the spikes
       GlideHammerJump
       AerialHammerJump, TripleJump OR Glide OR Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-      BlazeSwap=5 OR FlashSwap  # might be doable with less somehow, blaze swaps are hard
-      SpearJump=1, DoubleJump, Dash, Damage=20, Spear=1  # https://youtu.be/jQ-wWibCG_k
+      AbilitySwap=5  # might be doable with less somehow, blaze swaps are hard
+      DoubleJump, Dash, Spear=1, Damage=20  # https://youtu.be/bzKUNTi45KQ
 
   conn LowerReach.IceCavern:
     moki:
@@ -10272,6 +10272,7 @@ anchor LowerReach.TrialStart at 64, -4045:  # At trial start
     unsafe:
       Launch, Shuriken=1 OR Flash=1 OR Sentry=1  # shuriken/flash/sentry before using launch
       DoubleJump, TripleJump, Sword OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=10  # dboost on the flying spikes, which only deal 10 damages
+      DoubleJump, Dash, Spear=2, Damage=20  # https://youtu.be/EzWvMR4jR9w technically Spear=1+Damage=20+Spear=1
   pickup Reach.Trial.HiddenSL:
     moki: Glide
     kii:
