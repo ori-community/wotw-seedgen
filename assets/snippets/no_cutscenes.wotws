@@ -57,7 +57,6 @@ on spawn {
     store(npcsStateGroup.gromTalkedAboutBaur, true)
     store(npcsStateGroup.gromTalkedAboutLagoon, true)
     store(hubUberStateGroup.builderProjectHouses, 1)
-    store(questUberStateGroup.luposMapQuest, 4)
     store(npcsStateGroup.talkedInHub, 2)
     store(npcsStateGroup.willowsEndSeirExitCutscene, true)
     store(npcsStateGroup.metOpherHub, true)
