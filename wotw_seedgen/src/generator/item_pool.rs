@@ -319,26 +319,26 @@ impl<'log> ItemPool<'log> {
         item_metadata: &ItemMetadata,
         commands: &CommandsOutput,
     ) -> Option<CommandVoid> {
-        // TODO also precompute reroll chance?
-        self.items
-            .iter()
-            .rposition(|item| {
-                item.cost <= 10000. || {
-                    let choose = self.rng.gen_bool(10000. / f64::from(item.cost));
+        // TODO also precompute reroll chance? Or maintain a list of weights?
+        match self.items.iter().rposition(|item| {
+            item.cost <= 10000. || {
+                let choose = self.rng.gen_bool(10000. / f64::from(item.cost));
 
-                    if !choose {
-                        trace!(
-                            logger: self.log_capture,
-                            "{log_index}Rerolling random placement {item}",
-                            log_index = self.log_index,
-                            item = item_metadata.get(&item.command).log_name(commands),
-                        );
-                    }
-
-                    choose
+                if !choose {
+                    trace!(
+                        logger: self.log_capture,
+                        "{log_index}Rerolling random placement {item}",
+                        log_index = self.log_index,
+                        item = item_metadata.get(&item.command).log_name(commands),
+                    );
                 }
-            })
-            .map(|index| self.remove(index))
+
+                choose
+            }
+        }) {
+            None => self.items.pop().map(|item| item.command),
+            Some(index) => Some(self.remove(index)),
+        }
     }
 
     pub fn take(&mut self) -> impl Iterator<Item = CommandVoid> {
