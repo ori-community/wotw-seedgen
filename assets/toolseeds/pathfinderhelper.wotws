@@ -14,6 +14,9 @@
 !state(bind_pointer, Integer)
 !let(bind_counter, 0)
 
+!state(first_spawn, Boolean)
+on spawn store(first_spawn, true)
+
 on binding1 set_integer("bind_pointer", bind_pointer)
 on binding2 set_integer("bind_pointer", bind_pointer)
 on binding3 set_integer("bind_pointer", bind_pointer)
@@ -259,7 +262,7 @@ on reload {
     set_wheel_item_all_actions("glades_projects", LeftBottom, store(gladesProjects.lastTreePlanted, gladesProjects.lastTreePlanted == false))
 }
 
-on spawn {
+on first_spawn {
     store(player.spiritLight, 10000)
     store(player.baseMaxHealth, 200)
     store(player.health, 200)
@@ -505,14 +508,14 @@ fun world_reset() {
         "^("
         // player
         + "5\|"
+        // randoConfig
+        + "|7\|"
+        // custom
+        + "|([89]|10)\|"
         // skills
         + "|24\|"
         // shards
         + "|25\|"
-        // water
-        + "|6\|2000"
-        // playerUberStateGroupDescriptor
-        + "|3440\|"
         // spirit wells
         + "|21786\|10185"
         + "|11666\|61594"
@@ -528,8 +531,25 @@ fun world_reset() {
         + "|20120\|(49994|41398)"
         + "|10289\|4928"
         + "|16155\|(41465|50867)"
+        // water and seed_core rando states
+        + "|6\|(2000|301|302|402|501)"
+        // grom shop
+        + "|17\|(16825|15068)"
+        // playerUberStateGroupDescriptor
+        + "|3440\|"
+        // fast travel
+        + "|48248\|16489"
+        // marsh intro and torch
+        + "|21786\|48748"
+        // torch
+        + "|21786\|47458|9593\|3621"
+        // kwolok lever
+        + "|21786\|50432|48248\|33981"
+        // ku
+        + "|58674\|44798|14019\|(34504|54675|8973|35087|35399|45931)"
         + ")"
     )
+    trigger_client_event(spawn) // Fallback if an exclude is missing above, will spam the UberState log though
     controlled_priority_message("response", "@World Reset@", 4)
 }
 
@@ -2469,7 +2489,7 @@ on change 21194|38411 if uber_state_log uber_state_log_message("#minesUberStateG
 on change 21194|63648 if uber_state_log uber_state_log_message("#minesUberStateGroup.leverA# (21194|63648) -> " + 21194|63648)
 on change 21194|11371 if uber_state_log uber_state_log_message("#minesUberStateGroup.spiritShardA# (21194|11371) -> " + 21194|11371)
 
-on spawn anchor_warps()
+on first_spawn anchor_warps()
 fun anchor_warps() {
     // Used Regex on paths.wotwl:
     // FIND "(?:.*\n)*?anchor (.*?) at (-?\d+), ?(-?\d+):(?:\n|[^a].*\n)*" REPLACE "    create_warp_icon("$1", $2, $3)\n    set_warp_icon_label("$1", "#$1#")\n"
