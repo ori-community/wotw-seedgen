@@ -22,7 +22,7 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, mem, ops::RangeFrom, sync::LazyLock};
+use std::{cmp::Ordering, iter, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::{
     assets::{LocData, LocDataEntry},
     env_or,
@@ -295,6 +295,10 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         trace!(logger: self.log_capture, "--- Placement step #{}", self.step);
 
         self.spoiler.groups.push(SpoilerGroup::default());
+
+        if cfg!(debug_assertions) {
+            self.verify_remaining_counts();
+        }
     }
 
     fn sort_spoiler_placements(&mut self) {
@@ -430,6 +434,52 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         }
     }
 
+    fn verify_remaining_counts(&self) {
+        trace!(logger: self.log_capture, "Verifying remaining placement counts");
+
+        let mut placements_remaining = 0;
+        let mut spirit_light_placements_remaining = 0;
+        let mut shop_placements_remaining = 0;
+
+        for world in &self.worlds {
+            let world_placements_remaining = world.placements_remaining();
+            let world_shop_placements_remaining = world.shop_placements_remaining();
+
+            self.verify_remaining_counts_for(
+                &world.log_index,
+                world_placements_remaining,
+                world_shop_placements_remaining,
+                world.spirit_light_placements_remaining,
+            );
+
+            placements_remaining += world_placements_remaining;
+            spirit_light_placements_remaining += world.spirit_light_placements_remaining;
+            shop_placements_remaining += world_shop_placements_remaining;
+        }
+
+        self.verify_remaining_counts_for(
+            "",
+            placements_remaining,
+            shop_placements_remaining,
+            spirit_light_placements_remaining,
+        );
+    }
+
+    fn verify_remaining_counts_for(
+        &self,
+        log_index: &str,
+        placements: usize,
+        shop_placements: usize,
+        spirit_light_placements: usize,
+    ) {
+        trace!(
+            logger: self.log_capture,
+            "{log_index}Remaining: {placements} placements, {shop_placements} shop placements, {spirit_light_placements} spirit light placements",
+        );
+
+        assert!(placements - shop_placements >= spirit_light_placements);
+    }
+
     fn place_remaining_command(&mut self, command: CommandVoid, target_world_index: usize) {
         match self.choose_origin_world_for_remaining() {
             None => warn!(
@@ -470,20 +520,23 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         for origin_world_index in 0..self.worlds.len() {
             let origin_world = &mut self.worlds[origin_world_index];
 
+            let mut non_shop_placements_remaining = origin_world.non_shop_placements_remaining();
+
             let needs_random_placement = origin_world.reserve_placeholders();
-            let mut placements_remaining =
-                origin_world.placements_remaining() + needs_random_placement.len();
+            any_placed |= needs_random_placement.len() > 0;
 
             for pickup in needs_random_placement {
-                any_placed = true; // TODO pull out of loop and skip some more calculations that way
+                if pickup.uber_identifier.is_shop() {
+                    self.place_random_from_item_pool_at(pickup, origin_world_index);
+                    continue;
+                }
 
                 let origin_world = &mut self.worlds[origin_world_index];
 
-                let should_place_spirit_light = !pickup.uber_identifier.is_shop()
-                    && self.rng.gen_bool(
-                        origin_world.spirit_light_placements_remaining as f64
-                            / placements_remaining as f64,
-                    );
+                let should_place_spirit_light = self.rng.gen_bool(
+                    origin_world.spirit_light_placements_remaining as f64
+                        / non_shop_placements_remaining as f64,
+                );
 
                 if should_place_spirit_light {
                     let batch = origin_world.spirit_light_provider.take();
@@ -502,7 +555,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                     self.place_random_from_item_pool_at(pickup, origin_world_index);
                 }
 
-                placements_remaining -= 1;
+                non_shop_placements_remaining -= 1;
             }
         }
 
@@ -519,7 +572,10 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 &target_world.output.modifiers.item_metadata,
                 &target_world.output.commands,
             )
-            .unwrap_or_else(|| target_world.backup_gorlek_ore());
+            .unwrap_or_else(|| {
+                // TODO ensure this case is impossible and remove it?
+                target_world.backup_gorlek_ore("since the item pool unexpectedly returned nothing")
+            });
 
         self.place_command_at(item, pickup, origin_world_index, target_world_index, false);
     }
@@ -619,6 +675,11 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
         match origin_world.choose_non_spirit_light_location() {
             None => {
+                // TODO the spirit light amount generator will not account for this!
+                // Using a spawn slot increases the total number of placement locations used.
+                // Since nothing changed about what will be placed, this will be a spirit light placement.
+                origin_world.spirit_light_placements_remaining += 1;
+
                 if origin_world.spawn_slots > 0 {
                     origin_world.spawn_slots -= 1;
 
@@ -1144,6 +1205,24 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         self.placements_remaining() - self.spirit_light_placements_remaining
     }
 
+    fn shop_placements_remaining(&self) -> usize {
+        fn count_in<'i, I: Iterator<Item = &'i LocDataEntry>>(iter: I) -> usize {
+            iter.filter(|placement| placement.uber_identifier.is_shop())
+                .count()
+        }
+
+        count_in(iter::chain(&self.needs_placement, &self.placeholders).copied())
+            - count_in(
+                self.received_placement
+                    .iter()
+                    .map(|index| self.needs_placement[*index]),
+            )
+    }
+
+    fn non_shop_placements_remaining(&self) -> usize {
+        self.placements_remaining() - self.shop_placements_remaining()
+    }
+
     fn reserve_placeholders(&mut self) -> Vec<&'graph LocDataEntry> {
         self.received_placement
             .extend(self.reached_needs_placement.iter().copied());
@@ -1366,18 +1445,59 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     }
 
     fn choose_non_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
-        if self.non_spirit_light_placements_remaining() > 0 {
-            match self.reached_needs_placement.pop() {
-                None => self.placeholders.pop(),
-                Some(index) => {
-                    self.received_placement.push(index);
-
-                    Some(self.needs_placement[index])
-                }
-            }
-        } else {
-            None
+        if self.non_spirit_light_placements_remaining() == 0 {
+            return None;
         }
+
+        if self.non_shop_placements_remaining() == self.spirit_light_placements_remaining {
+            // Since shops cannot receive spirit light, we have to prioritize them
+            // for non spirit light placements once we run out of space.
+            return self.choose_shop_location();
+        }
+
+        match self.reached_needs_placement.pop() {
+            None => self.placeholders.pop(),
+            Some(index) => {
+                self.received_placement.push(index);
+
+                Some(self.needs_placement[index])
+            }
+        }
+    }
+
+    fn choose_shop_location(&mut self) -> Option<&'graph LocDataEntry> {
+        trace!(
+            logger: self.item_pool.log_capture,
+            "{log_index}Forcing placement in a shop to keep space for future spirit light placements",
+            log_index = self.log_index
+        );
+
+        let reached_needs_placement_shop = self
+            .reached_needs_placement
+            .iter()
+            .position(|index| self.needs_placement[*index].uber_identifier.is_shop());
+
+        let location = match reached_needs_placement_shop {
+            None => {
+                let placeholder_shop = self
+                    .placeholders
+                    .iter()
+                    .position(|placeholder| placeholder.uber_identifier.is_shop())?;
+
+                self.placeholders.swap_remove(placeholder_shop)
+            }
+            Some(reached_needs_placement_index) => {
+                let needs_placement_index = self
+                    .reached_needs_placement
+                    .swap_remove(reached_needs_placement_index);
+
+                self.received_placement.push(needs_placement_index);
+
+                self.needs_placement[needs_placement_index]
+            }
+        };
+
+        Some(location)
     }
 
     fn choose_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
@@ -1438,7 +1558,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             let is_shop = pickup.uber_identifier.is_shop();
 
             if is_shop {
-                let command = self.backup_gorlek_ore();
+                let command = self.backup_gorlek_ore("to avoid placing Spirit Light in a shop");
                 self.place_with_simulation(
                     pickup,
                     command,
@@ -1465,13 +1585,17 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         }
     }
 
-    fn backup_gorlek_ore(&mut self) -> CommandVoid {
-        // TODO try to avoid
+    // TODO try to avoid
+    fn backup_gorlek_ore(&mut self, reason: &str) -> CommandVoid {
+        // TODO the spirit light amount generator will not account for this!
+        // Conjuring a gorlek ore will push out a planned spirit light placement
+        self.spirit_light_placements_remaining -= 1;
+
         let command = compile::gorlek_ore();
 
         warn!(
             logger: self.item_pool.log_capture,
-            "{index}Placing more {name} than intended to avoid placing Spirit Light in a shop",
+            "{index}Placing more {name} than intended {reason}",
             index = self.log_index,
             name = self.log_name(&command),
         );
