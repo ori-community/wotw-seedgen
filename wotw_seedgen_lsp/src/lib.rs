@@ -6,8 +6,8 @@ mod seed;
 
 use tower_lsp::{LanguageServer, LspService, Server};
 use wotw_seedgen_data::assets::{
-    AssetCache, AssetCacheValues, AssetFileAccess, DefaultFileAccess, PresetFileAccess,
-    SnippetFileAccess,
+    AssetCache, AssetCacheValues, AssetFileAccess, DefaultFileAccess, PlandoFileAccess,
+    PresetFileAccess, SnippetFileAccess,
 };
 use wotw_seedgen_server_shared::ServerState;
 
@@ -26,7 +26,13 @@ pub fn start_logic() {
 
 fn start<F, V>(cache: AssetCache<F, V>)
 where
-    F: AssetFileAccess + SnippetFileAccess + PresetFileAccess + Send + Sync + 'static,
+    F: AssetFileAccess
+        + SnippetFileAccess
+        + PlandoFileAccess
+        + PresetFileAccess
+        + Send
+        + Sync
+        + 'static,
     V: AssetCacheValues + Send + Sync + 'static,
     Backend<ServerState<F, V>>: LanguageServer,
 {

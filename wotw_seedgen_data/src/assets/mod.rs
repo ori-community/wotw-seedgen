@@ -12,6 +12,8 @@ pub use uber_state_data::{
 };
 mod snippet_access;
 pub use snippet_access::{ChainedSnippetAccess, InlineSnippets, SnippetAccess};
+mod plando_access;
+pub use plando_access::PlandoAccess;
 mod presets;
 pub use presets::{
     PresetAccess, PresetGroup, PresetInfo, Tricks, UniversePreset, UniversePresetSettings,
@@ -23,8 +25,8 @@ mod file_access;
 pub use file_access::{
     canonicalize, create_dir_all, file_create, file_err, file_open, metadata, read_to_string,
     write, AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-    DefaultFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess, Watcher,
-    WatcherError, WatcherMessage, WatcherResult, EXECUTABLE_DIR, LOG_DATA_DIR,
+    DefaultFileAccess, PlandoFileAccess, PlandoFolderAccess, PresetFileAccess, SnippetFileAccess,
+    Watcher, WatcherError, WatcherMessage, WatcherResult, EXECUTABLE_DIR, LOG_DATA_DIR,
     RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
 };
 #[cfg(any(test, feature = "test_helpers"))]

@@ -1,3 +1,6 @@
+#name("Icon Index")
+#description("Uses wheels and the map to show all available icons")
+
 !spawn(-3219, -5935)
 
 on reload {

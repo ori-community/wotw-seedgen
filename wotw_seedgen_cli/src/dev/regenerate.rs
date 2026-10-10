@@ -3,14 +3,12 @@ use std::time::Instant;
 use log::{trace, warn};
 use wotw_seedgen::{
     data::assets::{self, file_err},
-    seed::{assembly::Assembly, SeedgenInfo},
+    seed::SeedReader,
 };
 use wotw_seedgen_git_info::{GitInfo, GIT_HEAD, GIT_STATUS};
-use zip::ZipArchive;
 
 use crate::{
     cli::{dev::RegenerateArgs, CompileArgs},
-    dev::helpers::json_by_name,
     log_config::LogConfig,
     seed::{generate, write_new_game_seed_source, write_seed},
     Error,
@@ -29,12 +27,12 @@ pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
     LogConfig::from_args(verbose_args).apply()?;
 
     let file = assets::file_open(&path)?;
-    let mut archive = ZipArchive::new(file).map_err(|err| file_err("read", &path, err))?;
-    let seedgen_info = json_by_name::<SeedgenInfo>(&mut archive, "seedgen_info.json")?;
+    let mut reader = SeedReader::new(file).map_err(|err| file_err("read", &path, err))?;
 
+    let seedgen_info = reader.read_seedgen_info()?;
     check_git_info(seedgen_info.git_info);
 
-    let assembly = json_by_name::<Assembly>(&mut archive, "assembly.json")?;
+    let assembly = reader.read_assembly()?;
 
     let seed_universe = generate(&seedgen_info.universe_settings, debug)?;
     if assembly != seed_universe.worlds[seedgen_info.world_index].assembly {

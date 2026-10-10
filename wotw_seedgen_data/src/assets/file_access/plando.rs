@@ -4,19 +4,21 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::assets::{AssetFileAccess, DefaultFileAccess, PresetFileAccess, SnippetFileAccess};
+use crate::assets::{
+    AssetFileAccess, DefaultFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess,
+};
 
-pub struct PlandoFileAccess<'a> {
+pub struct PlandoFolderAccess<'a> {
     root: &'a Path,
 }
 
-impl<'a> PlandoFileAccess<'a> {
+impl<'a> PlandoFolderAccess<'a> {
     pub fn new(root: &'a Path) -> Self {
         Self { root }
     }
 }
 
-impl AssetFileAccess for PlandoFileAccess<'_> {
+impl AssetFileAccess for PlandoFolderAccess<'_> {
     type Folders = <DefaultFileAccess as AssetFileAccess>::Folders;
     type Path = <DefaultFileAccess as AssetFileAccess>::Path;
 
@@ -25,7 +27,7 @@ impl AssetFileAccess for PlandoFileAccess<'_> {
     }
 }
 
-impl<'a> SnippetFileAccess for PlandoFileAccess<'a> {
+impl<'a> SnippetFileAccess for PlandoFolderAccess<'a> {
     type Folders = Chain<
         Once<Cow<'a, Path>>,
         Map<<DefaultFileAccess as SnippetFileAccess>::Folders, fn(PathBuf) -> Cow<'a, Path>>,
@@ -41,7 +43,16 @@ impl<'a> SnippetFileAccess for PlandoFileAccess<'a> {
     }
 }
 
-impl PresetFileAccess for PlandoFileAccess<'_> {
+impl PlandoFileAccess for PlandoFolderAccess<'_> {
+    type Folders = <DefaultFileAccess as PlandoFileAccess>::Folders;
+    type Path = <DefaultFileAccess as PlandoFileAccess>::Path;
+
+    fn plando_folders(&self) -> Self::Folders {
+        DefaultFileAccess.plando_folders()
+    }
+}
+
+impl PresetFileAccess for PlandoFolderAccess<'_> {
     type Folders = <DefaultFileAccess as PresetFileAccess>::Folders;
     type Path = <DefaultFileAccess as PresetFileAccess>::Path;
 

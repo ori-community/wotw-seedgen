@@ -2,13 +2,12 @@ use std::time::Instant;
 
 use wotw_seedgen::{
     data::assets::{self, file_err},
-    seed::SeedgenInfo,
+    seed::SeedReader,
 };
-use zip::ZipArchive;
 
 use crate::{
     cli::{dev::PatchArgs, CompileArgs},
-    dev::helpers::{json_by_name, read_ngss},
+    dev::helpers::read_ngss,
     log_config::LogConfig,
     seed::{generate, launch_seed},
     Error,
@@ -32,8 +31,9 @@ pub fn patch(args: PatchArgs) -> Result<(), Error> {
     };
 
     let file = assets::file_open(&path)?;
-    let mut archive = ZipArchive::new(file).map_err(|err| file_err("read", &path, err))?;
-    let seedgen_info = json_by_name::<SeedgenInfo>(&mut archive, "seedgen_info.json")?;
+    let seedgen_info = SeedReader::new(file)
+        .map_err(|err| file_err("read", &path, err))?
+        .read_seedgen_info()?;
 
     let seed_universe = generate(&seedgen_info.universe_settings, debug)?;
 

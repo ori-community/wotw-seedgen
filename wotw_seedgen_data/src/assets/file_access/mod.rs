@@ -9,12 +9,12 @@ pub use default_dirs::{
     DefaultFileAccess, EXECUTABLE_DIR, LOG_DATA_DIR, RANDOMIZER_USER_DATA_DIR,
     SEEDGEN_USER_DATA_DIR,
 };
-pub use plando::PlandoFileAccess;
+pub use plando::PlandoFolderAccess;
 pub use watch::{Watcher, WatcherError, WatcherMessage, WatcherResult};
 
 use crate::assets::{
-    LocData, PresetAccess, SnippetAccess, StateData, UberStateData, UberStateDump, UniversePreset,
-    WorldPreset,
+    LocData, PlandoAccess, PresetAccess, SnippetAccess, StateData, UberStateData, UberStateDump,
+    UniversePreset, WorldPreset,
 };
 use std::{
     borrow::Cow,
@@ -152,6 +152,31 @@ impl<T: SnippetFileAccess> SnippetAccess for T {
 
     fn available_snippets(&self) -> Vec<String> {
         folders::available_files(self.snippet_folders(), "wotws")
+    }
+}
+
+pub trait PlandoFileAccess {
+    type Folders: Iterator<Item = Self::Path>;
+    type Path: AsRef<Path>;
+
+    fn plando_folders(&self) -> Self::Folders;
+}
+
+impl<T: PlandoFileAccess> PlandoAccess for T {
+    fn read_plando(&self, identifier: &str) -> Result<Vec<u8>, String> {
+        let mut path = Cow::Borrowed(Path::new(identifier));
+
+        if path.extension().is_none() {
+            path.to_mut().set_extension("wotwr");
+        }
+
+        let (_, content) = folders::read(self.plando_folders(), &path)?;
+
+        Ok(content)
+    }
+
+    fn available_plandos(&self) -> Vec<String> {
+        folders::available_files(self.plando_folders(), "wotwr")
     }
 }
 

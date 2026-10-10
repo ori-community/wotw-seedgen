@@ -10,7 +10,7 @@ use wotw_seedgen::{
         parse::Source,
         seed_language::{compile::Compiler, output::PlaceholderMap},
     },
-    seed::Seed,
+    seed::{PlandoAttributes, Seed},
 };
 
 use crate::{cli::LaunchArgs, seed::launch_seed, Error};
@@ -72,7 +72,12 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
         .eprint_errors()
         .ok_or("failed to compile uber state log")?;
 
-    let seed = Seed::new(output, PlaceholderMap::default(), false);
+    let seed = Seed::new(output, PlaceholderMap::default(), false).with_plando_attributes(
+        PlandoAttributes {
+            name: Some("UberState Log".to_string()),
+            description: Some("Prints item messages and debug logs for every UberState change. Noisy states are ignored".to_string())
+        },
+    );
 
     let out = SEEDGEN_USER_DATA_DIR.join("uber_state_log.wotwr");
     let mut file = assets::file_create(&out)?;

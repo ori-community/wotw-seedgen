@@ -1,4 +1,4 @@
-use std::{ffi::OsStr, fs, path::PathBuf};
+use std::{ffi::OsStr, fs, io::Cursor, path::PathBuf};
 
 use axum::Json;
 use rustc_hash::FxHashMap;
@@ -8,14 +8,15 @@ use wotw_seedgen::{
         MapIcon, UniverseSettings,
         assets::{
             AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-            DefaultFileAccess, LocData, PresetFileAccess, SEEDGEN_USER_DATA_DIR, SnippetFileAccess,
-            StateData, UberStateData, UniversePreset, WorldPreset,
+            DefaultFileAccess, LocData, PlandoFileAccess, PresetFileAccess, SEEDGEN_USER_DATA_DIR,
+            SnippetFileAccess, StateData, UberStateData, UniversePreset, WorldPreset,
         },
         logic_language::{ast::Paths, output::Graph},
         parse::Source,
         seed_language::{metadata::Metadata, simulate::UberStates},
     },
     log_capture::{LogCapture, Record},
+    seed::SeedReader,
 };
 
 use crate::{
@@ -23,6 +24,7 @@ use crate::{
         SchemaResult,
         assets::AssetOrigin,
         logic::{MapIcons, RelevantUberStates, SpawnAnchors},
+        plandos::PlandoInfo,
         presets::{universe::UniversePresetInfo, world::WorldPresetInfo},
         snippets::SnippetInfo,
     },
@@ -44,6 +46,7 @@ pub struct CacheValues {
     pub snippet_info: FxHashMap<String, SchemaResult<SnippetInfo, String>>,
     pub universe_preset_info: FxHashMap<String, SchemaResult<UniversePresetInfo, String>>,
     pub world_preset_info: FxHashMap<String, SchemaResult<WorldPresetInfo, String>>,
+    pub plando_info: FxHashMap<String, SchemaResult<PlandoInfo, String>>,
 }
 
 impl CacheValues {
@@ -101,7 +104,7 @@ impl CacheValues {
 impl AssetCacheValues for CacheValues {
     fn new<F>(file_access: &F) -> Self
     where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     {
         let base = DefaultAssetCacheValues::new(file_access);
 
@@ -124,6 +127,7 @@ impl AssetCacheValues for CacheValues {
         let snippet_info = snippet_info(&base.snippets);
         let universe_preset_info = universe_preset_info(&base.universe_presets);
         let world_preset_info = world_preset_info(&base.world_presets);
+        let plando_info = plando_info(&base.plandos);
 
         Self {
             base,
@@ -137,6 +141,7 @@ impl AssetCacheValues for CacheValues {
             snippet_info,
             universe_preset_info,
             world_preset_info,
+            plando_info,
         }
     }
 
@@ -171,27 +176,38 @@ impl AssetCacheValues for CacheValues {
 
     fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
     where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     {
         self.base.update(file_access, changed.clone());
 
-        if changed.uber_state_dump {
+        let ChangedAssets {
+            loc_data,
+            state_data,
+            uber_state_dump,
+            paths,
+            snippets,
+            plandos,
+            universe_presets,
+            world_presets,
+        } = changed;
+
+        if uber_state_dump {
             self.uber_states = CacheResult(self.base.uber_state_data().map(UberStates::new));
         }
 
-        if changed.loc_data {
+        if loc_data {
             self.map_icons = CacheResult(self.base.loc_data().map(MapIcons::new));
             self.grom_shop_map_icon_index = grom_shop_map_icon_index(&self.map_icons);
         }
 
-        if changed.loc_data || changed.state_data {
+        if loc_data || state_data {
             self.relevant_uber_states = CacheResult(relevant_uber_states(
                 self.base.loc_data(),
                 self.base.state_data(),
             ));
         }
 
-        if changed.loc_data || changed.state_data || changed.paths {
+        if loc_data || state_data || paths {
             self.graph = CacheResult(graph(
                 self.base.paths(),
                 self.base.loc_data(),
@@ -204,15 +220,19 @@ impl AssetCacheValues for CacheValues {
         }
 
         // TODO patch maybe?
-        if !changed.snippets.is_empty() {
+        if !snippets.is_empty() {
             self.snippet_info = snippet_info(&self.base.snippets);
         }
 
-        if !changed.world_presets.is_empty() {
+        if !plandos.is_empty() {
+            self.plando_info = plando_info(&self.base.plandos);
+        }
+
+        if !world_presets.is_empty() {
             self.world_preset_info = world_preset_info(&self.base.world_presets);
         }
 
-        if !changed.universe_presets.is_empty() {
+        if !universe_presets.is_empty() {
             self.universe_preset_info = universe_preset_info(&self.base.universe_presets);
         }
     }
@@ -362,6 +382,23 @@ impl AssetInfo for WorldPresetInfo {
     }
 }
 
+impl AssetInfo for PlandoInfo {
+    type Asset = Vec<u8>;
+
+    fn new(asset: &Self::Asset) -> Self {
+        Self {
+            origin: AssetOrigin::ExecutableDir,
+            attributes: SeedReader::new(Cursor::new(asset))
+                .and_then(|mut reader| reader.read_plando_attributes())
+                .unwrap_or_default(),
+        }
+    }
+
+    fn origin(&mut self) -> &mut AssetOrigin {
+        &mut self.origin
+    }
+}
+
 fn asset_info<T, I>(
     assets: &FxHashMap<String, Result<T, String>>,
     folder: &str,
@@ -440,4 +477,10 @@ fn world_preset_info(
     world_presets: &FxHashMap<String, Result<WorldPreset, String>>,
 ) -> FxHashMap<String, SchemaResult<WorldPresetInfo, String>> {
     asset_info(world_presets, "world_presets", "json")
+}
+
+fn plando_info(
+    plandos: &FxHashMap<String, Result<Vec<u8>, String>>,
+) -> FxHashMap<String, SchemaResult<PlandoInfo, String>> {
+    asset_info(plandos, "plandos", "wotwr")
 }

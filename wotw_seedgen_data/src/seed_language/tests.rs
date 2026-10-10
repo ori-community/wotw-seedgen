@@ -315,7 +315,7 @@ impl SnippetFileAccess for SnippetAndToolseedAccess {
     fn snippet_folders(&self) -> Self::Folders {
         [
             WORKDIR.join("assets/snippets"),
-            WORKDIR.join("assets/toolseeds"),
+            WORKDIR.join("assets/plandos/src"),
         ]
         .into_iter()
     }

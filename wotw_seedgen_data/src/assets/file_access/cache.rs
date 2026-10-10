@@ -17,9 +17,9 @@ use rustc_hash::FxHashMap;
 use wotw_seedgen_parse::Source;
 
 use crate::assets::{
-    file_err, AssetFileAccess, LocData, PresetAccess, PresetFileAccess, SnippetAccess,
-    SnippetFileAccess, StateData, UberStateData, UniversePreset, Watcher, WatcherResult,
-    WorldPreset,
+    file_access::PlandoFileAccess, file_err, AssetFileAccess, LocData, PlandoAccess, PresetAccess,
+    PresetFileAccess, SnippetAccess, SnippetFileAccess, StateData, UberStateData, UniversePreset,
+    Watcher, WatcherResult, WorldPreset,
 };
 
 pub struct AssetCache<F, V> {
@@ -27,8 +27,10 @@ pub struct AssetCache<F, V> {
     pub values: V,
 }
 
-impl<F: AssetFileAccess + SnippetFileAccess + PresetFileAccess, V: AssetCacheValues>
-    AssetCache<F, V>
+impl<F, V> AssetCache<F, V>
+where
+    F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
+    V: AssetCacheValues,
 {
     pub fn new(file_access: F) -> Self {
         let values = V::new(&file_access);
@@ -141,7 +143,7 @@ impl<F: AssetFileAccess, V: AssetCacheValues> AssetFileAccess for AssetCache<F, 
 pub trait AssetCacheValues: Sized {
     fn new<F>(file_access: &F) -> Self
     where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess;
+        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess;
 
     fn loc_data(&self) -> Result<&LocData, String>;
 
@@ -159,7 +161,7 @@ pub trait AssetCacheValues: Sized {
 
     fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
     where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess;
+        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess;
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -169,6 +171,7 @@ pub struct ChangedAssets {
     pub uber_state_dump: bool,
     pub paths: bool,
     pub snippets: Vec<ChangeDetails>,
+    pub plandos: Vec<ChangeDetails>,
     pub universe_presets: Vec<ChangeDetails>,
     pub world_presets: Vec<ChangeDetails>,
 }
@@ -336,7 +339,7 @@ impl PathKind {
 
 fn is_in_folders_canonicalized(
     path: &Path,
-    folders: impl Iterator<Item=impl AsRef<Path>>,
+    folders: impl Iterator<Item = impl AsRef<Path>>,
 ) -> Result<bool, io::Error> {
     let canonicalized_path = path.canonicalize()?;
 
@@ -350,7 +353,7 @@ fn is_in_folders_canonicalized(
     Ok(false)
 }
 
-fn is_in_folders_duncified(path: &Path, folders: impl Iterator<Item=impl AsRef<Path>>) -> bool {
+fn is_in_folders_duncified(path: &Path, folders: impl Iterator<Item = impl AsRef<Path>>) -> bool {
     let duncified_path = dunce::simplified(path);
 
     for folder in folders {
@@ -429,12 +432,13 @@ pub struct DefaultAssetCacheValues {
     pub snippets: FxHashMap<String, Result<Source, String>>,
     pub universe_presets: FxHashMap<String, Result<UniversePreset, String>>,
     pub world_presets: FxHashMap<String, Result<WorldPreset, String>>,
+    pub plandos: FxHashMap<String, Result<Vec<u8>, String>>,
 }
 
 impl AssetCacheValues for DefaultAssetCacheValues {
     fn new<F>(file_access: &F) -> Self
     where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     {
         let loc_data = file_access.loc_data();
         let state_data = file_access.state_data();
@@ -468,6 +472,15 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             })
             .collect();
 
+        let plandos = file_access
+            .available_plandos()
+            .into_iter()
+            .map(|identifier| {
+                let plando = file_access.read_plando(&identifier);
+                (identifier, plando)
+            })
+            .collect();
+
         Self {
             loc_data,
             state_data,
@@ -476,12 +489,13 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             snippets,
             universe_presets,
             world_presets,
+            plandos,
         }
     }
 
     fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
     where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     {
         let ChangedAssets {
             loc_data,
@@ -489,6 +503,7 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             uber_state_dump,
             paths,
             snippets,
+            plandos,
             universe_presets,
             world_presets,
         } = changed;
@@ -511,6 +526,10 @@ impl AssetCacheValues for DefaultAssetCacheValues {
 
         update_subfolder(snippets, &mut self.snippets, |identifier| {
             file_access.read_snippet(identifier)
+        });
+
+        update_subfolder(plandos, &mut self.plandos, |identifier| {
+            file_access.read_plando(identifier)
         });
 
         update_subfolder(universe_presets, &mut self.universe_presets, |identifier| {

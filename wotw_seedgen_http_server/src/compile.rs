@@ -4,24 +4,25 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use rand_pcg::Pcg64Mcg;
-use rustc_hash::FxHashMap;
 use serde::Serialize;
 use tokio::sync::RwLockReadGuard;
 use utoipa::ToSchema;
 use wotw_seedgen::{
     data::{
         assets::{AssetCacheValues, ChainedSnippetAccess, InlineSnippets},
-        parse::Source,
         seed_language::{
             compile::{self, Compiler},
             output::postprocess,
         },
     },
     log_capture::{LogCapture, Record},
-    seed::Seed,
+    seed::{PlandoAttributes, Seed},
 };
 
-use crate::{api::plando::CompileQuery, assets::Cache};
+use crate::{
+    api::plandos::{CompileBody, CompileQuery},
+    assets::Cache,
+};
 
 pub type CompileResult = Result<Vec<u8>, CompileError>;
 
@@ -47,13 +48,15 @@ pub struct CompileOutput {
 
 pub fn compile(
     query: CompileQuery,
-    snippets: FxHashMap<String, Source>,
+    body: CompileBody,
     cache: RwLockReadGuard<Cache>,
 ) -> CompileResult {
     let CompileQuery {
         debug,
         max_log_level,
     } = query;
+
+    let CompileBody { snippets, entry } = body;
 
     let mut errors = Vec::new();
 
@@ -86,9 +89,13 @@ pub fn compile(
         .with_lint(true)
         .with_log_capture(&log_capture);
 
-    for identifier in inline_snippets.keys() {
-        // Cannot fail: identifier comes from inline_snippets and cyclic includes get written into the compiler errors and return Ok here
-        compiler.compile_snippet(identifier).unwrap();
+    if let Err(err) = compiler.compile_snippet(&entry) {
+        compiler.finish(); // errors will be empty - we failed to read the entry point
+
+        return Err(CompileError {
+            errors: vec![err],
+            logs: log_capture.finish(),
+        });
     }
 
     let compile::CompileResult { mut output, errors } = compiler.finish();
@@ -107,7 +114,9 @@ pub fn compile(
             .pop()
             .unwrap();
 
-        let seed = Seed::new(output, placeholder_map, debug);
+        let seed = Seed::new(output, placeholder_map, debug).with_plando_attributes(
+            PlandoAttributes::from_source(&inline_snippets.snippets[&entry].content),
+        );
 
         let output = CompileOutput {
             seed: ciborium::Value::Bytes(seed.package_into_bytes()),

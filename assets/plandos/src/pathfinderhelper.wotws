@@ -1,3 +1,6 @@
+#name("Pathfinder Helper")
+#description("Useful tools when writing logic")
+
 !include("seed_core")
 
 !builtin_icon(clean_water_icon, "icons/game/water.png")

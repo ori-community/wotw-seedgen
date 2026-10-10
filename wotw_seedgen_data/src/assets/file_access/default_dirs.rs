@@ -1,6 +1,6 @@
 use std::{array, env, path::PathBuf, sync::LazyLock};
 
-use crate::assets::{AssetFileAccess, PresetFileAccess, SnippetFileAccess};
+use crate::assets::{AssetFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess};
 
 pub static RANDOMIZER_USER_DATA_DIR: LazyLock<PathBuf> =
     LazyLock::new(|| match env::var_os("RANDOMIZER_USER_DATA_DIR") {
@@ -47,6 +47,15 @@ impl SnippetFileAccess for DefaultFileAccess {
 
     fn snippet_folders(&self) -> Self::Folders {
         subfolders("snippets")
+    }
+}
+
+impl PlandoFileAccess for DefaultFileAccess {
+    type Folders = array::IntoIter<Self::Path, 2>;
+    type Path = PathBuf;
+
+    fn plando_folders(&self) -> Self::Folders {
+        subfolders("plandos")
     }
 }
 

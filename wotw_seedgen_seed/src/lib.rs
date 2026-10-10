@@ -4,8 +4,11 @@ pub mod assembly;
 
 mod compile;
 mod package;
+mod plando_attributes;
 mod seedgen_info;
 
+pub use package::SeedReader;
+pub use plando_attributes::PlandoAttributes;
 pub use seedgen_info::SeedgenInfo;
 
 use assembly::{Assembly, Command};
@@ -32,6 +35,7 @@ pub struct Seed {
     pub preload: Preload,
     pub assembly: Assembly,
     pub seedgen_info: Option<SeedgenInfo>,
+    pub plando_attributes: Option<PlandoAttributes>,
     pub assets: FxHashMap<String, Vec<u8>>,
 }
 
@@ -59,6 +63,7 @@ impl Seed {
                 command_lookup: context.command_lookup,
             },
             seedgen_info: None,
+            plando_attributes: None,
             assets: output.assets.icons.into_iter().collect(), // TODO decide on a consistent data structure
         };
 
@@ -86,6 +91,11 @@ impl Seed {
     pub fn with_seedgen_info(mut self, seedgen_info: SeedgenInfo) -> Self {
         self.preload.slug = Some(seedgen_info.universe_settings.slugify());
         self.seedgen_info = Some(seedgen_info);
+        self
+    }
+
+    pub fn with_plando_attributes(mut self, plando_attributes: PlandoAttributes) -> Self {
+        self.plando_attributes = Some(plando_attributes);
         self
     }
 }

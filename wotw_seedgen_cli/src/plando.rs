@@ -13,14 +13,17 @@ use std::{
 };
 use wotw_seedgen::{
     data::{
-        assets::{self, AssetCache, DefaultAssetCacheValues, PlandoFileAccess, Watcher},
+        assets::{
+            self, AssetCache, AssetCacheValues, DefaultAssetCacheValues, PlandoFolderAccess,
+            Watcher, SEEDGEN_USER_DATA_DIR,
+        },
         seed_language::{compile::Compiler, output::postprocess},
     },
     log_capture::NO_LOG_CAPTURE,
-    seed::Seed,
+    seed::{PlandoAttributes, Seed},
 };
 
-type Cache<'a> = AssetCache<PlandoFileAccess<'a>, DefaultAssetCacheValues>;
+type Cache<'a> = AssetCache<PlandoFolderAccess<'a>, DefaultAssetCacheValues>;
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
@@ -34,8 +37,9 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     LogConfig::from_args(verbose_args).apply()?;
 
     let path = assets::canonicalize(path)?;
+    let is_dir = assets::metadata(&path)?.is_dir();
 
-    let (root, entry, lockfile) = if assets::metadata(&path)?.is_dir() {
+    let (root, entry, lockfile) = if is_dir {
         (path.as_path(), "main", path.join(".id_lock.json"))
     } else if path.extension() == Some(OsStr::new("wotws")) {
         let file_stem = path.file_stem().unwrap();
@@ -57,14 +61,25 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         )));
     };
 
-    let mut cache = Cache::new(PlandoFileAccess::new(root));
+    let mut cache = Cache::new(PlandoFolderAccess::new(root));
+
+    let attributes = attributes(&cache, entry)?;
 
     let out = match out {
         None => {
-            let mut out: PathBuf = root.join("out");
+            let mut out = SEEDGEN_USER_DATA_DIR.join("plandos");
             assets::create_dir_all(&out)?;
-            out.push(path.file_stem().unwrap_or_else(|| OsStr::new("plando")));
+
+            if let Some(name) = &attributes.name {
+                out.push(name);
+            } else if let (false, Some(stem)) = (is_dir, path.file_stem()) {
+                out.push(stem);
+            } else {
+                return Err(Error("Cannot decide output name. Add a #name attribute to the entry point or specify --out on the command line".to_string()));
+            }
+
             out.set_extension("wotwr");
+
             out
         }
         Some(out) => {
@@ -142,7 +157,8 @@ fn compile(
         .pop()
         .unwrap();
 
-    let seed = Seed::new(output, placeholder_map, debug);
+    let seed =
+        Seed::new(output, placeholder_map, debug).with_plando_attributes(attributes(cache, entry)?);
 
     let mut file = assets::file_create(out)?;
     seed.package(&mut file)?;
@@ -154,4 +170,9 @@ fn compile(
     );
 
     Ok(())
+}
+
+fn attributes(cache: &Cache, entry: &str) -> Result<PlandoAttributes, String> {
+    let snippet = cache.snippet(entry)?;
+    Ok(PlandoAttributes::from_source(&snippet.content))
 }

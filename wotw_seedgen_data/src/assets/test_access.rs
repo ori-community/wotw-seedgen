@@ -11,9 +11,9 @@ use wotw_seedgen_parse::Source;
 
 use crate::{
     assets::{
-        AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-        LocData, LocDataEntry, PresetAccess, PresetFileAccess, SnippetFileAccess, StateData,
-        UberStateData, UniversePreset, WorldPreset,
+        file_access::PlandoFileAccess, AssetCache, AssetCacheValues, AssetFileAccess,
+        ChangedAssets, DefaultAssetCacheValues, LocData, LocDataEntry, PresetAccess,
+        PresetFileAccess, SnippetFileAccess, StateData, UberStateData, UniversePreset, WorldPreset,
     },
     logic_language::{
         ast::Paths,
@@ -48,6 +48,15 @@ impl SnippetFileAccess for TestAccess {
     }
 }
 
+impl PlandoFileAccess for TestAccess {
+    type Folders = Once<Self::Path>;
+    type Path = &'static Path;
+
+    fn plando_folders(&self) -> Self::Folders {
+        iter::once(Path::new(concat!(ASSETS, "/plandos")))
+    }
+}
+
 impl PresetFileAccess for TestAccess {
     type Folders = Once<Self::Path>;
     type Path = &'static Path;
@@ -78,7 +87,7 @@ pub struct TestCacheGraphs {
 impl AssetCacheValues for TestCacheValues {
     fn new<F>(file_access: &F) -> Self
     where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     {
         let base = DefaultAssetCacheValues::new(file_access);
         let uber_states = UberStates::new(base.uber_state_data.as_ref().unwrap());

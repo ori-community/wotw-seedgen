@@ -1,10 +1,14 @@
-use crate::{Result, Seed, FORMAT_VERSION};
+use crate::{
+    assembly::Assembly, plando_attributes::PlandoAttributes, Result, Seed, SeedgenInfo,
+    FORMAT_VERSION,
+};
+use serde::de::DeserializeOwned;
 use std::{
-    io::{Cursor, Seek, Write},
+    io::{Cursor, Read, Seek, Write},
     sync::LazyLock,
 };
 use wotw_seedgen_data::env_or;
-use zip::{write::FileOptions, CompressionMethod, ZipWriter};
+use zip::{read::ZipFile, write::FileOptions, CompressionMethod, ZipArchive, ZipWriter};
 
 /// Zstd compression level up to 22
 ///
@@ -17,15 +21,27 @@ use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 static WOTWS_COMPRESSION_LEVEL: LazyLock<i64> =
     LazyLock::new(|| env_or("WOTWS_COMPRESSION_LEVEL", 9));
 
+const PRELOAD_PATH: &str = "preload.json";
+const ASSEMBLY_PATH: &str = "assembly.json";
+const SEEDGEN_INFO_PATH: &str = "seedgen_info.json";
+const PLANDO_ATTRIBUTES_PATH: &str = "plando_attributes.json";
+
 impl Seed {
     pub fn package<W: Write + Seek>(&self, obj: &mut W) -> Result<()> {
         let mut package = Package::new(obj)?;
 
-        package.append_compressed("preload.json", serde_json::to_vec(&self.preload)?)?;
-        package.append_compressed("assembly.json", serde_json::to_vec(&self.assembly)?)?;
+        package.append_compressed(PRELOAD_PATH, serde_json::to_vec(&self.preload)?)?;
+        package.append_compressed(ASSEMBLY_PATH, serde_json::to_vec(&self.assembly)?)?;
 
         if let Some(seedgen_info) = &self.seedgen_info {
-            package.append_compressed("seedgen_info.json", serde_json::to_vec(seedgen_info)?)?;
+            package.append_compressed(SEEDGEN_INFO_PATH, serde_json::to_vec(seedgen_info)?)?;
+        }
+
+        if let Some(plando_attributes) = &self.plando_attributes {
+            package.append_compressed(
+                PLANDO_ATTRIBUTES_PATH,
+                serde_json::to_vec(plando_attributes)?,
+            )?;
         }
 
         for (path, data) in &self.assets {
@@ -41,6 +57,41 @@ impl Seed {
         // Write into bytes shouldn't fail
         self.package(&mut bytes).unwrap();
         bytes.into_inner()
+    }
+}
+
+pub struct SeedReader<R> {
+    inner: ZipArchive<R>,
+}
+
+impl<R: Read + Seek> SeedReader<R> {
+    pub fn new(reader: R) -> Result<Self> {
+        Ok(Self {
+            inner: ZipArchive::new(reader)?,
+        })
+    }
+
+    pub fn read_assembly(&mut self) -> Result<Assembly> {
+        self.json_by_name(ASSEMBLY_PATH)
+    }
+
+    pub fn read_seedgen_info(&mut self) -> Result<SeedgenInfo> {
+        self.json_by_name(SEEDGEN_INFO_PATH)
+    }
+
+    pub fn read_plando_attributes(&mut self) -> Result<PlandoAttributes> {
+        self.json_by_name(PLANDO_ATTRIBUTES_PATH)
+    }
+
+    fn json_by_name<T: DeserializeOwned>(&mut self, name: &str) -> Result<T> {
+        Ok(serde_json::from_reader(self.by_name(name)?)?)
+    }
+
+    fn by_name<'s>(&'s mut self, name: &str) -> Result<ZipFile<'s, R>> {
+        Ok(self
+            .inner
+            .by_name(name)
+            .map_err(|err| format!("failed to read \"{name}\" from seed: {err}"))?)
     }
 }
 

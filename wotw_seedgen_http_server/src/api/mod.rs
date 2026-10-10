@@ -22,7 +22,7 @@ use crate::{RouterState, generate};
 
 pub mod assets;
 pub mod logic;
-pub mod plando;
+pub mod plandos;
 pub mod presets;
 pub mod settings;
 pub mod snippets;
@@ -42,7 +42,7 @@ pub fn router(cache: RouterState) -> Router {
         .nest(settings::SETTINGS, settings::router())
         .nest(presets::PRESETS, presets::router())
         .nest(snippets::SNIPPETS, snippets::router())
-        .nest(plando::PLANDO, plando::router())
+        .nest(plandos::PLANDO, plandos::router())
         .nest(spoilers::SPOILERS, spoilers::router())
         .layer(cors)
         .layer(DefaultBodyLimit::disable())
@@ -61,7 +61,7 @@ pub fn router(cache: RouterState) -> Router {
         (path = settings::SETTINGS, api = settings::Docs, tags = [settings::TAG]),
         (path = presets::PRESETS, api = presets::Docs, tags = [presets::TAG]),
         (path = snippets::SNIPPETS, api = snippets::Docs, tags = [snippets::TAG]),
-        (path = plando::PLANDO, api = plando::Docs, tags = [plando::TAG]),
+        (path = plandos::PLANDO, api = plandos::Docs, tags = [plandos::TAG]),
         (path = spoilers::SPOILERS, api = spoilers::Docs, tags = [spoilers::TAG]),
     ),
     // manually add things here that get missed by automatic collection

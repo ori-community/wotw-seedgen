@@ -33,7 +33,7 @@ use tower_lsp::{
     LanguageServer,
 };
 use wotw_seedgen_data::{
-    assets::{AssetCacheValues, PlandoFileAccess},
+    assets::{AssetCacheValues, PlandoFolderAccess},
     seed_language::{
         ast,
         compile::{Compiler, FunctionIdentifier},
@@ -232,7 +232,7 @@ impl Backend<Cache> {
             let loc_data = self.consume_result(cache.loc_data.as_ref()).await?;
             let uber_state_data = self.consume_result(cache.uber_state_data.as_ref()).await?;
 
-            let snippet_access = PlandoFileAccess::new(root);
+            let snippet_access = PlandoFolderAccess::new(root);
 
             let result = {
                 let mut compiler = Compiler::new(

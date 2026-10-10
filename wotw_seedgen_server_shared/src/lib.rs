@@ -8,8 +8,8 @@ use tokio::{
     },
 };
 use wotw_seedgen_data::assets::{
-    AssetCache, AssetCacheValues, AssetFileAccess, PresetFileAccess, SnippetFileAccess, Watcher,
-    WatcherMessage,
+    AssetCache, AssetCacheValues, AssetFileAccess, PlandoFileAccess, PresetFileAccess,
+    SnippetFileAccess, Watcher, WatcherMessage,
 };
 
 pub use crate::error::{Error, Result};
@@ -23,7 +23,13 @@ pub type ServerState<F, V> = Arc<RwLock<AssetCache<F, V>>>;
 
 pub fn start<F, V>(cache: AssetCache<F, V>) -> Result<(Runtime, ServerState<F, V>)>
 where
-    F: AssetFileAccess + SnippetFileAccess + PresetFileAccess + Send + Sync + 'static,
+    F: AssetFileAccess
+        + SnippetFileAccess
+        + PlandoFileAccess
+        + PresetFileAccess
+        + Send
+        + Sync
+        + 'static,
     V: AssetCacheValues + Send + Sync + 'static,
 {
     let start = Instant::now();
@@ -62,7 +68,7 @@ pub async fn watch_assets<F, V>(
     _watcher: Watcher,
     mut receiver: UnboundedReceiver<WatcherMessage>,
 ) where
-    F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+    F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     V: AssetCacheValues,
 {
     while let Some(res) = receiver.recv().await {
