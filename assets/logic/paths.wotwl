@@ -1752,6 +1752,24 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
   refill Checkpoint
   refill Health=1
 
+  state MarshPastOpher.BowCorruption:
+    moki:
+      Bow=1 OR Spear=1
+      Launch, Sword OR Hammer OR Shuriken=1 OR Grenade=1 OR Blaze=1  # sentry doesn't target those blobs so can't use BreakWall
+    gorlek:
+      Grenade=1
+      DoubleJump, TripleJump, Sword OR Hammer OR Shuriken=1 OR Blaze=1  # sentry doesn't target those blobs so can't use BreakWall
+    kii:
+      DoubleJump, Shuriken=1 OR Blaze=1
+      GlideJump, Shuriken=1 OR Blaze=1
+      DoubleJump, GlideJump, Sword OR Hammer
+      AerialHammerJump OR SwordSJump=1
+    unsafe:
+      Shuriken=1  # Make the platform swing then coyote jump from it
+      HammerExtension OR GlideHammerJump OR WallHammerJump OR CoyoteHammerJump
+      Wavedash, RegenJump, Sword OR Hammer OR Blaze=1  # Wavedash on the health plant. Maybe possible with sentry although I wasn't able to do it
+      AbilitySwap=1, Sword OR Hammer OR Blaze=1 OR Sentry=1  # sentry uses its burn damage
+
   pickup Marsh.OpherRoom.SwingPoleSL:
     moki: Damage=10
     unsafe: free
@@ -1768,39 +1786,103 @@ anchor MarshPastOpher.BowApproach at -490, -4245:  # On the right ledge above th
     unsafe: Spear=1 OR Blaze=2 OR GrenadeCancel OR PauseFloat OR BlazeSwap=1 OR FlashSwap
   conn MarshPastOpher.MillView:
     moki: Bash, Grenade=1  # this is the only non-redundant connection that will ever exist because everything else can pass through MarshPastOpher.BowPath first
-  conn MarshPastOpher.PoolsPathEast:
+  conn MashPastOpher.TopRightMillView:
     moki:
-      Bow=4, DoubleJump, Dash, Bash, Glide  # autoaim doesn't catch the second target, 2 is needed minimum
-      Bow=4, Bash, Launch  # autoaim doesn't catch the second target, 2 is needed minimum
-    gorlek:
-      Bow=2, Bash, Launch  # the moki path, but without safety energy
-      Bow=2, DoubleJump, Bash, TripleJump OR Glide
-      Launch, Glide
+      MarshPastOpher.BowCorruption, Bash:
+        Launch
+        DoubleJump, Dash, Glide
+    gorlek: Launch, Glide
     kii:  # Launch paths are more expensive than doing MarshPastOpher.MillView->MarshPastOpher.OpherSkipBranch->MarshPastOpher.PoolsPathEast
-      Bash, DoubleJump, TripleJump, Sword OR Hammer OR Bow=1 OR Spear=1 OR Shuriken=1 OR Grenade=1 OR Blaze=1  # sentry doesn't target those blobs so can't use BreakWall
-      Spear=3, Bash, DoubleJump, Dash OR Glide OR Hammer OR Sword
-      Spear=2, Grenade=1, Bash, DoubleJump, Dash OR Glide OR Hammer OR Sword  # Same as above but more energy efficient
-      Bow=2, Bash, DoubleJump, Dash OR Hammer OR Sword  # its easier with hammer than with a sword but it can be a little bit too precise (moved from unsafe)
-      Bash, AerialHammerJump
+      MarshPastOpher.BowCorruption, Bash:
+        DoubleJump, TripleJump
+        DoubleJump, Dash OR Glide OR Sword OR Hammer OR Spear=1
       GlideJump, DoubleJump, TripleJump, Dash
+      SwordJump, TripleJump, Dash OR Hammer OR GlideJump
     unsafe:
+      MarshPastOpher.BowCorruption, Bash
+      Hammer  # upslash on the jumpad
+      DoubleJump, TripleJump
       GlideJump, Dash, DoubleJump
-      GrenadeJump, DoubleJump  # https://youtu.be/uUh6RvW9e1E
-      GlideHammerJump OR AerialHammerJump
-      Bow=2 OR Spear=2 OR Grenade=2:
-        Bash, DoubleJump OR Dash OR Sword OR Hammer  # https://youtu.be/LeoIWBsq-s0
-      Bash, HammerExtension, Bow=1 OR Spear=1 OR Grenade=1  # Same as above but HammerExtension from the jumpad instead of using the first lantern
-      Bash, Glide, Bow=1 OR Spear=1 OR Grenade=1 OR Shuriken=1  # https://youtu.be/LJmKEirEloM
-      Sword OR Bow=1 OR Spear=1 OR Shuriken=1 OR Grenade=1 OR Blaze=1:  # break the corruption. Sword uses the jumpad, shuriken and blaze do a wavedash on the health plant to get in range. Sentry potentially possible by regen jumping out of that wavedash
-        Bash, Wavedash
-      Wavedash, RegenJump, Hammer  # upslash on the jumpad, if you're full health take a dboost on either the spikes or slime then long wavedash+regen jump
-      DoubleJump, TripleJump, Bash OR Combat=Slug:
-        Wavedash
+      GrenadeCancel  # https://youtu.be/NgzGu1qwEPs
   conn MarshPastOpher.OpherSkipBranch:  # Make sure it's not redundant with MarshPastOpher.MillView->MarshPastOpher.OpherSkipBranch nor MarshPastOpher.BowApproach->MarshPastOpher.PoolsPathEast
     unsafe:
       PauseFloat  # I hope it'll make you regret playing with that trick in logic
       Wavedash, Glide  # wavedash off health plant
       Wavedash, DoubleJump, RegenJump, Sword OR Hammer
+
+anchor MashPastOpher.TopRightMillView at -532, -4229:  # Above the corruption on the way to Bow
+  conn MarshPastOpher.MillViewHangingPlatform:
+    moki:
+      Launch, DoubleJump OR Dash OR Glide
+    gorlek:
+      DoubleJump, TripleJump, Dash OR Glide OR Sword OR Hammer
+      DoubleJump, Dash, Glide OR Sword OR Hammer
+    kii:
+      DoubleJump, Dash OR Glide
+      Glide, Dash, Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Bash, DoubleJump OR Dash OR Glide
+      GlideJump, DoubleJump OR Dash OR Hammer
+    unsafe:
+      AerialHammerJump OR PauseFloat OR AbilitySwap=2
+      GrenadeJump, DoubleJump
+      Glide, Dash
+      GlideJump, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel
+      Bash, Sword OR Hammer OR Shuriken=1
+      Wavedash, Combat=Slug OR Bash
+  conn MarshPastOpher.PoolsPathEast:
+    kii: Bash, Glide
+    unsafe:
+      Wavedash, Combat=Slug OR Bash:
+        RegenJump OR DoubleJump OR Glide OR BowCancel
+        Shuriken=1, Damage=10
+  conn MarshPastOpher.BowPath: free
+
+anchor MarshPastOpher.MillViewHangingPlatform at -576, -4231:  # on the platform on the way to MarshPastOpher.PoolsPathEast
+  state MarshPastOpher.PoolsPathCorruption:
+    moki:
+      Bow=1
+      Launch, Sword OR Hammer OR Shuriken=1 OR Blaze=1 OR Blaze=1 OR Grenade=1  # No sentry because it doesn't target the corruption. No spear because it can automaim the lantern instead of the corruption
+    gorlek:
+      DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Grenade=1
+      DoubleJump, Dash, Shuriken=1 OR Blaze=1
+    kii:
+      Spear=1 OR AerialHammerJump
+      Dash, Shuriken=1 OR Blaze=1
+      GlideJump, Shuriken=1 OR Blaze=1
+      GlideJump, DoubleJump OR Dash:
+        Sword OR Hammer OR Grenade=1
+    unsafe:
+      Grenade=1 OR Shuriken=2  # swing the platform first
+      AbilitySwap=1, BreakWall=3  # sentry work with burn damage
+      Launch, Sentry=1  # burn damage
+      Dash, Hammer
+
+  conn MarshPastOpher.PoolsPathEast:
+    moki, MarshPastOpher.PoolsPathCorruption, Bash:
+      Launch OR Glide
+      DoubleJump, Dash
+    gorlek:
+      MarshPastOpher.PoolsPathCorruption, Bash, DoubleJump OR Dash OR Sword
+      Glide, DoubleJump
+    kii:
+      MarshPastOpher.PoolsPathCorruption, Bash, Hammer OR Sentry=2
+      GlideJump
+      Glide, Dash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      MarshPastOpher.PoolsPathCorruption, Bash  # swing the platform
+      AerialHammerJump OR PauseFloat OR AbilitySwap=4  # Your 1st sentry will run out a bit after using your 3rd swap
+      Glide, Dash
+      GrenadeJump, DoubleJump  # https://youtu.be/uUh6RvW9e1E
+  conn MarshPastOpher.OpherSkipBranch:  # Check for redundancy with paths going to MarshPastOpher.PoolsPathEast
+    kii:  # no paths bellow kii because of unintuitive going back down here is
+      Glide OR Sword OR Blaze=5 OR Sentry=3
+      Bash, Grenade=1
+      DoubleJump, Dash OR Hammer OR Spear=2 OR Blaze=2 OR Sentry=2
+      Dash, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Dash OR AbilitySwap=1
+  conn MarshPastOpher.MillView: free
+  conn MarshPastOpher.BowPath: free
 
 anchor MarshPastOpher.BowArea at -443, -4236:  # Ledge to the left of the pit with bow tree.
   refill Energy=1:
