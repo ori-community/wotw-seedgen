@@ -81,20 +81,21 @@ on gladesProjects.removeThornsBuilt if hubUberStateGroup.builderProjectOpenCave 
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3) // Skip talking to the moki again after completing the pools wisp quest
 on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)
 
-on Hollow.Wisp check_ruins_door()
-on Pools.Wisp check_ruins_door()
-on Reach.Wisp check_ruins_door()
-on Depths.Wisp check_ruins_door()
-on Ruins.Wisp check_ruins_door()
+// The game actually checks for the quests, not the wisps.
+on EastHollow.KwolokMet check_ruins_door()
+on WestPools.LostParadiseCompleted check_ruins_door()
+on LowerReach.HighestReachCompleted check_ruins_door()
+on UpperDepths.BreakingMouldCompleted check_ruins_door()
+on UpperWastes.SiftingSandsCompleted check_ruins_door()
 fun check_ruins_door() {
-    if windtornRuinsGroup.openedDesertRuins == false {
-        set_integer("wisp_count", 0)
-        if Hollow.Wisp set_integer("wisp_count", 1)
-        if Pools.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
-        if Reach.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
-        if Depths.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
-        if Ruins.Wisp set_integer("wisp_count", get_integer("wisp_count") + 1)
-        if get_integer("wisp_count") >= 4 store(windtornRuinsGroup.openedDesertRuins, true)
+    if WindtornRuins.DoorOpen == false {
+        set_integer("ruins_door_count", 0)
+        if EastHollow.KwolokMet set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if WestPools.LostParadiseCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if LowerReach.HighestReachCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if UpperDepths.BreakingMouldCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if UpperWastes.SiftingSandsCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if get_integer("ruins_door_count") >= 4 store(WindtornRuins.DoorOpen, true)
     }
 }
 
