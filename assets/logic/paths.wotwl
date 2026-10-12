@@ -15654,10 +15654,10 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
   state WindtornRuins.DoorOpen:  # The game actually checks for the quests, not the wisps.
     moki: EastHollow.KwolokMet, WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted  # The way you would open it in a casual playthrough.
     unsafe:  # Sifting Sands is a valid quest for this door, and we need 4 out of 5.
-      EastHollow.KwolokMet, WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted, UpperWastes.SiftingSandsCompleted
-      EastHollow.KwolokMet, WestPools.LostParadiseCompleted, UpperDepths.BreakingMouldCompleted, UpperWastes.SiftingSandsCompleted
-      EastHollow.KwolokMet, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted, UpperWastes.SiftingSandsCompleted
-      WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted, UpperWastes.SiftingSandsCompleted
+      EastHollow.KwolokMet, WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted, WindtornRuins.SiftingSandsCompleted
+      EastHollow.KwolokMet, WestPools.LostParadiseCompleted, UpperDepths.BreakingMouldCompleted, WindtornRuins.SiftingSandsCompleted
+      EastHollow.KwolokMet, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted, WindtornRuins.SiftingSandsCompleted
+      WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted, WindtornRuins.SiftingSandsCompleted
   state UpperWastes.WormEscapeEnd:  # Finishing the escape by touching its ending point from outside Ruins.
   # Some paths could be in kii but I'm unsure we even want to have this "escape worm escape" in something else than unsafe?
     unsafe:

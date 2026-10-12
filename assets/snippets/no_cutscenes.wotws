@@ -86,7 +86,7 @@ on EastHollow.KwolokMet check_ruins_door()
 on WestPools.LostParadiseCompleted check_ruins_door()
 on LowerReach.HighestReachCompleted check_ruins_door()
 on UpperDepths.BreakingMouldCompleted check_ruins_door()
-on UpperWastes.SiftingSandsCompleted check_ruins_door()
+on WindtornRuins.SiftingSandsCompleted check_ruins_door()
 fun check_ruins_door() {
     if WindtornRuins.DoorOpen == false {
         set_integer("ruins_door_count", 0)
@@ -94,7 +94,7 @@ fun check_ruins_door() {
         if WestPools.LostParadiseCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
         if LowerReach.HighestReachCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
         if UpperDepths.BreakingMouldCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
-        if UpperWastes.SiftingSandsCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if WindtornRuins.SiftingSandsCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
         if get_integer("ruins_door_count") >= 4 store(WindtornRuins.DoorOpen, true)
     }
 }
