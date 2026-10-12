@@ -4122,8 +4122,8 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       Damage=120, Damage=120, Bash
       Damage=50, Damage=80, WaterDash  # Take a dboost from the mortar projectile before going in the water
 
-  pickup Hollow.KwoloksWisdom.Reward:
-    moki: Pools.KwoloksWisdom.Amulet, EastPools.KwoloksWisdomBossDefeated, WestPools.LostParadiseCompleted  # Lost Paradise spawns the altar, Kwolok's Wisdom allows interacting with the altar, QI required to turn it in
+  pickup Hollow.KwoloksWisdom.Reward:  # Also despawns the Moki in Pools
+    moki: EastPools.KwoloksWisdom.AltarRequested, WestPools.LostParadiseCompleted  # Lost Paradise spawns the altar, Kwolok's Wisdom allows interacting with the altar
   pickup Hollow.WoodsSwim.MortarSL:
     moki: Bash OR Launch
     gorlek: SentryJump=1
@@ -12928,14 +12928,14 @@ anchor EastPools.LeverRoom at -1160, -4152:  # At the amulet Moki
       PoolsApproach.WheelWall, WaterDash, Damage=120
       Damage=60, Spear=1
       WaterDash, Damage=40, Spear=1
-  state EastPools.KwoloksWisdomStarted: free  # Start of the Kwolok's Wisdom quest
-  state EastPools.KwoloksWisdomAmuletObtained:  # Report back to the moki after finding Kwolok in CentralRoom
+  state EastPools.KwoloksWisdom.Started: free  # Start of the Kwolok's Wisdom quest
+  state EastPools.KwoloksWisdom.KwolokFound:  # Report back to the moki after finding Kwolok in CentralRoom
     moki: EastPools.KwolokMetHalfway
-  state EastPools.KwoloksWisdomBossDefeated:  # Report back to the moki after defeating Kwolok
-    moki: Pools.KwoloksWisdom.Amulet, EastPools.KwoloksWisdomAmuletObtained, WestPools.LostParadiseCompleted
+  state EastPools.KwoloksWisdom.AltarRequested:  # Report back to the moki after defeating Kwolok. Also spawns the Moki in Glades, inside the hut next to Motay
+    moki: WestPools.LostParadiseCompleted
 
   pickup Pools.KwoloksWisdom.Amulet:
-    moki: EastPools.KwolokMetHalfway
+    moki: EastPools.KwolokMetHalfway OR WestPools.LostParadiseCompleted
   pickup Pools.FirstBubble.CrushersSL:
     moki: Water, WaterDash
     kii: WaterDash, Damage=40
