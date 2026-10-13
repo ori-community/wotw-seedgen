@@ -3473,7 +3473,7 @@ anchor EastHollow.Teleporter at -150, -4237:  # the teleporter
   refill Full
 
   state EastHollow.VoiceDoorOpen:
-    moki: Hollow.Wisp
+    moki: EastHollow.KwolokMet
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
   conn Teleporters: free
@@ -3639,7 +3639,7 @@ anchor EastHollow.AfterBeetleFight at -27, -4233:  # At the breakable floor to B
   refill Checkpoint
 
   state EastHollow.VoiceDoorOpen:
-    moki: Hollow.Wisp
+    moki: EastHollow.KwolokMet
 
   pickup Hollow.Hornbug.LanternsSL:
     moki: Bash, DoubleJump OR Launch  # there's a couple small awkward things adding up if you do this without Double Jump
@@ -4184,21 +4184,21 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
       Bash, Damage=80
       WaterDash, Bash, Damage=40
 
-  conn EastHollow.Kwolok:  # before getting the wisps, there is a slowzone making the jump towards Kwolok a bit difficult
+  conn EastHollow.Kwolok:  # before meeting Kwolok, there is a slowzone making the jump towards Kwolok a bit difficult
     moki:
       DoubleJump OR Dash OR Launch
       Bash, Grenade=1
       Water, WaterDash
     gorlek:
-      Hollow.Wisp, Glide OR Sword OR Hammer
+      EastHollow.KwolokMet, Glide OR Sword OR Hammer
       Damage=20, WaterDash
       SentryJump=1
     kii:
       Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2 OR GlideJump
       Water, Bash  # Use a fish. Might want a dboost because you can't see the fish while at the surface?
-      Hollow.Wisp OR Glide OR Water:
+      EastHollow.KwolokMet OR Glide OR Water:
         Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      # Hollow.Wisp, GrenadeJump=1
+      # EastHollow.KwolokMet, GrenadeJump=1
     unsafe: free  # fairly precise coyote jump followed by a wall jump to avoid touching the water
   conn WoodsEntry.ShriekMeet:
     moki, Water, EastHollow.SilentSwimWall, Combat=Balloon:
