@@ -55,6 +55,14 @@ requirement DepthsLight:
   kii: BowCancel  # is this reasonable?
   # unsafe: Grenade=3  # probably enough
 
+requirement RuinsDoor:  # The game checks for quest completions to allow opening the Windtorn Ruins door.
+  moki: EastHollow.KwolokMet, WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted  # The way you would open it in a casual playthrough.
+  unsafe, WindtornRuins.SiftingSandsCompleted:  # Sifting Sands is a valid quest for this door, you just need 4 out of the 5 wisp quests.
+    EastHollow.KwolokMet, WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted  # Skip UpperDepths.BreakingMouldCompleted
+    EastHollow.KwolokMet, WestPools.LostParadiseCompleted, UpperDepths.BreakingMouldCompleted  # Skip LowerReach.HighestReachCompleted
+    EastHollow.KwolokMet, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted  # Skip WestPools.LostParadiseCompleted
+    WestPools.LostParadiseCompleted, LowerReach.HighestReachCompleted, UpperDepths.BreakingMouldCompleted  # Skip EastHollow.KwolokMet
+
 anchor ExternalStates:  # States that can't be solved from this file. They are used by headers with !!set or by Archipelago
   state SkipKwolok:  # Used to logically support skipping Kwolok's fight
     moki: Impossible
@@ -109,7 +117,7 @@ anchor Teleporters:  # teleporter access
     moki: OuterRuinsTP, Burrow OR RemoveTPLocks
   conn WindtornRuins.RuinsTP:
     moki:
-      InnerRuinsTP, Burrow, Hollow.Wisp, Reach.Wisp, Depths.Wisp, Pools.Wisp
+      InnerRuinsTP, Burrow, RuinsDoor
       InnerRuinsTP, RemoveTPLocks
   conn WillowsEnd.InnerTP:
     moki: WillowTP, Burrow OR RemoveTPLocks
@@ -15646,11 +15654,13 @@ anchor UpperWastes.OutsideRuins at 2014, -3609:  # Just outside the door
     id: 27
     target: WindtornRuins.UpperRuinsDoor
     enter:
-      moki: Hollow.Wisp, Reach.Wisp, Depths.Wisp, Pools.Wisp
+      moki: WindtornRuins.DoorOpen
 
   refill Checkpoint
   refill Health=1
 
+  state WindtornRuins.DoorOpen:
+    moki: RuinsDoor
   state UpperWastes.WormEscapeEnd:  # Finishing the escape by touching its ending point from outside Ruins.
   # Some paths could be in kii but I'm unsure we even want to have this "escape worm escape" in something else than unsafe?
     unsafe:
