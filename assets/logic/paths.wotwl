@@ -4267,20 +4267,6 @@ anchor EastHollow.KwolokShrine at 267,-4208:  # checkpoint on the left of the Mo
 anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   refill Full
 
-  state Glades.Buildings.DwellingRepairs:
-    moki: Ore=15
-  state Glades.Buildings.RoofsOverHeads:
-    moki: Glades.Buildings.DwellingRepairs, Ore=21
-  state Glades.Buildings.OnwardsAndUpwards:
-    moki: Glades.Buildings.RoofsOverHeads, Ore=29
-  state Glades.Buildings.ThornySituation:
-    moki: Ore=23
-  state Glades.Buildings.ClearTheCaveEntrance:
-    moki: Glades.Buildings.ThornySituation, Ore=29
-  # decoration not accounted for
-
-  pickup Glades.RebuildGlades.Completed:
-    moki: Ore=40  # Eiko told me not to modify this so orishrug ~Cosmic
   pickup Glades.LupoSwim.CeilingSL:
     moki: Water, WaterDash OR Launch
     gorlek: Water, DoubleJump
@@ -4304,6 +4290,7 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   # unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
 
   conn Teleporters: free
+  conn GromShop: free
   conn GladesTown.TwillenHome: free
   conn GladesTown.ThornyBranch:
     moki:
@@ -17375,6 +17362,29 @@ anchor OpherShop:  # Opher's offers
   pickup Shop.Opher.Slot12:
     moki: SpiritLight=1200
 
+anchor GromShop at -319, -4152:
+  nospawn
+  
+  state Glades.Buildings.DwellingRepairs:
+    moki: Ore=15
+  state Glades.Buildings.RoofsOverHeads:
+    moki: Glades.Buildings.DwellingRepairs, Ore=21
+  state Glades.Buildings.OnwardsAndUpwards:
+    moki: Glades.Buildings.RoofsOverHeads, Ore=29
+  state Glades.Buildings.ThornySituation:
+    moki: Ore=23
+  state Glades.Buildings.ClearTheCaveEntrance:
+    moki: Glades.Buildings.ThornySituation, Ore=29
+  # decoration not accounted for
+
+  # This is an override by seed_core. This pickup in vanilla would be obtained when all the building projects have been completed and the cutscenes watched.
+  pickup Glades.RebuildGlades.Completed:
+    # Apparently there were a lot of complaints about having to search for every last Gorlek Ore in the map before being able to complete this quest.
+    # Moki requirements have been relaxed so that players are more likely to find the real required amount (29) before it comes into logic.
+    # Full context: https://discord.com/channels/942484331572658196/942484861569105990/952083829642895381
+    moki: Ore=40  # Feelsgood amount
+    unsafe: Ore=29  # Real requirement
+
 anchor TuleyShop at -173, -4139:
   nospawn
 
@@ -17393,5 +17403,6 @@ anchor TuleyShop at -173, -4139:
   state Glades.Plants.LastTree:
     moki: Woods.TreeKeeper.Seed
 
+  # This is an override by seed_core. This pickup in vanilla would be obtained when all the planting projects have been completed and the cutscenes watched.
   pickup Glades.RegrowGlades.Completed:
     moki: Glades.Plants.SelaFlowers, Glades.Plants.StickyGrass, Glades.Plants.Lightcatchers, Glades.Plants.BlueMoon, Glades.Plants.SpringPlants, Glades.Plants.LastTree
