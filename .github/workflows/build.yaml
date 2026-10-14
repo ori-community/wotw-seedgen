@@ -38,3 +38,27 @@ jobs:
           name: seedgen-windows
           path: ./target/release/wotw-seedgen.exe
           if-no-files-found: error
+
+  compile_seeds:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@master
+
+      - name: Download seedgen
+        uses: actions/download-artifact@v4
+        with:
+          name: seedgen-linux
+
+      - name: Compile installed seeds
+        run: |
+          export SEEDGEN_USER_DATA_DIR=assets
+          chmod +x ./wotw-seedgen
+          for seed in assets/plandos/src/*; do ./wotw-seedgen plando $seed; done
+
+      - name: Archive Compiled Seeds
+        uses: actions/upload-artifact@v4
+        with:
+          name: seeds
+          path: assets/plandos/*.wotwr
