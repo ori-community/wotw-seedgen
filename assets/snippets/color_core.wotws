@@ -2,7 +2,7 @@
 #name("Color Core")
 #description("Names some useful hex colors")
 
-!let(transparent, "<hex_ffffff80>")
+!let(transparent, "<hex_ffffffaa>")
 !export(transparent)
 
 !let(invisible, "<hex_00000000>")
