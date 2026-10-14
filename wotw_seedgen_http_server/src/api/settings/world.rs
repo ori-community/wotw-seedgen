@@ -1,4 +1,8 @@
-use axum::{Json, Router, extract::State, routing::get};
+use axum::{
+    Json, Router,
+    extract::State,
+    routing::{get, post},
+};
 use constcat::concat;
 use rand::thread_rng;
 use utoipa::OpenApi;
@@ -11,15 +15,17 @@ pub const WORLD: &str = concat!("/", TAG);
 
 const DEFAULT: &str = "/default";
 const RANDOM: &str = "/random";
+const CHECK: &str = "/check";
 
 pub fn router() -> Router<RouterState> {
     Router::new()
         .route(DEFAULT, get(default))
         .route(RANDOM, get(random))
+        .route(CHECK, post(check))
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(default, random))]
+#[openapi(paths(default, random, check))]
 pub struct Docs;
 
 /// Get the default world settings
@@ -42,4 +48,14 @@ async fn random(State(cache): State<RouterState>) -> Json<WorldSettings> {
     let cache = cache.read().await;
 
     Json(WorldSettings::random(&mut thread_rng(), &*cache))
+}
+
+/// Check world settings
+#[utoipa::path(
+    post,
+    path = CHECK,
+    responses((status = OK)),
+)]
+async fn check(Json(body): Json<WorldSettings>) {
+    let _ = body; // If we don't pretend to use the Json extractor above, utoipa will misbehave :)
 }

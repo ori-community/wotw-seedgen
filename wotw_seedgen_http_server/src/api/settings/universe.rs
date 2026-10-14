@@ -14,16 +14,18 @@ pub const TAG: &str = "universe";
 pub const UNIVERSE: &str = concat!("/", TAG);
 
 const NEW: &str = "/new";
+const CHECK: &str = "/check";
 const INLINE_SNIPPETS: &str = "/inline-snippets";
 
 pub fn router() -> Router<RouterState> {
     Router::new()
         .route(NEW, get(new))
+        .route(CHECK, post(check))
         .route(INLINE_SNIPPETS, post(inline_snippets))
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(new, inline_snippets))]
+#[openapi(paths(new, check, inline_snippets))]
 pub struct Docs;
 
 /// Start new universe settings
@@ -40,6 +42,16 @@ async fn new(Query(query): Query<NewQuery>) -> Json<UniverseSettings> {
 #[derive(Deserialize, IntoParams)]
 pub struct NewQuery {
     pub seed: String,
+}
+
+/// Check universe settings
+#[utoipa::path(
+    post,
+    path = CHECK,
+    responses((status = OK)),
+)]
+async fn check(Json(body): Json<UniverseSettings>) {
+    let _ = body; // If we don't pretend to use the Json extractor above, utoipa will misbehave :)
 }
 
 /// Inline all snippets originating from the data directory
