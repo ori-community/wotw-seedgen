@@ -1015,6 +1015,7 @@ fn multi_name<I>(names: I) -> CommandString
 where
     I: IntoIterator<Item = CommandString>,
 {
+    const TRANSPARENT_AND: &str = "<hex_ffffffaa>and</>";
     let names = names.into_iter();
 
     let (acc, const_acc) =
@@ -1026,7 +1027,7 @@ where
                         let const_acc = if const_acc.is_empty() {
                             name
                         } else {
-                            format!("{const_acc} and {name}")
+                            format!("{const_acc} {TRANSPARENT_AND} {name}")
                         };
 
                         (acc, const_acc)
@@ -1038,7 +1039,7 @@ where
                                 left: CommandString::from(Operation {
                                     left: acc,
                                     operator: Concatenator::Concat,
-                                    right: " and ".into(),
+                                    right: format!(" {TRANSPARENT_AND} ").into(),
                                 }),
                                 operator: Concatenator::Concat,
                                 right: name,
@@ -1056,7 +1057,7 @@ where
         (Some(acc), false) => CommandString::from(Operation {
             left: acc,
             operator: Concatenator::Concat,
-            right: format!(" and {const_acc}").into(),
+            right: format!(" {TRANSPARENT_AND} {const_acc}").into(),
         }),
         (Some(acc), true) => acc,
     }
