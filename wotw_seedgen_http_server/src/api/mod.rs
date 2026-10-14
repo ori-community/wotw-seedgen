@@ -196,7 +196,7 @@ impl From<LogLevelFilter> for log::LevelFilter {
 }
 
 #[derive(Clone, Serialize, ToSchema)]
-#[serde(tag = "status")]
+#[serde(tag = "status", content = "value")]
 pub enum SchemaResult<T, E> {
     Ok(T),
     Err(E),
