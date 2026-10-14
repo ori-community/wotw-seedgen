@@ -22,7 +22,10 @@ pub struct Docs;
 #[utoipa::path(
     post,
     path = RENDER,
-    responses((status = OK, body = String)),
+    responses(
+        (status = OK, body = String),
+        (status = UNPROCESSABLE_ENTITY, body = String),
+    ),
 )]
 async fn render(Json(body): Json<SeedSpoiler>) -> String {
     body.to_string()

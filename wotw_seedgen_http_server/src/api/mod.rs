@@ -138,6 +138,7 @@ impl Docs {
     params(GenerateQuery),
     responses(
         (status = OK, body = Vec<u8>),
+        (status = UNPROCESSABLE_ENTITY, body = String),
         (status = INTERNAL_SERVER_ERROR, body = GenerateError),
     ),
 )]

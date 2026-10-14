@@ -54,7 +54,10 @@ async fn random(State(cache): State<RouterState>) -> Json<WorldSettings> {
 #[utoipa::path(
     post,
     path = CHECK,
-    responses((status = OK)),
+    responses(
+        (status = OK),
+        (status = UNPROCESSABLE_ENTITY, body = String),
+    ),
 )]
 async fn check(Json(body): Json<WorldSettings>) {
     let _ = body; // If we don't pretend to use the Json extractor above, utoipa will misbehave :)
