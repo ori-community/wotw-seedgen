@@ -882,6 +882,13 @@
           "value": 0.0,
           "value_type": "Byte"
         },
+        "800": {
+          "name": "howlFightActive",
+          "readonly": true,
+          "type": "VirtualUberState",
+          "value": 0.0,
+          "value_type": "Boolean"
+        },
         "2000": {
           "name": "cleanWater",
           "readonly": false,
