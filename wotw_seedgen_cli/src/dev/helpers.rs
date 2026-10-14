@@ -10,7 +10,7 @@ use crate::Error;
 pub fn read_ngss() -> Result<PathBuf, Error> {
     let mut line = String::new();
 
-    let ngss_path = RANDOMIZER_USER_DATA_DIR.join("randomizer/.newgameseedsource");
+    let ngss_path = RANDOMIZER_USER_DATA_DIR.join("client/.newgameseedsource");
     BufReader::new(assets::file_open(&ngss_path)?)
         .read_line(&mut line)
         .map_err(|err| file_err("read", &ngss_path, err))?;

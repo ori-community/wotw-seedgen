@@ -204,7 +204,7 @@ pub fn write_new_game_seed_source(path: &Path) -> Result<(), Error> {
         )
     })?;
 
-    let newgameseedsource = RANDOMIZER_USER_DATA_DIR.join("randomizer/.newgameseedsource");
+    let newgameseedsource = RANDOMIZER_USER_DATA_DIR.join("client/.newgameseedsource");
 
     write(newgameseedsource, format!("file:{path}"))?;
 
