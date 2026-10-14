@@ -70,10 +70,10 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
             let mut out = SEEDGEN_USER_DATA_DIR.join("plandos");
             assets::create_dir_all(&out)?;
 
-            if let Some(name) = &attributes.name {
-                out.push(name);
-            } else if let (false, Some(stem)) = (is_dir, path.file_stem()) {
+            if let (false, Some(stem)) = (is_dir, path.file_stem()) {
                 out.push(stem);
+            } else if let Some(name) = &attributes.name {
+                out.push(name);
             } else {
                 return Err(Error("Cannot decide output name. Add a #name attribute to the entry point or specify --out on the command line".to_string()));
             }
