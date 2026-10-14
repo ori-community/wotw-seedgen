@@ -1,4 +1,5 @@
 use std::{
+    borrow::Cow,
     fs::{self, File},
     io::{self, Write},
     path::{Path, PathBuf},
@@ -197,6 +198,8 @@ pub fn launch_seed(path: &Path, args: LaunchArgs) -> Result<(), Error> {
 }
 
 pub fn write_new_game_seed_source(path: &Path) -> Result<(), Error> {
+    let path = path.canonicalize().map_or(Cow::Borrowed(path), Cow::Owned);
+
     let path = path.to_str().ok_or_else(|| {
         format!(
             "failed to write newgameseedsource for {}: invalid unicode",
