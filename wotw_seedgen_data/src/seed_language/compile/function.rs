@@ -1904,7 +1904,11 @@ where
                 .uber_state_data
                 .id_lookup
                 .iter()
-                .filter(|(uber_identifier, meta)| !meta.readonly && condition(**uber_identifier))
+                .filter(|(uber_identifier, meta)| {
+                    !meta.readonly
+                        && !uber_identifier.is_multiworld()
+                        && condition(**uber_identifier)
+                })
                 .map(|(uber_identifier, meta)| match &meta.default_value {
                     UberStateValue::Boolean(value) => store_boolean(*uber_identifier, *value),
                     UberStateValue::Integer(value) => store_integer(*uber_identifier, *value),

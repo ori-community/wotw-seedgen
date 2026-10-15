@@ -126,6 +126,10 @@ impl UberIdentifier {
         }
     }
 
+    pub const fn is_multiworld(&self) -> bool {
+        self.group == MULTIWORLD_GROUP
+    }
+
     pub const fn as_multiworld(self) -> Option<i32> {
         match self {
             UberIdentifier {
