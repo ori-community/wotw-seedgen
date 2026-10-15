@@ -43,17 +43,13 @@ all arenas are completed and all boss combat phases are skipped")
 
 !if skip_bosses {
     on spawn {
-        // TODO no state change to detect :(
-        store(swampStateGroup.nightCrawlerChaseStarted, true)
-        store(MarshSpawn.HowlBurnt, true)
-        store(swampStateGroup.nightCrawlerEscaped, true)
-        // TODO immune to debug damage?!?
+        // Hornbug is only combat and has no external consequence, so we save the player the cutscene
         store(EastHollow.BeetleDefeated, true)
         store(kwolokGroupDescriptor.hornBugBossState, 4)
     }
 
-    // on kwolokGroupDescriptor.hornBugBossState == 2 force_deal_enemy_damage(10000)
-    // !set_logic_state("EastHollow.BeetleDefeated")
+    on randoState.howlFightActive force_deal_enemy_damage(1000)
+    // No logical impact since the combat is free
 
     on lagoonStateGroup.kwolokBossState == 3 force_deal_enemy_damage(10000)
     !set_logic_state("SkipKwolok")
