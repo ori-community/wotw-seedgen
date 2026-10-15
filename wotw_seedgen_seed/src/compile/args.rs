@@ -1,7 +1,7 @@
 use super::{command::MemoryUsed, Compile};
 use crate::{assembly::Command, compile::CompileContext};
 use wotw_seedgen_data::seed_language::{
-    compile::RESERVED_MEMORY,
+    compile::ARG_MEMORY,
     output::{CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone},
 };
 
@@ -249,7 +249,7 @@ impl ArgDestination {
         };
 
         assert!(
-            *used < RESERVED_MEMORY,
+            *used < ARG_MEMORY,
             "failed to compile overly complex expression"
         );
 

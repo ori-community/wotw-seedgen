@@ -28,11 +28,11 @@ use wotw_seedgen_data::{
     env_or,
     logic_language::output::Node,
     seed_language::{
-        compile,
+        compile::{self, ORIGIN_WORLD_STRING},
         output::{
-            postprocess, AsConstant, ClientEvent, CommandBoolean, CommandString, CommandVoid,
-            CommandsOutput, Concatenator, ContainedWrites, ContainedWritesExt, Event,
-            IntermediateOutput, IntoConstant, Operation, Trigger, TriggerCondition,
+            postprocess, ClientEvent, CommandBoolean, CommandString, CommandVoid, CommandsOutput,
+            Concatenator, ContainedWrites, ContainedWritesExt, Event, IntermediateOutput,
+            IntoConstant, Operation, Trigger, TriggerCondition,
         },
         simulate::{Simulate, Simulation},
     },
@@ -848,21 +848,24 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 },
             );
 
-            // Append 'from <world>' to all messages
-            for message in command.contained_messages_mut() {
-                *message = match message.as_constant() {
-                    Some(value) => format!(
-                        "{value}{separator}from <world>{origin_world_index}</>",
-                        separator = if value.contains("\\n") { "\\n" } else { " " }
-                    )
-                    .into(),
-                    _ => CommandString::Concatenate {
-                        operation: Box::new(Operation {
-                            left: message.clone(),
-                            operator: Concatenator::Concat,
-                            right: format!(" from <world>{origin_world_index}</>").into(),
-                        }),
-                    },
+            let set_command = CommandVoid::SetString {
+                id: ORIGIN_WORLD_STRING,
+                value: format!(" from <world>{origin_world_index}</>").into(),
+            };
+            let unset_command = CommandVoid::SetString {
+                id: ORIGIN_WORLD_STRING,
+                value: "".into(),
+            };
+
+            match &mut command {
+                CommandVoid::Multi { commands } => {
+                    commands.insert(0, set_command);
+                    commands.push(unset_command);
+                }
+                _ => {
+                    command = CommandVoid::Multi {
+                        commands: vec![set_command, command, unset_command],
+                    }
                 }
             }
 

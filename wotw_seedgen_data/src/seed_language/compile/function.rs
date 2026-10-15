@@ -1,4 +1,4 @@
-use super::{expression::CompileInto, Compile, SnippetCompiler, PRIVATE_MEMORY};
+use super::{expression::CompileInto, Compile, SnippetCompiler};
 
 use crate::{
     assets::UberStateValue,
@@ -6,7 +6,7 @@ use crate::{
         ast::{self, UberStateType},
         compile::{
             add_float, add_integer, preprocess::PreprocessedFunction, store_boolean, store_float,
-            store_integer,
+            store_integer, ORIGIN_WORLD_STRING, RESERVED_BOOLEAN, RESERVED_STRING,
         },
         output::{
             ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
@@ -998,7 +998,7 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
                 Command::Void(CommandVoid::QueuedMessage {
                     id: None,
                     priority: false,
-                    message: arg(&mut context)?,
+                    message: message_with_origin_world(arg(&mut context)?),
                     timeout: Some(arg(&mut context)?),
                 })
             }
@@ -1592,14 +1592,26 @@ fn item_message(message: CommandString) -> CommandVoid {
     CommandVoid::QueuedMessage {
         id: None,
         priority: false,
-        message,
+        message: message_with_origin_world(message),
         timeout: None,
+    }
+}
+
+fn message_with_origin_world(message: CommandString) -> CommandString {
+    CommandString::Concatenate {
+        operation: Box::new(Operation {
+            left: message,
+            operator: Concatenator::Concat,
+            right: CommandString::GetString {
+                id: ORIGIN_WORLD_STRING,
+            },
+        }),
     }
 }
 
 fn set_spirit_light_string(value: &str) -> Box<CommandVoid> {
     Box::new(CommandVoid::SetString {
-        id: PRIVATE_MEMORY,
+        id: RESERVED_STRING,
         value: value.into(),
     })
 }
@@ -1650,7 +1662,9 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                     operator: Concatenator::Concat,
                     right: CommandString::Concatenate {
                         operation: Box::new(Operation {
-                            left: CommandString::GetString { id: PRIVATE_MEMORY },
+                            left: CommandString::GetString {
+                                id: RESERVED_STRING,
+                            },
                             operator: Concatenator::Concat,
                             right: "@".into(),
                         }),
@@ -1673,7 +1687,9 @@ fn spirit_light_string(amount: CommandInteger, rng: &mut Pcg64Mcg, remove: bool)
                         },
                     },
                     operator: Concatenator::Concat,
-                    right: CommandString::GetString { id: PRIVATE_MEMORY },
+                    right: CommandString::GetString {
+                        id: RESERVED_STRING,
+                    },
                 }),
             }
         }),
@@ -1689,7 +1705,7 @@ fn set_random_spirit_light_string(amount: &CommandInteger, rng: &mut Pcg64Mcg) -
         None => Box::new(CommandVoid::Multi {
             commands: vec![
                 CommandVoid::SetBoolean {
-                    id: PRIVATE_MEMORY,
+                    id: RESERVED_BOOLEAN,
                     value: CommandBoolean::CompareInteger {
                         operation: Box::new(Operation {
                             left: CommandInteger::Arithmetic {
@@ -1705,13 +1721,17 @@ fn set_random_spirit_light_string(amount: &CommandInteger, rng: &mut Pcg64Mcg) -
                     },
                 },
                 CommandVoid::If {
-                    condition: CommandBoolean::GetBoolean { id: PRIVATE_MEMORY },
+                    condition: CommandBoolean::GetBoolean {
+                        id: RESERVED_BOOLEAN,
+                    },
                     command: set_spirit_light_string(name.0),
                 },
                 CommandVoid::If {
                     condition: CommandBoolean::CompareBoolean {
                         operation: Box::new(Operation {
-                            left: CommandBoolean::GetBoolean { id: PRIVATE_MEMORY },
+                            left: CommandBoolean::GetBoolean {
+                                id: RESERVED_BOOLEAN,
+                            },
                             operator: EqualityComparator::Equal,
                             right: false.into(),
                         }),

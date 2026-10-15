@@ -14,7 +14,10 @@ use wotw_seedgen_parse::{Error, Span};
 
 use crate::{
     assets::{file_create, file_err},
-    seed_language::compile::{GlobalCompilerData, FREE_MEMORY_START},
+    seed_language::compile::{
+        GlobalCompilerData, FREE_BOOLEANS_START, FREE_FLOATS_START, FREE_INTEGERS_START,
+        FREE_STRINGS_START,
+    },
 };
 
 impl GlobalCompilerData<'_, '_, '_> {
@@ -216,13 +219,13 @@ impl Drop for IdResolver<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    boolean: IdMap<FREE_MEMORY_START>,
+    boolean: IdMap<FREE_BOOLEANS_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    integer: IdMap<FREE_MEMORY_START>,
+    integer: IdMap<FREE_INTEGERS_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    float: IdMap<FREE_MEMORY_START>,
+    float: IdMap<FREE_FLOATS_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    string: IdMap<FREE_MEMORY_START>,
+    string: IdMap<FREE_STRINGS_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     pub boolean_state: IdMap<0, 100>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]

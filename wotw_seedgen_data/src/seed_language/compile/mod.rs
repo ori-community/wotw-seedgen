@@ -65,11 +65,41 @@ enum CompileState {
 
 /// How many memory slots to reserve for generated calculations
 // TODO how much is needed
-pub const RESERVED_MEMORY: usize = 20;
-/// Memory slot for hardcoded calculations
-pub const PRIVATE_MEMORY: usize = RESERVED_MEMORY;
-/// Start of freely assignable memory
-pub const FREE_MEMORY_START: usize = PRIVATE_MEMORY + 1;
+pub const ARG_MEMORY: usize = 20;
+
+#[repr(usize)]
+enum Booleans {
+    Reserved = ARG_MEMORY,
+    FreeStart,
+}
+
+pub const RESERVED_BOOLEAN: usize = Booleans::Reserved as usize;
+pub const FREE_BOOLEANS_START: usize = Booleans::FreeStart as usize;
+
+#[repr(usize)]
+enum Integers {
+    FreeStart = ARG_MEMORY,
+}
+
+pub const FREE_INTEGERS_START: usize = Integers::FreeStart as usize;
+
+#[repr(usize)]
+enum Floats {
+    FreeStart = ARG_MEMORY,
+}
+
+pub const FREE_FLOATS_START: usize = Floats::FreeStart as usize;
+
+#[repr(usize)]
+enum Strings {
+    Reserved = ARG_MEMORY,
+    OriginWorld,
+    FreeStart,
+}
+
+pub const RESERVED_STRING: usize = Strings::Reserved as usize;
+pub const ORIGIN_WORLD_STRING: usize = Strings::OriginWorld as usize;
+pub const FREE_STRINGS_START: usize = Strings::FreeStart as usize;
 
 pub(crate) trait Compile<'source> {
     type Output;
