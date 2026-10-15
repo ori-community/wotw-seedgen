@@ -44,6 +44,7 @@ pub fn router(cache: RouterState) -> Router {
         .nest(snippets::SNIPPETS, snippets::router())
         .nest(plandos::PLANDO, plandos::router())
         .nest(spoilers::SPOILERS, spoilers::router())
+        .nest(assets::ASSETS, assets::router())
         .layer(cors)
         .layer(DefaultBodyLimit::disable())
         .merge(SwaggerUi::new("/docs").url(
@@ -63,6 +64,7 @@ pub fn router(cache: RouterState) -> Router {
         (path = snippets::SNIPPETS, api = snippets::Docs, tags = [snippets::TAG]),
         (path = plandos::PLANDO, api = plandos::Docs, tags = [plandos::TAG]),
         (path = spoilers::SPOILERS, api = spoilers::Docs, tags = [spoilers::TAG]),
+        (path = assets::ASSETS, api = assets::Docs, tags = [assets::TAG, logic::TAG, presets::TAG, snippets::TAG, plandos::TAG]),
     ),
     // manually add things here that get missed by automatic collection
     components(schemas(

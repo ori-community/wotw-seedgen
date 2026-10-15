@@ -14,6 +14,7 @@ use notify_debouncer_full::{
     DebouncedEvent,
 };
 use rustc_hash::FxHashMap;
+use serde::Serialize;
 use wotw_seedgen_parse::Source;
 
 use crate::assets::{
@@ -164,7 +165,7 @@ pub trait AssetCacheValues: Sized {
         F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess;
 }
 
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Default, Serialize)]
 pub struct ChangedAssets {
     pub loc_data: bool,
     pub state_data: bool,
@@ -176,7 +177,7 @@ pub struct ChangedAssets {
     pub world_presets: Vec<ChangeDetails>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 pub enum ChangeDetails {
     Create(String),
     Modify(String),

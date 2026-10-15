@@ -1,5 +1,4 @@
 use std::{
-    borrow::Cow,
     fs::{self, File},
     io::{self, Write},
     path::{Path, PathBuf},
@@ -19,8 +18,8 @@ use rustc_hash::FxHashMap;
 use wotw_seedgen::{
     data::{
         assets::{
-            self, file_err, write, AssetFileAccess, DefaultFileAccess, LocData, StateData,
-            UberStateData, RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
+            self, file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData,
+            SEEDGEN_USER_DATA_DIR,
         },
         logic_language::{ast::Paths, output::Graph},
         parse::Source,

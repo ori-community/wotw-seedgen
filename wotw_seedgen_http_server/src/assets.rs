@@ -1,7 +1,15 @@
 use std::{ffi::OsStr, fs, io::Cursor, path::PathBuf};
 
-use axum::Json;
+use axum::{
+    Json,
+    extract::ws::{self, WebSocket},
+};
+use futures_util::{SinkExt, stream::SplitSink};
 use rustc_hash::FxHashMap;
+use tokio::sync::{
+    Mutex,
+    mpsc::{UnboundedReceiver, UnboundedSender},
+};
 use wotw_seedgen::{
     Generator, SeedUniverse,
     data::{
@@ -20,6 +28,7 @@ use wotw_seedgen::{
 };
 
 use crate::{
+    RouterState,
     api::{
         SchemaResult,
         assets::AssetOrigin,
@@ -47,6 +56,7 @@ pub struct CacheValues {
     pub universe_preset_info: FxHashMap<String, SchemaResult<UniversePresetInfo, String>>,
     pub world_preset_info: FxHashMap<String, SchemaResult<WorldPresetInfo, String>>,
     pub plando_info: FxHashMap<String, SchemaResult<PlandoInfo, String>>,
+    pub watchers: Option<CacheWatchers>,
 }
 
 impl CacheValues {
@@ -142,6 +152,7 @@ impl AssetCacheValues for CacheValues {
             universe_preset_info,
             world_preset_info,
             plando_info,
+            watchers: None,
         }
     }
 
@@ -189,25 +200,25 @@ impl AssetCacheValues for CacheValues {
             plandos,
             universe_presets,
             world_presets,
-        } = changed;
+        } = &changed;
 
-        if uber_state_dump {
+        if *uber_state_dump {
             self.uber_states = CacheResult(self.base.uber_state_data().map(UberStates::new));
         }
 
-        if loc_data {
+        if *loc_data {
             self.map_icons = CacheResult(self.base.loc_data().map(MapIcons::new));
             self.grom_shop_map_icon_index = grom_shop_map_icon_index(&self.map_icons);
         }
 
-        if loc_data || state_data {
+        if *loc_data || *state_data {
             self.relevant_uber_states = CacheResult(relevant_uber_states(
                 self.base.loc_data(),
                 self.base.state_data(),
             ));
         }
 
-        if loc_data || state_data || paths {
+        if *loc_data || *state_data || *paths {
             self.graph = CacheResult(graph(
                 self.base.paths(),
                 self.base.loc_data(),
@@ -234,6 +245,37 @@ impl AssetCacheValues for CacheValues {
 
         if !universe_presets.is_empty() {
             self.universe_preset_info = universe_preset_info(&self.base.universe_presets);
+        }
+
+        if let Some(watchers) = &self.watchers {
+            let _ = watchers.sender.send(changed);
+        }
+    }
+}
+
+pub struct CacheWatchers {
+    pub sender: UnboundedSender<ChangedAssets>,
+    pub sockets: Mutex<Vec<SplitSink<WebSocket, ws::Message>>>,
+}
+
+impl CacheWatchers {
+    pub fn new(sender: UnboundedSender<ChangedAssets>) -> Self {
+        Self {
+            sender,
+            sockets: Mutex::new(Vec::new()),
+        }
+    }
+}
+
+pub async fn notify_watchers(mut receiver: UnboundedReceiver<ChangedAssets>, cache: RouterState) {
+    while let Some(changed) = receiver.recv().await {
+        let message = ws::Message::text(serde_json::to_string(&changed).unwrap());
+
+        let watchers = &cache.read().await.values.watchers;
+        let mut sockets = watchers.as_ref().unwrap().sockets.lock().await;
+
+        for socket in sockets.iter_mut() {
+            if socket.send(message.clone()).await.is_err() {}
         }
     }
 }

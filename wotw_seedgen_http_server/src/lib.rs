@@ -11,6 +11,7 @@ use tokio::{
 };
 use wotw_seedgen::data::assets::DefaultFileAccess;
 
+use crate::assets::{CacheWatchers, notify_watchers};
 use crate::{
     assets::Cache,
     error::{Error, Result},
@@ -34,9 +35,14 @@ pub fn start(inactivity_timeout: Option<Duration>, address: Option<SocketAddr>) 
         exit(2);
     }
 
-    let cache = Cache::new(DefaultFileAccess);
+    let mut cache = Cache::new(DefaultFileAccess);
+
+    let (sender, receiver) = mpsc::unbounded_channel();
+    cache.values.watchers = Some(CacheWatchers::new(sender));
 
     let (mut runtime, cache) = wotw_seedgen_server_shared::start(cache)?;
+
+    runtime.spawn(notify_watchers(receiver, cache.clone()));
 
     let mut router = api::router(cache);
 
