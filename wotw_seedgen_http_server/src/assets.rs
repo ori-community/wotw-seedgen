@@ -445,7 +445,8 @@ fn snippet_info(
         let mut includes = snippet_info.metadata.includes.iter().collect::<Vec<_>>();
 
         while let Some(included_identifier) = includes.pop() {
-            let SchemaResult::Ok(included_info) = &snippet_info_map[included_identifier] else {
+            let Some(SchemaResult::Ok(included_info)) = snippet_info_map.get(included_identifier)
+            else {
                 continue;
             };
 
