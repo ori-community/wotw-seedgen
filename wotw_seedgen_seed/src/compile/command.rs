@@ -155,6 +155,10 @@ impl Compile for input::CommandBoolean {
                 .float(2, *x2)
                 .float(3, *y2)
                 .call(Command::IsInRectangle, MemoryUsed::ONE_BOOLEAN),
+            Self::StringContains { haystack, needle } => Args::new(context)
+                .string(0, *haystack)
+                .string(1, *needle)
+                .call(Command::StringContains, MemoryUsed::ONE_BOOLEAN),
         }
     }
 }

@@ -64,7 +64,8 @@ impl ContainedReads for CommandBoolean {
             | Self::GetBoolean { .. }
             | Self::IsInCircle { .. }
             | Self::IsInPositionTrigger { .. }
-            | Self::IsInRectangle { .. } => none(),
+            | Self::IsInRectangle { .. }
+            | Self::StringContains { .. } => none(),
         }
     }
 }

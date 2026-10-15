@@ -139,6 +139,8 @@ pub enum Command {
     FloatToString,
     /// Get the length of String Memory 0 and store it in Integer Memory 0
     StringLength,
+    /// Check whether String Memory 0 contains String Memory 1
+    StringContains,
     /// Until the next reload, on every tick where `toggle` is `true` increment `timer` by the delta time in seconds
     DefineTimer(
         /*toggle*/ UberIdentifier,

@@ -750,13 +750,26 @@ impl ResolvePlaceholders for CommandBoolean {
             Self::CompareString { operation } => operation.resolve(context),
             Self::CompareZone { operation } => operation.resolve(context),
             Self::LogicOperation { operation } => operation.resolve(context),
+            Self::IsInCircle { x, y, r } => {
+                x.resolve(context);
+                y.resolve(context);
+                r.resolve(context);
+            }
+            Self::IsInRectangle { x1, y1, x2, y2 } => {
+                x1.resolve(context);
+                y1.resolve(context);
+                x2.resolve(context);
+                y2.resolve(context);
+            }
+            Self::StringContains { haystack, needle } => {
+                haystack.resolve(context);
+                needle.resolve(context);
+            }
             Self::Constant { .. }
             | Self::FunctionArgument { .. }
             | Self::FetchBoolean { .. }
             | Self::GetBoolean { .. }
-            | Self::IsInCircle { .. }
-            | Self::IsInPositionTrigger { .. }
-            | Self::IsInRectangle { .. } => {}
+            | Self::IsInPositionTrigger { .. } => {}
         }
     }
 }

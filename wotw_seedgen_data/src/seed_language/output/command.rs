@@ -104,6 +104,10 @@ pub enum CommandBoolean {
         x2: Box<CommandFloat>,
         y2: Box<CommandFloat>,
     },
+    StringContains {
+        haystack: Box<CommandString>,
+        needle: Box<CommandString>,
+    },
 }
 
 impl CommandBoolean {

@@ -107,6 +107,9 @@ impl Display for CommandBoolean {
             CommandBoolean::IsInRectangle { x1, y1, x2, y2 } => {
                 write!(f, "is_in_rectangle({x1}, {y1}, {x2}, {y2})")
             }
+            CommandBoolean::StringContains { haystack, needle } => {
+                write!(f, "string_contains({haystack}, {needle})")
+            }
         }
     }
 }

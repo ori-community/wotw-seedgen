@@ -1598,14 +1598,87 @@ fn item_message(message: CommandString) -> CommandVoid {
 }
 
 fn message_with_origin_world(message: CommandString) -> CommandString {
-    CommandString::Concatenate {
-        operation: Box::new(Operation {
-            left: message,
-            operator: Concatenator::Concat,
-            right: CommandString::GetString {
-                id: ORIGIN_WORLD_STRING,
-            },
-        }),
+    match message.into_constant() {
+        Ok(mut message) => {
+            message.push(if message.contains('\n') { '\n' } else { ' ' });
+            CommandString::Concatenate {
+                operation: Box::new(Operation {
+                    left: message.into(),
+                    operator: Concatenator::Concat,
+                    right: CommandString::GetString {
+                        id: ORIGIN_WORLD_STRING,
+                    },
+                }),
+            }
+        }
+        Err(message) => CommandString::Multi {
+            commands: vec![
+                CommandVoid::SetString {
+                    id: RESERVED_STRING,
+                    value: message,
+                },
+                CommandVoid::SetBoolean {
+                    id: RESERVED_BOOLEAN,
+                    value: CommandBoolean::StringContains {
+                        haystack: Box::new(CommandString::GetString {
+                            id: RESERVED_STRING,
+                        }),
+                        needle: Box::new("\\n".into()),
+                    },
+                },
+                CommandVoid::If {
+                    condition: CommandBoolean::GetBoolean {
+                        id: RESERVED_BOOLEAN,
+                    },
+                    command: Box::new(CommandVoid::SetString {
+                        id: RESERVED_STRING,
+                        value: CommandString::Concatenate {
+                            operation: Box::new(Operation {
+                                left: CommandString::GetString {
+                                    id: RESERVED_STRING,
+                                },
+                                operator: Concatenator::Concat,
+                                right: "\n".into(),
+                            }),
+                        },
+                    }),
+                },
+                CommandVoid::If {
+                    condition: CommandBoolean::CompareBoolean {
+                        operation: Box::new(Operation {
+                            left: CommandBoolean::GetBoolean {
+                                id: RESERVED_BOOLEAN,
+                            },
+                            operator: EqualityComparator::Equal,
+                            right: false.into(),
+                        }),
+                    },
+                    command: Box::new(CommandVoid::SetString {
+                        id: RESERVED_STRING,
+                        value: CommandString::Concatenate {
+                            operation: Box::new(Operation {
+                                left: CommandString::GetString {
+                                    id: RESERVED_STRING,
+                                },
+                                operator: Concatenator::Concat,
+                                right: " ".into(),
+                            }),
+                        },
+                    }),
+                },
+            ],
+            last: Box::new(CommandString::Concatenate {
+                operation: Box::new(Operation {
+                    left: CommandString::GetString {
+                        id: RESERVED_STRING,
+                    },
+                    operator: Concatenator::Concat,
+                    right: CommandString::GetString {
+                        id: ORIGIN_WORLD_STRING,
+                    },
+                }),
+            }),
+        },
     }
 }
 
