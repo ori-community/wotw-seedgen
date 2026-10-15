@@ -7,7 +7,7 @@ use wotw_seedgen::{
 
 use crate::{
     cli::{dev::PatchArgs, CompileArgs},
-    dev::helpers::read_ngss,
+    helpers::read_ngss,
     log_config::LogConfig,
     seed::{generate, launch_seed},
     Error,

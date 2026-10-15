@@ -26,8 +26,8 @@ pub use file_access::{
     canonicalize, create_dir_all, file_create, file_err, file_open, metadata, read_to_string,
     write, AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
     DefaultFileAccess, PlandoFileAccess, PlandoFolderAccess, PresetFileAccess, SnippetFileAccess,
-    Watcher, WatcherError, WatcherMessage, WatcherResult, EXECUTABLE_DIR, LOG_DATA_DIR,
-    RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
+    Watcher, WatcherError, WatcherMessage, WatcherResult, CLIENT_USER_DATA_DIR, EXECUTABLE_DIR,
+    LOG_DATA_DIR, RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
 };
 #[cfg(any(test, feature = "test_helpers"))]
 mod test_access;

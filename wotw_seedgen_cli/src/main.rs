@@ -1,5 +1,6 @@
 mod cli;
 mod dev;
+mod helpers;
 mod http_server;
 mod log_config;
 mod open;

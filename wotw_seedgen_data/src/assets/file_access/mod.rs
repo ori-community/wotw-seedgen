@@ -6,8 +6,8 @@ mod watch;
 
 pub use cache::{AssetCache, AssetCacheValues, ChangedAssets, DefaultAssetCacheValues};
 pub use default_dirs::{
-    DefaultFileAccess, EXECUTABLE_DIR, LOG_DATA_DIR, RANDOMIZER_USER_DATA_DIR,
-    SEEDGEN_USER_DATA_DIR,
+    DefaultFileAccess, CLIENT_USER_DATA_DIR, EXECUTABLE_DIR, LOG_DATA_DIR,
+    RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
 };
 pub use plando::PlandoFolderAccess;
 pub use watch::{Watcher, WatcherError, WatcherMessage, WatcherResult};

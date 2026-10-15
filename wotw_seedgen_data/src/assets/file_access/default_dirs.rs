@@ -18,6 +18,12 @@ pub static SEEDGEN_USER_DATA_DIR: LazyLock<PathBuf> =
         Some(data_dir) => PathBuf::from(data_dir),
     });
 
+pub static CLIENT_USER_DATA_DIR: LazyLock<PathBuf> =
+    LazyLock::new(|| match env::var_os("CLIENT_USER_DATA_DIR") {
+        None => RANDOMIZER_USER_DATA_DIR.join("client"),
+        Some(data_dir) => PathBuf::from(data_dir),
+    });
+
 pub static LOG_DATA_DIR: LazyLock<PathBuf> = LazyLock::new(|| match env::var_os("LOG_DATA_DIR") {
     None => RANDOMIZER_USER_DATA_DIR.join("logs"),
     Some(data_dir) => PathBuf::from(data_dir),

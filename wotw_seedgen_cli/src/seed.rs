@@ -10,6 +10,7 @@ use crate::{
     cli::{
         CompileArgs, GenerationArgs, LaunchArgs, SeedArgs, SeedSettingsArgs, AVAILABLE_SNIPPETS,
     },
+    helpers::write_ngss,
     log_config::LogConfig,
     Error,
 };
@@ -187,29 +188,12 @@ pub fn launch_seed(path: &Path, args: LaunchArgs) -> Result<(), Error> {
     } = args;
 
     if new_game_seed_source {
-        write_new_game_seed_source(path)?;
+        write_ngss(path)?;
     }
 
     if launch {
         open::that_detached(path).map_err(|err| file_err("launch", path, err))?;
     }
-
-    Ok(())
-}
-
-pub fn write_new_game_seed_source(path: &Path) -> Result<(), Error> {
-    let path = path.canonicalize().map_or(Cow::Borrowed(path), Cow::Owned);
-
-    let path = path.to_str().ok_or_else(|| {
-        format!(
-            "failed to write newgameseedsource for {}: invalid unicode",
-            path.display()
-        )
-    })?;
-
-    let newgameseedsource = RANDOMIZER_USER_DATA_DIR.join("client/.newgameseedsource");
-
-    write(newgameseedsource, format!("file:{path}"))?;
 
     Ok(())
 }

@@ -9,8 +9,9 @@ use wotw_seedgen_git_info::{GitInfo, GIT_HEAD, GIT_STATUS};
 
 use crate::{
     cli::{dev::RegenerateArgs, CompileArgs},
+    helpers::write_ngss,
     log_config::LogConfig,
-    seed::{generate, write_new_game_seed_source, write_seed},
+    seed::{generate, write_seed},
     Error,
 };
 
@@ -45,7 +46,7 @@ pub fn regenerate(args: RegenerateArgs) -> Result<(), Error> {
         Some(write_seed(seed_universe, &name, generation_args)?)
     } else {
         if launch_args.new_game_seed_source {
-            write_new_game_seed_source(&path)?;
+            write_ngss(&path)?;
         }
 
         None
