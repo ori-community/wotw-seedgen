@@ -779,7 +779,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             Ok(value) => format!("<world>{target_world_index}</>'s {value}").into(),
             Err(name) => CommandString::Concatenate {
                 operation: Box::new(Operation {
-                    left: format!("<world>{target_world_index}</>'s").into(),
+                    left: format!("<world>{target_world_index}</>'s ").into(),
                     operator: Concatenator::Concat,
                     right: name,
                 }),
