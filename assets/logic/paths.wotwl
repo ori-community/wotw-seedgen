@@ -4941,6 +4941,7 @@ anchor GladesTown.BelowBountyShard at -247, -4121:  # Bridge bellow the bounty s
       GladesTown.StickyGrass, Grapple, Sword OR Hammer
     kii:
       DoubleJump  # From Glades.AboveTokk.SL. Either wrap around the left wall or wall jump to the right wall to reach the platform on the left
+      GladesTown.StickyGrass, GlideJump
       GladesTown.StickyGrass, Grapple, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # The jump to the shard is possible without using any energy weapons but pretty precise
       # GrenadeJump=1, GladesTown.StickyGrass OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR GrenadeJump=1
     unsafe:
