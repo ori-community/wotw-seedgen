@@ -12,20 +12,20 @@ serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.37.0", features = ["rt-multi-thread"] }
 utoipa = { version = "6.0.0", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "10.0.1", features = ["axum"] }
-notify-debouncer-full = { version = "0.6.0", default-features = false }
-dirs = "6.0.0"
-itertools = "0.13"
+notify-debouncer-full = { version = "0.7.0", default-features = false }
+dirs = "7.0.0"
+itertools = "0.15"
 thiserror = "2.0.17"
 constcat = "0.6.1"
-ordered-float = { version = "4.2", features = ["serde"] }
+ordered-float = { version = "5.0", features = ["serde"] }
 rand = "0.8"
 rand_pcg = "0.3"
 rand_seeder = "0.3"
 rustc-hash = "2.1.1"
 serde_json = "1.0.145"
 single-instance = "0.3.3"
-strum = { version = "0.26", features = ["derive"] }
+strum = { version = "0.28", features = ["derive"] }
 ciborium = "0.2.2"
 socket2 = "0.6.1"
-tower-http = { version = "0.6.8", features = ["cors"] }
+tower-http = { version = "0.7.1", features = ["cors"] }
 log = { version = "0.4", features = ["serde"] }
