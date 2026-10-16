@@ -97,7 +97,7 @@ impl<R: Read + Seek> SeedReader<R> {
 
 struct Package<'k, W: Write + Seek> {
     zip: ZipWriter<W>,
-    options: FileOptions<'k, ()>,
+    options: FileOptions<'k, 'static, ()>,
 }
 
 impl<W: Write + Seek> Package<'_, W> {
