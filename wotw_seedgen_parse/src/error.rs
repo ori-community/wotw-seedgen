@@ -123,7 +123,7 @@ impl Error {
 
         let report = if source.content.is_empty() {
             // the error printing library (ariadne) seems to panic in this case
-            Report::<(&str, _)>::build(self.kind.severity().into(), id, 0)
+            Report::<(&str, _)>::build(self.kind.severity().into(), (id, 0..0))
                 .with_message("Empty Input")
         } else {
             let mut message = self.kind.to_string();
@@ -138,8 +138,8 @@ impl Error {
                 label = label.with_color(Color::Red);
             }
 
-            let mut report =
-                Report::build(self.kind.severity().into(), id, self.span.start).with_label(label);
+            let mut report = Report::build(self.kind.severity().into(), (id, self.span.clone()))
+                .with_label(label);
 
             if let Some(help) = &self.help {
                 report.set_help(help);
