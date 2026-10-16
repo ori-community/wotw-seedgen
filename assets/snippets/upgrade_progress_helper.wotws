@@ -15,6 +15,7 @@ fun write_upgrades(relevant: Boolean) {
     if skills.shuriken == relevant add_upgrade("Static Shuriken")
     if skills.blaze == relevant add_upgrade("Charge Blaze")
     if skills.sentry == relevant add_upgrade("Rapid Sentry")
+    if skills.bow == relevant add_upgrade("Long Splinter")
 }
 
 !export(add_upgrade)
@@ -116,6 +117,7 @@ on change randoUpgrades.burrowSpeedMultiplier update_upgrade_effects()
 on change randoUpgrades.burrowDashSpeedMultiplier update_upgrade_effects()
 on change randoUpgrades.swimSpeedMultiplier update_upgrade_effects()
 on change randoUpgrades.waterDashSpeedMultiplier update_upgrade_effects()
+on change randoUpgrades.splinterLongerRange update_upgrade_effects()
 on change energy_per_second update_upgrade_effects()
 on change health_per_second update_upgrade_effects()
 fun update_upgrade_effects() {
@@ -152,6 +154,7 @@ fun upgrade_effects_half(relevant: Boolean) {
         new_upgrade_effect_row("Bow")
         multiplier_row_item(randoUpgrades.bowCostMultiplier, "x Cost")
         multiplier_row_item(1 / randoUpgrades.bowRapidFireIntervalDurationMultiplier, "x Quickshot Speed")
+        toggle_row_item(randoUpgrades.splinterLongerRange, "Long Splinter")
         melting_row_item(randoUpgrades.bowAsFireSource)
         add_current_colored_row()
     }
