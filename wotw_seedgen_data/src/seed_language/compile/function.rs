@@ -20,7 +20,7 @@ use crate::{
 };
 use heck::ToTitleCase;
 use itertools::Itertools;
-use rand::seq::SliceRandom;
+use rand::seq::IndexedRandom;
 use rand_pcg::Pcg64Mcg;
 use regex::Regex;
 use rustc_hash::FxHashMap;

@@ -155,7 +155,7 @@ fn test_compiler_with_config<F: SnippetAccess>(
     config: FxHashMap<String, FxHashMap<String, String>>,
 ) -> Compiler<'_, 'static, 'static> {
     Compiler::new(
-        &mut rand::thread_rng(),
+        &mut rand::rng(),
         snippet_access,
         TEST_ASSETS.expect_loc_data(),
         TEST_ASSETS.expect_uber_state_data(),

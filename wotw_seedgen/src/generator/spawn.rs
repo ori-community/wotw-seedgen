@@ -22,11 +22,7 @@ use wotw_seedgen_data::{
 };
 use wotw_seedgen_log_capture::LogCapture;
 
-use crate::{
-    generator::{format_pickups, SEED_FAILED_MESSAGE},
-    item_pool::ItemPool,
-    LogicalDifficulty, World,
-};
+use crate::{generator::format_pickups, item_pool::ItemPool, LogicalDifficulty, World};
 
 pub fn choose_spawn<'graph, 'log>(
     rng: &mut Pcg64Mcg,
@@ -61,7 +57,7 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
         item_pool: &'pool ItemPool<'log>,
         output: &'output mut IntermediateOutput<'log>,
     ) -> Self {
-        let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
+        let rng = Pcg64Mcg::from_rng(rng);
 
         let default_spawn = world.graph.find_node(DEFAULT_SPAWN).unwrap();
 
@@ -377,7 +373,7 @@ struct FullyRandomSpawnGenerator<'graph> {
 
 impl<'graph> FullyRandomSpawnGenerator<'graph> {
     fn new(rng: &mut Pcg64Mcg, graph: &'graph Graph) -> Result<Self, String> {
-        let mut rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
+        let mut rng = Pcg64Mcg::from_rng(rng);
 
         // Postpone allocating indices because the size is big
         let (index, _) = graph

@@ -1,6 +1,4 @@
-use super::{
-    item_pool::ItemPool, spirit_light::SpiritLightProvider, Seed, SeedUniverse, SEED_FAILED_MESSAGE,
-};
+use super::{item_pool::ItemPool, spirit_light::SpiritLightProvider, Seed, SeedUniverse};
 use crate::{
     generator::{
         entrances::generate_entrances,
@@ -15,10 +13,10 @@ use crate::{
 use itertools::Itertools;
 use log::{log_enabled, trace, warn, Level::Trace};
 use rand::{
-    distributions::{Uniform, WeightedIndex},
+    distr::{weighted::WeightedIndex, Uniform},
     prelude::Distribution,
-    seq::SliceRandom,
-    Rng, SeedableRng,
+    seq::{IndexedRandom, SliceRandom},
+    RngExt, SeedableRng,
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
@@ -237,7 +235,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         let spoiler = SeedSpoiler::new(spawns, entrances);
 
         Ok(Self {
-            rng: Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE),
+            rng: Pcg64Mcg::from_rng(&mut *rng),
             worlds,
             settings,
             ordering_distribution,
@@ -533,7 +531,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
                 let origin_world = &mut self.worlds[origin_world_index];
 
-                let should_place_spirit_light = self.rng.gen_bool(
+                let should_place_spirit_light = self.rng.random_bool(
                     origin_world.spirit_light_placements_remaining as f64
                         / non_shop_placements_remaining as f64,
                 );
@@ -945,7 +943,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         index: usize,
         multiworld: bool,
     ) -> Result<Self, String> {
-        let mut rng = Pcg64Mcg::from_rng(&mut *rng).expect(SEED_FAILED_MESSAGE);
+        let mut rng = Pcg64Mcg::from_rng(&mut *rng);
 
         let log_index = if multiworld {
             format!("[{index}] ")
@@ -1753,8 +1751,8 @@ struct OrderingDistribution {
 
 impl OrderingDistribution {
     fn new(rng: &mut Pcg64Mcg) -> Self {
-        let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
-        let distribution = Uniform::new_inclusive(-1, 1);
+        let rng = Pcg64Mcg::from_rng(rng);
+        let distribution = Uniform::new_inclusive(-1, 1).unwrap();
 
         Self { rng, distribution }
     }

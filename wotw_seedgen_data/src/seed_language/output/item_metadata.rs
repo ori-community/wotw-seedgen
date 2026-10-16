@@ -7,7 +7,7 @@ use crate::{
 };
 use derivative::Derivative;
 use log::warn;
-use rand::seq::SliceRandom;
+use rand::seq::IndexedRandom;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};

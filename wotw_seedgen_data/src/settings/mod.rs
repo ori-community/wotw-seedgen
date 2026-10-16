@@ -17,7 +17,7 @@ use std::{
 use heck::ToTitleCase;
 use itertools::Itertools;
 use log::warn;
-use rand::{distributions::Open01, seq::SliceRandom, Rng};
+use rand::{distr::Open01, seq::IndexedRandom, Rng, RngExt};
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumMessage, EnumString, VariantArray, VariantNames};
@@ -237,20 +237,20 @@ impl WorldSettings {
 
         let tricks = <Trick as VariantArray>::VARIANTS
             .iter()
-            .filter(|trick| difficulty >= trick.min_difficulty() && rng.gen())
+            .filter(|trick| difficulty >= trick.min_difficulty() && rng.random())
             .copied()
             .collect();
 
         let randomize_entrances = rng
-            .gen::<bool>()
-            .then(|| GreaterOneU8::new(rng.gen_range(2..=3)).unwrap());
+            .random::<bool>()
+            .then(|| GreaterOneU8::new(rng.random_range(2..=3)).unwrap());
 
         let mut snippet_config = FxHashMap::default();
 
         let snippets = snippets
             .iter()
             .filter_map(|(identifier, metadata)| {
-                if metadata.hidden || rng.gen() {
+                if metadata.hidden || rng.random() {
                     return None;
                 }
 
@@ -259,14 +259,14 @@ impl WorldSettings {
                     .iter()
                     .filter_map(|(identifier, arg)| match arg.value {
                         ConfigValue::Boolean { default } => rng
-                            .gen::<bool>()
+                            .random::<bool>()
                             .then(|| (identifier.clone(), (!default).to_string())),
                         ConfigValue::Integer { default } => {
                             let value = i32::max(default + gen_config_deviation(rng) as i32, 0);
                             filter_default(identifier, value, default)
                         }
                         ConfigValue::IntegerRange { default, min, max } => {
-                            let value = (min <= max).then(|| rng.gen_range(min..=max))?;
+                            let value = (min <= max).then(|| rng.random_range(min..=max))?;
                             filter_default(identifier, value, default)
                         }
                         ConfigValue::Float { default } => {
@@ -274,7 +274,7 @@ impl WorldSettings {
                             filter_default(identifier, value, default)
                         }
                         ConfigValue::FloatRange { default, min, max } => {
-                            let value = (min <= max).then(|| rng.gen_range(*min..=*max))?;
+                            let value = (min <= max).then(|| rng.random_range(*min..=*max))?;
                             filter_default(identifier, value, *default)
                         }
                     })
@@ -668,10 +668,10 @@ impl GameDifficulties {
     fn random<R: Rng>(rng: &mut R) -> Self {
         loop {
             let attempt = Self {
-                easy: rng.gen(),
-                normal: rng.gen(),
-                hard: rng.gen(),
-                only_show_selected: rng.gen(),
+                easy: rng.random(),
+                normal: rng.random(),
+                hard: rng.random(),
+                only_show_selected: rng.random(),
             };
 
             if attempt.any_enabled() {

@@ -15,7 +15,7 @@ use crate::{
     Position, UberIdentifier, Zone,
 };
 use ordered_float::OrderedFloat;
-use rand::Rng;
+use rand::RngExt;
 use std::{fmt::Display, iter, mem, ops::Range, str::FromStr};
 use wotw_seedgen_parse::{Error, Identifier, Span, SpanEnd, SpanStart, Spanned, SpannedOption};
 
@@ -1358,7 +1358,7 @@ impl<'source> Compile<'source> for ast::RandomBooleanArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        let value = compiler.rng.gen::<bool>();
+        let value = compiler.rng.random::<bool>();
         compiler.define_variable(self.identifier.data, value);
     }
 }
@@ -1371,7 +1371,7 @@ impl<'source> Compile<'source> for ast::RandomIntegerArgs<'source> {
         let max = get_command_arg(self.0.max).and_then(|max| max.evaluate(compiler));
 
         if let (Some(min), Some(max)) = (min, max) {
-            let value: i32 = compiler.rng.gen_range(min..=max);
+            let value: i32 = compiler.rng.random_range(min..=max);
 
             compiler.define_variable(self.0.identifier.data, value);
         }
@@ -1386,7 +1386,7 @@ impl<'source> Compile<'source> for ast::RandomFloatArgs<'source> {
         let max = get_command_arg(self.0.max).and_then(|max| max.evaluate::<f32>(compiler));
 
         if let (Some(min), Some(max)) = (min, max) {
-            let value: f32 = compiler.rng.gen_range(min..=max);
+            let value: f32 = compiler.rng.random_range(min..=max);
 
             compiler.define_variable(self.0.identifier.data, OrderedFloat(value));
         }
@@ -1445,7 +1445,7 @@ impl<'source> Compile<'source> for ast::RandomFromPoolArgs<'source> {
             return;
         }
 
-        let index = compiler.rng.gen_range(0..values.len());
+        let index = compiler.rng.random_range(0..values.len());
         let chosen = values.swap_remove(index);
 
         compiler.define_variable(self.identifier.data, chosen);

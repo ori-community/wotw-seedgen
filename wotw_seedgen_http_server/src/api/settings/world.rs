@@ -4,7 +4,6 @@ use axum::{
     routing::{get, post},
 };
 use constcat::concat;
-use rand::thread_rng;
 use utoipa::OpenApi;
 use wotw_seedgen::data::WorldSettings;
 
@@ -47,7 +46,7 @@ async fn default() -> Json<WorldSettings> {
 async fn random(State(cache): State<RouterState>) -> Json<WorldSettings> {
     let cache = cache.read().await;
 
-    Json(WorldSettings::random(&mut thread_rng(), &*cache))
+    Json(WorldSettings::random(&mut rand::rng(), &*cache))
 }
 
 /// Check world settings

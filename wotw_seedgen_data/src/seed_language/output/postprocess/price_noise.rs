@@ -1,4 +1,4 @@
-use rand::{distributions::Uniform, prelude::Distribution};
+use rand::distr::{Distribution, Uniform};
 use rand_pcg::Pcg64Mcg;
 
 use crate::{
@@ -13,7 +13,7 @@ pub struct PriceNoise(Uniform<f32>);
 
 impl PriceNoise {
     pub fn new() -> Self {
-        Self(Uniform::new_inclusive(0.75, 1.25))
+        Self(Uniform::new_inclusive(0.75, 1.25).unwrap())
     }
 
     pub fn add_noise(&self, price: &mut CommandInteger, rng: &mut Pcg64Mcg) {

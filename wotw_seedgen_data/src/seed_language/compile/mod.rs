@@ -291,7 +291,6 @@ pub(crate) struct SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates, 'l
     pub errors: Vec<Error>,
 }
 
-const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
 impl<'source, 'compiler, 'snippets, 'uberstates, 'log>
     SnippetCompiler<'source, 'compiler, 'snippets, 'uberstates, 'log>
 {
@@ -306,7 +305,7 @@ impl<'source, 'compiler, 'snippets, 'uberstates, 'log>
         let debug = global.output.assets.debug.is_some();
 
         let mut compiler = Self {
-            rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
+            rng: Pcg64Mcg::from_rng(rng),
             identifier,
             global,
             preprocessed,
@@ -504,7 +503,7 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
         uber_state_data: &'uberstates UberStateData,
     ) -> Self {
         Self {
-            rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
+            rng: Pcg64Mcg::from_rng(rng),
             global: GlobalCompilerData::new(loc_data, uber_state_data, snippet_access),
             compiled_snippets: FxHashMap::default(),
             errors: FxHashMap::default(),

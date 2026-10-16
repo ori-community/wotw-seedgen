@@ -1,10 +1,9 @@
 use crate::generator::solutions::{cost_from_iter, Cost};
 
-use super::SEED_FAILED_MESSAGE;
 use derivative::Derivative;
 use itertools::Itertools;
 use log::{trace, warn};
-use rand::{seq::SliceRandom, Rng, SeedableRng};
+use rand::{seq::SliceRandom, RngExt, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{
@@ -104,7 +103,7 @@ impl<'log> ItemPoolBuilder<'log> {
             + SHARDS.len()
             + WeaponUpgrade::VARIANTS.len();
 
-        let rng = Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE);
+        let rng = Pcg64Mcg::from_rng(rng);
         let items = Vec::with_capacity(TOTAL_AMOUNT);
         let item_pool = ItemPool::new(rng, items);
         let mut builder = Self { item_pool };
@@ -322,7 +321,7 @@ impl<'log> ItemPool<'log> {
         // TODO also precompute reroll chance? Or maintain a list of weights?
         match self.items.iter().rposition(|item| {
             item.cost <= 10000. || {
-                let choose = self.rng.gen_bool(10000. / f64::from(item.cost));
+                let choose = self.rng.random_bool(10000. / f64::from(item.cost));
 
                 if !choose {
                     trace!(

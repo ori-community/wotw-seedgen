@@ -447,7 +447,7 @@ impl WorldPresetSettings {
         } = self;
 
         if let Some(true) = random_settings {
-            *settings = WorldSettings::random(&mut rand::thread_rng(), file_access);
+            *settings = WorldSettings::random(&mut rand::rng(), file_access);
         }
 
         for identifier in includes.into_iter().flatten() {

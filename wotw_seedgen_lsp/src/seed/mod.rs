@@ -235,13 +235,9 @@ impl Backend<Cache> {
             let snippet_access = PlandoFolderAccess::new(root);
 
             let result = {
-                let mut compiler = Compiler::new(
-                    &mut rand::thread_rng(),
-                    &snippet_access,
-                    loc_data,
-                    uber_state_data,
-                )
-                .with_lint(true);
+                let mut compiler =
+                    Compiler::new(&mut rand::rng(), &snippet_access, loc_data, uber_state_data)
+                        .with_lint(true);
 
                 // TODO currently we can only give diagnostics for saved files because we're not using the editors in-memory changes
                 // Need to do changes in the language create to improve that

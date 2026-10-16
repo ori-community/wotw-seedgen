@@ -13,7 +13,7 @@ use crate::{
     log_config::LogConfig,
     Error,
 };
-use rand::{distributions::Uniform, prelude::Distribution};
+use rand::{distr::Uniform, prelude::Distribution};
 use rustc_hash::FxHashMap;
 use wotw_seedgen::{
     data::{
@@ -44,11 +44,8 @@ pub fn seed(args: SeedArgs) -> Result<(), Error> {
     let mut settings = settings_args.into_universe_settings()?;
 
     let name = if settings.seed.is_empty() {
-        let distribution = Uniform::from('0'..='9');
-        settings.seed = distribution
-            .sample_iter(rand::thread_rng())
-            .take(12)
-            .collect();
+        let distribution = Uniform::try_from('0'..='9').unwrap();
+        settings.seed = distribution.sample_iter(rand::rng()).take(12).collect();
 
         "seed"
     } else {

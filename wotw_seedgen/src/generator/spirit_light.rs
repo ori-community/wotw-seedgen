@@ -1,5 +1,4 @@
-use super::SEED_FAILED_MESSAGE;
-use rand::{distributions::Uniform, prelude::Distribution, SeedableRng};
+use rand::{distr::Uniform, prelude::Distribution, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 
 const NOISE: f32 = 0.25;
@@ -24,10 +23,10 @@ pub struct SpiritLightProvider {
 impl SpiritLightProvider {
     pub fn new(rng: &mut Pcg64Mcg) -> Self {
         Self {
-            rng: Pcg64Mcg::from_rng(rng).expect(SEED_FAILED_MESSAGE),
+            rng: Pcg64Mcg::from_rng(rng),
             a: 0.,
             i: 0.,
-            b_noisy: Uniform::new_inclusive(0., 0.),
+            b_noisy: Uniform::new_inclusive(0., 0.).unwrap(),
             b: 0.,
             p: 0.,
         }
@@ -42,7 +41,7 @@ impl SpiritLightProvider {
             self.b = t;
             self.p = total_placements as f32;
             self.a = 0.;
-            self.b_noisy = Uniform::new_inclusive(t - t / 100., t + t / 100.);
+            self.b_noisy = Uniform::new_inclusive(t - t / 100., t + t / 100.).unwrap();
             return;
         }
 
@@ -50,7 +49,8 @@ impl SpiritLightProvider {
         self.b = t / 400.; // default: 20000 / 400 = 50
         self.p = total_placements as f32;
         self.a = 3. * (t - self.b * self.p) / (self.p * self.p * self.p);
-        self.b_noisy = Uniform::new_inclusive(self.b * (1. - NOISE), self.b * (1. + NOISE));
+        self.b_noisy =
+            Uniform::new_inclusive(self.b * (1. - NOISE), self.b * (1. + NOISE)).unwrap();
     }
 
     pub fn take(&mut self) -> i32 {

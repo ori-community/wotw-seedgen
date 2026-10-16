@@ -33,8 +33,6 @@ use wotw_seedgen_seed::Seed;
 /// Retries are mostly expected when using items that seedgen cannot force-place such as launch fragments.
 static RETRIES: LazyLock<u32> = LazyLock::new(|| env_or("RETRIES", 10));
 
-const SEED_FAILED_MESSAGE: &str = "Failed to seed child RNG";
-
 pub struct Generator<'graph, 'loc_data, 'uber_state_data, 'access, 'settings, 'perf, 'log, A> {
     pub graph: &'graph Graph,
     pub loc_data: &'loc_data LocData,
@@ -94,7 +92,7 @@ where
             serde_json::to_string(self.settings).unwrap(),
         );
 
-        let mut rng: Pcg64Mcg = Seeder::from(&self.settings.seed).make_rng();
+        let mut rng: Pcg64Mcg = Seeder::from(&self.settings.seed).into_rng();
 
         let snippet_outputs = self
             .settings

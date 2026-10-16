@@ -1,6 +1,5 @@
 use std::{fmt::Write, time::Instant};
 
-use rand::thread_rng;
 use wotw_seedgen::{
     data::{
         assets::{
@@ -63,7 +62,7 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
     let state_data = DefaultFileAccess.state_data()?;
     let uber_state_data = UberStateData::from_parts(uber_state_dump, &loc_data, &state_data);
 
-    let mut compiler = Compiler::new(&mut thread_rng(), &snippets, &loc_data, &uber_state_data);
+    let mut compiler = Compiler::new(&mut rand::rng(), &snippets, &loc_data, &uber_state_data);
 
     compiler.compile_snippet("")?;
 
