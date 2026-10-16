@@ -167,6 +167,7 @@ pub trait AssetCacheValues: Sized {
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, ToSchema)]
+#[serde(rename_all = "camelCase")]
 pub struct ChangedAssets {
     pub loc_data: bool,
     pub state_data: bool,
