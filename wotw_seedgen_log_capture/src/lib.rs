@@ -30,6 +30,10 @@ impl LogCapture {
         self
     }
 
+    pub fn capture_enabled(&self, level: Level) -> bool {
+        self.max_level >= level
+    }
+
     pub fn finish(self) -> Vec<Record> {
         self.records.into_inner().unwrap()
     }
@@ -43,14 +47,14 @@ impl Default for LogCapture {
 
 impl Log for LogCapture {
     fn enabled(&self, metadata: &Metadata) -> bool {
-        log::logger().enabled(metadata) || self.max_level >= metadata.level()
+        log::logger().enabled(metadata) || self.capture_enabled(metadata.level())
     }
 
     fn log(&self, record: &log::Record) {
         let global_logger = log::logger();
 
         let level = record.metadata().level();
-        if self.max_level < level {
+        if !self.capture_enabled(level) {
             global_logger.log(record);
             return;
         }

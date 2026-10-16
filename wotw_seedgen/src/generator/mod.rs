@@ -14,7 +14,7 @@ use crate::{
     world::World,
 };
 use itertools::Itertools;
-use log::{info, trace, warn};
+use log::{info, trace, warn, Level};
 use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::{fmt::Display, sync::LazyLock};
@@ -22,6 +22,7 @@ use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, LocData, LocDataEntry, SnippetAccess, UberStateData},
     env_or,
     logic_language::output::Graph,
+    parse::Severity,
     seed_language::{compile::Compiler, output::IntermediateOutput, simulate::UberStates},
     UniverseSettings, WorldSettings,
 };
@@ -114,7 +115,11 @@ where
                 .with_log_capture(self.log_capture);
 
                 // TODO this is inefficient because we probably do a lot of redundant work between the worlds
-                let output = parse_snippets(world_settings, compiler)?;
+                let output = parse_snippets(
+                    world_settings,
+                    compiler,
+                    self.log_capture.capture_enabled(Level::Error),
+                )?;
 
                 Ok((world_settings, output))
             })
@@ -187,6 +192,7 @@ pub struct SeedUniverse {
 fn parse_snippets<'log>(
     world_settings: &WorldSettings,
     mut compiler: Compiler<'_, '_, 'log>,
+    error_capture_enabled: bool,
 ) -> Result<IntermediateOutput<'log>, String> {
     compiler.compile_snippet("seed_core")?;
 
@@ -194,10 +200,36 @@ fn parse_snippets<'log>(
         compiler.compile_snippet(identifier)?;
     }
 
-    compiler
-        .finish()
-        .eprint_errors()
-        .ok_or_else(|| "failed to compile snippets".to_string())
+    let result = compiler.finish();
+
+    let failed_snippets = result
+        .errors
+        .iter()
+        .filter(|(_, (_, errors))| {
+            errors
+                .iter()
+                .any(|error| error.kind.severity() == Severity::Error)
+        })
+        .map(|(identifier, _)| identifier.clone())
+        .collect::<Vec<_>>();
+
+    let output = if error_capture_enabled {
+        failed_snippets.is_empty().then_some(result.output)
+    } else {
+        result.eprint_errors()
+    };
+
+    output.ok_or_else(|| {
+        if failed_snippets.len() == 1 {
+            format!("failed to compile \"{}\"", failed_snippets.first().unwrap())
+        } else {
+            format!(
+                "failed to compile {amount} snippets: \"{identifiers}\"",
+                amount = failed_snippets.len(),
+                identifiers = failed_snippets.iter().format("\", \"")
+            )
+        }
+    })
 }
 
 fn format_pickups<'a, 'graph>(
