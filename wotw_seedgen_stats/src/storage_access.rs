@@ -34,7 +34,7 @@ use crate::handle_errors::HandleErrors;
 use std::{
     fs::{self, DirEntry, File, ReadDir},
     hash::{Hash, Hasher},
-    io::{self, Write},
+    io::{self, Read},
     iter,
     path::{Path, PathBuf},
     sync::LazyLock,
@@ -63,8 +63,8 @@ impl SeedStorageAccess for FileAccess {
             .find_map(|entry| {
                 let path = entry.path();
                 let seed = path.file_stem()?.to_str()?.to_owned();
-                let previous: SeedSpoiler =
-                    bincode::deserialize_from(File::open(path).ok()?).ok()?;
+
+                let previous: SeedSpoiler = postcard::from_bytes(&fs::read(path).ok()?).ok()?;
 
                 Some((seed, previous))
             })
@@ -93,19 +93,18 @@ impl SeedStorageAccess for FileAccess {
     }
 
     fn write_seed(&self, seed: &SeedSpoiler, settings: &UniverseSettings) -> Result<()> {
-        let bytes = bincode::serialize(seed).expect("Failed to serialize spoiler");
         let mut path = path_from_settings(settings);
         assets::create_dir_all(&path)?;
 
         path.push(&settings.seed);
 
-        let mut file = fs::OpenOptions::new()
+        let file = fs::OpenOptions::new()
             .write(true)
             .create_new(true)
             .open(&path)
             .map_err(|err| format!("Failed to write seed to storage: {err}"))?;
 
-        file.write_all(bytes.as_ref())
+        postcard::to_io(seed, file)
             .map_err(|err| format!("Failed to write seed to storage: {err}"))?;
 
         Ok(())
@@ -121,76 +120,32 @@ impl SeedStorageAccess for FileAccess {
 
 // An Iterator reading stored seeds from the filesystem
 pub struct ReadSeeds {
-    #[allow(clippy::type_complexity)]
-    inner: Option<iter::Map<HandleErrorsReadDir, fn(DirEntry) -> Result<SeedSpoiler>>>,
+    buffer: Vec<u8>,
+    read_dir: Option<HandleErrorsReadDir>,
 }
 
 impl ReadSeeds {
     fn new(settings: &UniverseSettings, limit: usize) -> Result<Self> {
         let path = path_from_settings(settings);
 
-        match read_dir(&path, limit) {
-            Ok(dir) => print_feedback_for_existing_seeds(dir),
+        let read_dir = match read_dir(&path, limit) {
+            Ok(dir) => {
+                print_feedback_for_existing_seeds(dir);
+                Some(read_dir(&path, limit).map_err(|err| format_read_dir_err(err, &path))?)
+            }
             Err(err) => {
-                return if err.kind() == io::ErrorKind::NotFound {
-                    Ok(Self { inner: None })
+                if err.kind() == io::ErrorKind::NotFound {
+                    None
                 } else {
-                    Err(format_read_dir_err(err, &path))
+                    return Err(format_read_dir_err(err, &path));
                 }
             }
-        }
+        };
 
-        let inner = read_dir(&path, limit)
-                .map_err(|err| format_read_dir_err(err, &path))?
-                .map(
-                    (|entry| {
-                        let path = entry.path();
-                        fs::read(&path)
-                            .map_err(|err| {
-                                (
-                                    format!(
-                                        "Failed to read seed from seed storage at \"{}\": {}",
-                                        path.display(),
-                                        err
-                                    ),
-                                    path.clone(),
-                                )
-                            })
-                            .map(|bytes| (bytes, path))
-                            .and_then(|(bytes, path)| {
-                                bincode::deserialize::<SeedSpoiler>(&bytes).map_err(|err| {
-                                    (
-                                        format!(
-                                            "Failed to deserialize seed from seed storage at \"{}\": {}",
-                                            path.display(),
-                                            err
-                                        ),
-                                        path,
-                                    )
-                                })
-                            })
-                            .map_err(|(err, path)| {
-                                match fs::remove_file(&path) {
-                                    Ok(()) => {
-                                        eprintln!(
-                                            "Removed \"{}\" from seed storage",
-                                            path.display()
-                                        );
-                                    }
-                                    Err(err) => {
-                                        eprintln!(
-                                            "Failed to remove \"{}\" from seed storage: {}",
-                                            path.display(),
-                                            err
-                                        );
-                                    }
-                                }
-                                err
-                            })
-                    }) as fn(DirEntry) -> Result<SeedSpoiler>,
-                );
-
-        Ok(Self { inner: Some(inner) })
+        Ok(Self {
+            buffer: Vec::with_capacity(1024 * 1024 * 1024),
+            read_dir,
+        })
     }
 }
 
@@ -198,7 +153,52 @@ impl Iterator for ReadSeeds {
     type Item = Result<SeedSpoiler>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.inner.as_mut().and_then(Iterator::next)
+        let entry = self.read_dir.as_mut()?.next()?;
+
+        let path = entry.path();
+        Some(
+            File::open(&path)
+                .map_err(|err| {
+                    (
+                        format!(
+                            "Failed to read seed from seed storage at \"{}\": {}",
+                            path.display(),
+                            err
+                        ),
+                        path.clone(),
+                    )
+                })
+                .and_then(|mut file| {
+                    self.buffer.clear();
+                    file.read_to_end(&mut self.buffer).unwrap();
+                    // from_io doesn't work, doesn't matter enough to find out why
+                    postcard::from_bytes(&self.buffer).map_err(|err| {
+                        (
+                            format!(
+                                "Failed to deserialize seed from seed storage at \"{}\": {}",
+                                path.display(),
+                                err
+                            ),
+                            path,
+                        )
+                    })
+                })
+                .map_err(|(err, path)| {
+                    match fs::remove_file(&path) {
+                        Ok(()) => {
+                            eprintln!("Removed \"{}\" from seed storage", path.display());
+                        }
+                        Err(err) => {
+                            eprintln!(
+                                "Failed to remove \"{}\" from seed storage: {}",
+                                path.display(),
+                                err
+                            );
+                        }
+                    }
+                    err
+                }),
+        )
     }
 }
 
@@ -227,7 +227,8 @@ fn path_from_settings(settings: &UniverseSettings) -> PathBuf {
 fn hash_settings(settings: &UniverseSettings) -> u64 {
     // TODO why not derive Hash on WorldSettings?
     let mut hasher = FxHasher::default();
-    let bytes = bincode::serialize(&settings.world_settings).expect("Failed to serialize settings"); // We deliberately ignore the seed
+    let bytes =
+        postcard::to_stdvec(&settings.world_settings).expect("Failed to serialize settings"); // We deliberately ignore the seed
     bytes.hash(&mut hasher);
     hasher.finish()
 }
