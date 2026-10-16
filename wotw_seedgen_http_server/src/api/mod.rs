@@ -15,6 +15,7 @@ use tower_http::cors::{Any, CorsLayer};
 use utoipa::{IntoParams, OpenApi, PartialSchema, ToSchema, openapi};
 use utoipa_swagger_ui::SwaggerUi;
 use wotw_seedgen::data::UniverseSettings;
+use wotw_seedgen::data::assets::ChangedAssets;
 use wotw_seedgen::data::seed_language::output::{CommandZone, Trigger};
 
 use crate::generate::{GenerateError, GenerateResult};
@@ -76,7 +77,8 @@ pub fn router(cache: RouterState) -> Router {
         // types passed to it
         CommandZone,
         // LogLevelFilter is missed because oriShrug
-        LogLevelFilter
+        LogLevelFilter,
+        ChangedAssets
     )),
 )]
 struct Docs;
