@@ -848,7 +848,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
             let set_command = CommandVoid::SetString {
                 id: ORIGIN_WORLD_STRING,
-                value: format!(" from <world>{origin_world_index}</>").into(),
+                value: format!("from <world>{origin_world_index}</>").into(),
             };
             let unset_command = CommandVoid::SetString {
                 id: ORIGIN_WORLD_STRING,
