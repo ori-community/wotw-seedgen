@@ -505,6 +505,12 @@ impl WorldPresetSettings {
     }
 
     fn check_compability_0_to_1(&mut self) -> Result<(), String> {
+        if let Some(includes) = &mut self.includes {
+            if includes.remove("glitches") {
+                self.tricks = Some(Tricks::All);
+            }
+        }
+
         if let Some(snippets) = &mut self.snippets {
             for index in 0..snippets.len() {
                 let snippet = &mut snippets[index];
