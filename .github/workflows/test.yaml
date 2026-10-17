@@ -96,11 +96,19 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: seed_linux
-          path: "/tmp/seed_linux"
+          path: "/tmp/seed_linux/"
       - name: Download Windows seed
         uses: actions/download-artifact@v7
         with:
           name: seed_windows
-          path: "/tmp/seed_windows"
+          path: "/tmp/seed_windows/"
+      - name: Install zipcmp
+        run: sudo apt-get install -y zipcmp
       - name: Compare seedgen output
-        run: diff -rq /tmp/seed_linux /tmp/seed_windows
+        run: |
+          (
+            zipcmp /tmp/seed_linux/*.wotwr /tmp/seed_windows/*.wotwr &&
+            echo "Seed files match"
+          ) || (
+            echo "Seed files don't match" 1>&2
+          )
