@@ -106,8 +106,8 @@ jobs:
         run: |
           mkdir /tmp/seed_windows
           mkdir /tmp/seed_linux
-          unzip -d /tmp/seed_windows /tmp/artifacts/seed_windows.zip
-          unzip -d /tmp/seed_linux /tmp/artifacts/seed_linux.zip
+          unzip -d /tmp/seed_windows /tmp/artifacts/seed_windows
+          unzip -d /tmp/seed_linux /tmp/artifacts/seed_linux
       - name: Compare seedgen output
         run: |
           sudo apt-get install -y zipcmp
