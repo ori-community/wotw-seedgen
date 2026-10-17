@@ -19,7 +19,7 @@ use crate::assets::{
 use std::{
     borrow::Cow,
     fmt::Display,
-    fs::{self, File, Metadata},
+    fs::{self, DirEntry, File, Metadata},
     io::{self, BufReader},
     path::{Path, PathBuf},
 };
@@ -38,11 +38,30 @@ pub fn file_open<P: AsRef<Path>>(path: P) -> Result<File, String> {
 }
 
 pub fn read_to_string<P: AsRef<Path>>(path: P) -> Result<String, String> {
-    action_with("read", path.as_ref(), fs::read_to_string)
+    read_with(path.as_ref(), fs::read_to_string)
 }
 
 pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), String> {
     create_with(path.as_ref(), fs::create_dir_all)
+}
+
+pub fn read_dir<P: AsRef<Path>>(path: P) -> Result<ReadDir<P>, String> {
+    let inner = read_with(path.as_ref(), fs::read_dir)?;
+    Ok(ReadDir { path, inner })
+}
+
+pub struct ReadDir<P> {
+    path: P,
+    inner: fs::ReadDir,
+}
+
+impl<P: AsRef<Path>> Iterator for ReadDir<P> {
+    type Item = Result<DirEntry, String>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let entry = self.inner.next()?;
+        Some(entry.map_err(|err| file_err("read", &self.path, err)))
+    }
 }
 
 pub fn canonicalize<P: AsRef<Path>>(path: P) -> Result<PathBuf, String> {
@@ -50,7 +69,7 @@ pub fn canonicalize<P: AsRef<Path>>(path: P) -> Result<PathBuf, String> {
 }
 
 pub fn metadata<P: AsRef<Path>>(path: P) -> Result<Metadata, String> {
-    action_with("read", path.as_ref(), fs::metadata)
+    read_with(path.as_ref(), fs::metadata)
 }
 
 pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> Result<(), String> {
@@ -62,6 +81,13 @@ fn create_with<'p, O, F: FnOnce(&'p Path) -> io::Result<O>>(
     f: F,
 ) -> Result<O, String> {
     action_with("create", path, f)
+}
+
+fn read_with<'p, O, F: FnOnce(&'p Path) -> io::Result<O>>(
+    path: &'p Path,
+    f: F,
+) -> Result<O, String> {
+    action_with("read", path, f)
 }
 
 fn action_with<'p, O, F: FnOnce(&'p Path) -> io::Result<O>>(

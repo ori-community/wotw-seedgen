@@ -1,3 +1,4 @@
+mod builtin_icons;
 mod format_strings;
 mod id_use;
 mod identifier_use;
@@ -7,18 +8,23 @@ use wotw_seedgen_parse::{Error, Source};
 
 use crate::seed_language::{
     ast::{self, Traverse},
-    compile::lint::{format_strings::FormatStrings, id_use::IdUse, identifier_use::Unused},
+    compile::lint::{
+        builtin_icons::BuiltinIcons, format_strings::FormatStrings, id_use::IdUse,
+        identifier_use::Unused,
+    },
 };
 
 pub fn lint_ast(ast: &ast::Snippet, errors: &mut Vec<Error>) {
     let unused = Unused::default();
     let format_strings = FormatStrings::new(errors);
+    let builtin_icons = BuiltinIcons::new();
 
-    let mut handler = (unused, format_strings);
+    let mut handler = (unused, (format_strings, builtin_icons));
     ast.traverse(&mut handler);
-    let (unused, _) = handler;
+    let (unused, (_, builtin_icons)) = handler;
 
     unused.finish(errors);
+    builtin_icons.finish(errors);
 }
 
 #[derive(Debug, Default)]
