@@ -13,7 +13,7 @@
 !augment_fun(enable_all(), if enabled == false store(enabled, true))
 !augment_fun(disable_all(), if enabled store(enabled, false))
 
-!builtin_icon(rapid_hammer_icon, "icons/bonus/rapidsmash.png")
+!builtin_icon(rapid_hammer_icon, "icons/bonus/rapid_smash.png")
 
 fun rapid_hammer() {
     // TODO this strange ordering should be obsolete?

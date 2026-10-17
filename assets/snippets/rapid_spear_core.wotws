@@ -13,7 +13,7 @@
 !augment_fun(enable_all(), if enabled == false store(enabled, true))
 !augment_fun(disable_all(), if enabled store(enabled, false))
 
-!builtin_icon(rapid_spear_icon, "icons/bonus/rapidspear.png")
+!builtin_icon(rapid_spear_icon, "icons/bonus/rapid_spear.png")
 
 fun rapid_spear() {
     item_message("#Rapid Spear x" + (collected + 1) + "#")

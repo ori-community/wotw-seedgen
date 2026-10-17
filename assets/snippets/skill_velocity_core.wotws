@@ -13,7 +13,7 @@
 !augment_fun(enable_all(), if enabled == false store(enabled, true))
 !augment_fun(disable_all(), if enabled store(enabled, false))
 
-!builtin_icon(skill_velocity_icon, "icons/bonus/skillvelocity.png")
+!builtin_icon(skill_velocity_icon, "icons/bonus/skill_velocity.png")
 
 fun skill_velocity() {
     item_message("#Skill Velocity x" + (collected + 1) + "#")

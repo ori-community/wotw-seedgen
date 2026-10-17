@@ -30,10 +30,10 @@ By default those are bound to
 !include("list_core", new_column, add_row, next_item_first, new_colored_row, add_colored_row_item)
 !include("stats")
 
-!builtin_icon(progress_summary_icon, "icons/wheel/progress_summary.blue.png") // TODO inconsistent casing in the icon filenames
+!builtin_icon(progress_summary_icon, "icons/wheel/progress_summary.blue.png")
 !builtin_icon(tree_progress_icon, "icons/wheel/tree_progress.blue.png")
-!builtin_icon(wisp_progress_icon, "icons/wheel/wisps_progress.png") // TODO why do others have blue and this one not
-!builtin_icon(quest_progress_icon, "icons/wheel/quests_progress.blue.png") // TODO some filenames are singular, some plural...
+!builtin_icon(wisp_progress_icon, "icons/wheel/wisp_progress.png")
+!builtin_icon(quest_progress_icon, "icons/wheel/quest_progress.blue.png")
 !builtin_icon(teleporter_icon, "icons/game/teleporter.png")
 !builtin_icon(entrance_connections_icon, "icons/wheel/entrance_connections.blue.png")
 

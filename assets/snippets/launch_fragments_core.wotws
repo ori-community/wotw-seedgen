@@ -2,7 +2,7 @@
 #name("Launch Fragments Core")
 #description("Adds support for Launch Fragments")
 
-!builtin_icon(launch_fragment_icon, "icons/bonus/launchfragment.png")
+!builtin_icon(launch_fragment_icon, "icons/bonus/launch_fragment.png")
 
 !include("progress_helper", write_progress_message)
 !include("list_core", add_row)

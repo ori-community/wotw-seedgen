@@ -364,13 +364,13 @@ impl CommonUberIdentifier {
 
     pub const fn icon(self) -> Option<Icon> {
         let icon = match self {
-            Self::SpiritLight => Icon::File(Cow::Borrowed("icons/game/experience.png")),
-            Self::GorlekOre => Icon::File(Cow::Borrowed("icons/game/gorlekore.png")),
+            Self::SpiritLight => Icon::File(Cow::Borrowed("icons/game/spirit_light.png")),
+            Self::GorlekOre => Icon::File(Cow::Borrowed("icons/game/gorlek_ore.png")),
             Self::Keystones => Icon::File(Cow::Borrowed("icons/game/keystone.png")),
-            Self::ShardSlots => Icon::File(Cow::Borrowed("icons/game/shardslot.png")),
-            Self::CleanWater => Icon::File(Cow::Borrowed("icons/game/water.png")),
-            Self::BaseMaxHealth => Icon::File(Cow::Borrowed("icons/game/healthfragment.png")),
-            Self::BaseMaxEnergy => Icon::File(Cow::Borrowed("icons/game/energyfragment.png")),
+            Self::ShardSlots => Icon::File(Cow::Borrowed("icons/game/shard_slot.png")),
+            Self::CleanWater => Icon::File(Cow::Borrowed("icons/game/clean_water.monochrome.png")),
+            Self::BaseMaxHealth => Icon::File(Cow::Borrowed("icons/game/health_fragment.png")),
+            Self::BaseMaxEnergy => Icon::File(Cow::Borrowed("icons/game/energy_fragment.png")),
             Self::WeaponUpgrade(weapon_upgrade) => match weapon_upgrade {
                 WeaponUpgrade::ExplodingSpear => Icon::Opher(OpherIcon::ExplodingSpear),
                 WeaponUpgrade::HammerShockwave => Icon::Opher(OpherIcon::HammerShockwave),
@@ -389,10 +389,10 @@ impl CommonUberIdentifier {
                 Skill::Blaze => Icon::Opher(OpherIcon::Blaze),
                 Skill::Sentry => Icon::Opher(OpherIcon::Sentry),
                 Skill::GladesAncestralLight => {
-                    Icon::File(Cow::Borrowed("icons/game/ancestrallight1.png"))
+                    Icon::File(Cow::Borrowed("icons/game/glades_ancestral_light.png"))
                 }
                 Skill::MarshAncestralLight => {
-                    Icon::File(Cow::Borrowed("icons/game/ancestrallight2.png"))
+                    Icon::File(Cow::Borrowed("icons/game/marsh_ancestral_light.png"))
                 }
                 skill => match skill.equipment() {
                     None => return None,
