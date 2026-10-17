@@ -96,16 +96,18 @@ jobs:
         uses: actions/download-artifact@v7
         with:
           name: seed_linux
-          path: "/tmp/seed_linux"
+          path: "/tmp/artifacts"
       - name: Download Windows seed
         uses: actions/download-artifact@v7
         with:
           name: seed_windows
-          path: "/tmp/seed_windows"
+          path: "/tmp/artifacts"
       - name: Extract Artifacts
         run: |
-          unzip /tmp/seed_windows
-          unzip /tmp/seed_linux
+          mkdir /tmp/seed_windows
+          mkdir /tmp/seed_linux
+          unzip -d /tmp/seed_windows /tmp/artifacts/seed_windows.zip
+          unzip -d /tmp/seed_linux /tmp/artifacts/seed_linux.zip
       - name: Compare seedgen output
         run: |
           sudo apt-get install -y zipcmp
