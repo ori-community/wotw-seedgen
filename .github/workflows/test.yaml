@@ -102,7 +102,11 @@ jobs:
         with:
           name: seed_windows
           path: "/tmp/seed_windows"
+      - name: Extract Artifacts
+        run: |
+          unzip /tmp/seed_windows
+          unzip /tmp/seed_linux
       - name: Compare seedgen output
         run: |
           sudo apt-get install -y zipcmp
-          zipcmp /tmp/seed_linux /tmp/seed_windows
+          zipcmp /tmp/seed_linux/*.wotwr /tmp/seed_windows/*.wotwr
