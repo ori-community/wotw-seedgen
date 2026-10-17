@@ -103,4 +103,6 @@ jobs:
           name: seed_windows
           path: "/tmp/seed_windows"
       - name: Compare seedgen output
-        run: diff -rq /tmp/seed_linux /tmp/seed_windows
+        run: |
+          apt-get install -y zipcmp
+          zipcmp /tmp/seed_linux /tmp/seed_windows
