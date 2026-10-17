@@ -1,7 +1,15 @@
 #name("Icon Index")
 #description("Uses wheels and the map to show all available icons")
 
+!builtin_icon(message_icon, "icons/game/message.png")
+
 !spawn(-3219, -5935)
+
+on spawn {
+    item_message("[OpenRandomizerWheel]Wheel, Shop and message icons\n[OpenAreaMap]Map Icons")
+    store(randoState.enableSpoilerFilter, true)
+    store(player.currentMapFilter, 4)
+}
 
 on reload {
     root()
@@ -14,19 +22,23 @@ on reload {
 }
 
 fun root() {
-    set_wheel_item_data("root", Left, "Shards", "[Ability1]View", Overcharge)
-    set_wheel_item_all_actions("root", Left, switch_wheel("shards"))
-    set_wheel_item_data("root", LeftTop, "Equipment", "[Ability1]View", Hammer)
-    set_wheel_item_all_actions("root", LeftTop, switch_wheel("equipment"))
-    set_wheel_item_data("root", TopLeft, "Opher", "[Ability1]View", Sentry)
-    set_wheel_item_all_actions("root", TopLeft, switch_wheel("opher"))
-    set_wheel_item_data("root", Top, "Lupo", "[Ability1]View", EnergyFragmentsMap)
-    set_wheel_item_all_actions("root", Top, switch_wheel("lupo"))
-    set_wheel_item_data("root", TopRight, "Grom", "[Ability1]View", RepairTheSpiritWell)
-    set_wheel_item_all_actions("root", TopRight, switch_wheel("grom"))
-    set_wheel_item_data("root", RightTop, "Tuley", "[Ability1]View", SelaFlowers)
-    set_wheel_item_all_actions("root", RightTop, switch_wheel("tuley"))
-    set_wheel_item_data("root", Right, "Placeholder", "", Placeholder)
+    set_wheel_item_data("root", LeftBottom, "Message icons", "[Ability1]View", message_icon)
+    set_wheel_item_all_actions("root", LeftBottom, icons_message())
+    set_wheel_item_data("root", Left, "Message xbox icons", "[Ability1]View", message_icon)
+    set_wheel_item_all_actions("root", Left, xbox_icons_message())
+    set_wheel_item_data("root", LeftTop, "Shards", "[Ability1]View", Overcharge)
+    set_wheel_item_all_actions("root", LeftTop, switch_wheel("shards"))
+    set_wheel_item_data("root", TopLeft, "Equipment", "[Ability1]View", Hammer)
+    set_wheel_item_all_actions("root", TopLeft, switch_wheel("equipment"))
+    set_wheel_item_data("root", Top, "Opher", "[Ability1]View", Sentry)
+    set_wheel_item_all_actions("root", Top, switch_wheel("opher"))
+    set_wheel_item_data("root", TopRight, "Lupo", "[Ability1]View", EnergyFragmentsMap)
+    set_wheel_item_all_actions("root", TopRight, switch_wheel("lupo"))
+    set_wheel_item_data("root", RightTop, "Grom", "[Ability1]View", RepairTheSpiritWell)
+    set_wheel_item_all_actions("root", RightTop, switch_wheel("grom"))
+    set_wheel_item_data("root", Right, "Tuley", "[Ability1]View", SelaFlowers)
+    set_wheel_item_all_actions("root", Right, switch_wheel("tuley"))
+    set_wheel_item_data("root", RightBottom, "Placeholder", "", Placeholder)
 }
 
 fun shards() {
@@ -192,9 +204,42 @@ fun tuley() {
     set_wheel_item_data("tuley", Bottom, "TheLastSeed", "", TheLastSeed)
 }
 
-on spawn store(randoState.enableSpoilerFilter, true)
+fun icons_message() {
+    free_message(
+        "icons",
+        "#icon#\n" +
+        "a       b       c       d       e       f       g       h       i       j       k       l       m\n" +
+        "<icon>abcdefghijklm</>\n" +
+        "n       o       p       q       r       s       t       u       v       w       x       y       z\n" +
+        "<icon>nopqrstuvwxyz</>\n" +
+        "A          B            C           D      E       F      G      H       I       J       K       L      M\n" +
+        "<icon>AB</>    <icon>CDEFGHIJKLM</>\n" +
+        "N     O      P          Q         R        S            T            U         V       X    Y    Z\n" +
+        "<icon>NOPQRSTUVWXYZ</>\n" + // W does not seem to exist
+        "0       1      2       3      4       5      6       7      8       9\n" +
+        "<icon>0123456789</>\n" +
+        "!      %      =       ?       [        ]       \       +       ~       '        -        .         ,        ;\n" +
+        "<icon>!%=?[" + "]\+~'-.,;</>\n" +
+        "\n" +
+        "[Binding1]Close"
+    )
+}
 
-// TODO spoiler map crashes
+fun xbox_icons_message() {
+    free_message(
+        "icons",
+        "#xbox#\n" +
+        "1      	2       	3      	4       	5      	6       	7        	8        	0\n" +
+        "<xbox>123456780</>\n" +
+        "d       	l     	m   	p     	r      	s     	u     	A   	B   	L   	R 	S  	T  	X  	Y\n" +
+        "<xbox>d</>	<xbox>l</>	<xbox>mp</>  <xbox>r</>	<xbox>su</>	<xbox>ABLRSTXY</>\n" +
+        "\n" +
+        "[Binding1]Close"
+    )
+}
+
+on binding1 destroy_message("icons")
+
 !item_data_map_icon(item_message("Keystone"), Keystone)
 on Marsh.Spawn.LeftHF item_message("Keystone")
 !item_data_map_icon(item_message("Mapstone"), Mapstone)
