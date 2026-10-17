@@ -104,5 +104,5 @@ jobs:
           path: "/tmp/seed_windows"
       - name: Compare seedgen output
         run: |
-          apt-get install -y zipcmp
+          sudo apt-get install -y zipcmp
           zipcmp /tmp/seed_linux /tmp/seed_windows
