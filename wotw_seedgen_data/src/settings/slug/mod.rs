@@ -2,6 +2,7 @@ mod slugstrings;
 #[cfg(test)]
 mod tests;
 
+use log::trace;
 use sha2::{Digest, Sha256};
 
 use crate::{settings::slug::slugstrings::SLUGSTRINGS, UniverseSettings};
@@ -12,7 +13,7 @@ impl UniverseSettings {
         let json = serde_json::to_vec(self).unwrap();
         let hash = u64::from_be_bytes(*Sha256::digest(json).first_chunk().unwrap());
 
-        SLUGSTRINGS
+        let slug = SLUGSTRINGS
             .iter()
             .enumerate()
             .map(|(index, slug_strings)| {
@@ -32,6 +33,10 @@ impl UniverseSettings {
                     (hash >> (index as u32 * shift)) as usize & (2_usize.pow(shift) - 1);
                 slug_strings[word_index]
             })
-            .collect()
+            .collect();
+
+        trace!("Slug: {slug}");
+
+        slug
     }
 }

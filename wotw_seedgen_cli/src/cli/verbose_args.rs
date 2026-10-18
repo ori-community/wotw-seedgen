@@ -38,6 +38,7 @@ pub struct VerboseArgs {
 
 #[derive(ValueEnum, Debug, Clone, PartialEq)]
 pub enum VerboseTarget {
+    Slug,
     Placement,
     Reached,
     IsMet,

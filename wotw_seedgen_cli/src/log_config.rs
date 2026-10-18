@@ -19,6 +19,7 @@ use crate::{
 #[derive(Debug)]
 pub struct LogConfig {
     trace_seedgen: bool,
+    trace_slug: LevelFilter,
     trace_placement: LevelFilter,
     trace_reached: LevelFilter,
     trace_is_met: LevelFilter,
@@ -32,6 +33,7 @@ pub struct LogConfig {
     trace_uber_states: Option<Vec<UberIdentifier>>,
 }
 
+const SLUG_MOD: &str = "wotw_seedgen_data::settings::slug";
 const PLACEMENT_MOD: &str = "wotw_seedgen::generator::placement";
 const ITEM_POOL_MOD: &str = "wotw_seedgen::generator::item_pool";
 const REACHED_MOD: &str = "wotw_seedgen::world::reached";
@@ -47,6 +49,7 @@ impl Default for LogConfig {
     fn default() -> Self {
         Self {
             trace_seedgen: false,
+            trace_slug: LevelFilter::Info,
             trace_placement: LevelFilter::Info,
             trace_reached: LevelFilter::Info,
             trace_is_met: LevelFilter::Info,
@@ -67,6 +70,7 @@ impl Index<VerboseTarget> for LogConfig {
 
     fn index(&self, index: VerboseTarget) -> &Self::Output {
         match index {
+            VerboseTarget::Slug => &self.trace_slug,
             VerboseTarget::Placement => &self.trace_placement,
             VerboseTarget::Reached => &self.trace_reached,
             VerboseTarget::IsMet => &self.trace_is_met,
@@ -84,6 +88,7 @@ impl Index<VerboseTarget> for LogConfig {
 impl IndexMut<VerboseTarget> for LogConfig {
     fn index_mut(&mut self, index: VerboseTarget) -> &mut Self::Output {
         match index {
+            VerboseTarget::Slug => &mut self.trace_slug,
             VerboseTarget::Placement => &mut self.trace_placement,
             VerboseTarget::Reached => &mut self.trace_reached,
             VerboseTarget::IsMet => &mut self.trace_is_met,
@@ -139,6 +144,7 @@ impl LogConfig {
 
         let Self {
             trace_seedgen,
+            trace_slug,
             trace_placement,
             trace_reached,
             trace_is_met,
@@ -159,6 +165,7 @@ impl LogConfig {
                 .format(|out, message, record| {
                     out.finish(format_args!("{:<7}{}", record.level(), message));
                 })
+                .level_for(SLUG_MOD, trace_slug)
                 .level_for(PLACEMENT_MOD, trace_placement)
                 .level_for(ITEM_POOL_MOD, trace_placement)
                 .level_for(REACHED_MOD, trace_reached)
