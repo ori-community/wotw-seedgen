@@ -33,7 +33,7 @@
 !builtin_icon(splinter_shuriken_icon, "icons/bonus/splinter_shuriken.png")
 !builtin_icon(bashable_shuriken_icon, "icons/bonus/bashable_shuriken.png")
 !builtin_icon(ultra_flap_icon, "icons/bonus/ultra_flap.png")
-// !builtin_icon(long_splinter_icon, "icons/bonus/long_splinter.png")
+!builtin_icon(long_splinter_icon, "icons/bonus/splinter_range_upgrade.png")
 
 !state(energy_regenerations, Integer)
 !export(energy_regenerations)
@@ -610,7 +610,7 @@ fun long_splinter() {
     "#Long Splinter#",
     200,
     "Arrows have longer range with " + shard_string(Splinter) + " equipped",
-    // long_splinter_icon,
+    long_splinter_icon,
     Placeholder,
     BonusItem
 )
