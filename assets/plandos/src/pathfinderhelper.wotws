@@ -2139,7 +2139,6 @@ on change 7|18 if uber_state_log uber_state_log_message("#randoConfig.allowTelep
 on change 7|421 if uber_state_log uber_state_log_message("#randoConfig.baurSneezeWithFlash# (7|421) -> " + 7|421)
 on change 7|506 if uber_state_log uber_state_log_message("#randoConfig.beautifyPlayCutscene# (7|506) -> " + 7|506)
 on change 7|21 if uber_state_log uber_state_log_message("#randoConfig.allowTeleportingAtRuinsMapstone# (7|21) -> " + 7|21)
-on change 7|301 if uber_state_log uber_state_log_message("#randoConfig.forceNoAirDecelerationFlag# (7|301) -> " + 7|301)
 on change 7|512 if uber_state_log uber_state_log_message("#randoConfig.blueMoonPlayCutscene# (7|512) -> " + 7|512)
 on change 7|515 if uber_state_log uber_state_log_message("#randoConfig.lastTreePlayCutscene# (7|515) -> " + 7|515)
 on change 7|200 if uber_state_log uber_state_log_message("#randoConfig.showSmallEntrances# (7|200) -> " + 7|200)
