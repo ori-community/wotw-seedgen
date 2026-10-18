@@ -1,11 +1,11 @@
-use std::{ffi::OsStr, fs, io::Cursor, path::PathBuf};
+use std::{collections::hash_map::Entry, ffi::OsStr, fs, io::Cursor, path::PathBuf};
 
 use axum::{
     Json,
     extract::ws::{self, WebSocket},
 };
 use futures_util::{SinkExt, stream::SplitSink};
-use rustc_hash::FxHashMap;
+use rustc_hash::{FxBuildHasher, FxHashMap};
 use tokio::sync::{
     Mutex,
     mpsc::{UnboundedReceiver, UnboundedSender},
@@ -16,8 +16,8 @@ use wotw_seedgen::{
         MapIcon, UniverseSettings,
         assets::{
             AssetCache, AssetCacheValues, ChangedAssets, DefaultAssetCacheValues,
-            DefaultFileAccess, FullFileAccess, Pickups, SEEDGEN_USER_DATA_DIR, States,
-            UberStateData, UniversePreset, WorldPreset,
+            DefaultFileAccess, EXECUTABLE_DIR, FullFileAccess, Pickups, SEEDGEN_USER_DATA_DIR,
+            States, UberStateData, UniversePreset, WorldPreset,
         },
         logic_language::{ast::Paths, output::Graph},
         parse::Source,
@@ -31,7 +31,7 @@ use crate::{
     RouterState,
     api::{
         SchemaResult,
-        assets::AssetOrigin,
+        assets::{AssetOrigin, AssetOriginDir},
         logic::{MapIcons, RelevantUberStates, SpawnAnchors},
         plandos::PlandoInfo,
         presets::{universe::UniversePresetInfo, world::WorldPresetInfo},
@@ -359,108 +359,59 @@ impl<T: Clone> CacheResult<T> {
     }
 }
 
-trait AssetInfo {
-    type Asset;
-
-    fn new(asset: &Self::Asset) -> Self;
-
-    fn origin(&mut self) -> &mut AssetOrigin;
-}
-
-impl AssetInfo for SnippetInfo {
-    type Asset = Source;
-
-    fn new(asset: &Self::Asset) -> Self {
-        // TODO cache asts?
-        let metadata = Metadata::from_source(&asset.content);
-        // corrected later when the full tree is available
-        let tree_requires_local_files = metadata.requires_local_files;
-
-        Self {
-            origin: AssetOrigin::ExecutableDir,
-            metadata,
-            tree_requires_local_files,
-        }
-    }
-
-    fn origin(&mut self) -> &mut AssetOrigin {
-        &mut self.origin
-    }
-}
-
-impl AssetInfo for UniversePresetInfo {
-    type Asset = UniversePreset;
-
-    fn new(asset: &Self::Asset) -> Self {
-        Self {
-            origin: AssetOrigin::ExecutableDir,
-            content: asset.clone(),
-        }
-    }
-
-    fn origin(&mut self) -> &mut AssetOrigin {
-        &mut self.origin
-    }
-}
-
-impl AssetInfo for WorldPresetInfo {
-    type Asset = WorldPreset;
-
-    fn new(asset: &Self::Asset) -> Self {
-        Self {
-            origin: AssetOrigin::ExecutableDir,
-            content: asset.clone(),
-        }
-    }
-
-    fn origin(&mut self) -> &mut AssetOrigin {
-        &mut self.origin
-    }
-}
-
-impl AssetInfo for PlandoInfo {
-    type Asset = Vec<u8>;
-
-    fn new(asset: &Self::Asset) -> Self {
-        Self {
-            origin: AssetOrigin::ExecutableDir,
-            attributes: SeedReader::new(Cursor::new(asset))
-                .and_then(|mut reader| reader.read_plando_attributes())
-                .unwrap_or_default(),
-        }
-    }
-
-    fn origin(&mut self) -> &mut AssetOrigin {
-        &mut self.origin
-    }
-}
-
-fn asset_info<T, I>(
+fn asset_info<T, I, F>(
     assets: &FxHashMap<String, Result<T, String>>,
     dir: &str,
     extension: &str,
+    mut f: F,
 ) -> FxHashMap<String, SchemaResult<I, String>>
 where
-    I: AssetInfo<Asset = T>,
+    F: FnMut(AssetOrigin, &T) -> I,
 {
-    let mut asset_info = assets
-        .iter()
-        .map(|(identifier, asset)| (identifier.clone(), ok_ref(asset).map(I::new).into()))
-        .collect::<FxHashMap<_, _>>();
+    let mut origins = FxHashMap::with_capacity_and_hasher(assets.len(), FxBuildHasher);
 
     for path in data_dir_assets(dir, extension) {
-        let identifier = path.file_stem().unwrap().to_str().unwrap();
+        let identifier = path.file_stem().unwrap().to_str().unwrap().to_string();
         let path = path.to_str().unwrap().to_string();
-        if let SchemaResult::Ok(info) = asset_info.get_mut(identifier).unwrap() {
-            *info.origin() = AssetOrigin::UserDataDir { path };
+        let origin = AssetOrigin::new(AssetOriginDir::UserData, path);
+
+        origins.insert(identifier, origin);
+    }
+
+    for path in excutable_dir_assets(dir, extension) {
+        let identifier = path.file_stem().unwrap().to_str().unwrap().to_string();
+
+        if let Entry::Vacant(entry) = origins.entry(identifier) {
+            let path = path.to_str().unwrap().to_string();
+            let origin = AssetOrigin::new(AssetOriginDir::Executable, path);
+
+            entry.insert(origin);
         }
     }
 
-    asset_info
+    assets
+        .iter()
+        .filter_map(|(identifier, asset)| {
+            origins.remove(identifier).map(|origin| {
+                (
+                    identifier.clone(),
+                    ok_ref(asset).map(|t| f(origin, t)).into(),
+                )
+            })
+        })
+        .collect::<FxHashMap<_, _>>()
 }
 
 fn data_dir_assets(dir: &str, extension: &str) -> impl Iterator<Item = PathBuf> {
-    fs::read_dir(SEEDGEN_USER_DATA_DIR.join(dir))
+    dir_assets(SEEDGEN_USER_DATA_DIR.join(dir), extension)
+}
+
+fn excutable_dir_assets(dir: &str, extension: &str) -> impl Iterator<Item = PathBuf> {
+    dir_assets(EXECUTABLE_DIR.join(dir), extension)
+}
+
+fn dir_assets(dir: PathBuf, extension: &str) -> impl Iterator<Item = PathBuf> {
+    fs::read_dir(dir)
         .into_iter()
         .flatten()
         .flatten()
@@ -471,7 +422,18 @@ fn data_dir_assets(dir: &str, extension: &str) -> impl Iterator<Item = PathBuf> 
 fn snippet_info(
     snippets: &FxHashMap<String, Result<Source, String>>,
 ) -> FxHashMap<String, SchemaResult<SnippetInfo, String>> {
-    let mut snippet_info_map = asset_info::<_, SnippetInfo>(snippets, "snippets", "wotws");
+    let mut snippet_info_map = asset_info(snippets, "snippets", "wotws", |origin, source| {
+        // TODO cache asts?
+        let metadata = Metadata::from_source(&source.content);
+        // corrected later when the full tree is available
+        let tree_requires_local_files = metadata.requires_local_files;
+
+        SnippetInfo {
+            origin,
+            metadata,
+            tree_requires_local_files,
+        }
+    });
 
     for identifier in snippets.keys() {
         let SchemaResult::Ok(snippet_info) = &snippet_info_map[identifier] else {
@@ -507,17 +469,38 @@ fn snippet_info(
 fn plando_info(
     plandos: &FxHashMap<String, Result<Vec<u8>, String>>,
 ) -> FxHashMap<String, SchemaResult<PlandoInfo, String>> {
-    asset_info(plandos, "plandos", "wotwr")
+    asset_info(plandos, "plandos", "wotwr", |origin, plando| PlandoInfo {
+        origin,
+        attributes: SeedReader::new(Cursor::new(plando))
+            .and_then(|mut reader| reader.read_plando_attributes())
+            .unwrap_or_default(),
+    })
 }
 
 fn universe_preset_info(
     universe_presets: &FxHashMap<String, Result<UniversePreset, String>>,
 ) -> FxHashMap<String, SchemaResult<UniversePresetInfo, String>> {
-    asset_info(universe_presets, "universe_presets", "json")
+    asset_info(
+        universe_presets,
+        "universe_presets",
+        "json",
+        |origin, universe_preset| UniversePresetInfo {
+            origin,
+            content: universe_preset.clone(),
+        },
+    )
 }
 
 fn world_preset_info(
     world_presets: &FxHashMap<String, Result<WorldPreset, String>>,
 ) -> FxHashMap<String, SchemaResult<WorldPresetInfo, String>> {
-    asset_info(world_presets, "world_presets", "json")
+    asset_info(
+        world_presets,
+        "world_presets",
+        "json",
+        |origin, world_preset| WorldPresetInfo {
+            origin,
+            content: world_preset.clone(),
+        },
+    )
 }

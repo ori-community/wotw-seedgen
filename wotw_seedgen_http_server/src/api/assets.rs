@@ -58,10 +58,23 @@ async fn watch(ws: WebSocketUpgrade, State(cache): State<RouterState>) -> Respon
 
 /// Origin of an asset
 #[derive(Debug, Clone, Serialize, ToSchema)]
-#[serde(tag = "kind", rename_all_fields = "camelCase")]
-pub enum AssetOrigin {
+#[serde(rename_all = "camelCase")]
+pub struct AssetOrigin {
+    pub dir: AssetOriginDir,
+    pub path: String,
+}
+
+impl AssetOrigin {
+    pub fn new(dir: AssetOriginDir, path: String) -> Self {
+        Self { dir, path }
+    }
+}
+
+/// Origin directory of an asset
+#[derive(Debug, Clone, Serialize, ToSchema)]
+pub enum AssetOriginDir {
     /// This asset was found within the seedgen executable's parent directory
-    ExecutableDir,
+    Executable,
     /// This asset was found within the user data directory
-    UserDataDir { path: String },
+    UserData,
 }
