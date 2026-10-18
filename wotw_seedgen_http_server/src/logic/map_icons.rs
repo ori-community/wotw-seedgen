@@ -3,7 +3,7 @@ use std::{hash::BuildHasher, sync::LazyLock};
 use rustc_hash::{FxBuildHasher, FxHashMap};
 use wotw_seedgen::data::{
     MapIcon, Position, UberIdentifier, Zone,
-    assets::{LocData, LocDataEntry},
+    assets::{Pickups, PickupsEntry},
     seed_language::ast::Comparator,
 };
 
@@ -59,7 +59,7 @@ static SPIRIT_TRIAL_END_POSITIONS: LazyLock<FxHashMap<UberIdentifier, Position>>
     });
 
 impl MapIcons {
-    pub fn new(loc_data: &LocData) -> Self {
+    pub fn new(pickups: &Pickups) -> Self {
         const SPIRIT_TRIAL_COUNT: usize = 8;
         const SHOP_ICON_COUNT: usize = 7;
         const OPHER_ITEM_COUNT: usize = 12;
@@ -68,7 +68,7 @@ impl MapIcons {
         const SHOP_ITEM_COUNT: usize = OPHER_ITEM_COUNT + TWILLEN_ITEM_COUNT + LUPO_ITEM_COUNT;
 
         let map_icon_count =
-            loc_data.entries.len() + SPIRIT_TRIAL_COUNT * 3 + SHOP_ICON_COUNT - SHOP_ITEM_COUNT;
+            pickups.entries.len() + SPIRIT_TRIAL_COUNT * 3 + SHOP_ICON_COUNT - SHOP_ITEM_COUNT;
 
         let mut map_icons = Vec::with_capacity(map_icon_count);
 
@@ -76,7 +76,7 @@ impl MapIcons {
         let mut twillen_conditions = Vec::with_capacity(TWILLEN_ITEM_COUNT);
         let mut lupo_conditions = Vec::with_capacity(LUPO_ITEM_COUNT);
 
-        for entry in &loc_data.entries {
+        for entry in &pickups.entries {
             match entry.map_icon {
                 MapIcon::Opher => {
                     opher_conditions.push(MapIconCondition::new(entry.uber_identifier, None));
@@ -128,7 +128,7 @@ impl MapIcons {
                 positions: vec![Position::new(-212.3, -4158.8)],
                 visible_if_any: lupo_conditions,
             },
-            // TODO make from loc_data if that gets grom shop entries
+            // TODO make from pickups if that gets grom shop entries
             MapIconInfo {
                 label: "GromShop".to_string(),
                 icon: MapIcon::Grom,
@@ -152,7 +152,7 @@ impl MapIcons {
 }
 
 impl MapIconInfo {
-    fn from_entry(entry: &LocDataEntry) -> Option<Self> {
+    fn from_entry(entry: &PickupsEntry) -> Option<Self> {
         entry.map_position.map(|map_position| MapIconInfo {
             label: entry.identifier.clone(),
             icon: entry.map_icon,
@@ -161,7 +161,7 @@ impl MapIconInfo {
         })
     }
 
-    fn spirit_trial_start(entry: &LocDataEntry, position: Position) -> Self {
+    fn spirit_trial_start(entry: &PickupsEntry, position: Position) -> Self {
         MapIconInfo {
             label: entry.identifier.clone(),
             icon: MapIcon::RaceStart,
@@ -174,7 +174,7 @@ impl MapIconInfo {
         }
     }
 
-    fn spirit_trial_start_finished(entry: &LocDataEntry, position: Position) -> Self {
+    fn spirit_trial_start_finished(entry: &PickupsEntry, position: Position) -> Self {
         MapIconInfo {
             label: entry.identifier.clone(),
             icon: MapIcon::RaceStartFinished,
@@ -187,7 +187,7 @@ impl MapIconInfo {
         }
     }
 
-    fn spirit_trial_end(entry: &LocDataEntry, position: Position) -> Self {
+    fn spirit_trial_end(entry: &PickupsEntry, position: Position) -> Self {
         MapIconInfo {
             label: activation_identifier(&entry.identifier),
             icon: MapIcon::RaceEnd,
@@ -200,7 +200,7 @@ impl MapIconInfo {
         }
     }
 
-    fn spirit_trial_end_finished(entry: &LocDataEntry, position: Position) -> Self {
+    fn spirit_trial_end_finished(entry: &PickupsEntry, position: Position) -> Self {
         MapIconInfo {
             label: activation_identifier(&entry.identifier),
             icon: MapIcon::RaceEndFinished,

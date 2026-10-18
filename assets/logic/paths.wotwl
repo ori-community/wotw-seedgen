@@ -1,5 +1,5 @@
 # This file defines all the requirements a player has to fulfill in order to reach a given pickup on the map.
-# The pickup names and locations are defined in loc_data.csv.
+# The pickup names and locations are defined in pickups.csv.
 
 # All pickups are tied to an anchor, a point on the map. The requirements listed under a pickup are what you need to get from that anchor to that pickup. For more details on this visit https://docs.google.com/document/d/1XAiL4GbyYGr2_PobxWajrOPO9kQ5UOSf4KrbI1rsOBM/view?usp=sharing
 

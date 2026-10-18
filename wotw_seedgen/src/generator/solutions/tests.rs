@@ -1183,8 +1183,8 @@ static REGIONLESS_GRAPH: LazyLock<Graph> = LazyLock::new(|| {
         .with_settings(slice::from_ref(&*GORLEK_SETTINGS))
         .compile(
             paths,
-            TEST_ASSETS.expect_loc_data().clone(),
-            TEST_ASSETS.expect_state_data().clone(),
+            TEST_ASSETS.expect_pickups().clone(),
+            TEST_ASSETS.expect_states().clone(),
         )
         .eprint_errors(source)
         .unwrap()

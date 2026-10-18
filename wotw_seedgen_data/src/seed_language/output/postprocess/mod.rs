@@ -16,7 +16,7 @@ use super::{
 };
 
 use crate::{
-    assets::{LocData, LocDataEntry},
+    assets::{Pickups, PickupsEntry},
     seed_language::output::{
         display::strip_invisible_characters,
         item_metadata::{random_shop_description, single_item, DEFAULT_SHOP_PRICE},
@@ -33,16 +33,16 @@ use rustc_hash::{FxBuildHasher, FxHashMap};
 
 pub fn postprocess(
     worlds: &mut [&mut IntermediateOutput],
-    loc_data: &LocData,
+    pickups: &Pickups,
     rng: &mut Pcg64Mcg,
 ) -> Vec<PlaceholderMap> {
-    let postprocessor = UniversePostprocessor::new(worlds, loc_data);
+    let postprocessor = UniversePostprocessor::new(worlds, pickups);
 
     let placeholder_maps = postprocessor.resolve_placeholders().collect::<Vec<_>>();
     let extra_events = postprocessor.generate_defaults(rng).collect::<Vec<_>>();
 
     let UniversePostprocessor {
-        loc_data_triggers, ..
+        pickup_triggers, ..
     } = postprocessor;
 
     for (output, extra_events) in worlds.iter_mut().zip(extra_events) {
@@ -51,7 +51,7 @@ pub fn postprocess(
 
         // TODO merge events with identical triggers where it doesn't break order?
 
-        loc_data_triggers.generate_message_origins(&mut output.commands.events);
+        pickup_triggers.generate_message_origins(&mut output.commands.events);
 
         output.commands.events.splice(0..0, extra_events);
     }
@@ -65,19 +65,19 @@ pub struct PlaceholderMap {
     pub strings: FxHashMap<StringOrPlaceholder, CommandString>,
 }
 
-pub struct UniversePostprocessor<'output, 'locdata, 'log> {
+pub struct UniversePostprocessor<'output, 'pickups, 'log> {
     worlds: Vec<WorldPostprocessor<'output, 'log>>,
-    loc_data_triggers: LocDataTriggers<'locdata>,
+    pickup_triggers: PickupsTriggers<'pickups>,
     multiworld_lookup: MultiworldLookup<'output>,
 }
 
 struct WorldPostprocessor<'output, 'log> {
     output: &'output IntermediateOutput<'log>,
-    loc_data_events: IndexMap<&'output Trigger, Vec<&'output Event>, FxBuildHasher>,
+    pickup_events: IndexMap<&'output Trigger, Vec<&'output Event>, FxBuildHasher>,
 }
 
-struct LocDataTriggers<'locdata> {
-    inner: FxHashMap<CommandBoolean, &'locdata LocDataEntry>,
+struct PickupsTriggers<'pickups> {
+    inner: FxHashMap<CommandBoolean, &'pickups PickupsEntry>,
 }
 
 #[derive(Default)]
@@ -92,21 +92,21 @@ struct MultiworldEvent<'output> {
     target_command: &'output CommandVoid,
 }
 
-impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
+impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
     pub fn new(
         worlds: &'output [&mut IntermediateOutput<'log>],
-        loc_data: &'locdata LocData,
+        pickups: &'pickups Pickups,
     ) -> Self {
-        let loc_data_triggers = LocDataTriggers::new(loc_data);
+        let pickup_triggers = PickupsTriggers::new(pickups);
         let multiworld_lookup = MultiworldLookup::new(worlds);
         let worlds = worlds
             .iter()
-            .map(|output| WorldPostprocessor::new(output, &loc_data_triggers))
+            .map(|output| WorldPostprocessor::new(output, &pickup_triggers))
             .collect();
 
         Self {
             worlds,
-            loc_data_triggers,
+            pickup_triggers,
             multiworld_lookup,
         }
     }
@@ -193,7 +193,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
                 });
         }
 
-        self.loc_data_triggers
+        self.pickup_triggers
             .get(trigger)
             .map(|entry| (origin_world_index, entry.zone))
     }
@@ -211,9 +211,9 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
         let origin_world = &self.worlds[origin_world_index];
 
         let matches = origin_world
-            .loc_data_events
+            .pickup_events
             .iter()
-            .map(|(trigger, events)| (&self.loc_data_triggers[trigger], events))
+            .map(|(trigger, events)| (&self.pickup_triggers[trigger], events))
             .filter(|(entry, _)| entry.zone == zone)
             .flat_map(|(entry, events)| {
                 events
@@ -255,7 +255,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
         let mut extra_events = vec![];
         let mut next_spoiler_icon_id = 0usize;
 
-        for (trigger, events) in &world.loc_data_events {
+        for (trigger, events) in &world.pickup_events {
             let shop_identifier = trigger
                 .as_condition()
                 .and_then(|condition| match condition {
@@ -270,7 +270,7 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
                     _ => None,
                 });
 
-            let map_position = self.loc_data_triggers[trigger].map_position;
+            let map_position = self.pickup_triggers[trigger].map_position;
 
             if shop_identifier.is_none() && map_position.is_none() {
                 continue;
@@ -448,24 +448,21 @@ impl<'output, 'locdata, 'log> UniversePostprocessor<'output, 'locdata, 'log> {
 }
 
 impl<'output, 'log> WorldPostprocessor<'output, 'log> {
-    fn new(output: &'output IntermediateOutput<'log>, loc_data_triggers: &LocDataTriggers) -> Self {
-        let mut loc_data_events = IndexMap::<_, Vec<_>, FxBuildHasher>::default();
+    fn new(output: &'output IntermediateOutput<'log>, pickup_triggers: &PickupsTriggers) -> Self {
+        let mut pickup_events = IndexMap::<_, Vec<_>, FxBuildHasher>::default();
 
         for event in output
             .commands
             .events
             .iter()
-            .filter(|event| loc_data_triggers.contains(&event.trigger))
+            .filter(|event| pickup_triggers.contains(&event.trigger))
         {
-            loc_data_events
-                .entry(&event.trigger)
-                .or_default()
-                .push(event);
+            pickup_events.entry(&event.trigger).or_default().push(event);
         }
 
         Self {
             output,
-            loc_data_events,
+            pickup_events,
         }
     }
 
@@ -488,15 +485,15 @@ impl<'output, 'log> WorldPostprocessor<'output, 'log> {
     }
 }
 
-impl<'locdata> LocDataTriggers<'locdata> {
-    fn new(loc_data: &'locdata LocData) -> Self {
+impl<'pickups> PickupsTriggers<'pickups> {
+    fn new(pickups: &'pickups Pickups) -> Self {
         Self {
-            inner: loc_data
+            inner: pickups
                 .entries
                 .iter()
                 .map(|entry| {
                     (
-                        CommandBoolean::loc_data_condition(entry.uber_identifier, entry.value),
+                        CommandBoolean::pickup_condition(entry.uber_identifier, entry.value),
                         entry,
                     )
                 })
@@ -504,7 +501,7 @@ impl<'locdata> LocDataTriggers<'locdata> {
         }
     }
 
-    fn get(&self, trigger: &Trigger) -> Option<&LocDataEntry> {
+    fn get(&self, trigger: &Trigger) -> Option<&PickupsEntry> {
         self.inner.get(trigger.as_condition()?).copied()
     }
 
@@ -537,8 +534,8 @@ impl<'locdata> LocDataTriggers<'locdata> {
     }
 }
 
-impl Index<&Trigger> for LocDataTriggers<'_> {
-    type Output = LocDataEntry;
+impl Index<&Trigger> for PickupsTriggers<'_> {
+    type Output = PickupsEntry;
 
     fn index(&self, index: &Trigger) -> &Self::Output {
         self.get(index).unwrap()
@@ -646,17 +643,17 @@ trait ResolvePlaceholders {
     fn resolve(&self, context: &mut ResolveContext);
 }
 
-struct ResolveContext<'postprocessor, 'output, 'locdata, 'log> {
-    postprocessor: &'postprocessor UniversePostprocessor<'output, 'locdata, 'log>,
+struct ResolveContext<'postprocessor, 'output, 'pickups, 'log> {
+    postprocessor: &'postprocessor UniversePostprocessor<'output, 'pickups, 'log>,
     world_index: usize,
     placeholder_map: PlaceholderMap,
 }
 
-impl<'postprocessor, 'output, 'locdata, 'log>
-    ResolveContext<'postprocessor, 'output, 'locdata, 'log>
+impl<'postprocessor, 'output, 'pickups, 'log>
+    ResolveContext<'postprocessor, 'output, 'pickups, 'log>
 {
     fn new(
-        postprocessor: &'postprocessor UniversePostprocessor<'output, 'locdata, 'log>,
+        postprocessor: &'postprocessor UniversePostprocessor<'output, 'pickups, 'log>,
         world_index: usize,
     ) -> Self {
         Self {
@@ -1113,7 +1110,7 @@ where
 }
 
 fn count_in_zone_message(
-    matches: Vec<(&Event, &LocDataEntry)>,
+    matches: Vec<(&Event, &PickupsEntry)>,
     item_metadata: &ItemMetadata,
 ) -> CommandString {
     if matches.is_empty() {
@@ -1141,7 +1138,7 @@ fn count_in_zone_message(
         ]
         .into_iter()
         .chain(matches.into_iter().map(|(event, entry)| CommandVoid::If {
-            condition: CommandBoolean::loc_data_condition(entry.uber_identifier, entry.value),
+            condition: CommandBoolean::pickup_condition(entry.uber_identifier, entry.value),
             command: Box::new(CommandVoid::Multi {
                 commands: vec![
                     CommandVoid::SetInteger {

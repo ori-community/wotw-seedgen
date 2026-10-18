@@ -27,15 +27,15 @@ fn logic_assets(c: &mut Criterion) {
     });
 
     let paths = &*PATHS;
-    let loc_data = TEST_ASSETS.loc_data().unwrap();
-    let state_data = TEST_ASSETS.state_data().unwrap();
+    let pickups = TEST_ASSETS.pickups().unwrap();
+    let states = TEST_ASSETS.states().unwrap();
     let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
 
     group.bench_function("compile", |b| {
         b.iter(|| {
             Graph::compiler()
                 .with_settings(slice::from_ref(&settings))
-                .compile(paths.clone(), loc_data.clone(), state_data.clone())
+                .compile(paths.clone(), pickups.clone(), states.clone())
         })
     });
 
@@ -70,7 +70,7 @@ fn snippets(c: &mut Criterion) {
             let mut compiler = Compiler::new(
                 &mut rng,
                 &*TEST_ASSETS,
-                TEST_ASSETS.expect_loc_data(),
+                TEST_ASSETS.expect_pickups(),
                 TEST_ASSETS.expect_uber_state_data(),
             )
             .with_lint(true);
@@ -125,7 +125,7 @@ fn simulation(c: &mut Criterion) {
     let mut compiler = Compiler::new(
         &mut Pcg64Mcg::new(0),
         &*TEST_ASSETS,
-        TEST_ASSETS.expect_loc_data(),
+        TEST_ASSETS.expect_pickups(),
         TEST_ASSETS.expect_uber_state_data(),
     );
     compiler.compile_snippet("launch_fragments").unwrap();

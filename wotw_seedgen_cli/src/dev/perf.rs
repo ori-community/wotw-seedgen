@@ -22,7 +22,7 @@ pub fn perf(args: PerfArgs) -> Result<(), Error> {
     } = args;
 
     let settings = settings_args.into_universe_settings()?;
-    let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
+    let (graph, pickups, uber_state_data) = logic_assets(&settings.world_settings)?;
     let mut perf_data = PerfData::new();
 
     match target {
@@ -43,7 +43,7 @@ pub fn perf(args: PerfArgs) -> Result<(), Error> {
                 .spawn_scoped(scope, || {
                     let generator = Generator::new(
                         &graph,
-                        &loc_data,
+                        &pickups,
                         &uber_state_data,
                         &DefaultFileAccess,
                         &settings,

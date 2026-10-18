@@ -1,9 +1,9 @@
 //! Utilities to deal with some of the simpler asset files used by the seed generator.
 
-mod loc_data;
-pub use loc_data::{LocData, LocDataEntry};
-mod state_data;
-pub use state_data::{StateData, StateDataEntry};
+mod pickups;
+pub use pickups::{Pickups, PickupsEntry};
+mod states;
+pub use states::{States, StatesEntry};
 mod uber_state_data;
 pub use uber_state_data::{
     RandoUberStateGroup, UberStateAlias, UberStateData, UberStateDataEntry, UberStateDump,

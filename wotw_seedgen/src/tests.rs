@@ -17,7 +17,7 @@ fn some_seeds() {
     fn generate_test_seed(graph: &Graph, universe_settings: &UniverseSettings) {
         Generator::new(
             graph,
-            TEST_ASSETS.expect_loc_data(),
+            TEST_ASSETS.expect_pickups(),
             TEST_ASSETS.expect_uber_state_data(),
             &*TEST_ASSETS,
             universe_settings,
@@ -34,8 +34,8 @@ fn some_seeds() {
         .with_settings(&universe_settings.world_settings)
         .compile(
             paths.clone(),
-            TEST_ASSETS.loc_data().unwrap(),
-            TEST_ASSETS.state_data().unwrap(),
+            TEST_ASSETS.pickups().unwrap(),
+            TEST_ASSETS.states().unwrap(),
         )
         .parsed
         .unwrap();
@@ -47,8 +47,8 @@ fn some_seeds() {
         .with_settings(&universe_settings.world_settings)
         .compile(
             paths,
-            TEST_ASSETS.loc_data().unwrap(),
-            TEST_ASSETS.state_data().unwrap(),
+            TEST_ASSETS.pickups().unwrap(),
+            TEST_ASSETS.states().unwrap(),
         )
         .parsed
         .unwrap();

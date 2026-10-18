@@ -1,7 +1,7 @@
 use std::{borrow::Cow, iter, mem, ops::Range, str::FromStr};
 
 use crate::{
-    assets::{LocData, StateData, StateDataEntry},
+    assets::{Pickups, States, StatesEntry},
     logic_language::{
         ast,
         optimize::Optimize,
@@ -61,16 +61,16 @@ impl<'settings, 'log> CompilerConfig<'settings, 'log> {
     pub fn compile(
         self,
         mut paths: ast::Paths,
-        loc_data: LocData,
-        state_data: StateData,
+        pickups: Pickups,
+        states: States,
     ) -> ParseResult<Graph> {
-        let loc_data_nodes = loc_data
+        let pickup_nodes = pickups
             .entries
             .into_iter()
             .map(Node::Pickup)
             .collect::<Vec<_>>();
 
-        let state_data_nodes = state_data
+        let states_nodes = states
             .entries
             .into_iter()
             .map(Node::State)
@@ -78,8 +78,8 @@ impl<'settings, 'log> CompilerConfig<'settings, 'log> {
 
         let mut compiler = Compiler::new(
             &mut paths,
-            &loc_data_nodes,
-            &state_data_nodes,
+            &pickup_nodes,
+            &states_nodes,
             self.settings,
             self.log_capture,
         );
@@ -95,9 +95,9 @@ impl<'settings, 'log> CompilerConfig<'settings, 'log> {
             ..
         } = compiler;
 
-        let mut nodes: Vec<Node> = loc_data_nodes;
-        nodes.reserve_exact(state_data_nodes.len() + compiled_nodes.len());
-        nodes.extend(state_data_nodes);
+        let mut nodes: Vec<Node> = pickup_nodes;
+        nodes.reserve_exact(states_nodes.len() + compiled_nodes.len());
+        nodes.extend(states_nodes);
         nodes.extend(compiled_nodes);
 
         nodes.shrink_to_fit();
@@ -143,8 +143,8 @@ struct PickupData {
 impl<'source, 'log> Compiler<'source, 'log> {
     fn new(
         paths: &mut ast::Paths,
-        loc_data_nodes: &'source [Node],
-        state_data_nodes: &'source [Node],
+        pickup_nodes: &'source [Node],
+        states_nodes: &'source [Node],
         settings: &[WorldSettings],
         log_capture: &'log LogCapture,
     ) -> Self {
@@ -153,7 +153,7 @@ impl<'source, 'log> Compiler<'source, 'log> {
 
         // index_iter has to be the second iterator so it doesn't get incremented when the first one runs out
         let mut pickup_map = FxHashMap::default();
-        for (node, index) in iter::zip(loc_data_nodes, &mut node_index_iter) {
+        for (node, index) in iter::zip(pickup_nodes, &mut node_index_iter) {
             let pickup = node.expect_pickup();
 
             let identifier = pickup.identifier.as_str();
@@ -168,18 +168,18 @@ impl<'source, 'log> Compiler<'source, 'log> {
                 .is_some()
             {
                 errors.push(Error::error(
-                    format!("duplicate identifier \"{identifier}\" in loc_data"),
+                    format!("duplicate identifier \"{identifier}\" in pickups"),
                     0..0,
                 ));
             }
         }
 
         let mut state_map = FxHashMap::default();
-        for (node, index) in iter::zip(state_data_nodes, &mut node_index_iter) {
+        for (node, index) in iter::zip(states_nodes, &mut node_index_iter) {
             let identifier = node.identifier();
             if state_map.insert(Cow::Borrowed(identifier), index).is_some() {
                 errors.push(Error::error(
-                    format!("duplicate identifier \"{identifier}\" in state_data"),
+                    format!("duplicate identifier \"{identifier}\" in states"),
                     0..0,
                 ));
             }
@@ -270,7 +270,7 @@ impl<'source, 'log> Compiler<'source, 'log> {
         Self {
             nodes,
             extern_requirements: vec![],
-            index_offset: loc_data_nodes.len() + state_data_nodes.len(),
+            index_offset: pickup_nodes.len() + states_nodes.len(),
             entrance_nodes: vec![],
             default_entrance_connections: FxHashMap::default(),
             requirements: RequirementRepository::new(settings),
@@ -314,7 +314,7 @@ impl<'source, 'log> Compiler<'source, 'log> {
 
             let visited_state_index = self.nodes.len();
             // TODO during seedgen this should be 1, but start as 0 in the true seed
-            self.nodes.push(Node::State(StateDataEntry {
+            self.nodes.push(Node::State(StatesEntry {
                 identifier: format!("{anchor_identifier}Visited"),
                 uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
                 value: None,
@@ -341,7 +341,7 @@ impl<'source, 'log> Compiler<'source, 'log> {
 
                 let target_anchor = self.nodes[target_index].expect_anchor(); // TODO verify while parsing
 
-                self.nodes.push(Node::State(StateDataEntry {
+                self.nodes.push(Node::State(StatesEntry {
                     identifier: format!("{} to {}", anchor_identifier, target_anchor.identifier),
                     uber_identifier: UberIdentifier::entrances(entrance_id),
                     value: Some(target_anchor.entrance.as_ref().unwrap().id), // TODO this should not be treated as strictly incremental

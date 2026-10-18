@@ -153,19 +153,19 @@ on skills.glide updateOpherHintPrice()
 on skills.bash updateTwillenHintPrice()
 on skills.bow updateTwillenHintPrice()
 
-!remove_location(Shop.Lupo.Slot3)
+!no_random_placement(Shop.Lupo.Slot3)
 on Shop.Lupo.Slot3 {
     create_stats_entry(Lupo, "Lupo Hint")
     write_lupo_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Shop.Opher.Slot11)
+!no_random_placement(Shop.Opher.Slot11)
 on Shop.Opher.Slot11 {
     create_stats_entry(Opher, "Opher Hint")
     write_opher_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Shop.Twillen.Slot8)
+!no_random_placement(Shop.Twillen.Slot8)
 on Shop.Twillen.Slot8 {
     create_stats_entry(Twillen, "Twillen Hint")
     write_twillen_hint()

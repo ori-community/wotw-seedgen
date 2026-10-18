@@ -3,13 +3,13 @@ use std::hash::BuildHasher;
 use rustc_hash::FxBuildHasher;
 use wotw_seedgen::data::{
     Shard, Skill, Teleporter, UberIdentifier, WeaponUpgrade,
-    assets::{LocData, StateData},
+    assets::{Pickups, States},
 };
 
 use crate::api::{Hash, logic::RelevantUberStates};
 
 impl RelevantUberStates {
-    pub fn new(loc_data: &LocData, state_data: &StateData) -> Self {
+    pub fn new(pickups: &Pickups, states: &States) -> Self {
         const INVENTORY: [UberIdentifier; 81] = [
             UberIdentifier::SPIRIT_LIGHT,
             UberIdentifier::GORLEK_ORE,
@@ -94,14 +94,14 @@ impl RelevantUberStates {
             WeaponUpgrade::RAPID_SENTRY_ID,
         ];
 
-        let loc_data = loc_data.entries.iter().map(|entry| entry.uber_identifier);
-        let state_data = state_data.entries.iter().map(|entry| entry.uber_identifier);
+        let pickups = pickups.entries.iter().map(|entry| entry.uber_identifier);
+        let states = states.entries.iter().map(|entry| entry.uber_identifier);
 
         let entrances = (1..=32).map(UberIdentifier::entrances);
         let known_entrance_connections = (1..=32).map(UberIdentifier::known_entrance_connections);
 
-        let identifiers = loc_data
-            .chain(state_data)
+        let identifiers = pickups
+            .chain(states)
             .chain(entrances)
             .chain(known_entrance_connections)
             .chain(INVENTORY)

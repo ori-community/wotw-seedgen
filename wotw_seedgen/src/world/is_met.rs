@@ -11,7 +11,7 @@ use log::trace;
 use ordered_float::OrderedFloat;
 use smallvec::SmallVec;
 use strum::Display;
-use wotw_seedgen_data::assets::{LocDataEntry, StateDataEntry};
+use wotw_seedgen_data::assets::{PickupsEntry, StatesEntry};
 use wotw_seedgen_data::logic_language::output::Node;
 use wotw_seedgen_data::seed_language::simulate::ShopItemVisibility;
 use wotw_seedgen_data::Teleporter;
@@ -68,12 +68,12 @@ impl Missing<'_> {
             Node::Anchor(_) => {
                 panic!("state requirement pointed to anchor {}", node.identifier())
             }
-            Node::Pickup(LocDataEntry {
+            Node::Pickup(PickupsEntry {
                 uber_identifier,
                 value,
                 ..
             })
-            | Node::State(StateDataEntry {
+            | Node::State(StatesEntry {
                 uber_identifier,
                 value,
                 ..

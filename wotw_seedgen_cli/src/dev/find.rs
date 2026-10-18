@@ -87,7 +87,7 @@ where
     let start = Instant::now();
 
     let settings = settings_args.into_universe_settings()?;
-    let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
+    let (graph, pickups, uber_state_data) = logic_assets(&settings.world_settings)?;
 
     let FindArgs { start: count } = find_args;
 
@@ -111,7 +111,7 @@ where
 
                     let generator = Generator::new(
                         &graph,
-                        &loc_data,
+                        &pickups,
                         &uber_state_data,
                         &DefaultFileAccess,
                         &settings,

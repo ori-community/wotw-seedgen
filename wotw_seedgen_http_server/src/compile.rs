@@ -60,8 +60,8 @@ pub fn compile(
 
     let mut errors = Vec::new();
 
-    let loc_data = cache
-        .loc_data()
+    let pickups = cache
+        .pickups()
         .map_err(|message| errors.push(message))
         .ok();
     let uber_state_data = cache
@@ -69,7 +69,7 @@ pub fn compile(
         .map_err(|message| errors.push(message))
         .ok();
 
-    let (Some(loc_data), Some(uber_state_data)) = (loc_data, uber_state_data) else {
+    let (Some(pickups), Some(uber_state_data)) = (pickups, uber_state_data) else {
         return Err(CompileError {
             errors,
             logs: Vec::new(),
@@ -84,7 +84,7 @@ pub fn compile(
     let inline_snippets = InlineSnippets::new(snippets);
     let snippet_access = ChainedSnippetAccess::new(&inline_snippets, &cache.base);
 
-    let mut compiler = Compiler::new(&mut rng, &snippet_access, loc_data, uber_state_data)
+    let mut compiler = Compiler::new(&mut rng, &snippet_access, pickups, uber_state_data)
         .with_debug(debug)
         .with_lint(true)
         .with_log_capture(&log_capture);
@@ -110,7 +110,7 @@ pub fn compile(
         .collect::<Vec<_>>();
 
     if errors.is_empty() {
-        let placeholder_map = postprocess(&mut [&mut output], loc_data, &mut rng)
+        let placeholder_map = postprocess(&mut [&mut output], pickups, &mut rng)
             .pop()
             .unwrap();
 

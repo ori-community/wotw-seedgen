@@ -30,14 +30,14 @@ pub fn stats(args: StatsArgs) -> Result<(), Error> {
 
     let settings = settings_args.into_universe_settings()?;
 
-    let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
+    let (graph, pickups, uber_state_data) = logic_assets(&settings.world_settings)?;
 
     let mut generator = StatsGenerator::new(
         &settings,
         &graph,
         &DefaultFileAccess,
         &storage_access::FileAccess,
-        &loc_data,
+        &pickups,
         &uber_state_data,
     )
     .sample_size(sample_size);

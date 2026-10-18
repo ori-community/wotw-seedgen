@@ -152,7 +152,7 @@ pub trait Simulation: Sized {
     }
 
     #[inline]
-    fn loc_data_condition_met(&self, uber_identifier: UberIdentifier, value: Option<i32>) -> bool {
+    fn pickup_condition_met(&self, uber_identifier: UberIdentifier, value: Option<i32>) -> bool {
         match value {
             None => self.fetch_boolean(uber_identifier),
             Some(value) => self.fetch_integer(uber_identifier) >= value,
@@ -290,7 +290,7 @@ pub trait Simulation: Sized {
     ///
     /// ```
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
@@ -316,7 +316,7 @@ pub trait Simulation: Sized {
     ///
     /// ```
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, LocData, StateData, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
     /// # let uber_states = TEST_ASSETS.uber_states.clone();

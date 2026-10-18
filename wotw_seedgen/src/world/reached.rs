@@ -17,7 +17,7 @@ use itertools::Itertools;
 use log::{trace, warn};
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use wotw_seedgen_data::{
-    assets::{LocDataEntry, StateDataEntry},
+    assets::{PickupsEntry, StatesEntry},
     logic_language::output::{Anchor, Connection, Graph, Node, Refill, RefillValue, Requirement},
     seed_language::{
         output::CommandsOutput,
@@ -457,7 +457,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
     #[inline]
     pub fn reached_pickups<'s>(
         &'s self,
-    ) -> impl Iterator<Item = &'graph LocDataEntry> + use<'s, 'graph> {
+    ) -> impl Iterator<Item = &'graph PickupsEntry> + use<'s, 'graph> {
         self.reached_nodes().filter_map(Node::try_as_pickup_ref)
     }
 
@@ -718,7 +718,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
             let met = if uber_identifier.is_entrance() {
                 self.entrance_condition_met(uber_identifier, node.value().unwrap())
             } else {
-                self.loc_data_condition_met(uber_identifier, node.value())
+                self.pickup_condition_met(uber_identifier, node.value())
             };
 
             if met {
@@ -753,12 +753,12 @@ impl<'graph> World<'graph, '_, '_, '_> {
 
         match node {
             Node::Anchor(anchor) => self.traverse_anchor(anchor, node_index, orb_variants, output),
-            Node::Pickup(LocDataEntry {
+            Node::Pickup(PickupsEntry {
                 uber_identifier,
                 value,
                 ..
             })
-            | Node::State(StateDataEntry {
+            | Node::State(StatesEntry {
                 uber_identifier,
                 value,
                 ..

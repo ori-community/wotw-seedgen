@@ -157,7 +157,7 @@ fn test_compiler_with_config<F: SnippetAccess>(
     Compiler::new(
         &mut rand::rng(),
         snippet_access,
-        TEST_ASSETS.expect_loc_data(),
+        TEST_ASSETS.expect_pickups(),
         TEST_ASSETS.expect_uber_state_data(),
     )
     .with_config(config)

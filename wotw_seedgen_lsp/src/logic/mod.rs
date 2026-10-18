@@ -89,14 +89,14 @@ impl Backend<Cache> {
         self.update_diagnostics_with(uri, async |path| {
             let source = self.consume_result(assets::read_to_string(&path)).await?;
             let cache = self.cache.read().await;
-            let loc_data = self.consume_result(cache.loc_data()).await?;
-            let state_data = self.consume_result(cache.state_data()).await?;
+            let pickups = self.consume_result(cache.pickups()).await?;
+            let states = self.consume_result(cache.states()).await?;
 
             let ParseResult { parsed, mut errors } = Paths::parse(&source);
 
             if let Some(paths) = parsed {
                 let mut result =
-                    Graph::compiler().compile(paths, loc_data.clone(), state_data.clone());
+                    Graph::compiler().compile(paths, pickups.clone(), states.clone());
 
                 errors.append(&mut result.errors);
             }

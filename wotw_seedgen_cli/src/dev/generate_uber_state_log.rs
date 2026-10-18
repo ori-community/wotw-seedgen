@@ -58,11 +58,11 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
         Source::new("uber_state_log".to_string(), source),
     )]);
 
-    let loc_data = DefaultFileAccess.loc_data()?;
-    let state_data = DefaultFileAccess.state_data()?;
-    let uber_state_data = UberStateData::from_parts(uber_state_dump, &loc_data, &state_data);
+    let pickups = DefaultFileAccess.pickups()?;
+    let states = DefaultFileAccess.states()?;
+    let uber_state_data = UberStateData::from_parts(uber_state_dump, &pickups, &states);
 
-    let mut compiler = Compiler::new(&mut rand::rng(), &snippets, &loc_data, &uber_state_data);
+    let mut compiler = Compiler::new(&mut rand::rng(), &snippets, &pickups, &uber_state_data);
 
     compiler.compile_snippet("")?;
 

@@ -2,7 +2,7 @@ use std::io::Write;
 
 use arboard::Clipboard;
 use wotw_seedgen::data::assets::{
-    self, LocData, StateData, UberStateData, UberStateDump, UberStateNameEntry,
+    self, Pickups, States, UberStateData, UberStateDump, UberStateNameEntry,
 };
 
 use crate::Error;
@@ -45,7 +45,7 @@ pub fn import_uber_states() -> Result<(), Error> {
     let mut dump: UberStateDump =
         serde_json::from_str(&text).map_err(|err| format!("failed to parse clipboard: {err}"))?;
 
-    let data = UberStateData::from_parts(dump.clone(), &LocData::default(), &StateData::default());
+    let data = UberStateData::from_parts(dump.clone(), &Pickups::default(), &States::default());
 
     for (name, value) in &OVERRIDES {
         let (group, member) = name.split_once('.').unwrap();

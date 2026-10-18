@@ -2,8 +2,8 @@ use std::iter;
 
 use wotw_seedgen_data::{
     assets::{
-        AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, LocData,
-        PresetFileAccess, SnippetFileAccess, StateData, UberStateData,
+        AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, Pickups,
+        PresetFileAccess, SnippetFileAccess, States, UberStateData,
     },
     parse::Source,
 };
@@ -12,8 +12,8 @@ use wotw_seedgen_server_shared::ServerState;
 pub type Cache = ServerState<DefaultFileAccess, CacheValues>;
 
 pub struct CacheValues {
-    pub loc_data: Result<LocData, String>,
-    pub state_data: Result<StateData, String>,
+    pub pickups: Result<Pickups, String>,
+    pub states: Result<States, String>,
 }
 
 impl AssetCacheValues for CacheValues {
@@ -21,21 +21,21 @@ impl AssetCacheValues for CacheValues {
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        let loc_data = file_access.loc_data();
-        let state_data = file_access.state_data();
+        let pickups = file_access.pickups();
+        let states = file_access.states();
 
         Self {
-            loc_data,
-            state_data,
+            pickups,
+            states,
         }
     }
 
-    fn loc_data(&self) -> Result<&LocData, String> {
-        self.loc_data.as_ref().map_err(String::clone)
+    fn pickups(&self) -> Result<&Pickups, String> {
+        self.pickups.as_ref().map_err(String::clone)
     }
 
-    fn state_data(&self) -> Result<&StateData, String> {
-        self.state_data.as_ref().map_err(String::clone)
+    fn states(&self) -> Result<&States, String> {
+        self.states.as_ref().map_err(String::clone)
     }
 
     fn uber_state_data(&self) -> Result<&UberStateData, String> {
@@ -63,11 +63,11 @@ impl AssetCacheValues for CacheValues {
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        if changed.loc_data {
-            self.loc_data = file_access.loc_data();
+        if changed.pickups {
+            self.pickups = file_access.pickups();
         }
-        if changed.state_data {
-            self.state_data = file_access.state_data();
+        if changed.states {
+            self.states = file_access.states();
         }
     }
 }

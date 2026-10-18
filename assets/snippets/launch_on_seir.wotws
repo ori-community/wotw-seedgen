@@ -5,5 +5,5 @@
 !tags("Launch on Seir")
 
 !remove_item(skill(Launch), 1)
-!remove_location(Ruins.Wisp)
+!no_random_placement(Ruins.Wisp)
 on Ruins.Wisp skill(Launch)

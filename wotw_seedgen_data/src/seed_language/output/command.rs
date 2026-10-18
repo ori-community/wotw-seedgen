@@ -111,7 +111,7 @@ pub enum CommandBoolean {
 }
 
 impl CommandBoolean {
-    pub fn loc_data_condition(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
+    pub fn pickup_condition(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
         match value {
             None => CommandBoolean::FetchBoolean { uber_identifier },
             Some(value) => CommandBoolean::CompareInteger {

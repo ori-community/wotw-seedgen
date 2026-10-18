@@ -19,8 +19,8 @@ use utoipa::ToSchema;
 use wotw_seedgen_parse::Source;
 
 use crate::assets::{
-    file_access::PlandoFileAccess, file_err, AssetFileAccess, LocData, PlandoAccess, PresetAccess,
-    PresetFileAccess, SnippetAccess, SnippetFileAccess, StateData, UberStateData, UniversePreset,
+    file_access::PlandoFileAccess, file_err, AssetFileAccess, Pickups, PlandoAccess, PresetAccess,
+    PresetFileAccess, SnippetAccess, SnippetFileAccess, States, UberStateData, UniversePreset,
     Watcher, WatcherResult, WorldPreset,
 };
 
@@ -121,18 +121,18 @@ impl<F: AssetFileAccess, V: AssetCacheValues> AssetFileAccess for AssetCache<F, 
         self.file_access.asset_folders()
     }
 
-    fn loc_data(&self) -> Result<LocData, String> {
-        self.values.loc_data().cloned()
+    fn pickups(&self) -> Result<Pickups, String> {
+        self.values.pickups().cloned()
     }
 
-    fn state_data(&self) -> Result<StateData, String> {
-        self.values.state_data().cloned()
+    fn states(&self) -> Result<States, String> {
+        self.values.states().cloned()
     }
 
     fn uber_state_data(
         &self,
-        _loc_data: &LocData,
-        _state_data: &StateData,
+        _pickups: &Pickups,
+        _state_data: &States,
     ) -> Result<UberStateData, String> {
         self.values.uber_state_data().cloned()
     }
@@ -147,9 +147,9 @@ pub trait AssetCacheValues: Sized {
     where
         F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess;
 
-    fn loc_data(&self) -> Result<&LocData, String>;
+    fn pickups(&self) -> Result<&Pickups, String>;
 
-    fn state_data(&self) -> Result<&StateData, String>;
+    fn states(&self) -> Result<&States, String>;
 
     fn uber_state_data(&self) -> Result<&UberStateData, String>;
 
@@ -169,8 +169,8 @@ pub trait AssetCacheValues: Sized {
 #[derive(Debug, Clone, PartialEq, Default, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct ChangedAssets {
-    pub loc_data: bool,
-    pub state_data: bool,
+    pub pickups: bool,
+    pub states: bool,
     pub uber_state_dump: bool,
     pub paths: bool,
     pub snippets: Vec<ChangeDetails>,
@@ -273,8 +273,8 @@ impl ChangedAssets {
 
     fn update_known_files(&mut self, path_kind: PathKind) {
         match path_kind {
-            PathKind::LocData => self.loc_data = true,
-            PathKind::StateData => self.state_data = true,
+            PathKind::Pickups => self.pickups = true,
+            PathKind::States => self.states = true,
             PathKind::UberStateDump => self.uber_state_dump = true,
             PathKind::Paths => self.paths = true,
             _ => {}
@@ -298,8 +298,8 @@ fn validate_paths<const N: usize>(paths: Vec<PathBuf>, kind: &str) -> Option<[Pa
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum PathKind {
-    LocData,
-    StateData,
+    Pickups,
+    States,
     UberStateDump,
     Paths,
     Snippet,
@@ -312,10 +312,10 @@ impl PathKind {
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        if path.ends_with(F::LOC_DATA_PATH) {
-            Some(Self::LocData)
-        } else if path.ends_with(F::STATE_DATA_PATH) {
-            Some(Self::StateData)
+        if path.ends_with(F::PICKUPS_PATH) {
+            Some(Self::Pickups)
+        } else if path.ends_with(F::STATES_PATH) {
+            Some(Self::States)
         } else if path.ends_with(F::UBER_STATE_DUMP_PATH) {
             Some(Self::UberStateDump)
         } else if path.ends_with(F::PATHS_PATH) {
@@ -428,8 +428,8 @@ impl<F, V: PresetAccess> PresetAccess for AssetCache<F, V> {
 }
 
 pub struct DefaultAssetCacheValues {
-    pub loc_data: Result<LocData, String>,
-    pub state_data: Result<StateData, String>,
+    pub pickups: Result<Pickups, String>,
+    pub states: Result<States, String>,
     pub uber_state_data: Result<UberStateData, String>,
     pub paths: Result<Source, String>,
     pub snippets: FxHashMap<String, Result<Source, String>>,
@@ -443,9 +443,9 @@ impl AssetCacheValues for DefaultAssetCacheValues {
     where
         F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     {
-        let loc_data = file_access.loc_data();
-        let state_data = file_access.state_data();
-        let uber_state_data = uber_state_data(&loc_data, &state_data, file_access);
+        let pickups = file_access.pickups();
+        let states = file_access.states();
+        let uber_state_data = uber_state_data(&pickups, &states, file_access);
         let paths = file_access.paths();
 
         let snippets = file_access
@@ -485,8 +485,8 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             .collect();
 
         Self {
-            loc_data,
-            state_data,
+            pickups,
+            states,
             uber_state_data,
             paths,
             snippets,
@@ -501,8 +501,8 @@ impl AssetCacheValues for DefaultAssetCacheValues {
         F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
     {
         let ChangedAssets {
-            loc_data,
-            state_data,
+            pickups,
+            states,
             uber_state_dump,
             paths,
             snippets,
@@ -511,16 +511,16 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             world_presets,
         } = changed;
 
-        if uber_state_dump || loc_data {
-            self.loc_data = file_access.loc_data();
+        if uber_state_dump || pickups {
+            self.pickups = file_access.pickups();
         }
 
-        if uber_state_dump || state_data {
-            self.state_data = file_access.state_data();
+        if uber_state_dump || states {
+            self.states = file_access.states();
         }
 
         if uber_state_dump {
-            self.uber_state_data = uber_state_data(&self.loc_data, &self.state_data, file_access);
+            self.uber_state_data = uber_state_data(&self.pickups, &self.states, file_access);
         }
 
         if paths {
@@ -544,12 +544,12 @@ impl AssetCacheValues for DefaultAssetCacheValues {
         });
     }
 
-    fn loc_data(&self) -> Result<&LocData, String> {
-        self.loc_data.as_ref().map_err(String::clone)
+    fn pickups(&self) -> Result<&Pickups, String> {
+        self.pickups.as_ref().map_err(String::clone)
     }
 
-    fn state_data(&self) -> Result<&StateData, String> {
-        self.state_data.as_ref().map_err(String::clone)
+    fn states(&self) -> Result<&States, String> {
+        self.states.as_ref().map_err(String::clone)
     }
 
     fn uber_state_data(&self) -> Result<&UberStateData, String> {
@@ -578,18 +578,18 @@ impl AssetCacheValues for DefaultAssetCacheValues {
 }
 
 fn uber_state_data<F>(
-    loc_data: &Result<LocData, String>,
-    state_data: &Result<StateData, String>,
+    pickups: &Result<Pickups, String>,
+    states: &Result<States, String>,
     file_access: &F,
 ) -> Result<UberStateData, String>
 where
     F: AssetFileAccess,
 {
-    loc_data
+    pickups
         .as_ref()
-        .and_then(|loc_data| state_data.as_ref().map(|state_data| (loc_data, state_data)))
+        .and_then(|pickups| states.as_ref().map(|states| (pickups, states)))
         .map_err(String::clone)
-        .and_then(|(loc_data, state_data)| file_access.uber_state_data(loc_data, state_data))
+        .and_then(|(pickups, states)| file_access.uber_state_data(pickups, states))
 }
 
 fn update_subfolder<F, V>(changes: Vec<ChangeDetails>, values: &mut FxHashMap<String, V>, mut f: F)

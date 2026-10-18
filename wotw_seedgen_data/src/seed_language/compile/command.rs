@@ -117,10 +117,10 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::ItemDataMapIcon(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::RemoveLocation(_, command) => {
+            ast::Command::NoRandomPlacement(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::LocationSlots(_, command) => {
+            ast::Command::RandomPlacementSlots(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::SetLogicState(_, command) => {
@@ -1151,7 +1151,7 @@ fn insert_item_data<T, F: FnOnce(&mut ItemMetadataEntry) -> &mut Option<T>>(
     }
 }
 
-impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
+impl<'source> Compile<'source> for ast::NoRandomPlacementArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
@@ -1170,7 +1170,7 @@ impl<'source> Compile<'source> for ast::RemoveLocationArgs<'source> {
     }
 }
 
-impl<'source> Compile<'source> for ast::LocationSlotsArgs<'source> {
+impl<'source> Compile<'source> for ast::RandomPlacementSlotsArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
@@ -1188,7 +1188,7 @@ impl<'source> Compile<'source> for ast::LocationSlotsArgs<'source> {
                     .global
                     .output
                     .modifiers
-                    .location_slots
+                    .random_placement_slots
                     .insert(location, slots.try_into().unwrap_or_default());
             }
         }
@@ -1197,9 +1197,9 @@ impl<'source> Compile<'source> for ast::LocationSlotsArgs<'source> {
 
 impl SnippetCompiler<'_, '_, '_, '_, '_> {
     fn check_location(&mut self, location: &CommandBoolean, span: Range<usize>) {
-        if !self.global.loc_data_conditions.contains(location) {
+        if !self.global.pickup_conditions.contains(location) {
             self.errors.push(Error::error(
-                "not a location from loc_data.csv".to_string(),
+                "not a location from pickups.csv".to_string(),
                 span,
             ));
         }

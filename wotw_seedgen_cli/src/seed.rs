@@ -18,7 +18,7 @@ use rustc_hash::FxHashMap;
 use wotw_seedgen::{
     data::{
         assets::{
-            self, file_err, AssetFileAccess, DefaultFileAccess, LocData, StateData, UberStateData,
+            self, file_err, AssetFileAccess, DefaultFileAccess, Pickups, States, UberStateData,
             SEEDGEN_USER_DATA_DIR,
         },
         logic_language::{ast::Paths, output::Graph},
@@ -211,11 +211,11 @@ fn write_spoiler(mut path: PathBuf, spoiler: SeedSpoiler, json_spoiler: bool) ->
 }
 
 pub fn generate(settings: &UniverseSettings, debug: bool) -> Result<SeedUniverse, Error> {
-    let (graph, loc_data, uber_state_data) = logic_assets(&settings.world_settings)?;
+    let (graph, pickups, uber_state_data) = logic_assets(&settings.world_settings)?;
 
     let seed_universe = Generator::new(
         &graph,
-        &loc_data,
+        &pickups,
         &uber_state_data,
         &DefaultFileAccess,
         settings,
@@ -235,48 +235,48 @@ pub fn paths(source: &Source) -> Result<Paths<'_>, Error> {
 pub fn graph(
     source: &Source,
     paths: Paths,
-    loc_data: LocData,
-    state_data: StateData,
+    pickups: Pickups,
+    states: States,
     settings: &[WorldSettings],
 ) -> Result<Graph, Error> {
     Graph::compiler()
         .with_settings(settings)
-        .compile(paths, loc_data, state_data)
+        .compile(paths, pickups, states)
         .eprint_errors(source)
         .ok_or_else(|| Error("failed to compile graph".to_string()))
 }
 
-pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, LocData, UberStateData), Error> {
+pub fn logic_assets(settings: &[WorldSettings]) -> Result<(Graph, Pickups, UberStateData), Error> {
     let LogicFiles {
-        loc_data,
-        state_data,
+        pickups,
+        states,
         paths_source: source,
         uber_state_data,
     } = LogicFiles::new()?;
 
     let paths = paths(&source)?;
-    let graph = graph(&source, paths, loc_data.clone(), state_data, settings)?;
+    let graph = graph(&source, paths, pickups.clone(), states, settings)?;
 
-    Ok((graph, loc_data, uber_state_data))
+    Ok((graph, pickups, uber_state_data))
 }
 
 pub struct LogicFiles {
-    pub loc_data: LocData,
-    pub state_data: StateData,
+    pub pickups: Pickups,
+    pub states: States,
     pub paths_source: Source,
     pub uber_state_data: UberStateData,
 }
 
 impl LogicFiles {
     pub fn new() -> Result<Self, Error> {
-        let loc_data = DefaultFileAccess.loc_data()?;
-        let state_data = DefaultFileAccess.state_data()?;
+        let pickups = DefaultFileAccess.pickups()?;
+        let states = DefaultFileAccess.states()?;
         let paths_source = DefaultFileAccess.paths()?;
-        let uber_state_data = DefaultFileAccess.uber_state_data(&loc_data, &state_data)?;
+        let uber_state_data = DefaultFileAccess.uber_state_data(&pickups, &states)?;
 
         Ok(LogicFiles {
-            loc_data,
-            state_data,
+            pickups,
+            states,
             paths_source,
             uber_state_data,
         })

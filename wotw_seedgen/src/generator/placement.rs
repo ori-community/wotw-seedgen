@@ -22,7 +22,7 @@ use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, iter, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::{
-    assets::{LocData, LocDataEntry},
+    assets::{Pickups, PickupsEntry},
     env_or,
     logic_language::output::Node,
     seed_language::{
@@ -76,9 +76,9 @@ pub struct WorldContext<'graph, 'settings, 'perf, 'log> {
     /// generates appropriate spirit light amounts
     spirit_light_provider: SpiritLightProvider,
     /// all remaining pickups which need to be assigned random placements
-    needs_placement: Vec<&'graph LocDataEntry>,
+    needs_placement: Vec<&'graph PickupsEntry>,
     /// unreachable pickups which should be assigned extra spirit light
-    unreachable: Vec<&'graph LocDataEntry>,
+    unreachable: Vec<&'graph PickupsEntry>,
     /// initial length of `needs_placement`
     total_pickups: f32,
     /// cost of ks doors already opened on spawn, which will be ignored for forced keystones
@@ -86,7 +86,7 @@ pub struct WorldContext<'graph, 'settings, 'perf, 'log> {
     /// how many pickups should be assigned spirit light placements
     spirit_light_placements_remaining: usize,
     /// pickups which have been reached but explicitely haven't been assigned a placement yet to leave space for later progressions
-    placeholders: Vec<&'graph LocDataEntry>,
+    placeholders: Vec<&'graph PickupsEntry>,
     /// indices into `needs_placement` for pickups that are reachable and may be used for placements in this step
     reached_needs_placement: Vec<usize>,
     /// indices into `needs_placement` for pickups that have received a placement and should be removed before the next placement step
@@ -248,7 +248,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
     pub fn attempt_placements(
         mut self,
-        loc_data: &LocData,
+        pickups: &Pickups,
         debug: bool,
     ) -> Result<SeedUniverse, String> {
         self.preplacements()?;
@@ -275,7 +275,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
             }
         }
 
-        Ok(self.finish(loc_data, debug))
+        Ok(self.finish(pickups, debug))
     }
 
     fn preplacements(&mut self) -> Result<(), String> {
@@ -560,7 +560,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         any_placed
     }
 
-    fn place_random_from_item_pool_at(&mut self, pickup: &LocDataEntry, origin_world_index: usize) {
+    fn place_random_from_item_pool_at(&mut self, pickup: &PickupsEntry, origin_world_index: usize) {
         let target_world_index = self.choose_target_world_for_random_placement();
         let target_world = &mut self.worlds[target_world_index];
 
@@ -788,7 +788,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     fn place_command_at(
         &mut self,
         command: CommandVoid,
-        pickup: &LocDataEntry,
+        pickup: &PickupsEntry,
         origin_world_index: usize,
         target_world_index: usize,
         mark_forced: bool,
@@ -812,7 +812,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         );
 
         self.push_command(
-            Trigger::loc_data_trigger(pickup.uber_identifier, pickup.value),
+            Trigger::pickup_trigger(pickup.uber_identifier, pickup.value),
             command,
             origin_world_index,
             target_world_index,
@@ -911,14 +911,14 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
         }
     }
 
-    fn finish(mut self, loc_data: &LocData, debug: bool) -> SeedUniverse {
+    fn finish(mut self, pickups: &Pickups, debug: bool) -> SeedUniverse {
         let mut output = self
             .worlds
             .iter_mut()
             .map(|world| &mut world.output)
             .collect::<Vec<_>>();
 
-        let placeholder_maps = postprocess(&mut output, loc_data, &mut self.rng);
+        let placeholder_maps = postprocess(&mut output, pickups, &mut self.rng);
 
         SeedUniverse {
             worlds: self
@@ -1047,11 +1047,11 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         zone_reachable: &mut FxHashMap<Zone, Vec<usize>>,
         zone_unreachable: &mut FxHashMap<Zone, Vec<usize>>,
         zone: Zone,
-    ) -> Result<&'graph LocDataEntry, String> {
+    ) -> Result<&'graph PickupsEntry, String> {
         fn zone_pickups<'a>(
             zone_pickups: &'a mut FxHashMap<Zone, Vec<usize>>,
             zone: Zone,
-            pickups: &[&LocDataEntry],
+            pickups: &[&PickupsEntry],
         ) -> &'a mut Vec<usize> {
             zone_pickups.entry(zone).or_insert_with(|| {
                 pickups
@@ -1132,7 +1132,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
     fn preplace(
         &mut self,
-        pickup: &LocDataEntry,
+        pickup: &PickupsEntry,
         command: CommandVoid,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
@@ -1146,7 +1146,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
         self.write_placement_spoiler(pickup, &command, placement_spoiler);
 
-        let condition = CommandBoolean::loc_data_condition(pickup.uber_identifier, pickup.value);
+        let condition = CommandBoolean::pickup_condition(pickup.uber_identifier, pickup.value);
         let already_reached = self.world.simulate(&condition, &self.output.commands);
 
         let mut trigger = Trigger::Condition(TriggerCondition::new(condition));
@@ -1207,7 +1207,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     }
 
     fn shop_placements_remaining(&self) -> usize {
-        fn count_in<'i, I: Iterator<Item = &'i LocDataEntry>>(iter: I) -> usize {
+        fn count_in<'i, I: Iterator<Item = &'i PickupsEntry>>(iter: I) -> usize {
             iter.filter(|placement| placement.uber_identifier.is_shop())
                 .count()
         }
@@ -1224,7 +1224,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         self.placements_remaining() - self.shop_placements_remaining()
     }
 
-    fn reserve_placeholders(&mut self) -> Vec<&'graph LocDataEntry> {
+    fn reserve_placeholders(&mut self) -> Vec<&'graph PickupsEntry> {
         self.received_placement
             .extend(self.reached_needs_placement.iter().copied());
 
@@ -1445,7 +1445,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         self.place_spirit_light(next_spirit_light_location, next_batch, placement_spoiler);
     }
 
-    fn choose_non_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
+    fn choose_non_spirit_light_location(&mut self) -> Option<&'graph PickupsEntry> {
         if self.non_spirit_light_placements_remaining() == 0 {
             return None;
         }
@@ -1466,7 +1466,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         }
     }
 
-    fn choose_shop_location(&mut self) -> Option<&'graph LocDataEntry> {
+    fn choose_shop_location(&mut self) -> Option<&'graph PickupsEntry> {
         trace!(
             logger: self.item_pool.log_capture,
             "{log_index}Forcing placement in a shop to keep space for future spirit light placements",
@@ -1501,7 +1501,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         Some(location)
     }
 
-    fn choose_spirit_light_location(&mut self) -> Option<&'graph LocDataEntry> {
+    fn choose_spirit_light_location(&mut self) -> Option<&'graph PickupsEntry> {
         match self
             .reached_needs_placement
             .iter()
@@ -1606,7 +1606,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
     fn place_with_simulation<F>(
         &mut self,
-        pickup: &LocDataEntry,
+        pickup: &PickupsEntry,
         command: CommandVoid,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
         simulate: F,
@@ -1624,7 +1624,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         self.write_placement_spoiler(pickup, &command, placement_spoiler);
 
         self.push_command_with_simulation(
-            Trigger::loc_data_trigger(pickup.uber_identifier, pickup.value),
+            Trigger::pickup_trigger(pickup.uber_identifier, pickup.value),
             command,
             simulate,
         );
@@ -1632,7 +1632,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
     fn place_spirit_light(
         &mut self,
-        pickup: &LocDataEntry,
+        pickup: &PickupsEntry,
         amount: i32,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
@@ -1647,7 +1647,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
     fn place_without_simulation(
         &mut self,
-        pickup: &LocDataEntry,
+        pickup: &PickupsEntry,
         command: CommandVoid,
         placement_spoiler: &mut Vec<SpoilerPlacement>,
     ) {
@@ -1675,7 +1675,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
     fn write_placement_spoiler(
         &mut self,
-        pickup: &LocDataEntry,
+        pickup: &PickupsEntry,
         command: &CommandVoid,
         into: &mut Vec<SpoilerPlacement>,
     ) {

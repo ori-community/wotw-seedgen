@@ -16,8 +16,8 @@ use wotw_seedgen::{
         MapIcon, UniverseSettings,
         assets::{
             AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultAssetCacheValues,
-            DefaultFileAccess, LocData, PlandoFileAccess, PresetFileAccess, SEEDGEN_USER_DATA_DIR,
-            SnippetFileAccess, StateData, UberStateData, UniversePreset, WorldPreset,
+            DefaultFileAccess, Pickups, PlandoFileAccess, PresetFileAccess, SEEDGEN_USER_DATA_DIR,
+            SnippetFileAccess, States, UberStateData, UniversePreset, WorldPreset,
         },
         logic_language::{ast::Paths, output::Graph},
         parse::Source,
@@ -103,7 +103,7 @@ impl CacheValues {
     > {
         Ok(Generator::new(
             ok_ref(&self.graph.0)?,
-            ok_ref(&self.base.loc_data)?,
+            ok_ref(&self.base.pickups)?,
             ok_ref(&self.base.uber_state_data)?,
             &self.base,
             settings,
@@ -118,17 +118,17 @@ impl AssetCacheValues for CacheValues {
     {
         let base = DefaultAssetCacheValues::new(file_access);
 
-        let loc_data = base.loc_data();
-        let state_data = base.state_data();
+        let pickups = base.pickups();
+        let states = base.states();
 
         let uber_states = CacheResult(base.uber_state_data().map(UberStates::new));
-        let map_icons = CacheResult(loc_data.clone().map(MapIcons::new));
+        let map_icons = CacheResult(pickups.clone().map(MapIcons::new));
         let grom_shop_map_icon_index = grom_shop_map_icon_index(&map_icons);
 
         let relevant_uber_states =
-            CacheResult(relevant_uber_states(loc_data.clone(), state_data.clone()));
+            CacheResult(relevant_uber_states(pickups.clone(), states.clone()));
 
-        let graph = CacheResult(graph(base.paths(), loc_data, state_data));
+        let graph = CacheResult(graph(base.paths(), pickups, states));
         let spawn_anchors = CacheResult(ok_ref(&graph.0).map(SpawnAnchors::new));
 
         let node_index_to_map_icon_index =
@@ -157,12 +157,12 @@ impl AssetCacheValues for CacheValues {
     }
 
     // TODO custom error types on traits?
-    fn loc_data(&self) -> Result<&LocData, String> {
-        self.base.loc_data()
+    fn pickups(&self) -> Result<&Pickups, String> {
+        self.base.pickups()
     }
 
-    fn state_data(&self) -> Result<&StateData, String> {
-        self.base.state_data()
+    fn states(&self) -> Result<&States, String> {
+        self.base.states()
     }
 
     fn uber_state_data(&self) -> Result<&UberStateData, String> {
@@ -192,8 +192,8 @@ impl AssetCacheValues for CacheValues {
         self.base.update(file_access, changed.clone());
 
         let ChangedAssets {
-            loc_data,
-            state_data,
+            pickups,
+            states,
             uber_state_dump,
             paths,
             snippets,
@@ -206,23 +206,23 @@ impl AssetCacheValues for CacheValues {
             self.uber_states = CacheResult(self.base.uber_state_data().map(UberStates::new));
         }
 
-        if *loc_data {
-            self.map_icons = CacheResult(self.base.loc_data().map(MapIcons::new));
+        if *pickups {
+            self.map_icons = CacheResult(self.base.pickups().map(MapIcons::new));
             self.grom_shop_map_icon_index = grom_shop_map_icon_index(&self.map_icons);
         }
 
-        if *loc_data || *state_data {
+        if *pickups || *states {
             self.relevant_uber_states = CacheResult(relevant_uber_states(
-                self.base.loc_data(),
-                self.base.state_data(),
+                self.base.pickups(),
+                self.base.states(),
             ));
         }
 
-        if *loc_data || *state_data || *paths {
+        if *pickups || *states || *paths {
             self.graph = CacheResult(graph(
                 self.base.paths(),
-                self.base.loc_data(),
-                self.base.state_data(),
+                self.base.pickups(),
+                self.base.states(),
             ));
             self.spawn_anchors = CacheResult(ok_ref(&self.graph.0).map(SpawnAnchors::new));
 
@@ -291,16 +291,16 @@ fn grom_shop_map_icon_index(map_icons: &CacheResult<MapIcons>) -> Option<usize> 
 }
 
 fn relevant_uber_states(
-    loc_data: Result<&LocData, String>,
-    state_data: Result<&StateData, String>,
+    pickups: Result<&Pickups, String>,
+    states: Result<&States, String>,
 ) -> Result<RelevantUberStates, String> {
-    Ok(RelevantUberStates::new(loc_data?, state_data?))
+    Ok(RelevantUberStates::new(pickups?, states?))
 }
 
 fn graph(
     source: Result<&Source, String>,
-    loc_data: Result<&LocData, String>,
-    state_data: Result<&StateData, String>,
+    pickups: Result<&Pickups, String>,
+    states: Result<&States, String>,
 ) -> Result<Graph, String> {
     let source = source?;
 
@@ -309,7 +309,7 @@ fn graph(
         .ok_or("failed to parse paths".to_string())?;
 
     Graph::compiler()
-        .compile(paths, loc_data?.clone(), state_data?.clone())
+        .compile(paths, pickups?.clone(), states?.clone())
         .eprint_errors(source)
         .ok_or("failed to compile graph".to_string())
 }

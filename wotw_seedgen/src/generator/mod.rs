@@ -19,7 +19,7 @@ use rand_pcg::Pcg64Mcg;
 use rand_seeder::Seeder;
 use std::{fmt::Display, sync::LazyLock};
 use wotw_seedgen_data::{
-    assets::{ChainedSnippetAccess, LocData, LocDataEntry, SnippetAccess, UberStateData},
+    assets::{ChainedSnippetAccess, Pickups, PickupsEntry, SnippetAccess, UberStateData},
     env_or,
     logic_language::output::Graph,
     parse::Severity,
@@ -34,9 +34,9 @@ use wotw_seedgen_seed::Seed;
 /// Retries are mostly expected when using items that seedgen cannot force-place such as launch fragments.
 static RETRIES: LazyLock<u32> = LazyLock::new(|| env_or("RETRIES", 10));
 
-pub struct Generator<'graph, 'loc_data, 'uber_state_data, 'access, 'settings, 'perf, 'log, A> {
+pub struct Generator<'graph, 'pickups, 'uber_state_data, 'access, 'settings, 'perf, 'log, A> {
     pub graph: &'graph Graph,
-    pub loc_data: &'loc_data LocData,
+    pub pickups: &'pickups Pickups,
     pub uber_state_data: &'uber_state_data UberStateData,
     pub snippet_access: &'access A,
     pub settings: &'settings UniverseSettings,
@@ -45,21 +45,21 @@ pub struct Generator<'graph, 'loc_data, 'uber_state_data, 'access, 'settings, 'p
     pub log_capture: &'log LogCapture,
 }
 
-impl<'graph, 'loc_data, 'uber_state_data, 'access, 'settings, 'perf, 'log, A>
-    Generator<'graph, 'loc_data, 'uber_state_data, 'access, 'settings, 'perf, 'log, A>
+impl<'graph, 'pickups, 'uber_state_data, 'access, 'settings, 'perf, 'log, A>
+    Generator<'graph, 'pickups, 'uber_state_data, 'access, 'settings, 'perf, 'log, A>
 where
     A: SnippetAccess,
 {
     pub fn new(
         graph: &'graph Graph,
-        loc_data: &'loc_data LocData,
+        pickups: &'pickups Pickups,
         uber_state_data: &'uber_state_data UberStateData,
         snippet_access: &'access A,
         settings: &'settings UniverseSettings,
     ) -> Self {
         Self {
             graph,
-            loc_data,
+            pickups,
             uber_state_data,
             snippet_access,
             settings,
@@ -106,7 +106,7 @@ where
                 let compiler = Compiler::new(
                     &mut rng,
                     &snippet_access,
-                    self.loc_data,
+                    self.pickups,
                     self.uber_state_data,
                 )
                 .with_config(world_settings.snippet_config.clone())
@@ -155,7 +155,7 @@ where
 
             let context = Context::new(&mut rng, worlds, self.settings, self.log_capture)?;
 
-            match context.attempt_placements(self.loc_data, self.debug) {
+            match context.attempt_placements(self.pickups, self.debug) {
                 Ok(seed) => {
                     if attempt > 1 {
                         info!(
@@ -233,7 +233,7 @@ fn parse_snippets<'log>(
 }
 
 fn format_pickups<'a, 'graph>(
-    pickups: &'a [&'graph LocDataEntry],
+    pickups: &'a [&'graph PickupsEntry],
 ) -> impl Display + use<'a, 'graph> {
     pickups.iter().map(|pickup| &pickup.identifier).format(", ")
 }

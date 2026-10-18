@@ -239,67 +239,67 @@ on spawn {
     set_shop_item_price(Burrows.LupoMap, 50)
 }
 
-!remove_location(Marsh.LupoMap)
+!no_random_placement(Marsh.LupoMap)
 on Marsh.LupoMap {
     set_string("hint", "")
     write_marsh_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Hollow.LupoMap)
+!no_random_placement(Hollow.LupoMap)
 on Hollow.LupoMap {
     set_string("hint", "")
     write_hollow_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Shop.Lupo.Slot1)
+!no_random_placement(Shop.Lupo.Slot1)
 on Shop.Lupo.Slot1 {
     set_string("hint", "")
     write_glades_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Wellspring.LupoMap)
+!no_random_placement(Wellspring.LupoMap)
 on Wellspring.LupoMap {
     set_string("hint", "")
     write_wellspring_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Shop.Lupo.Slot2)
+!no_random_placement(Shop.Lupo.Slot2)
 on Shop.Lupo.Slot2 {
     set_string("hint", "")
     write_woods_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Reach.LupoMap)
+!no_random_placement(Reach.LupoMap)
 on Reach.LupoMap {
     set_string("hint", "")
     write_reach_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Depths.LupoMap)
+!no_random_placement(Depths.LupoMap)
 on Depths.LupoMap {
     set_string("hint", "")
     write_depths_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Pools.LupoMap)
+!no_random_placement(Pools.LupoMap)
 on Pools.LupoMap {
     set_string("hint", "")
     write_pools_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Wastes.LupoMap)
+!no_random_placement(Wastes.LupoMap)
 on Wastes.LupoMap {
     set_string("hint", "")
     write_wastes_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Willow.LupoMap)
+!no_random_placement(Willow.LupoMap)
 on Willow.LupoMap {
     set_string("hint", "")
     write_willow_hint()
     item_message(get_string("hint"))
 }
-!remove_location(Burrows.LupoMap)
+!no_random_placement(Burrows.LupoMap)
 on Burrows.LupoMap {
     set_string("hint", "")
     write_burrows_hint()

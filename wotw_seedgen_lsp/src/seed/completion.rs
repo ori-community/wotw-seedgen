@@ -18,8 +18,8 @@ use wotw_seedgen_data::{
             EventContent, Expression, ExpressionValue, FunctionCall, FunctionDefinition,
             GameDifficulty, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
             ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-            LocationSlotsArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
-            RandomNumberArgs, RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs,
+            RandomPlacementSlotsArgs, NoRandomPlacementArgs, Operation, PreplaceArgs, RandomFloatArgs,
+            RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, RemoveItemArgs,
             RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
             StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
             UberIdentifierNumeric, UberStateType, ZoneOfArgs,
@@ -893,10 +893,10 @@ impl CompletionInSpan for Command<'_> {
             Command::ItemDataMapIcon(item_data_map_icon, args) => {
                 args.span_checked_completion((item_data_map_icon, args).span(), index, cache)
             }
-            Command::RemoveLocation(remove_location, args) => {
-                args.span_checked_completion((remove_location, args).span(), index, cache)
+            Command::NoRandomPlacement(no_random_placement, args) => {
+                args.span_checked_completion((no_random_placement, args).span(), index, cache)
             }
-            Command::LocationSlots(location, args) => {
+            Command::RandomPlacementSlots(location, args) => {
                 args.span_checked_completion((location, args).span(), index, cache)
             }
             Command::SetLogicState(_, _) => None,
@@ -1346,19 +1346,19 @@ impl ErrCompletion for ItemDataMapIconArgs<'_> {
     }
 }
 
-impl CompletionInSpan for RemoveLocationArgs<'_> {
+impl CompletionInSpan for NoRandomPlacementArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.location.completion(index, cache)
     }
 }
 
-impl ErrCompletion for RemoveLocationArgs<'_> {
+impl ErrCompletion for NoRandomPlacementArgs<'_> {
     fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         Expression::err_completion(cache)
     }
 }
 
-impl CompletionInSpan for LocationSlotsArgs<'_> {
+impl CompletionInSpan for RandomPlacementSlotsArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.location
             .completion(index, cache)
@@ -1366,7 +1366,7 @@ impl CompletionInSpan for LocationSlotsArgs<'_> {
     }
 }
 
-impl ErrCompletion for LocationSlotsArgs<'_> {
+impl ErrCompletion for RandomPlacementSlotsArgs<'_> {
     fn err_completion(cache: &CacheValues) -> Vec<CompletionItem> {
         Expression::err_completion(cache)
     }

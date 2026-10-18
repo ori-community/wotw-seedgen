@@ -22,7 +22,7 @@ use rustc_hash::FxHashMap;
 use storage_access::SeedStorageAccess;
 use wotw_seedgen::{
     data::{
-        assets::{LocData, SnippetAccess, UberStateData},
+        assets::{Pickups, SnippetAccess, UberStateData},
         logic_language::output::Graph,
         UniverseSettings,
     },
@@ -37,7 +37,7 @@ pub type Result<T> = std::result::Result<T, String>;
 pub struct StatsGenerator<
     'settings,
     'graph,
-    'locdata,
+    'pickups,
     'uberstates,
     'snippet_access,
     'storage_access,
@@ -61,10 +61,10 @@ pub struct StatsGenerator<
     ///
     /// You can obtain this from the logic language crate using [`Graph::compile`]
     pub graph: &'graph Graph,
-    /// The [`LocData`] passed to seedgen
+    /// The [`Pickups`] passed to seedgen
     ///
     /// TODO how can you obtain this
-    pub loc_data: &'locdata LocData,
+    pub pickups: &'pickups Pickups,
     /// The [`UberStateData`] passed to seedgen
     ///
     /// TODO how can you obtain this
@@ -91,7 +91,7 @@ pub type ChainedAnalyzers = Vec<Box<dyn Analyzer>>;
 impl<
         'settings,
         'graph,
-        'locdata,
+        'pickups,
         'uberstates,
         'snippet_access,
         'storage_access,
@@ -101,7 +101,7 @@ impl<
     StatsGenerator<
         'settings,
         'graph,
-        'locdata,
+        'pickups,
         'uberstates,
         'snippet_access,
         'storage_access,
@@ -114,7 +114,7 @@ impl<
         graph: &'graph Graph,
         snippet_access: &'snippet_access A1,
         storage_access: &'storage_access A2,
-        loc_data: &'locdata LocData,
+        pickups: &'pickups Pickups,
         uber_state_data: &'uberstates UberStateData,
     ) -> Self {
         Self {
@@ -124,7 +124,7 @@ impl<
             graph,
             snippet_access,
             storage_access,
-            loc_data,
+            pickups,
             uber_state_data,
             tolerated_errors: 4,
             error_message_limit: 10,
@@ -311,7 +311,7 @@ impl<
     fn generate_one_seed(&self, settings: &UniverseSettings) -> Result<SeedUniverse> {
         Generator::new(
             self.graph,
-            self.loc_data,
+            self.pickups,
             self.uber_state_data,
             self.snippet_access,
             settings,

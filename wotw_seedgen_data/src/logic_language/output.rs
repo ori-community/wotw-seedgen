@@ -1,7 +1,7 @@
 use std::fmt::{self, Display};
 
 use crate::{
-    assets::{LocDataEntry, StateDataEntry},
+    assets::{PickupsEntry, StatesEntry},
     Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, Zone,
 };
 use itertools::Itertools;
@@ -43,8 +43,8 @@ impl Graph {
 #[derive(Debug, Clone, PartialEq, Serialize, ToSchema, EnumIs, EnumTryAs)]
 pub enum Node {
     Anchor(Anchor),
-    Pickup(LocDataEntry),
-    State(StateDataEntry),
+    Pickup(PickupsEntry),
+    State(StatesEntry),
     LogicalState(String),
 }
 
@@ -119,7 +119,7 @@ impl Node {
         }
     }
 
-    pub fn expect_pickup(&self) -> &LocDataEntry {
+    pub fn expect_pickup(&self) -> &PickupsEntry {
         match self {
             Node::Pickup(pickup) => pickup,
             _ => panic!("Called expect_pickup on {self:?}"),

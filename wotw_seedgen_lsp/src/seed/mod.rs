@@ -229,14 +229,14 @@ impl Backend<Cache> {
                 .await?;
 
             let cache = self.cache.read().await;
-            let loc_data = self.consume_result(cache.loc_data.as_ref()).await?;
+            let pickups = self.consume_result(cache.pickups.as_ref()).await?;
             let uber_state_data = self.consume_result(cache.uber_state_data.as_ref()).await?;
 
             let snippet_access = PlandoFolderAccess::new(root);
 
             let result = {
                 let mut compiler =
-                    Compiler::new(&mut rand::rng(), &snippet_access, loc_data, uber_state_data)
+                    Compiler::new(&mut rand::rng(), &snippet_access, pickups, uber_state_data)
                         .with_lint(true);
 
                 // TODO currently we can only give diagnostics for saved files because we're not using the editors in-memory changes

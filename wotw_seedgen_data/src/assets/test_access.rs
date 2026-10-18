@@ -12,8 +12,8 @@ use wotw_seedgen_parse::Source;
 use crate::{
     assets::{
         file_access::PlandoFileAccess, AssetCache, AssetCacheValues, AssetFileAccess,
-        ChangedAssets, DefaultAssetCacheValues, LocData, LocDataEntry, PresetAccess,
-        PresetFileAccess, SnippetFileAccess, StateData, UberStateData, UniversePreset, WorldPreset,
+        ChangedAssets, DefaultAssetCacheValues, Pickups, PickupsEntry, PresetAccess,
+        PresetFileAccess, SnippetFileAccess, States, UberStateData, UniversePreset, WorldPreset,
     },
     logic_language::{
         ast::Paths,
@@ -102,12 +102,12 @@ impl AssetCacheValues for TestCacheValues {
         }
     }
 
-    fn loc_data(&self) -> Result<&LocData, String> {
-        self.base.loc_data()
+    fn pickups(&self) -> Result<&Pickups, String> {
+        self.base.pickups()
     }
 
-    fn state_data(&self) -> Result<&StateData, String> {
-        self.base.state_data()
+    fn states(&self) -> Result<&States, String> {
+        self.base.states()
     }
 
     fn uber_state_data(&self) -> Result<&UberStateData, String> {
@@ -156,12 +156,12 @@ impl PresetAccess for TestCacheValues {
 }
 
 impl TestCacheValues {
-    pub fn expect_loc_data(&self) -> &LocData {
-        self.base.loc_data.as_ref().unwrap()
+    pub fn expect_pickups(&self) -> &Pickups {
+        self.base.pickups.as_ref().unwrap()
     }
 
-    pub fn expect_state_data(&self) -> &StateData {
-        self.base.state_data.as_ref().unwrap()
+    pub fn expect_states(&self) -> &States {
+        self.base.states.as_ref().unwrap()
     }
 
     pub fn expect_uber_state_data(&self) -> &UberStateData {
@@ -221,8 +221,8 @@ fn graph(base: &DefaultAssetCacheValues, settings: &[WorldSettings]) -> Graph {
         .with_settings(settings)
         .compile(
             paths,
-            base.loc_data.clone().unwrap(),
-            base.state_data.clone().unwrap(),
+            base.pickups.clone().unwrap(),
+            base.states.clone().unwrap(),
         )
         .eprint_errors(source)
         .unwrap()
@@ -245,7 +245,7 @@ impl TestGraph {
                 implicitly_generated: false,
             }],
         )));
-        graph.nodes.push(Node::Pickup(LocDataEntry {
+        graph.nodes.push(Node::Pickup(PickupsEntry {
             identifier: "yummy".to_owned(),
             zone: Zone::Marsh,
             map_icon: MapIcon::SpiritLight,
@@ -287,16 +287,16 @@ mod tests {
 
     #[test]
     fn validate_logic_csvs() {
-        let loc_data = TEST_ASSETS.expect_loc_data();
-        let state_data = TEST_ASSETS.expect_state_data();
+        let pickups = TEST_ASSETS.expect_pickups();
+        let states = TEST_ASSETS.expect_states();
         let uber_state_data = TEST_ASSETS.expect_uber_state_data();
 
-        for (identifier, uber_identifier, value) in loc_data
+        for (identifier, uber_identifier, value) in pickups
             .entries
             .iter()
             .map(|entry| (&entry.identifier, entry.uber_identifier, entry.value))
             .chain(
-                state_data
+                states
                     .entries
                     .iter()
                     .map(|entry| (&entry.identifier, entry.uber_identifier, entry.value)),

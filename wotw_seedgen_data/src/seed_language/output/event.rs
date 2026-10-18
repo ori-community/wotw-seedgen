@@ -50,8 +50,8 @@ pub enum Trigger {
 }
 
 impl Trigger {
-    pub fn loc_data_trigger(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
-        Self::Condition(TriggerCondition::new(CommandBoolean::loc_data_condition(
+    pub fn pickup_trigger(uber_identifier: UberIdentifier, value: Option<i32>) -> Self {
+        Self::Condition(TriggerCondition::new(CommandBoolean::pickup_condition(
             uber_identifier,
             value,
         )))

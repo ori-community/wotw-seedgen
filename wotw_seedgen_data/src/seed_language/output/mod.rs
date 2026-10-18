@@ -159,7 +159,7 @@ pub struct GenerationModifiers<'log> {
     pub spirit_light_change: i32,
     pub item_metadata: ItemMetadata<'log>,
     pub removed_locations: FxHashSet<CommandBoolean>,
-    pub location_slots: FxHashMap<CommandBoolean, u32>,
+    pub random_placement_slots: FxHashMap<CommandBoolean, u32>,
     pub logical_state_sets: FxHashSet<String>,
     pub only_simulation_events: Vec<Range<usize>>,
     pub preplacements: Vec<(CommandVoid, Zone)>,

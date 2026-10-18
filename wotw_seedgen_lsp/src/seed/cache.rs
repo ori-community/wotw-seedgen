@@ -4,8 +4,8 @@ use rustc_hash::FxHashMap;
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
 use wotw_seedgen_data::{
     assets::{
-        AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, LocData,
-        PresetFileAccess, SnippetFileAccess, StateData, UberStateData, UberStateDataEntry,
+        AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, Pickups,
+        PresetFileAccess, SnippetFileAccess, States, UberStateData, UberStateDataEntry,
         UberStateNameEntry,
     },
     parse::Source,
@@ -16,7 +16,7 @@ use wotw_seedgen_server_shared::ServerState;
 pub type Cache = ServerState<DefaultFileAccess, CacheValues>;
 
 pub struct CacheValues {
-    pub loc_data: Result<LocData, String>,
+    pub pickups: Result<Pickups, String>,
     pub uber_state_data: Result<UberStateData, String>,
     pub uber_identifier_completion: UberIdentifierCompletion,
 }
@@ -50,23 +50,22 @@ impl AssetCacheValues for CacheValues {
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        let loc_data = file_access.loc_data();
-        let uber_state_data =
-            uber_state_data(loc_data.as_ref().map_err(String::clone), file_access);
+        let pickups = file_access.pickups();
+        let uber_state_data = uber_state_data(pickups.as_ref().map_err(String::clone), file_access);
         let uber_identifier_completion = UberIdentifierCompletion::new(&uber_state_data);
 
         Self {
-            loc_data,
+            pickups,
             uber_state_data,
             uber_identifier_completion,
         }
     }
 
-    fn loc_data(&self) -> Result<&LocData, String> {
-        self.loc_data.as_ref().map_err(String::clone)
+    fn pickups(&self) -> Result<&Pickups, String> {
+        self.pickups.as_ref().map_err(String::clone)
     }
 
-    fn state_data(&self) -> Result<&StateData, String> {
+    fn states(&self) -> Result<&States, String> {
         unimplemented!()
     }
 
@@ -95,22 +94,22 @@ impl AssetCacheValues for CacheValues {
     where
         F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
     {
-        if changed.loc_data {
-            self.loc_data = file_access.loc_data();
+        if changed.pickups {
+            self.pickups = file_access.pickups();
         }
 
-        if changed.loc_data || changed.state_data || changed.uber_state_dump {
-            self.uber_state_data = uber_state_data(self.loc_data(), file_access);
+        if changed.pickups || changed.states || changed.uber_state_dump {
+            self.uber_state_data = uber_state_data(self.pickups(), file_access);
             self.uber_identifier_completion = UberIdentifierCompletion::new(&self.uber_state_data);
         }
     }
 }
 
 fn uber_state_data<F: AssetFileAccess>(
-    loc_data: Result<&LocData, String>,
+    pickups: Result<&Pickups, String>,
     file_access: &F,
 ) -> Result<UberStateData, String> {
-    file_access.uber_state_data(loc_data?, &file_access.state_data()?)
+    file_access.uber_state_data(pickups?, &file_access.states()?)
 }
 
 impl UberIdentifierCompletion {

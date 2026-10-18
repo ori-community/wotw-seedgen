@@ -2,7 +2,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
 use utoipa::ToSchema;
-use wotw_seedgen_data::{assets::LocDataEntry, seed_language::output::CommandVoid, Position, Zone};
+use wotw_seedgen_data::{assets::PickupsEntry, seed_language::output::CommandVoid, Position, Zone};
 
 /// Complete data to create a logic spoiler for the seed
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
@@ -84,7 +84,7 @@ pub struct SpoilerItem {
     pub name: String,
 }
 
-/// Select data from a [`LocDataEntry`]
+/// Select data from a [`PickupsEntry`]
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
 pub struct NodeSummary {
@@ -97,7 +97,7 @@ pub struct NodeSummary {
 }
 
 impl NodeSummary {
-    pub(super) fn new(pickup: &LocDataEntry) -> Self {
+    pub(super) fn new(pickup: &PickupsEntry) -> Self {
         Self {
             identifier: pickup.identifier.clone(),
             position: pickup.position,

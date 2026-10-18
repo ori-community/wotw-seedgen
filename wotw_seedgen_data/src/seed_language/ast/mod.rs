@@ -574,13 +574,13 @@ pub enum Command<'source> {
         Spanned<ItemDataMapIcon>,
         CommandArgs<ItemDataMapIconArgs<'source>>,
     ),
-    RemoveLocation(
-        Spanned<RemoveLocation>,
-        CommandArgs<RemoveLocationArgs<'source>>,
+    NoRandomPlacement(
+        Spanned<NoRandomPlacement>,
+        CommandArgs<NoRandomPlacementArgs<'source>>,
     ),
-    LocationSlots(
-        Spanned<LocationSlots>,
-        CommandArgs<LocationSlotsArgs<'source>>,
+    RandomPlacementSlots(
+        Spanned<RandomPlacementSlots>,
+        CommandArgs<RandomPlacementSlotsArgs<'source>>,
     ),
     SetLogicState(
         Spanned<SetLogicState>,
@@ -958,19 +958,19 @@ pub struct ItemDataMapIconArgs<'source> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct RemoveLocation;
+pub struct NoRandomPlacement;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct RemoveLocationArgs<'source> {
+pub struct NoRandomPlacementArgs<'source> {
     pub location: Expression<'source>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct LocationSlots;
+pub struct RandomPlacementSlots;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct LocationSlotsArgs<'source> {
+pub struct RandomPlacementSlotsArgs<'source> {
     pub location: Expression<'source>,
     pub slots: CommandArg<Expression<'source>>,
 }

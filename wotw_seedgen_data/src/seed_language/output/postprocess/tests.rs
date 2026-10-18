@@ -19,14 +19,14 @@ use crate::{
 
 static MARSH_TRIGGER: LazyLock<Trigger> = LazyLock::new(|| {
     let uber_identifier = TEST_ASSETS
-        .expect_loc_data()
+        .expect_pickups()
         .entries
         .iter()
         .find(|entry| entry.zone == Zone::Marsh && entry.value.is_none())
         .unwrap()
         .uber_identifier;
 
-    Trigger::loc_data_trigger(uber_identifier, None)
+    Trigger::pickup_trigger(uber_identifier, None)
 });
 
 macro_rules! test {
@@ -110,7 +110,7 @@ fn count_in_zone() {
                 count_in_zone_message(
                     vec![(
                         &on_marsh(command.clone()),
-                        TEST_ASSETS.expect_loc_data().entries.first().unwrap(),
+                        TEST_ASSETS.expect_pickups().entries.first().unwrap(),
                     )],
                     &ItemMetadata::new(),
                 )
@@ -131,7 +131,7 @@ fn count_in_zone() {
                     count_in_zone_message(
                         vec![(
                             &on_marsh_multiworld(),
-                            TEST_ASSETS.expect_loc_data().entries.first().unwrap(),
+                            TEST_ASSETS.expect_pickups().entries.first().unwrap(),
                         )],
                         &ItemMetadata::new(),
                     )
@@ -152,7 +152,7 @@ fn test_postprocess<const N: usize>(commands: [CommandsOutput; N]) -> Vec<Placeh
 
     postprocess(
         &mut worlds,
-        TEST_ASSETS.expect_loc_data(),
+        TEST_ASSETS.expect_pickups(),
         &mut Pcg64Mcg::new(0),
     )
 }

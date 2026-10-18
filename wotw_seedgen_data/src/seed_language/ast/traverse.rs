@@ -13,11 +13,11 @@ use crate::seed_language::ast::{
     DifficultyVisibleArgs, Event, EventContent, ExportArgs, Expression, ExpressionValue,
     FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
     ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
-    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, LocationSlotsArgs, Operation, PreplaceArgs,
-    RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs, RandomNumberArgs,
-    RandomPoolArgs, RemoveItemArgs, RemoveLocationArgs, RemoveSpiritLightArgs, SetConfigArgs,
-    SetLogicStateArgs, Snippet, SpawnArgs, StateArgs, TagsArg, TimerArgs, Trigger, TriggerBinding,
-    UberIdentifier, ZoneOfArgs,
+    ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, NoRandomPlacementArgs, Operation,
+    PreplaceArgs, RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs,
+    RandomNumberArgs, RandomPlacementSlotsArgs, RandomPoolArgs, RemoveItemArgs,
+    RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs, Snippet, SpawnArgs, StateArgs,
+    TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier, ZoneOfArgs,
 };
 
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
@@ -419,11 +419,11 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
-            Self::RemoveLocation(keyword, args) => {
+            Self::NoRandomPlacement(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
-            Self::LocationSlots(keyword, args) => {
+            Self::RandomPlacementSlots(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
@@ -747,13 +747,13 @@ impl<H: Handler> Traverse<H> for ItemDataMapIconArgs<'_> {
     }
 }
 
-impl<H: Handler> Traverse<H> for RemoveLocationArgs<'_> {
+impl<H: Handler> Traverse<H> for NoRandomPlacementArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.location.traverse(handler);
     }
 }
 
-impl<H: Handler> Traverse<H> for LocationSlotsArgs<'_> {
+impl<H: Handler> Traverse<H> for RandomPlacementSlotsArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.location.traverse(handler);
         inspect_command_arg(&self.slots, |slots| slots.traverse(handler));

@@ -3,15 +3,15 @@
 //! # Examples
 //!
 //! ```
-//! use wotw_seedgen_data::{assets::{LocData, LocDataEntry}, MapIcon, Position, UberIdentifier, Zone};
+//! use wotw_seedgen_data::{assets::{Pickups, PickupsEntry}, MapIcon, Position, UberIdentifier, Zone};
 //!
 //! let input = "Identifier, Condition, Zone, PickupType, PickupDetails, X, Y, MapX, MapY
 //! Marsh.Spawn.LeftHF, 21786|60210, Marsh, HealthFragment, , -958.6, -4313.2, -958.6199, -4312.245
 //! Glades.MotayHut.SL, 42178|57455, Glades, SpiritLight, 100, -172.7, -4583.2, -392.8, -4130.6";
-//! let loc_data = LocData::from_reader(input.as_bytes()).unwrap();
+//! let pickups = Pickups::from_reader(input.as_bytes()).unwrap();
 //!
-//! assert_eq!(loc_data.entries, vec![
-//!     LocDataEntry {
+//! assert_eq!(pickups.entries, vec![
+//!     PickupsEntry {
 //!         identifier: "Marsh.Spawn.LeftHF".to_string(),
 //!         zone: Zone::Marsh,
 //!         map_icon: MapIcon::HealthFragment,
@@ -20,7 +20,7 @@
 //!         position: Some(Position::new(-958., -4313.)),
 //!         map_position: Some(Position::new(-958., -4313.)),
 //!     },
-//!     LocDataEntry {
+//!     PickupsEntry {
 //!         identifier: "Glades.MotayHut.SL".to_string(),
 //!         zone: Zone::Glades,
 //!         map_icon: MapIcon::SpiritLight,
@@ -40,16 +40,16 @@ use utoipa::ToSchema;
 
 /// Information about all pickup locations which should be filled by the randomizer
 #[derive(Debug, Clone, PartialEq, Default)]
-pub struct LocData {
+pub struct Pickups {
     /// List of individual pickup locations
-    pub entries: Vec<LocDataEntry>,
+    pub entries: Vec<PickupsEntry>,
 }
 
 // TODO while breaking everything could also just change the loc data format to save this transformation
 /// Information about a pickup location
 #[derive(Debug, Clone, Serialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
-pub struct LocDataEntry {
+pub struct PickupsEntry {
     /// Unique identifier for this pickup location which is used in `paths.wotwl`
     pub identifier: String,
     /// Map zone containing this pickup location
@@ -68,13 +68,13 @@ pub struct LocDataEntry {
     pub map_position: Option<Position>,
 }
 
-impl PartialEq for LocDataEntry {
+impl PartialEq for PickupsEntry {
     fn eq(&self, other: &Self) -> bool {
         self.identifier == other.identifier
     }
 }
 
-impl LocData {
+impl Pickups {
     /// Parse from a [`Read`] implementation, such as a file or byte slice
     ///
     /// Note that the underlying CSV reader is buffered automatically, so you should not
@@ -92,7 +92,7 @@ impl LocData {
             .map_err(|err| err.to_string())?
         {
             let record = record
-                .deserialize::<LocDataInput>(None)
+                .deserialize::<PickupsInput>(None)
                 .map_err(|err| err.to_string())?;
 
             let position = match (record.x, record.y) {
@@ -105,7 +105,7 @@ impl LocData {
                 _ => None,
             };
 
-            entries.push(LocDataEntry {
+            entries.push(PickupsEntry {
                 identifier: record.identifier,
                 zone: record.zone,
                 map_icon: record.pickup_type,
@@ -122,7 +122,7 @@ impl LocData {
 #[serde_as]
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
-struct LocDataInput<'a> {
+struct PickupsInput<'a> {
     identifier: String,
     condition: LogicCondition,
     #[serde_as(as = "DisplayFromStr")]

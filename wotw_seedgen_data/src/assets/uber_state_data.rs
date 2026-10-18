@@ -1,5 +1,5 @@
 use crate::{
-    assets::{LocData, StateData},
+    assets::{Pickups, States},
     UberIdentifier,
 };
 use indexmap::IndexMap;
@@ -235,7 +235,7 @@ impl Display for UberStateValue {
 }
 
 impl UberStateData {
-    pub fn from_parts(dump: UberStateDump, loc_data: &LocData, state_data: &StateData) -> Self {
+    pub fn from_parts(dump: UberStateDump, pickups: &Pickups, states: &States) -> Self {
         let mut uber_state_data = Self::default();
 
         for (group, dump_group) in dump.groups {
@@ -281,7 +281,7 @@ impl UberStateData {
             }
         }
 
-        for record in &loc_data.entries {
+        for record in &pickups.entries {
             uber_state_data.add_rando_name(
                 record.identifier.clone(),
                 record.uber_identifier,
@@ -289,7 +289,7 @@ impl UberStateData {
             );
         }
 
-        for record in &state_data.entries {
+        for record in &states.entries {
             uber_state_data.add_rando_name(
                 record.identifier.clone(),
                 record.uber_identifier,

@@ -139,10 +139,10 @@ fn compile(
 ) -> Result<(), Error> {
     let start = Instant::now();
 
-    let loc_data = cache.loc_data.as_ref()?;
+    let pickups = cache.pickups.as_ref()?;
     let uber_state_data = cache.uber_state_data.as_ref()?;
 
-    let mut compiler = Compiler::new(rng, cache, loc_data, uber_state_data)
+    let mut compiler = Compiler::new(rng, cache, pickups, uber_state_data)
         .with_lockfile(lockfile, &NO_LOG_CAPTURE)
         .with_lint(true)
         .with_debug(debug);
@@ -153,7 +153,7 @@ fn compile(
         .eprint_errors()
         .ok_or_else(|| Error(format!("failed to compile \"{entry}\"")))?;
 
-    let placeholder_map = postprocess(&mut [&mut output], loc_data, rng)
+    let placeholder_map = postprocess(&mut [&mut output], pickups, rng)
         .pop()
         .unwrap();
 

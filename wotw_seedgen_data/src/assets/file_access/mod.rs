@@ -13,7 +13,7 @@ pub use plando::PlandoFolderAccess;
 pub use watch::{Watcher, WatcherError, WatcherMessage, WatcherResult};
 
 use crate::assets::{
-    LocData, PlandoAccess, PresetAccess, SnippetAccess, StateData, UberStateData, UberStateDump,
+    Pickups, PlandoAccess, PresetAccess, SnippetAccess, States, UberStateData, UberStateDump,
     UniversePreset, WorldPreset,
 };
 use std::{
@@ -105,20 +105,20 @@ pub trait AssetFileAccess {
 
     fn asset_folders(&self) -> Self::Folders;
 
-    const LOC_DATA_PATH: &str = "logic/loc_data.csv";
+    const PICKUPS_PATH: &str = "logic/pickups.csv";
 
-    fn loc_data(&self) -> Result<LocData, String> {
-        let (path, file) = folders::open(self.asset_folders(), Path::new(Self::LOC_DATA_PATH))?;
+    fn pickups(&self) -> Result<Pickups, String> {
+        let (path, file) = folders::open(self.asset_folders(), Path::new(Self::PICKUPS_PATH))?;
 
-        LocData::from_reader(file).map_err(|err| file_err("parse", &path, err))
+        Pickups::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
 
-    const STATE_DATA_PATH: &str = "logic/state_data.csv";
+    const STATES_PATH: &str = "logic/states.csv";
 
-    fn state_data(&self) -> Result<StateData, String> {
-        let (path, file) = folders::open(self.asset_folders(), Path::new(Self::STATE_DATA_PATH))?;
+    fn states(&self) -> Result<States, String> {
+        let (path, file) = folders::open(self.asset_folders(), Path::new(Self::STATES_PATH))?;
 
-        StateData::from_reader(file).map_err(|err| file_err("parse", &path, err))
+        States::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
 
     const UBER_STATE_DUMP_PATH: &str = "uber_state_dump.json";
@@ -130,14 +130,10 @@ pub trait AssetFileAccess {
         serde_json::from_reader(BufReader::new(file)).map_err(|err| file_err("parse", &path, err))
     }
 
-    fn uber_state_data(
-        &self,
-        loc_data: &LocData,
-        state_data: &StateData,
-    ) -> Result<UberStateData, String> {
+    fn uber_state_data(&self, pickups: &Pickups, states: &States) -> Result<UberStateData, String> {
         let dump = self.uber_state_dump()?;
 
-        Ok(UberStateData::from_parts(dump, loc_data, state_data))
+        Ok(UberStateData::from_parts(dump, pickups, states))
     }
 
     const PATHS_PATH: &str = "logic/paths.wotwl";

@@ -137,7 +137,7 @@ fn generation(c: &mut Criterion) {
     let mut seed = 0..;
     let graph = &TEST_ASSETS.graphs.moki;
     let test_assets = &*TEST_ASSETS;
-    let loc_data = test_assets.expect_loc_data();
+    let pickups = test_assets.expect_pickups();
     let uber_state_data = test_assets.expect_uber_state_data();
 
     group.bench_function("default", |b| {
@@ -145,7 +145,7 @@ fn generation(c: &mut Criterion) {
             universe_settings.seed = seed.next().unwrap().to_string();
             Generator::new(
                 graph,
-                loc_data,
+                pickups,
                 uber_state_data,
                 test_assets,
                 &universe_settings,
@@ -178,7 +178,7 @@ fn generation(c: &mut Criterion) {
                 universe_settings.seed = seed.next().unwrap().to_string();
                 Generator::new(
                     &graph,
-                    loc_data,
+                    pickups,
                     uber_state_data,
                     test_assets,
                     &universe_settings,
@@ -211,7 +211,7 @@ fn generation(c: &mut Criterion) {
             universe_settings.seed = seed.next().unwrap().to_string();
             Generator::new(
                 &graph,
-                loc_data,
+                pickups,
                 uber_state_data,
                 test_assets,
                 &universe_settings,
@@ -235,7 +235,7 @@ fn multiworld(c: &mut Criterion) {
     let graph = TEST_ASSETS.graph(&universe_settings.world_settings);
 
     let test_assets = &*TEST_ASSETS;
-    let loc_data = test_assets.expect_loc_data();
+    let pickups = test_assets.expect_pickups();
     let uber_state_data = test_assets.expect_uber_state_data();
 
     let world_settings = universe_settings.world_settings.pop().unwrap();
@@ -249,7 +249,7 @@ fn multiworld(c: &mut Criterion) {
                 universe_settings.seed = seed.next().unwrap().to_string();
                 Generator::new(
                     &graph,
-                    loc_data,
+                    pickups,
                     uber_state_data,
                     test_assets,
                     &universe_settings,

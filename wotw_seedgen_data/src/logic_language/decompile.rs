@@ -204,8 +204,8 @@ impl Display for ConnectionDecompiler<'_> {
 
         match &self.graph.nodes[*to] {
             Node::Anchor(anchor) => write!(f, "  conn {}", anchor.identifier)?,
-            Node::Pickup(loc_data_entry) => write!(f, "  pickup {}", loc_data_entry.identifier)?,
-            Node::State(state_data_entry) => write!(f, "  state {}", state_data_entry.identifier)?,
+            Node::Pickup(pickup_entry) => write!(f, "  pickup {}", pickup_entry.identifier)?,
+            Node::State(states_entry) => write!(f, "  state {}", states_entry.identifier)?,
             Node::LogicalState(identifier) => write!(f, "  state {identifier}")?,
         }
 

@@ -66,7 +66,7 @@ fn full_reach_check() {
 
     let all_locations = TEST_ASSETS
         .values
-        .expect_loc_data()
+        .expect_pickups()
         .entries
         .iter()
         .map(|location| location.identifier.as_str())

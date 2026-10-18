@@ -10,7 +10,7 @@ use rand::{
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashSet;
 use wotw_seedgen_data::{
-    assets::LocDataEntry,
+    assets::PickupsEntry,
     logic_language::output::{Graph, Node},
     seed_language::{
         ast::ClientEvent,
@@ -305,8 +305,8 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
 
 #[derive(Default)]
 pub struct SpawnOutput<'graph> {
-    pub total_reach: Vec<&'graph LocDataEntry>,
-    pub unreachable: Vec<&'graph LocDataEntry>,
+    pub total_reach: Vec<&'graph PickupsEntry>,
+    pub unreachable: Vec<&'graph PickupsEntry>,
 }
 
 struct RandomSpawnGenerator {
@@ -421,14 +421,14 @@ impl Iterator for FullyRandomSpawnGenerator<'_> {
 fn filter_placement_locations<'a>(
     world: &World,
     log_index: &str,
-    placement_locations: &mut Vec<&'a LocDataEntry>,
+    placement_locations: &mut Vec<&'a PickupsEntry>,
     output: &IntermediateOutput,
     log_capture: &LogCapture,
 ) {
     let mut extra_slots = vec![];
 
     placement_locations.retain(|pickup| {
-        let condition = CommandBoolean::loc_data_condition(pickup.uber_identifier, pickup.value);
+        let condition = CommandBoolean::pickup_condition(pickup.uber_identifier, pickup.value);
         // TODO remove by identifier instead?
         if output.modifiers.removed_locations.contains(&condition) {
             trace!(
@@ -440,7 +440,7 @@ fn filter_placement_locations<'a>(
             return false;
         }
 
-        if world.loc_data_condition_met(pickup.uber_identifier, pickup.value) {
+        if world.pickup_condition_met(pickup.uber_identifier, pickup.value) {
             trace!(
                 logger: log_capture,
                 "{log_index}Removing {pickup} from placement locations since the condition was met on spawn",
@@ -450,7 +450,7 @@ fn filter_placement_locations<'a>(
             return false;
         }
 
-        match output.modifiers.location_slots.get(&condition) {
+        match output.modifiers.random_placement_slots.get(&condition) {
             None | Some(1) => {},
             Some(0) => {
                 trace!(
