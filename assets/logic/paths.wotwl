@@ -9040,6 +9040,254 @@ anchor WoodsShrine at 1361, -4068:
   pickup Woods.CombatShrine:
     moki: WoodsMain.CombatShrineCompleted
 
+region WeepingRidge:
+  # This is mirrored from WillowsEnd.
+  moki: Danger=60, Regenerate OR RemoveRegionRegen  # 40 spike + 20 enemy damage
+  gorlek: Danger=40, Regenerate OR RemoveRegionRegen  # 40 spike damage
+  kii: Danger=40  # 40 spike damage
+  unsafe: free
+
+anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weeping ridge
+  refill Checkpoint
+  refill Health=1
+  refill Energy=3:
+    moki: BreakCrystal
+
+  conn WeepingRidge.Elevator:
+    moki:
+      DoubleJump, Dash OR Glide
+      Bash, Grenade=1
+      Launch
+    gorlek: DoubleJump OR SentryJump=1
+    kii:
+      Dash OR Hammer OR GlideJump
+      Sword, Shuriken=1 OR Flash=1 OR Sentry=1
+      # GrenadeJump=1, Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe:
+      Sword  # upslash+downslash
+      Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
+      GrenadeJump
+  conn LowerWastes.FeedingGroundsTP:  # covers connections into woods
+    moki: WindtornRuins.SeirSkill, Burrow  # Seir to make it a safe path
+    gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
+
+anchor WeepingRidge.Elevator at 1170, -3820:  # Bottom checkpoint next to the elevator
+  refill Checkpoint
+
+  state WeepingRidge.ElevatorFightCompleted:
+    moki: Combat=2xCrystalMiner+2xShieldCrystalMiner
+
+  conn WeepingRidge.TopElevator:
+    moki: WeepingRidge.ElevatorFightCompleted
+  conn WeepingRidge.Bottom:
+    moki: Launch OR DoubleJump OR Dash OR Glide
+    gorlek: Sword OR Hammer
+    kii:
+      Bash, Grenade=1
+      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: free  # coyote jump
+
+anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top of the elevator
+  refill Checkpoint
+  refill Health=1
+
+  pickup Woods.LaunchTree.ElementalOre:
+    moki: Launch, Bash, DoubleJump OR Dash OR Glide
+    gorlek:
+      Launch, DoubleJump OR Dash OR Bash OR Glide
+      Launch, Sword, Damage=20
+    kii:  # launch/hjump paths are redundant with WeepingRidge.AfterElementals->Ore
+      Bash, Dash
+      Bash, DoubleJump, Damage=20, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Damage is for weird laser patterns
+      DoubleJump, TripleJump, Sword
+    unsafe:
+      SentryJump=2, DoubleJump, Bow=1, Damage=40
+      SentryJump=2, DoubleJump, TripleJump OR Dash OR Glide  # Use weapon stall to reach the edge below the portal
+      Bash, Glide  # wait on the left wall until the elemental gives you a shot to bash
+      DoubleJump, TripleJump
+      DoubleJump, Sword, Damage=40, Bow=1  # Reset your jump by slashing the elemental, pogo him to reach the wall above the portal, djump + upslash from under the Mine to reach the spikes
+      Bash, DoubleJump
+      Unpopular, Bash  # Projectile redirect + friendly spikes https://youtu.be/SecqqWk_hFE
+
+  conn WeepingRidge.AfterElementals:
+    moki:
+      Glide
+      Launch, Bash OR DoubleJump OR Dash
+    gorlek:
+      Launch, Bow=1
+      Bash, Dash, Bow=1
+      DoubleJump, Bow=1, Damage=40
+      Bash, DoubleJump, TripleJump
+      Bash, DoubleJump, Bow=1, Sword OR Hammer
+      DoubleJump, TripleJump, Sword OR Hammer OR Dash
+    kii:
+      Launch
+      Damage=40, DoubleJump OR Dash
+      Bash, Dash
+      Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      Sword, DoubleJump OR Dash  # Use sword on elemental to reset your djump/dash (don't use portal with dash)
+      DoubleJump, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+      Damage=40, SwordSJump=1  # Full hover twice, Dboost on spikes, SentryJump into the portal
+    unsafe:
+      Damage=40, Sword OR Hammer
+      Dash, Hammer OR DoubleJump  # Dash against the ceiling to refresh your dash
+      Bash, DoubleJump  # Bashglide to the 2nd elemental. Precise
+      # Bash, DoubleJump, Bow=1  # Bashgliding with bow directly to the platform. Easier than the bowless path.
+      Unpopular, Bash  # Projectile redirect + friendly spikes https://youtu.be/YbaXP2qQv9Y
+      AerialHammerJump  # Refresh DJ against the wall
+      PauseFloat
+      AbilitySwap=3  # https://youtu.be/4Njv3ZjfDoo
+      DoubleJump, TripleJump  # Wrap around the central wall. Too many enemies for kii
+  conn WeepingRidge.WillowEntranceLedge:
+    moki, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump, Dash OR Glide
+    gorlek, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump OR Dash
+    kii, WeepingRidge.ElevatorFightCompleted:
+      Launch, Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
+      Launch, Bash, Grenade=1
+      Bash, Grenade=3, DoubleJump, TripleJump
+      AerialHammerJump, TripleJump
+      SwordSJump=3, DoubleJump, TripleJump, Dash, Damage=20  # sjump on top of elevator -> sjump + hover from the left wall on top of third laser -> sjump and take a dboost on last laser to reach the wall above -> tjump + dash + upslash to reach the ledge above
+      HammerSJump=2, DoubleJump, TripleJump, Dash, Shuriken=1 OR Sentry=1  # similar but tjump+upslash to avoid the last sjump. Energy weapon for the final hover
+    unsafe, WeepingRidge.ElevatorFightCompleted:
+      Launch
+      SentryJump=3, DoubleJump, TripleJump, Dash
+      SwordSJump=4 OR HammerSJump=5  # Hammer takes longer to upswing and lasers will stop you
+      HammerSJump=4, DoubleJump OR Dash OR Glide
+      Bash, Grenade=3, DoubleJump
+      AerialHammerJump  # upslash to get on top ofd the elevator then walljump of the right friendly spikes. Get a wall jump on the last turret to reach the top
+      GrenadeJump, GrenadeCancel, DoubleJump
+      DoubleJump, TripleJump, Dash, Damage=20, SpearJump=2  # augmented dboost on the 1st laser to spear jump from the spikes
+      DoubleJump, TripleJump, Dash, Damage=60, Damage=40
+  conn WeepingRidge.Elevator:
+    moki, WeepingRidge.ElevatorFightCompleted:
+      Launch
+      Bash, Grenade=1
+      DoubleJump, Dash, Glide
+    gorlek, WeepingRidge.ElevatorFightCompleted:
+      SentryJump=1
+      DoubleJump, TripleJump OR Dash OR Glide
+    kii, WeepingRidge.ElevatorFightCompleted:
+      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=4
+      # GrenadeJump=1, Shuriken=2 OR Blaze=6
+    unsafe, WeepingRidge.ElevatorFightCompleted:
+      Shuriken=1 OR Sentry=2 OR AbilitySwap=1 OR PauseFloat  # Towards the left wall. Shuriken: https://youtu.be/jF3Gi90F5Ws.
+      SpearJump=1, Spear=2  # 1 jump + 1 spear might be possible. https://youtu.be/AEiZkRiLQCc
+      GrenadeJump  # Can barely make it to the ledge above the portal
+
+anchor WeepingRidge.AfterElementals at 1303, -3769:  # Ledge next to the spikes, under the portal leeding to the ore
+  pickup Woods.LaunchTree.ElementalOre:
+    moki: Launch, DoubleJump OR Dash OR Bash OR Glide
+    gorlek: Launch
+    kii:
+      Bash, Grenade=1, Damage=20, DoubleJump OR Dash  # Damage for wonky lasers
+      SentryJump=2, Damage=20  # Damage for wonky lasers
+      AerialHammerJump, SentryJump=1, Damage=20  # Same as above but hjump through the portal
+      AerialHammerJump, Damage=60  # Easy to hit the mine or the laser, which launch you into the spikes
+    unsafe:  # It is possible to duck left of the portal to wait out the laser
+      DoubleJump, TripleJump  # https://youtu.be/8VSgSO7I_zA
+      Bash, Grenade=1  # https://youtu.be/dOrFj9RT4KE
+      Bash, DoubleJump, Dash OR Glide OR PauseFloat  # bait a projectile instead of using the portal
+      Bash, GlideJump  # bait a projectile instead of using the portal
+      SentryJump=2 OR AerialHammerJump OR GlideHammerJump
+      SentryJump=1, SwordJump OR Bash  # (2a) sjump, (3) Pogo the elemental, reset above portal, swordJump and upslash
+      GrenadeJump, DoubleJump OR Bash
+      WallHammerJump  # Off the ledge, (3) Off the ledge and turnaround off the wall
+
+  conn WeepingRidge.AboveTree: free
+  conn WeepingRidge.TopElevator:
+    moki: Launch, Bash, Glide  # Glide is the only ability that really helps you outwait the laser attack
+    gorlek:
+      Launch, Bash
+      Launch, DoubleJump, Dash  # this gives you good mobility to avoid the enemies
+    kii:
+      Launch, DoubleJump OR Dash OR Damage=20  # dboost on the mine inbetween the two elementals
+      AerialHammerJump, Damage=20, TripleJump OR Bash OR Glide  # dboost on the mine at the wall for leniency
+      AerialHammerJump, Dash, Damage=40  # dboost on the mine + laser as you are more likely to aggro the 2nd elemental
+    unsafe:
+      Launch
+      DoubleJump, TripleJump, Damage=40
+      DoubleJump, TripleJump, Bash  # Bait elemental projectiles
+      AerialHammerJump  # continue to extend your hjump when exiting a portal before doing a new one 
+      GrenadeJump, DoubleJump, Damage=20  # dboost on the mine
+      SwordSJump=5, Damage=20  # Pogo the first elemental, dboost on the mine
+      SwordSJump=4, SwordJump, Damage=20  # Same as above, but swordjump+upslash into the top portal
+
+anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
+  refill Checkpoint
+
+  pickup Woods.LaunchTree: free
+  pickup Woods.LaunchTree.PortalSL:
+    moki: Launch
+    kii:
+      SentryJump=1, DoubleJump, TripleJump  # Max height
+      AerialHammerJump
+    unsafe:
+      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40  # take a dboost in the left spikes
+      SwordSJump=2  # Use the micro ledge on the left after entering the portal
+      DoubleJump, TripleJump, Damage=40, Damage=80
+      SentryJump=1, DoubleJump  # with sword,need Upswing. With hammer, max height from the right of the portal is enough
+      GlideHammerJump
+      GrenadeJump, DoubleJump
+  pickup Woods.LaunchTree.RightSL:
+    moki: Launch, DoubleJump, Bow=2
+    gorlek:
+      Launch, Bow=1 OR Spear=1 OR Grenade=1 OR Damage=20
+      Bash, Grenade=2, DoubleJump, TripleJump, Damage=40
+      SentryJump=2, DoubleJump, TripleJump, Damage=40
+    kii:
+      Launch
+      Bash, Grenade=2, DoubleJump, TripleJump
+      Bash, Grenade=2, DoubleJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      AerialHammerJump, TripleJump OR Dash OR Glide OR Sword OR Flash=1 OR Sentry=1  # condition is for the first hjump
+      AerialHammerJump, Shuriken=1, Damage=20  # same as above but account for touching the mine with shuriken 
+      SentryJump=2, DoubleJump, TripleJump
+      SentryJump=2, DoubleJump, Dash, Shuriken=1 OR Sentry=1
+      # GrenadeJump=2, DoubleJump, TripleJump
+    unsafe:  # may be inaccurate after moving paths to this anchor
+      Bash, Grenade=3  # Walljump beneath the spikes to catch the last grenade higher up
+      SentryJump=3 OR AerialHammerJump
+      DoubleJump, TripleJump, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mine near the tree | wasn't consistent enough for kii
+      GrenadeJump, DoubleJump  # Go to the right wall beneath the mine
+      GrenadeJump, GlideJump, Damage=40  # Take a dboost beneath the pickup
+      Dash, DoubleJump:  # https://youtu.be/Di__18L5bVc
+        TripleJump
+        Spear=2, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      # SentryJump=1, DoubleJump, TripleJump, Dash  # Dash from the wall above the tree + tjump + weapon combo to reach the right platform.
+
+  conn WeepingRidge.AfterElementals:
+    moki:
+      Launch
+      Bash, Grenade=1
+    gorlek: SentryJump=1
+    kii:
+      DoubleJump, TripleJump, Damage=40
+      AerialHammerJump  # OR GrenadeJump
+      GlideJump, DoubleJump, TripleJump
+    unsafe:
+      DoubleJump, Damage=40, Dash OR Sword OR Hammer
+      DoubleJump, TripleJump, Damage=20  # use the mine as an elevator
+      DoubleJump, TripleJump, Sword  # pogo the mine on the left to avoid the explosion
+      GlideHammerJump OR GrenadeJump OR AbilitySwap=2
+      GlideJump, Damage=40, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GlideJump, DoubleJump, Sword OR Hammer OR Spear=1  # sword pogo the mine
+      BlazeSwap=1, DoubleJump OR GlideJump
+      SentrySwap=1, DoubleJump OR GlideJump
+
+anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willow entrance
+  entrance:
+    id: 29
+    target: WillowsEnd.Entry
+    enter: free
+
+  refill Checkpoint
+  conn WeepingRidge.TopElevator:  # Could be just the elevator state but adding more requirement in lower difficulties because not all lasers are visible at once
+    gorlek, WeepingRidge.ElevatorFightCompleted:
+      Glide OR Damage=20
+    kii, WeepingRidge.ElevatorFightCompleted:  # land on top of the second laser
+      Launch OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
+      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+    unsafe: WeepingRidge.ElevatorFightCompleted
+
 region LowerReach:
   # This is mirrored in UpperReach.
   # Reach spikes deal 20 damage, enemies generally 10 but the Miners' hammer attack deals 20 damage.
@@ -15922,254 +16170,6 @@ anchor WindtornRuins.MapstoneAltar at 1969, -4024:  # At the ancient map pedesta
       Sword, Shuriken=1  # Pogo
   conn LowerWastes.MinesEntrance:
     moki: Burrow, BreakWall=20
-
-region WeepingRidge:
-  # This is mirrored from WillowsEnd.
-  moki: Danger=60, Regenerate OR RemoveRegionRegen  # 40 spike + 20 enemy damage
-  gorlek: Danger=40, Regenerate OR RemoveRegionRegen  # 40 spike damage
-  kii: Danger=40  # 40 spike damage
-  unsafe: free
-
-anchor WeepingRidge.Bottom at 1210, -3830:  # After crossing the portal to weeping ridge
-  refill Checkpoint
-  refill Health=1
-  refill Energy=3:
-    moki: BreakCrystal
-
-  conn WeepingRidge.Elevator:
-    moki:
-      DoubleJump, Dash OR Glide
-      Bash, Grenade=1
-      Launch
-    gorlek: DoubleJump OR SentryJump=1
-    kii:
-      Dash OR Hammer OR GlideJump
-      Sword, Shuriken=1 OR Flash=1 OR Sentry=1
-      # GrenadeJump=1, Glide OR Sword OR Shuriken=1 OR Flash=1 OR Sentry=1
-    unsafe:
-      Sword  # upslash+downslash
-      Glide, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1
-      GrenadeJump
-  conn LowerWastes.FeedingGroundsTP:  # covers connections into woods
-    moki: WindtornRuins.SeirSkill, Burrow  # Seir to make it a safe path
-    gorlek: Burrow  # won't softlock if you did the cat and mouse because you'll have unlocked the teleporter
-
-anchor WeepingRidge.Elevator at 1170, -3820:  # Bottom checkpoint next to the elevator
-  refill Checkpoint
-
-  state WeepingRidge.ElevatorFightCompleted:
-    moki: Combat=2xCrystalMiner+2xShieldCrystalMiner
-
-  conn WeepingRidge.TopElevator:
-    moki: WeepingRidge.ElevatorFightCompleted
-  conn WeepingRidge.Bottom:
-    moki: Launch OR DoubleJump OR Dash OR Glide
-    gorlek: Sword OR Hammer
-    kii:
-      Bash, Grenade=1
-      Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: free  # coyote jump
-
-anchor WeepingRidge.TopElevator at 1189, -3716:  # After the portal at the top of the elevator
-  refill Checkpoint
-  refill Health=1
-
-  pickup Woods.LaunchTree.ElementalOre:
-    moki: Launch, Bash, DoubleJump OR Dash OR Glide
-    gorlek:
-      Launch, DoubleJump OR Dash OR Bash OR Glide
-      Launch, Sword, Damage=20
-    kii:  # launch/hjump paths are redundant with WeepingRidge.AfterElementals->Ore
-      Bash, Dash
-      Bash, DoubleJump, Damage=20, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Damage is for weird laser patterns
-      DoubleJump, TripleJump, Sword
-    unsafe:
-      SentryJump=2, DoubleJump, Bow=1, Damage=40
-      SentryJump=2, DoubleJump, TripleJump OR Dash OR Glide  # Use weapon stall to reach the edge below the portal
-      Bash, Glide  # wait on the left wall until the elemental gives you a shot to bash
-      DoubleJump, TripleJump
-      DoubleJump, Sword, Damage=40, Bow=1  # Reset your jump by slashing the elemental, pogo him to reach the wall above the portal, djump + upslash from under the Mine to reach the spikes
-      Bash, DoubleJump
-      Unpopular, Bash  # Projectile redirect + friendly spikes https://youtu.be/SecqqWk_hFE
-
-  conn WeepingRidge.AfterElementals:
-    moki:
-      Glide
-      Launch, Bash OR DoubleJump OR Dash
-    gorlek:
-      Launch, Bow=1
-      Bash, Dash, Bow=1
-      DoubleJump, Bow=1, Damage=40
-      Bash, DoubleJump, TripleJump
-      Bash, DoubleJump, Bow=1, Sword OR Hammer
-      DoubleJump, TripleJump, Sword OR Hammer OR Dash
-    kii:
-      Launch
-      Damage=40, DoubleJump OR Dash
-      Bash, Dash
-      Bash, DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      Sword, DoubleJump OR Dash  # Use sword on elemental to reset your djump/dash (don't use portal with dash)
-      DoubleJump, Dash, Hammer OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
-      Damage=40, SwordSJump=1  # Full hover twice, Dboost on spikes, SentryJump into the portal
-    unsafe:
-      Damage=40, Sword OR Hammer
-      Dash, Hammer OR DoubleJump  # Dash against the ceiling to refresh your dash
-      Bash, DoubleJump  # Bashglide to the 2nd elemental. Precise
-      # Bash, DoubleJump, Bow=1  # Bashgliding with bow directly to the platform. Easier than the bowless path.
-      Unpopular, Bash  # Projectile redirect + friendly spikes https://youtu.be/YbaXP2qQv9Y
-      AerialHammerJump  # Refresh DJ against the wall
-      PauseFloat
-      AbilitySwap=3  # https://youtu.be/4Njv3ZjfDoo
-      DoubleJump, TripleJump  # Wrap around the central wall. Too many enemies for kii
-  conn WeepingRidge.WillowEntranceLedge:
-    moki, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump, Dash OR Glide
-    gorlek, WeepingRidge.ElevatorFightCompleted: Launch, DoubleJump OR Dash
-    kii, WeepingRidge.ElevatorFightCompleted:
-      Launch, Glide OR Sword OR Hammer OR Shuriken=2 OR Sentry=3
-      Launch, Bash, Grenade=1
-      Bash, Grenade=3, DoubleJump, TripleJump
-      AerialHammerJump, TripleJump
-      SwordSJump=3, DoubleJump, TripleJump, Dash, Damage=20  # sjump on top of elevator -> sjump + hover from the left wall on top of third laser -> sjump and take a dboost on last laser to reach the wall above -> tjump + dash + upslash to reach the ledge above
-      HammerSJump=2, DoubleJump, TripleJump, Dash, Shuriken=1 OR Sentry=1  # similar but tjump+upslash to avoid the last sjump. Energy weapon for the final hover
-    unsafe, WeepingRidge.ElevatorFightCompleted:
-      Launch
-      SentryJump=3, DoubleJump, TripleJump, Dash
-      SwordSJump=4 OR HammerSJump=5  # Hammer takes longer to upswing and lasers will stop you
-      HammerSJump=4, DoubleJump OR Dash OR Glide
-      Bash, Grenade=3, DoubleJump
-      AerialHammerJump  # upslash to get on top ofd the elevator then walljump of the right friendly spikes. Get a wall jump on the last turret to reach the top
-      GrenadeJump, GrenadeCancel, DoubleJump
-      DoubleJump, TripleJump, Dash, Damage=20, SpearJump=2  # augmented dboost on the 1st laser to spear jump from the spikes
-      DoubleJump, TripleJump, Dash, Damage=60, Damage=40
-  conn WeepingRidge.Elevator:
-    moki, WeepingRidge.ElevatorFightCompleted:
-      Launch
-      Bash, Grenade=1
-      DoubleJump, Dash, Glide
-    gorlek, WeepingRidge.ElevatorFightCompleted:
-      SentryJump=1
-      DoubleJump, TripleJump OR Dash OR Glide
-    kii, WeepingRidge.ElevatorFightCompleted:
-      DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=4
-      # GrenadeJump=1, Shuriken=2 OR Blaze=6
-    unsafe, WeepingRidge.ElevatorFightCompleted:
-      Shuriken=1 OR Sentry=2 OR AbilitySwap=1 OR PauseFloat  # Towards the left wall. Shuriken: https://youtu.be/jF3Gi90F5Ws.
-      SpearJump=1, Spear=2  # 1 jump + 1 spear might be possible. https://youtu.be/AEiZkRiLQCc
-      GrenadeJump  # Can barely make it to the ledge above the portal
-
-anchor WeepingRidge.AfterElementals at 1303, -3769:  # Ledge next to the spikes, under the portal leeding to the ore
-  pickup Woods.LaunchTree.ElementalOre:
-    moki: Launch, DoubleJump OR Dash OR Bash OR Glide
-    gorlek: Launch
-    kii:
-      Bash, Grenade=1, Damage=20, DoubleJump OR Dash  # Damage for wonky lasers
-      SentryJump=2, Damage=20  # Damage for wonky lasers
-      AerialHammerJump, SentryJump=1, Damage=20  # Same as above but hjump through the portal
-      AerialHammerJump, Damage=60  # Easy to hit the mine or the laser, which launch you into the spikes
-    unsafe:  # It is possible to duck left of the portal to wait out the laser
-      DoubleJump, TripleJump  # https://youtu.be/8VSgSO7I_zA
-      Bash, Grenade=1  # https://youtu.be/dOrFj9RT4KE
-      Bash, DoubleJump, Dash OR Glide OR PauseFloat  # bait a projectile instead of using the portal
-      Bash, GlideJump  # bait a projectile instead of using the portal
-      SentryJump=2 OR AerialHammerJump OR GlideHammerJump
-      SentryJump=1, SwordJump OR Bash  # (2a) sjump, (3) Pogo the elemental, reset above portal, swordJump and upslash
-      GrenadeJump, DoubleJump OR Bash
-      WallHammerJump  # Off the ledge, (3) Off the ledge and turnaround off the wall
-
-  conn WeepingRidge.AboveTree: free
-  conn WeepingRidge.TopElevator:
-    moki: Launch, Bash, Glide  # Glide is the only ability that really helps you outwait the laser attack
-    gorlek:
-      Launch, Bash
-      Launch, DoubleJump, Dash  # this gives you good mobility to avoid the enemies
-    kii:
-      Launch, DoubleJump OR Dash OR Damage=20  # dboost on the mine inbetween the two elementals
-      AerialHammerJump, Damage=20, TripleJump OR Bash OR Glide  # dboost on the mine at the wall for leniency
-      AerialHammerJump, Dash, Damage=40  # dboost on the mine + laser as you are more likely to aggro the 2nd elemental
-    unsafe:
-      Launch
-      DoubleJump, TripleJump, Damage=40
-      DoubleJump, TripleJump, Bash  # Bait elemental projectiles
-      AerialHammerJump  # continue to extend your hjump when exiting a portal before doing a new one 
-      GrenadeJump, DoubleJump, Damage=20  # dboost on the mine
-      SwordSJump=5, Damage=20  # Pogo the first elemental, dboost on the mine
-      SwordSJump=4, SwordJump, Damage=20  # Same as above, but swordjump+upslash into the top portal
-
-anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
-  refill Checkpoint
-
-  pickup Woods.LaunchTree: free
-  pickup Woods.LaunchTree.PortalSL:
-    moki: Launch
-    kii:
-      SentryJump=1, DoubleJump, TripleJump  # Max height
-      AerialHammerJump
-    unsafe:
-      Bash, Grenade=1, DoubleJump, TripleJump, Damage=40  # take a dboost in the left spikes
-      SwordSJump=2  # Use the micro ledge on the left after entering the portal
-      DoubleJump, TripleJump, Damage=40, Damage=80
-      SentryJump=1, DoubleJump  # with sword,need Upswing. With hammer, max height from the right of the portal is enough
-      GlideHammerJump
-      GrenadeJump, DoubleJump
-  pickup Woods.LaunchTree.RightSL:
-    moki: Launch, DoubleJump, Bow=2
-    gorlek:
-      Launch, Bow=1 OR Spear=1 OR Grenade=1 OR Damage=20
-      Bash, Grenade=2, DoubleJump, TripleJump, Damage=40
-      SentryJump=2, DoubleJump, TripleJump, Damage=40
-    kii:
-      Launch
-      Bash, Grenade=2, DoubleJump, TripleJump
-      Bash, Grenade=2, DoubleJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
-      AerialHammerJump, TripleJump OR Dash OR Glide OR Sword OR Flash=1 OR Sentry=1  # condition is for the first hjump
-      AerialHammerJump, Shuriken=1, Damage=20  # same as above but account for touching the mine with shuriken 
-      SentryJump=2, DoubleJump, TripleJump
-      SentryJump=2, DoubleJump, Dash, Shuriken=1 OR Sentry=1
-      # GrenadeJump=2, DoubleJump, TripleJump
-    unsafe:  # may be inaccurate after moving paths to this anchor
-      Bash, Grenade=3  # Walljump beneath the spikes to catch the last grenade higher up
-      SentryJump=3 OR AerialHammerJump
-      DoubleJump, TripleJump, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # pogo the mine near the tree | wasn't consistent enough for kii
-      GrenadeJump, DoubleJump  # Go to the right wall beneath the mine
-      GrenadeJump, GlideJump, Damage=40  # Take a dboost beneath the pickup
-      Dash, DoubleJump:  # https://youtu.be/Di__18L5bVc
-        TripleJump
-        Spear=2, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      # SentryJump=1, DoubleJump, TripleJump, Dash  # Dash from the wall above the tree + tjump + weapon combo to reach the right platform.
-
-  conn WeepingRidge.AfterElementals:
-    moki:
-      Launch
-      Bash, Grenade=1
-    gorlek: SentryJump=1
-    kii:
-      DoubleJump, TripleJump, Damage=40
-      AerialHammerJump  # OR GrenadeJump
-      GlideJump, DoubleJump, TripleJump
-    unsafe:
-      DoubleJump, Damage=40, Dash OR Sword OR Hammer
-      DoubleJump, TripleJump, Damage=20  # use the mine as an elevator
-      DoubleJump, TripleJump, Sword  # pogo the mine on the left to avoid the explosion
-      GlideHammerJump OR GrenadeJump OR AbilitySwap=2
-      GlideJump, Damage=40, DoubleJump OR Dash OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
-      GlideJump, DoubleJump, Sword OR Hammer OR Spear=1  # sword pogo the mine
-      BlazeSwap=1, DoubleJump OR GlideJump
-      SentrySwap=1, DoubleJump OR GlideJump
-
-anchor WeepingRidge.WillowEntranceLedge at 1113, -3657:  # at the ledge to willow entrance
-  entrance:
-    id: 29
-    target: WillowsEnd.Entry
-    enter: free
-
-  refill Checkpoint
-  conn WeepingRidge.TopElevator:  # Could be just the elevator state but adding more requirement in lower difficulties because not all lasers are visible at once
-    gorlek, WeepingRidge.ElevatorFightCompleted:
-      Glide OR Damage=20
-    kii, WeepingRidge.ElevatorFightCompleted:  # land on top of the second laser
-      Launch OR Dash OR Sword OR Hammer OR Blaze=4 OR Sentry=2
-      DoubleJump, TripleJump OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: WeepingRidge.ElevatorFightCompleted
 
 region WillowsEnd:
   # This is mirrored in WeepingRidge.

@@ -2,13 +2,10 @@
 #name("Stats")
 #description("Adds pickup stats")
 
-// TODO fix burrows interrupting marsh in pickups
 !let(total_pickups_marsh, 56)
 !let(total_pickups_hollow, 33)
 !let(total_pickups_glades, 40)
 !let(total_pickups_wellspring, 38)
-// TODO fix pools being early in pickups
-// TODO fix woods being split in pickups
 !let(total_pickups_woods, 32)
 !let(total_pickups_reach, 44)
 !let(total_pickups_depths, 25)

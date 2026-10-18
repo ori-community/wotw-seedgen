@@ -17,6 +17,11 @@ MarshSpawn.BurrowArena, 9593|59418
 MarshPastOpher.PoolsPathFloor, 9593|17659
 Marsh.UpperPoolsPath.ShortcutWall, 9593|34704
 Marsh.UpperPoolsPath.PoolsWall, 945|43451
+MidnightBurrows.TeleporterActive, 24922|42531
+MidnightBurrows.KeystoneDoor, 18793|3171
+MidnightBurrows.Lever, 24922|16603
+MidnightBurrows.HowlsDenShortcut, 24922|2524
+MidnightBurrows.TabletQICollected, 48248|18458 >= 3
 HowlsDen.LowerLoopExitBarrier, 21786|29636
 HowlsDen.UpperLoopEntranceBarrier, 21786|876
 HowlsDen.UpperLoopExitBarrier, 21786|25291
@@ -67,11 +72,6 @@ GladesTown.FamilyReunion, 14019|27804 >= 4
 GladesTown.FatherMokiGone, 42178|36609
 GladesTown.DiamondInTheRoughCompleted, 14019|61011 >= 5
 WestGlades.CombatShrineCompleted, 44310|58796
-MidnightBurrows.TeleporterActive, 24922|42531
-MidnightBurrows.KeystoneDoor, 18793|3171
-MidnightBurrows.Lever, 24922|16603
-MidnightBurrows.HowlsDenShortcut, 24922|2524
-MidnightBurrows.TabletQICollected, 48248|18458 >= 3
 InnerWellspring.DrainLever, 37858|31187
 InnerWellspring.WaterDashSwitch, 37858|6338
 InnerWellspring.DrainRoomBottomWheel, 37858|50902
@@ -107,6 +107,7 @@ WoodsMain.LogBlobDestroyed, 58674|48394
 WoodsMain.TrialActivation, 44964|22703 >= 1
 WoodsMain.TeleporterActive, 58674|1965
 WoodsMain.CombatShrineCompleted, 58674|56043
+WeepingRidge.ElevatorFightCompleted, 36153|23584
 LowerReach.ArenaBeaten, 28895|42209
 LowerReach.BearBridgeBroken, 28895|49329
 LowerReach.BearSneezed, 28895|29098 >= 1
@@ -178,7 +179,6 @@ WindtornRuins.TeleporterActive, 10289|4928
 WindtornRuins.SeirSkill, 24|108
 WindtornRuins.EscapeCompleted, 10289|19890 >= 3
 WindtornRuins.SiftingSandsCompleted, 14019|35399 >= 3
-WeepingRidge.ElevatorFightCompleted, 36153|23584
 WillowsEnd.GrappleWheelsHeart, 16155|60752
 WillowsEnd.BoulderHeart, 16155|41488
 WillowsEnd.InnerTeleporterActive, 16155|41465
