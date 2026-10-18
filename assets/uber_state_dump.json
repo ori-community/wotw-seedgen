@@ -368,7 +368,7 @@
           "value": 0.0,
           "value_type": "Byte"
         },
-		"39": {
+        "39": {
           "name": "extraLaunches",
           "readonly": false,
           "type": "SerializedByteUberState",

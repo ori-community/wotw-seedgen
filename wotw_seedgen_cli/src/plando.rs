@@ -14,8 +14,8 @@ use std::{
 use wotw_seedgen::{
     data::{
         assets::{
-            self, AssetCache, AssetCacheValues, DefaultAssetCacheValues, PlandoFolderAccess,
-            Watcher, SEEDGEN_USER_DATA_DIR,
+            self, AssetCache, AssetCacheValues, DefaultAssetCacheValues, PlandoDirAccess, Watcher,
+            SEEDGEN_USER_DATA_DIR,
         },
         seed_language::{compile::Compiler, output::postprocess},
     },
@@ -23,7 +23,7 @@ use wotw_seedgen::{
     seed::{PlandoAttributes, Seed},
 };
 
-type Cache<'a> = AssetCache<PlandoFolderAccess<'a>, DefaultAssetCacheValues>;
+type Cache<'a> = AssetCache<PlandoDirAccess<'a>, DefaultAssetCacheValues>;
 
 pub fn plando(args: PlandoArgs) -> Result<(), Error> {
     let PlandoArgs {
@@ -61,7 +61,7 @@ pub fn plando(args: PlandoArgs) -> Result<(), Error> {
         )));
     };
 
-    let mut cache = Cache::new(PlandoFolderAccess::new(root));
+    let mut cache = Cache::new(PlandoDirAccess::new(root));
 
     let attributes = attributes(&cache, entry)?;
 
@@ -153,9 +153,7 @@ fn compile(
         .eprint_errors()
         .ok_or_else(|| Error(format!("failed to compile \"{entry}\"")))?;
 
-    let placeholder_map = postprocess(&mut [&mut output], pickups, rng)
-        .pop()
-        .unwrap();
+    let placeholder_map = postprocess(&mut [&mut output], pickups, rng).pop().unwrap();
 
     let seed =
         Seed::new(output, placeholder_map, debug).with_plando_attributes(attributes(cache, entry)?);

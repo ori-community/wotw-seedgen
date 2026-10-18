@@ -23,7 +23,7 @@ pub struct StatsArgs {
         reset = Reset.render(),
     ))]
     pub analyzers: Vec<ChainedAnalyzers>,
-    // TODO folder_name, tolerated_errors, error_message_limit, overwrite_cache
+    // TODO dir_name, tolerated_errors, error_message_limit, overwrite_cache
 }
 
 #[derive(Clone)]

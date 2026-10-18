@@ -2,8 +2,8 @@ use std::iter;
 
 use wotw_seedgen_data::{
     assets::{
-        AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, Pickups,
-        PresetFileAccess, SnippetFileAccess, States, UberStateData,
+        AssetCacheValues, ChangedAssets, DefaultFileAccess, FullFileAccess, KnownAssetAccess,
+        Pickups, States, UberStateData,
     },
     parse::Source,
 };
@@ -17,17 +17,11 @@ pub struct CacheValues {
 }
 
 impl AssetCacheValues for CacheValues {
-    fn new<F>(file_access: &F) -> Self
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn new<F: FullFileAccess>(file_access: &F) -> Self {
         let pickups = file_access.pickups();
         let states = file_access.states();
 
-        Self {
-            pickups,
-            states,
-        }
+        Self { pickups, states }
     }
 
     fn pickups(&self) -> Result<&Pickups, String> {
@@ -59,10 +53,7 @@ impl AssetCacheValues for CacheValues {
         iter::once(unimplemented!())
     }
 
-    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn update<F: FullFileAccess>(&mut self, file_access: &F, changed: ChangedAssets) {
         if changed.pickups {
             self.pickups = file_access.pickups();
         }

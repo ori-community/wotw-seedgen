@@ -4,8 +4,8 @@ use rustc_hash::FxHashMap;
 use tower_lsp::lsp_types::{CompletionItem, CompletionItemKind, CompletionItemLabelDetails};
 use wotw_seedgen_data::{
     assets::{
-        AssetCacheValues, AssetFileAccess, ChangedAssets, DefaultFileAccess, Pickups,
-        PresetFileAccess, SnippetFileAccess, States, UberStateData, UberStateDataEntry,
+        AssetCacheValues, ChangedAssets, DefaultFileAccess, FullFileAccess, KnownAssetAccess,
+        KnownAssetFileAccess, Pickups, States, UberStateData, UberStateDataEntry,
         UberStateNameEntry,
     },
     parse::Source,
@@ -46,10 +46,7 @@ pub struct UberIdentifierNameMemberCompletion {
 }
 
 impl AssetCacheValues for CacheValues {
-    fn new<F>(file_access: &F) -> Self
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn new<F: FullFileAccess>(file_access: &F) -> Self {
         let pickups = file_access.pickups();
         let uber_state_data = uber_state_data(pickups.as_ref().map_err(String::clone), file_access);
         let uber_identifier_completion = UberIdentifierCompletion::new(&uber_state_data);
@@ -90,10 +87,7 @@ impl AssetCacheValues for CacheValues {
         iter::once(unimplemented!())
     }
 
-    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn update<F: FullFileAccess>(&mut self, file_access: &F, changed: ChangedAssets) {
         if changed.pickups {
             self.pickups = file_access.pickups();
         }
@@ -105,7 +99,7 @@ impl AssetCacheValues for CacheValues {
     }
 }
 
-fn uber_state_data<F: AssetFileAccess>(
+fn uber_state_data<F: KnownAssetFileAccess>(
     pickups: Result<&Pickups, String>,
     file_access: &F,
 ) -> Result<UberStateData, String> {

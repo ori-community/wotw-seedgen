@@ -5,6 +5,7 @@ use std::{
 };
 
 use itertools::Itertools;
+use log::debug;
 use notify_debouncer_full::{
     notify::{self, EventKind, RecommendedWatcher, RecursiveMode},
     DebounceEventResult, DebouncedEvent, Debouncer, RecommendedCache,
@@ -45,18 +46,36 @@ impl Watcher {
         })
     }
 
-    pub fn watch(
+    pub fn watch_dir(
         &mut self,
         path: impl AsRef<Path>,
         recursive_mode: RecursiveMode,
     ) -> WatcherResult<()> {
         if fs::create_dir_all(&path).is_ok() {
-            self.sender
-                .watch(&path, recursive_mode)
-                .map_err(|err| WatcherError::Watch(err, path.as_ref().to_path_buf()))
+            self.watch(path, recursive_mode)
         } else {
             Ok(())
         }
+    }
+
+    pub fn watch_file(&mut self, path: impl AsRef<Path>) -> WatcherResult<()> {
+        if fs::metadata(&path).is_ok() {
+            self.watch(path, RecursiveMode::NonRecursive)
+        } else {
+            Ok(())
+        }
+    }
+
+    fn watch(
+        &mut self,
+        path: impl AsRef<Path>,
+        recursive_mode: RecursiveMode,
+    ) -> WatcherResult<()> {
+        debug!(target: "watcher", "watching \"{}\"", path.as_ref().display());
+
+        self.sender
+            .watch(&path, recursive_mode)
+            .map_err(|err| WatcherError::Watch(err, path.as_ref().to_path_buf()))
     }
 }
 

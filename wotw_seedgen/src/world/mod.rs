@@ -149,7 +149,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{KnownAssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen::data::WorldSettings;
     /// use wotw_seedgen::orbs::Orbs;
     ///
@@ -171,7 +171,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::{output::CommandsOutput, simulate::UberStates};
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{KnownAssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, Difficulty, Shard, WorldSettings};
     /// use wotw_seedgen::orbs::Orbs;
     ///
@@ -207,7 +207,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::{output::CommandsOutput, simulate::UberStates};
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{KnownAssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
     /// use wotw_seedgen::orbs::Orbs;
     ///
@@ -246,7 +246,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # use wotw_seedgen::World;
     /// # use wotw_seedgen_data::seed_language::{output::CommandsOutput, simulate::UberStates};
     /// # use wotw_seedgen_data::logic_language::output::Graph;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{KnownAssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen::data::{seed_language::simulate::Simulation, WorldSettings};
     ///
     /// # let graph = Graph::empty();

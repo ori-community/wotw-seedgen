@@ -309,10 +309,10 @@ static WORKDIR: LazyLock<&Path> = LazyLock::new(|| Path::new(".."));
 struct SnippetAndToolseedAccess;
 
 impl SnippetFileAccess for SnippetAndToolseedAccess {
-    type Folders = array::IntoIter<Self::Path, 2>;
+    type Dirs = array::IntoIter<Self::Path, 2>;
     type Path = PathBuf;
 
-    fn snippet_folders(&self) -> Self::Folders {
+    fn snippet_dirs(&self) -> Self::Dirs {
         [
             WORKDIR.join("assets/snippets"),
             WORKDIR.join("assets/plandos/src"),

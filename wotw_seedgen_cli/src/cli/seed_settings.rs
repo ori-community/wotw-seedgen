@@ -353,7 +353,7 @@ fn preset_help(available_presets: &[AvailablePreset], kind: &str) -> String {
     let mut help = format!(
         "{kind} presets define reusable settings to be applied to a {kind_lower}.\n\
         For details on how to create them, try '{literal}seedgen help {kind_lower}-preset{reset}'\n\
-        All json files in the '{kind_lower}_presets' folder in the current working directory are available\n\n\
+        All json files in the '{kind_lower}_presets' directory in the current working directory are available\n\n\
         Currently {count} {kind_lower} preset{plural} available",
         literal = LITERAL.render(),
         reset = Reset.render(),
@@ -383,7 +383,7 @@ fn preset_help(available_presets: &[AvailablePreset], kind: &str) -> String {
 fn snippets_help(available_snippets: &[AvailableSnippet]) -> String {
     let mut help = format!(
         "Snippets can modify seed generation in many ways.\n\
-        All wotws files in the 'snippets' folder inside the current directory or seedgen's directory are available\n\
+        All wotws files in the 'snippets' directory inside the current directory or seedgen's directory are available\n\
         See the official documentation for information on how to write your own snippets: https://docs.wotw.orirando.com/docs/seedlang\n\n\
         Currently {} snippet{} available",
         available_snippets.len(),

@@ -18,7 +18,7 @@ use rustc_hash::FxHashMap;
 use wotw_seedgen::{
     data::{
         assets::{
-            self, file_err, AssetFileAccess, DefaultFileAccess, Pickups, States, UberStateData,
+            self, file_err, DefaultFileAccess, KnownAssetAccess, Pickups, States, UberStateData,
             SEEDGEN_USER_DATA_DIR,
         },
         logic_language::{ast::Paths, output::Graph},

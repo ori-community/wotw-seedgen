@@ -1,6 +1,8 @@
 use std::{array, env, path::PathBuf, sync::LazyLock};
 
-use crate::assets::{AssetFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess};
+use crate::assets::{
+    FullFileAccess, KnownAssetFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess,
+};
 
 pub static RANDOMIZER_USER_DATA_DIR: LazyLock<PathBuf> =
     LazyLock::new(|| match env::var_os("RANDOMIZER_USER_DATA_DIR") {
@@ -38,47 +40,53 @@ pub static EXECUTABLE_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
 
 pub struct DefaultFileAccess;
 
-impl AssetFileAccess for DefaultFileAccess {
-    type Folders = array::IntoIter<Self::Path, 2>;
-    type Path = &'static PathBuf;
+impl FullFileAccess for DefaultFileAccess {}
 
-    fn asset_folders(&self) -> Self::Folders {
-        [&*SEEDGEN_USER_DATA_DIR, &*EXECUTABLE_DIR].into_iter()
+impl KnownAssetFileAccess for DefaultFileAccess {
+    type Dirs = array::IntoIter<Self::Path, 2>;
+    type Path = PathBuf;
+
+    fn logic_dirs(&self) -> Self::Dirs {
+        subdirs("logic")
+    }
+
+    fn uber_state_dump_paths(&self) -> Self::Dirs {
+        subdirs("uber_state_dump.json")
     }
 }
 
 impl SnippetFileAccess for DefaultFileAccess {
-    type Folders = array::IntoIter<Self::Path, 2>;
+    type Dirs = array::IntoIter<Self::Path, 2>;
     type Path = PathBuf;
 
-    fn snippet_folders(&self) -> Self::Folders {
-        subfolders("snippets")
+    fn snippet_dirs(&self) -> Self::Dirs {
+        subdirs("snippets")
     }
 }
 
 impl PlandoFileAccess for DefaultFileAccess {
-    type Folders = array::IntoIter<Self::Path, 2>;
+    type Dirs = array::IntoIter<Self::Path, 2>;
     type Path = PathBuf;
 
-    fn plando_folders(&self) -> Self::Folders {
-        subfolders("plandos")
+    fn plando_dirs(&self) -> Self::Dirs {
+        subdirs("plandos")
     }
 }
 
 impl PresetFileAccess for DefaultFileAccess {
-    type Folders = array::IntoIter<Self::Path, 2>;
+    type Dirs = array::IntoIter<Self::Path, 2>;
     type Path = PathBuf;
 
-    fn universe_folders(&self) -> Self::Folders {
-        subfolders("universe_presets")
+    fn universe_dirs(&self) -> Self::Dirs {
+        subdirs("universe_presets")
     }
 
-    fn world_folders(&self) -> Self::Folders {
-        subfolders("world_presets")
+    fn world_dirs(&self) -> Self::Dirs {
+        subdirs("world_presets")
     }
 }
 
-fn subfolders(prefix: &str) -> array::IntoIter<PathBuf, 2> {
+fn subdirs(prefix: &str) -> array::IntoIter<PathBuf, 2> {
     [
         SEEDGEN_USER_DATA_DIR.join(prefix),
         EXECUTABLE_DIR.join(prefix),

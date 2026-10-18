@@ -3,7 +3,7 @@ use std::{slice, sync::LazyLock};
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand_pcg::Pcg64Mcg;
 use wotw_seedgen_data::{
-    assets::{AssetFileAccess, SnippetAccess, TEST_ASSETS},
+    assets::{SnippetAccess, TEST_ASSETS},
     logic_language::{ast::Paths, output::Graph},
     seed_language::{
         ast::Snippet,
@@ -27,8 +27,8 @@ fn logic_assets(c: &mut Criterion) {
     });
 
     let paths = &*PATHS;
-    let pickups = TEST_ASSETS.pickups().unwrap();
-    let states = TEST_ASSETS.states().unwrap();
+    let pickups = TEST_ASSETS.expect_pickups();
+    let states = TEST_ASSETS.expect_states();
     let settings = WorldSettings::difficulty_default(Difficulty::Unsafe);
 
     group.bench_function("compile", |b| {

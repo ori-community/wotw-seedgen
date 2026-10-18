@@ -5,7 +5,7 @@ use std::{
 };
 
 use itertools::Itertools;
-use log::warn;
+use log::{debug, warn};
 use notify_debouncer_full::{
     notify::{
         event::{CreateKind, DataChange, ModifyKind, RemoveKind, RenameMode},
@@ -19,9 +19,9 @@ use utoipa::ToSchema;
 use wotw_seedgen_parse::Source;
 
 use crate::assets::{
-    file_access::PlandoFileAccess, file_err, AssetFileAccess, Pickups, PlandoAccess, PresetAccess,
-    PresetFileAccess, SnippetAccess, SnippetFileAccess, States, UberStateData, UniversePreset,
-    Watcher, WatcherResult, WorldPreset,
+    file_access::FullFileAccess, file_err, KnownAssetAccess, KnownAssetFileAccess, Pickups,
+    PlandoAccess, PresetAccess, SnippetAccess, States, UberStateData, UniversePreset, Watcher,
+    WatcherResult, WorldPreset,
 };
 
 pub struct AssetCache<F, V> {
@@ -29,11 +29,7 @@ pub struct AssetCache<F, V> {
     pub values: V,
 }
 
-impl<F, V> AssetCache<F, V>
-where
-    F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
-    V: AssetCacheValues,
-{
+impl<F: FullFileAccess, V: AssetCacheValues> AssetCache<F, V> {
     pub fn new(file_access: F) -> Self {
         let values = V::new(&file_access);
 
@@ -44,20 +40,28 @@ where
     }
 
     pub fn watch(&self, watcher: &mut Watcher) -> WatcherResult<()> {
-        for folder in self.file_access.asset_folders() {
-            watcher.watch(folder, RecursiveMode::NonRecursive)?;
+        for dir in self.file_access.logic_dirs() {
+            watcher.watch_dir(dir, RecursiveMode::NonRecursive)?;
         }
 
-        for folder in self.file_access.snippet_folders() {
-            watcher.watch(folder, RecursiveMode::Recursive)?;
+        for path in self.file_access.uber_state_dump_paths() {
+            watcher.watch_file(path)?;
         }
 
-        for folder in self.file_access.universe_folders() {
-            watcher.watch(folder, RecursiveMode::NonRecursive)?;
+        for dir in self.file_access.snippet_dirs() {
+            watcher.watch_dir(dir, RecursiveMode::Recursive)?;
         }
 
-        for folder in self.file_access.world_folders() {
-            watcher.watch(folder, RecursiveMode::NonRecursive)?;
+        for dir in self.file_access.plando_dirs() {
+            watcher.watch_dir(dir, RecursiveMode::NonRecursive)?;
+        }
+
+        for dir in self.file_access.universe_dirs() {
+            watcher.watch_dir(dir, RecursiveMode::NonRecursive)?;
+        }
+
+        for dir in self.file_access.world_dirs() {
+            watcher.watch_dir(dir, RecursiveMode::NonRecursive)?;
         }
 
         Ok(())
@@ -68,6 +72,8 @@ where
 
         for debounced in events {
             let Event { kind, paths, .. } = debounced.event;
+
+            debug!(target: "watcher", "incoming watcher event: {kind:?} for \"{paths}\"", paths = paths.iter().map(|path| path.display()).format("\", \""));
 
             match kind {
                 EventKind::Create(CreateKind::Any | CreateKind::File) => changed.create(paths, &self.file_access),
@@ -97,6 +103,8 @@ where
             }
         }
 
+        debug!(target: "watcher", "computed changes: {changed:?}");
+
         let any_changed = changed != ChangedAssets::default();
 
         self.values.update(&self.file_access, changed);
@@ -113,39 +121,8 @@ impl<F, V> Deref for AssetCache<F, V> {
     }
 }
 
-impl<F: AssetFileAccess, V: AssetCacheValues> AssetFileAccess for AssetCache<F, V> {
-    type Folders = F::Folders;
-    type Path = F::Path;
-
-    fn asset_folders(&self) -> Self::Folders {
-        self.file_access.asset_folders()
-    }
-
-    fn pickups(&self) -> Result<Pickups, String> {
-        self.values.pickups().cloned()
-    }
-
-    fn states(&self) -> Result<States, String> {
-        self.values.states().cloned()
-    }
-
-    fn uber_state_data(
-        &self,
-        _pickups: &Pickups,
-        _state_data: &States,
-    ) -> Result<UberStateData, String> {
-        self.values.uber_state_data().cloned()
-    }
-
-    fn paths(&self) -> Result<Source, String> {
-        self.values.paths().cloned()
-    }
-}
-
 pub trait AssetCacheValues: Sized {
-    fn new<F>(file_access: &F) -> Self
-    where
-        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess;
+    fn new<F: FullFileAccess>(file_access: &F) -> Self;
 
     fn pickups(&self) -> Result<&Pickups, String>;
 
@@ -161,9 +138,7 @@ pub trait AssetCacheValues: Sized {
 
     fn available_snippets(&self) -> impl Iterator<Item = &String>;
 
-    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess;
+    fn update<F: FullFileAccess>(&mut self, file_access: &F, changed: ChangedAssets);
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, ToSchema)]
@@ -188,24 +163,15 @@ pub enum ChangeDetails {
 }
 
 impl ChangedAssets {
-    fn create<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn create<F: FullFileAccess>(&mut self, paths: Vec<PathBuf>, file_access: &F) {
         self.update_single_path(paths, "create", ChangeDetails::Create, file_access);
     }
 
-    fn remove<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn remove<F: FullFileAccess>(&mut self, paths: Vec<PathBuf>, file_access: &F) {
         self.update_single_path(paths, "remove", ChangeDetails::Remove, file_access);
     }
 
-    fn rename<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn rename<F: FullFileAccess>(&mut self, paths: Vec<PathBuf>, file_access: &F) {
         let Some([from, to]) = validate_paths(paths, "rename") else {
             return;
         };
@@ -238,10 +204,7 @@ impl ChangedAssets {
         }
     }
 
-    fn modify<F>(&mut self, paths: Vec<PathBuf>, file_access: &F)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
+    fn modify<F: FullFileAccess>(&mut self, paths: Vec<PathBuf>, file_access: &F) {
         self.update_single_path(paths, "modify", ChangeDetails::Modify, file_access);
     }
 
@@ -253,7 +216,7 @@ impl ChangedAssets {
         file_access: &F,
     ) where
         D: FnOnce(String) -> ChangeDetails,
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
+        F: FullFileAccess,
     {
         let Some([path]) = validate_paths(paths, kind) else {
             return;
@@ -264,10 +227,13 @@ impl ChangedAssets {
         };
 
         match path_kind {
+            PathKind::Pickups | PathKind::States | PathKind::Paths | PathKind::UberStateDump => {
+                self.update_known_files(path_kind)
+            }
             PathKind::Snippet => self.snippets.push(details(to_identifier(&path))),
+            PathKind::Plando => self.plandos.push(details(to_identifier(&path))),
             PathKind::UniversePreset => self.universe_presets.push(details(to_identifier(&path))),
             PathKind::WorldPreset => self.world_presets.push(details(to_identifier(&path))),
-            _ => self.update_known_files(path_kind),
         }
     }
 
@@ -275,8 +241,8 @@ impl ChangedAssets {
         match path_kind {
             PathKind::Pickups => self.pickups = true,
             PathKind::States => self.states = true,
-            PathKind::UberStateDump => self.uber_state_dump = true,
             PathKind::Paths => self.paths = true,
+            PathKind::UberStateDump => self.uber_state_dump = true,
             _ => {}
         }
     }
@@ -300,55 +266,64 @@ fn validate_paths<const N: usize>(paths: Vec<PathBuf>, kind: &str) -> Option<[Pa
 enum PathKind {
     Pickups,
     States,
-    UberStateDump,
     Paths,
+    UberStateDump,
     Snippet,
+    Plando,
     UniversePreset,
     WorldPreset,
 }
 
 impl PathKind {
-    fn detect<F>(path: &Path, file_access: &F) -> Option<Self>
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
-        if path.ends_with(F::PICKUPS_PATH) {
-            Some(Self::Pickups)
-        } else if path.ends_with(F::STATES_PATH) {
-            Some(Self::States)
-        } else if path.ends_with(F::UBER_STATE_DUMP_PATH) {
-            Some(Self::UberStateDump)
-        } else if path.ends_with(F::PATHS_PATH) {
-            Some(Self::Paths)
-        } else {
-            let extension = path.extension()?;
+    fn detect<F: FullFileAccess>(path: &Path, file_access: &F) -> Option<Self> {
+        let filename = path.file_name()?.to_str()?;
 
-            if extension == "wotws" {
-                is_in_folders(path, file_access.snippet_folders()).then_some(Self::Snippet)
-            } else if extension == "json" {
-                if is_in_folders(path, file_access.world_folders()) {
+        match filename {
+            "pickups.csv" => {
+                return is_in_dirs(path, file_access.logic_dirs()).then_some(Self::Pickups)
+            }
+            "states.csv" => {
+                return is_in_dirs(path, file_access.logic_dirs()).then_some(Self::States)
+            }
+            "paths.wotwl" => {
+                return is_in_dirs(path, file_access.logic_dirs()).then_some(Self::Paths)
+            }
+            "uber_state_dump.json" => {
+                if is_in_dirs(path, file_access.uber_state_dump_paths()) {
+                    return Some(Self::UberStateDump);
+                }
+            }
+            _ => {}
+        };
+
+        let (_, extension) = filename.rsplit_once('.')?;
+
+        match extension {
+            "wotws" => is_in_dirs(path, file_access.snippet_dirs()).then_some(Self::Snippet),
+            "wotwr" => is_in_dirs(path, file_access.plando_dirs()).then_some(Self::Plando),
+            "json" => {
+                if is_in_dirs(path, file_access.world_dirs()) {
                     Some(Self::WorldPreset)
-                } else if is_in_folders(path, file_access.universe_folders()) {
+                } else if is_in_dirs(path, file_access.universe_dirs()) {
                     Some(Self::UniversePreset)
                 } else {
                     None
                 }
-            } else {
-                None
             }
+            _ => None,
         }
     }
 }
 
-fn is_in_folders_canonicalized(
+fn is_in_dirs_canonicalized(
     path: &Path,
-    folders: impl Iterator<Item = impl AsRef<Path>>,
+    dirs: impl Iterator<Item = impl AsRef<Path>>,
 ) -> Result<bool, io::Error> {
     let canonicalized_path = path.canonicalize()?;
 
-    for folder in folders {
-        let canonicalized_folder = fs::canonicalize(folder)?;
-        if canonicalized_path.starts_with(canonicalized_folder) {
+    for dir in dirs {
+        let canonicalized_dir = fs::canonicalize(dir)?;
+        if canonicalized_path.starts_with(canonicalized_dir) {
             return Ok(true);
         }
     }
@@ -356,12 +331,12 @@ fn is_in_folders_canonicalized(
     Ok(false)
 }
 
-fn is_in_folders_duncified(path: &Path, folders: impl Iterator<Item = impl AsRef<Path>>) -> bool {
+fn is_in_dirs_duncified(path: &Path, dirs: impl Iterator<Item = impl AsRef<Path>>) -> bool {
     let duncified_path = dunce::simplified(path);
 
-    for folder in folders {
-        let duncified_folder = dunce::simplified(folder.as_ref());
-        if duncified_path.starts_with(duncified_folder) {
+    for dir in dirs {
+        let duncified_dir = dunce::simplified(dir.as_ref());
+        if duncified_path.starts_with(duncified_dir) {
             return true;
         }
     }
@@ -369,15 +344,15 @@ fn is_in_folders_duncified(path: &Path, folders: impl Iterator<Item = impl AsRef
     false
 }
 
-fn is_in_folders(path: &Path, mut folders: impl Iterator<Item = impl AsRef<Path>>) -> bool {
+fn is_in_dirs(path: &Path, mut dirs: impl Iterator<Item = impl AsRef<Path>>) -> bool {
     // On Windows there are multiple path formats, including the legacy one ("C:\File.txt") and UNC
     // paths ("\\?\C:\File.txt"). Because of this, a simple starts_with doesn't work here.
     // `std::canonicalize` always returns UNC paths, but it only works for files that actually
     // exist, so it doesn't work if we want to check whether it was likely that a file was inside
-    // a folder before.
+    // a directory before.
 
-    is_in_folders_canonicalized(path, &mut folders)
-        .unwrap_or_else(|_| is_in_folders_duncified(path, &mut folders))
+    is_in_dirs_canonicalized(path, &mut dirs)
+        .unwrap_or_else(|_| is_in_dirs_duncified(path, &mut dirs))
 }
 
 fn to_identifier(path: &Path) -> String {
@@ -433,16 +408,13 @@ pub struct DefaultAssetCacheValues {
     pub uber_state_data: Result<UberStateData, String>,
     pub paths: Result<Source, String>,
     pub snippets: FxHashMap<String, Result<Source, String>>,
+    pub plandos: FxHashMap<String, Result<Vec<u8>, String>>,
     pub universe_presets: FxHashMap<String, Result<UniversePreset, String>>,
     pub world_presets: FxHashMap<String, Result<WorldPreset, String>>,
-    pub plandos: FxHashMap<String, Result<Vec<u8>, String>>,
 }
 
 impl AssetCacheValues for DefaultAssetCacheValues {
-    fn new<F>(file_access: &F) -> Self
-    where
-        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
-    {
+    fn new<F: FullFileAccess>(file_access: &F) -> Self {
         let pickups = file_access.pickups();
         let states = file_access.states();
         let uber_state_data = uber_state_data(&pickups, &states, file_access);
@@ -454,6 +426,15 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             .map(|identifier| {
                 let snippet = file_access.read_snippet(&identifier);
                 (identifier, snippet)
+            })
+            .collect();
+
+        let plandos = file_access
+            .available_plandos()
+            .into_iter()
+            .map(|identifier| {
+                let plando = file_access.read_plando(&identifier);
+                (identifier, plando)
             })
             .collect();
 
@@ -475,31 +456,19 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             })
             .collect();
 
-        let plandos = file_access
-            .available_plandos()
-            .into_iter()
-            .map(|identifier| {
-                let plando = file_access.read_plando(&identifier);
-                (identifier, plando)
-            })
-            .collect();
-
         Self {
             pickups,
             states,
             uber_state_data,
             paths,
             snippets,
+            plandos,
             universe_presets,
             world_presets,
-            plandos,
         }
     }
 
-    fn update<F>(&mut self, file_access: &F, changed: ChangedAssets)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
-    {
+    fn update<F: FullFileAccess>(&mut self, file_access: &F, changed: ChangedAssets) {
         let ChangedAssets {
             pickups,
             states,
@@ -527,19 +496,19 @@ impl AssetCacheValues for DefaultAssetCacheValues {
             self.paths = file_access.paths();
         }
 
-        update_subfolder(snippets, &mut self.snippets, |identifier| {
+        update_subdir(snippets, &mut self.snippets, |identifier| {
             file_access.read_snippet(identifier)
         });
 
-        update_subfolder(plandos, &mut self.plandos, |identifier| {
+        update_subdir(plandos, &mut self.plandos, |identifier| {
             file_access.read_plando(identifier)
         });
 
-        update_subfolder(universe_presets, &mut self.universe_presets, |identifier| {
+        update_subdir(universe_presets, &mut self.universe_presets, |identifier| {
             file_access.universe_preset(identifier)
         });
 
-        update_subfolder(world_presets, &mut self.world_presets, |identifier| {
+        update_subdir(world_presets, &mut self.world_presets, |identifier| {
             file_access.world_preset(identifier)
         });
     }
@@ -577,14 +546,11 @@ impl AssetCacheValues for DefaultAssetCacheValues {
     }
 }
 
-fn uber_state_data<F>(
+fn uber_state_data<F: KnownAssetFileAccess>(
     pickups: &Result<Pickups, String>,
     states: &Result<States, String>,
     file_access: &F,
-) -> Result<UberStateData, String>
-where
-    F: AssetFileAccess,
-{
+) -> Result<UberStateData, String> {
     pickups
         .as_ref()
         .and_then(|pickups| states.as_ref().map(|states| (pickups, states)))
@@ -592,7 +558,7 @@ where
         .and_then(|(pickups, states)| file_access.uber_state_data(pickups, states))
 }
 
-fn update_subfolder<F, V>(changes: Vec<ChangeDetails>, values: &mut FxHashMap<String, V>, mut f: F)
+fn update_subdir<F, V>(changes: Vec<ChangeDetails>, values: &mut FxHashMap<String, V>, mut f: F)
 where
     F: FnMut(&str) -> V,
 {

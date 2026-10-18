@@ -70,7 +70,7 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
             fs::read_to_string(settings_path).map_or(true, |previous| previous == settings_json);
         if may_write {
             if index > 0 {
-                eprintln!("Encountered previous stats with the same folder name but different settings, renaming to \"{unique_settings_summary}\"");
+                eprintln!("Encountered previous stats with the same directory name but different settings, renaming to \"{unique_settings_summary}\"");
             }
             break;
         }

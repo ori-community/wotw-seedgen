@@ -62,9 +62,9 @@ pub enum Cli {
     },
     /// Generate seed statistics
     ///
-    /// The resulting statistics will be written into a 'stats' folder, you can read them out there
+    /// The resulting statistics will be written into a 'stats' directory, you can read them out there
     ///
-    /// This command also maintains a cache of seeds in a 'seed_storage' folder, you do not need to interact with this folder (although you won't break anything either if you delete it or such)
+    /// This command also maintains a cache of seeds in a 'seed_storage' directory, you do not need to interact with this directory (although you won't break anything either if you delete it or such)
     Stats {
         #[command(flatten)]
         args: StatsArgs,

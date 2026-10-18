@@ -1,66 +1,73 @@
 use std::{
     borrow::Cow,
-    iter::{self, Chain, Map, Once},
+    iter::{self, Chain, Empty, Map, Once},
     path::{Path, PathBuf},
 };
 
 use crate::assets::{
-    AssetFileAccess, DefaultFileAccess, PlandoFileAccess, PresetFileAccess, SnippetFileAccess,
+    DefaultFileAccess, FullFileAccess, KnownAssetFileAccess, PlandoFileAccess, PresetFileAccess,
+    SnippetFileAccess,
 };
 
-pub struct PlandoFolderAccess<'a> {
+pub struct PlandoDirAccess<'a> {
     root: &'a Path,
 }
 
-impl<'a> PlandoFolderAccess<'a> {
+impl<'a> PlandoDirAccess<'a> {
     pub fn new(root: &'a Path) -> Self {
         Self { root }
     }
 }
 
-impl AssetFileAccess for PlandoFolderAccess<'_> {
-    type Folders = <DefaultFileAccess as AssetFileAccess>::Folders;
-    type Path = <DefaultFileAccess as AssetFileAccess>::Path;
+impl FullFileAccess for PlandoDirAccess<'_> {}
 
-    fn asset_folders(&self) -> Self::Folders {
-        DefaultFileAccess.asset_folders()
+impl KnownAssetFileAccess for PlandoDirAccess<'_> {
+    type Dirs = <DefaultFileAccess as KnownAssetFileAccess>::Dirs;
+    type Path = <DefaultFileAccess as KnownAssetFileAccess>::Path;
+
+    fn logic_dirs(&self) -> Self::Dirs {
+        DefaultFileAccess.logic_dirs()
+    }
+
+    fn uber_state_dump_paths(&self) -> Self::Dirs {
+        DefaultFileAccess.uber_state_dump_paths()
     }
 }
 
-impl<'a> SnippetFileAccess for PlandoFolderAccess<'a> {
-    type Folders = Chain<
+impl<'a> SnippetFileAccess for PlandoDirAccess<'a> {
+    type Dirs = Chain<
         Once<Cow<'a, Path>>,
-        Map<<DefaultFileAccess as SnippetFileAccess>::Folders, fn(PathBuf) -> Cow<'a, Path>>,
+        Map<<DefaultFileAccess as SnippetFileAccess>::Dirs, fn(PathBuf) -> Cow<'a, Path>>,
     >;
     type Path = Cow<'a, Path>;
 
-    fn snippet_folders(&self) -> Self::Folders {
+    fn snippet_dirs(&self) -> Self::Dirs {
         iter::once(Cow::Borrowed(self.root)).chain(
             DefaultFileAccess
-                .snippet_folders()
+                .snippet_dirs()
                 .map(Cow::Owned as fn(_) -> _),
         )
     }
 }
 
-impl PlandoFileAccess for PlandoFolderAccess<'_> {
-    type Folders = <DefaultFileAccess as PlandoFileAccess>::Folders;
-    type Path = <DefaultFileAccess as PlandoFileAccess>::Path;
+impl PlandoFileAccess for PlandoDirAccess<'_> {
+    type Dirs = Empty<PathBuf>;
+    type Path = PathBuf;
 
-    fn plando_folders(&self) -> Self::Folders {
-        DefaultFileAccess.plando_folders()
+    fn plando_dirs(&self) -> Self::Dirs {
+        iter::empty()
     }
 }
 
-impl PresetFileAccess for PlandoFolderAccess<'_> {
-    type Folders = <DefaultFileAccess as PresetFileAccess>::Folders;
-    type Path = <DefaultFileAccess as PresetFileAccess>::Path;
+impl PresetFileAccess for PlandoDirAccess<'_> {
+    type Dirs = Empty<PathBuf>;
+    type Path = PathBuf;
 
-    fn universe_folders(&self) -> Self::Folders {
-        DefaultFileAccess.universe_folders()
+    fn universe_dirs(&self) -> Self::Dirs {
+        iter::empty()
     }
 
-    fn world_folders(&self) -> Self::Folders {
-        DefaultFileAccess.world_folders()
+    fn world_dirs(&self) -> Self::Dirs {
+        iter::empty()
     }
 }

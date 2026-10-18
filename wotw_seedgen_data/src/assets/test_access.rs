@@ -11,9 +11,10 @@ use wotw_seedgen_parse::Source;
 
 use crate::{
     assets::{
-        file_access::PlandoFileAccess, AssetCache, AssetCacheValues, AssetFileAccess,
-        ChangedAssets, DefaultAssetCacheValues, Pickups, PickupsEntry, PresetAccess,
-        PresetFileAccess, SnippetFileAccess, States, UberStateData, UniversePreset, WorldPreset,
+        file_access::{FullFileAccess, PlandoFileAccess},
+        AssetCache, AssetCacheValues, ChangedAssets, DefaultAssetCacheValues, KnownAssetFileAccess,
+        Pickups, PickupsEntry, PresetAccess, PresetFileAccess, SnippetFileAccess, States,
+        UberStateData, UniversePreset, WorldPreset,
     },
     logic_language::{
         ast::Paths,
@@ -30,42 +31,48 @@ pub struct TestAccess;
 pub static TEST_ASSETS: LazyLock<AssetCache<TestAccess, TestCacheValues>> =
     LazyLock::new(|| AssetCache::new(TestAccess));
 
-impl AssetFileAccess for TestAccess {
-    type Folders = Once<Self::Path>;
+impl FullFileAccess for TestAccess {}
+
+impl KnownAssetFileAccess for TestAccess {
+    type Dirs = Once<Self::Path>;
     type Path = &'static Path;
 
-    fn asset_folders(&self) -> Self::Folders {
-        iter::once(Path::new(ASSETS))
+    fn logic_dirs(&self) -> Self::Dirs {
+        iter::once(Path::new(concat!(ASSETS, "/logic")))
+    }
+
+    fn uber_state_dump_paths(&self) -> Self::Dirs {
+        iter::once(Path::new(concat!(ASSETS, "/uber_state_dump.json")))
     }
 }
 
 impl SnippetFileAccess for TestAccess {
-    type Folders = Once<Self::Path>;
+    type Dirs = Once<Self::Path>;
     type Path = &'static Path;
 
-    fn snippet_folders(&self) -> Self::Folders {
+    fn snippet_dirs(&self) -> Self::Dirs {
         iter::once(Path::new(concat!(ASSETS, "/snippets")))
     }
 }
 
 impl PlandoFileAccess for TestAccess {
-    type Folders = Once<Self::Path>;
+    type Dirs = Once<Self::Path>;
     type Path = &'static Path;
 
-    fn plando_folders(&self) -> Self::Folders {
+    fn plando_dirs(&self) -> Self::Dirs {
         iter::once(Path::new(concat!(ASSETS, "/plandos")))
     }
 }
 
 impl PresetFileAccess for TestAccess {
-    type Folders = Once<Self::Path>;
+    type Dirs = Once<Self::Path>;
     type Path = &'static Path;
 
-    fn universe_folders(&self) -> Self::Folders {
+    fn universe_dirs(&self) -> Self::Dirs {
         iter::once(Path::new(concat!(ASSETS, "/universe_presets")))
     }
 
-    fn world_folders(&self) -> Self::Folders {
+    fn world_dirs(&self) -> Self::Dirs {
         iter::once(Path::new(concat!(ASSETS, "/world_presets")))
     }
 }
@@ -85,10 +92,7 @@ pub struct TestCacheGraphs {
 }
 
 impl AssetCacheValues for TestCacheValues {
-    fn new<F>(file_access: &F) -> Self
-    where
-        F: AssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess,
-    {
+    fn new<F: FullFileAccess>(file_access: &F) -> Self {
         let base = DefaultAssetCacheValues::new(file_access);
         let uber_states = UberStates::new(base.uber_state_data.as_ref().unwrap());
         let graphs = TestCacheGraphs::new(&base);
@@ -130,11 +134,7 @@ impl AssetCacheValues for TestCacheValues {
         self.base.available_snippets()
     }
 
-    fn update<F>(&mut self, _file_access: &F, _changed: ChangedAssets)
-    where
-        F: AssetFileAccess + SnippetFileAccess + PresetFileAccess,
-    {
-    }
+    fn update<F: FullFileAccess>(&mut self, _file_access: &F, _changed: ChangedAssets) {}
 }
 
 impl PresetAccess for TestCacheValues {

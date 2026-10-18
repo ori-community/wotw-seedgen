@@ -1,5 +1,7 @@
 //! Utilities to deal with some of the simpler asset files used by the seed generator.
 
+mod known_asset_access;
+pub use known_asset_access::KnownAssetAccess;
 mod pickups;
 pub use pickups::{Pickups, PickupsEntry};
 mod states;
@@ -24,8 +26,8 @@ pub use no_access::NoAccess;
 mod file_access;
 pub use file_access::{
     canonicalize, create_dir_all, file_create, file_err, file_open, metadata, read_dir,
-    read_to_string, write, AssetCache, AssetCacheValues, AssetFileAccess, ChangedAssets,
-    DefaultAssetCacheValues, DefaultFileAccess, PlandoFileAccess, PlandoFolderAccess,
+    read_to_string, write, AssetCache, AssetCacheValues, ChangedAssets, DefaultAssetCacheValues,
+    DefaultFileAccess, FullFileAccess, KnownAssetFileAccess, PlandoDirAccess, PlandoFileAccess,
     PresetFileAccess, ReadDir, SnippetFileAccess, Watcher, WatcherError, WatcherMessage,
     WatcherResult, CLIENT_USER_DATA_DIR, EXECUTABLE_DIR, LOG_DATA_DIR, RANDOMIZER_USER_DATA_DIR,
     SEEDGEN_USER_DATA_DIR,

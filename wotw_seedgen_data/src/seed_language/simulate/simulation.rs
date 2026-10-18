@@ -290,7 +290,7 @@ pub trait Simulation: Sized {
     ///
     /// ```
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{KnownAssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
@@ -316,7 +316,7 @@ pub trait Simulation: Sized {
     ///
     /// ```
     /// # use wotw_seedgen_data::seed_language::simulate::UberStates;
-    /// # use wotw_seedgen_data::assets::{AssetFileAccess, Pickups, States, TEST_ASSETS};
+    /// # use wotw_seedgen_data::assets::{KnownAssetFileAccess, Pickups, States, TEST_ASSETS};
     /// use wotw_seedgen_data::seed_language::simulate::{WorldState, Simulation};
     ///
     /// # let uber_states = TEST_ASSETS.uber_states.clone();

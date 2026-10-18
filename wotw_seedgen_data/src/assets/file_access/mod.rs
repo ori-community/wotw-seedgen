@@ -1,6 +1,6 @@
 mod cache;
 mod default_dirs;
-mod folders;
+mod dirs;
 mod plando;
 mod watch;
 
@@ -9,12 +9,12 @@ pub use default_dirs::{
     DefaultFileAccess, CLIENT_USER_DATA_DIR, EXECUTABLE_DIR, LOG_DATA_DIR,
     RANDOMIZER_USER_DATA_DIR, SEEDGEN_USER_DATA_DIR,
 };
-pub use plando::PlandoFolderAccess;
+pub use plando::PlandoDirAccess;
 pub use watch::{Watcher, WatcherError, WatcherMessage, WatcherResult};
 
 use crate::assets::{
-    Pickups, PlandoAccess, PresetAccess, SnippetAccess, States, UberStateData, UberStateDump,
-    UniversePreset, WorldPreset,
+    known_asset_access::KnownAssetAccess, Pickups, PlandoAccess, PresetAccess, SnippetAccess,
+    States, UberStateDump, UniversePreset, WorldPreset,
 };
 use std::{
     borrow::Cow,
@@ -98,60 +98,57 @@ fn action_with<'p, O, F: FnOnce(&'p Path) -> io::Result<O>>(
     f(path).map_err(|err| file_err(action, path, err))
 }
 
-// TODO this trait for non-file access?
-pub trait AssetFileAccess {
-    type Folders: Iterator<Item = Self::Path>;
+pub trait FullFileAccess:
+    KnownAssetFileAccess + SnippetFileAccess + PlandoFileAccess + PresetFileAccess
+{
+}
+
+pub trait KnownAssetFileAccess {
+    type Dirs: Iterator<Item = Self::Path>;
     type Path: AsRef<Path>;
 
-    fn asset_folders(&self) -> Self::Folders;
+    fn logic_dirs(&self) -> Self::Dirs;
 
-    const PICKUPS_PATH: &str = "logic/pickups.csv";
+    fn uber_state_dump_paths(&self) -> Self::Dirs;
+}
 
+impl<T: KnownAssetFileAccess> KnownAssetAccess for T {
     fn pickups(&self) -> Result<Pickups, String> {
-        let (path, file) = folders::open(self.asset_folders(), Path::new(Self::PICKUPS_PATH))?;
+        let (path, file) = dirs::join(self.logic_dirs(), Path::new("pickups.csv")).open()?;
 
         Pickups::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
 
-    const STATES_PATH: &str = "logic/states.csv";
-
     fn states(&self) -> Result<States, String> {
-        let (path, file) = folders::open(self.asset_folders(), Path::new(Self::STATES_PATH))?;
+        let (path, file) = dirs::join(self.logic_dirs(), Path::new("states.csv")).open()?;
 
         States::from_reader(file).map_err(|err| file_err("parse", &path, err))
     }
 
-    const UBER_STATE_DUMP_PATH: &str = "uber_state_dump.json";
-
-    fn uber_state_dump(&self) -> Result<UberStateDump, String> {
-        let (path, file) =
-            folders::open(self.asset_folders(), Path::new(Self::UBER_STATE_DUMP_PATH))?;
-
-        serde_json::from_reader(BufReader::new(file)).map_err(|err| file_err("parse", &path, err))
-    }
-
-    fn uber_state_data(&self, pickups: &Pickups, states: &States) -> Result<UberStateData, String> {
-        let dump = self.uber_state_dump()?;
-
-        Ok(UberStateData::from_parts(dump, pickups, states))
-    }
-
-    const PATHS_PATH: &str = "logic/paths.wotwl";
-
     fn paths(&self) -> Result<Source, String> {
         let (path, content) =
-            folders::read_to_string(self.asset_folders(), Path::new(Self::PATHS_PATH))?;
+            dirs::join(self.logic_dirs(), Path::new("paths.wotwl")).read_to_string()?;
 
         let id = path.to_string_lossy().to_string();
         Ok(Source::new(id, content))
     }
+
+    fn uber_state_dump(&self) -> Result<UberStateDump, String> {
+        let (path, file) = dirs::open(
+            self.uber_state_dump_paths()
+                .map(|p| p.as_ref().to_path_buf()),
+            "uber_state_dump.json",
+        )?;
+
+        serde_json::from_reader(BufReader::new(file)).map_err(|err| file_err("parse", &path, err))
+    }
 }
 
 pub trait SnippetFileAccess {
-    type Folders: Iterator<Item = Self::Path>;
+    type Dirs: Iterator<Item = Self::Path>;
     type Path: AsRef<Path>;
 
-    fn snippet_folders(&self) -> Self::Folders;
+    fn snippet_dirs(&self) -> Self::Dirs;
 }
 
 impl<T: SnippetFileAccess> SnippetAccess for T {
@@ -162,26 +159,28 @@ impl<T: SnippetFileAccess> SnippetAccess for T {
             path.to_mut().set_extension("wotws");
         }
 
-        let (path, content) = folders::read_to_string(self.snippet_folders(), &path)?;
+        let (path, content) = dirs::join(self.snippet_dirs(), &path).read_to_string()?;
 
         let id = path.to_string_lossy().to_string();
         Ok(Source::new(id, content))
     }
 
     fn read_file(&self, path: &Path) -> Result<Vec<u8>, String> {
-        folders::read(self.snippet_folders(), path).map(|(_, content)| content)
+        let (_, content) = dirs::join(self.snippet_dirs(), path).read()?;
+
+        Ok(content)
     }
 
     fn available_snippets(&self) -> Vec<String> {
-        folders::available_files(self.snippet_folders(), "wotws")
+        dirs::available_files(self.snippet_dirs(), "wotws")
     }
 }
 
 pub trait PlandoFileAccess {
-    type Folders: Iterator<Item = Self::Path>;
+    type Dirs: Iterator<Item = Self::Path>;
     type Path: AsRef<Path>;
 
-    fn plando_folders(&self) -> Self::Folders;
+    fn plando_dirs(&self) -> Self::Dirs;
 }
 
 impl<T: PlandoFileAccess> PlandoAccess for T {
@@ -192,39 +191,51 @@ impl<T: PlandoFileAccess> PlandoAccess for T {
             path.to_mut().set_extension("wotwr");
         }
 
-        let (_, content) = folders::read(self.plando_folders(), &path)?;
+        let (_, content) = dirs::join(self.plando_dirs(), &path).read()?;
 
         Ok(content)
     }
 
     fn available_plandos(&self) -> Vec<String> {
-        folders::available_files(self.plando_folders(), "wotwr")
+        dirs::available_files(self.plando_dirs(), "wotwr")
     }
 }
 
 pub trait PresetFileAccess {
-    type Folders: Iterator<Item = Self::Path>;
+    type Dirs: Iterator<Item = Self::Path>;
     type Path: AsRef<Path>;
 
-    fn universe_folders(&self) -> Self::Folders;
+    fn universe_dirs(&self) -> Self::Dirs;
 
-    fn world_folders(&self) -> Self::Folders;
+    fn world_dirs(&self) -> Self::Dirs;
 }
 
 impl<T: PresetFileAccess> PresetAccess for T {
     fn universe_preset(&self, identifier: &str) -> Result<UniversePreset, String> {
-        folders::read_json(self.universe_folders(), identifier)
+        let mut path = Cow::Borrowed(Path::new(identifier));
+
+        if path.extension().is_none() {
+            path.to_mut().set_extension("json");
+        }
+
+        dirs::join(self.universe_dirs(), &path).read_json()
     }
 
     fn world_preset(&self, identifier: &str) -> Result<WorldPreset, String> {
-        folders::read_json(self.world_folders(), identifier)
+        let mut path = Cow::Borrowed(Path::new(identifier));
+
+        if path.extension().is_none() {
+            path.to_mut().set_extension("json");
+        }
+
+        dirs::join(self.world_dirs(), &path).read_json()
     }
 
     fn available_universe_presets(&self) -> Vec<String> {
-        folders::available_files(self.universe_folders(), "json")
+        dirs::available_files(self.universe_dirs(), "json")
     }
 
     fn available_world_presets(&self) -> Vec<String> {
-        folders::available_files(self.world_folders(), "json")
+        dirs::available_files(self.world_dirs(), "json")
     }
 }

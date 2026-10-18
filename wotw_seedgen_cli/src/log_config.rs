@@ -28,6 +28,7 @@ pub struct LogConfig {
     trace_entrances: LevelFilter,
     trace_optimize_graph: LevelFilter,
     trace_seed_compile: LevelFilter,
+    trace_watcher: LevelFilter,
     trace_uber_states: Option<Vec<UberIdentifier>>,
 }
 
@@ -55,6 +56,7 @@ impl Default for LogConfig {
             trace_entrances: LevelFilter::Info,
             trace_optimize_graph: LevelFilter::Info,
             trace_seed_compile: LevelFilter::Info,
+            trace_watcher: LevelFilter::Info,
             trace_uber_states: None,
         }
     }
@@ -74,6 +76,7 @@ impl Index<VerboseTarget> for LogConfig {
             VerboseTarget::Entrances => &self.trace_entrances,
             VerboseTarget::OptimizeGraph => &self.trace_optimize_graph,
             VerboseTarget::SeedCompile => &self.trace_seed_compile,
+            VerboseTarget::Watcher => &self.trace_watcher,
         }
     }
 }
@@ -90,6 +93,7 @@ impl IndexMut<VerboseTarget> for LogConfig {
             VerboseTarget::Entrances => &mut self.trace_entrances,
             VerboseTarget::OptimizeGraph => &mut self.trace_optimize_graph,
             VerboseTarget::SeedCompile => &mut self.trace_seed_compile,
+            VerboseTarget::Watcher => &mut self.trace_watcher,
         }
     }
 }
@@ -144,6 +148,7 @@ impl LogConfig {
             trace_entrances,
             trace_optimize_graph,
             trace_seed_compile,
+            trace_watcher,
             trace_uber_states,
         } = self;
 
@@ -164,6 +169,10 @@ impl LogConfig {
                 .level_for(ENTRANCES_MOD, trace_entrances)
                 .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
                 .level_for(SEED_COMPILE_MOD, trace_seed_compile)
+                .level_for("watcher", trace_watcher)
+                .level_for("notify_debouncer_full", LevelFilter::Off)
+                .level_for("mio::poll", LevelFilter::Off)
+                .level_for("notify::inotify", LevelFilter::Off)
                 .level_for("perf_counters", LevelFilter::Off)
                 .chain(assets::file_create(LOG_DATA_DIR.join("seedgen_log.txt"))?);
 

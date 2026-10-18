@@ -157,8 +157,8 @@ fn compile() {
     let Some(graph) = Graph::compiler()
         .compile(
             paths,
-            TEST_ASSETS.values.expect_pickups().clone(),
-            TEST_ASSETS.values.expect_states().clone(),
+            TEST_ASSETS.expect_pickups().clone(),
+            TEST_ASSETS.expect_states().clone(),
         )
         .eprint_errors(&source)
     else {

@@ -47,4 +47,5 @@ pub enum VerboseTarget {
     Entrances,
     OptimizeGraph,
     SeedCompile,
+    Watcher,
 }

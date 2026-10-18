@@ -3,7 +3,7 @@ use std::{fmt::Write, time::Instant};
 use wotw_seedgen::{
     data::{
         assets::{
-            self, AssetFileAccess, DefaultFileAccess, InlineSnippets, UberStateData,
+            self, DefaultFileAccess, InlineSnippets, KnownAssetAccess, UberStateData,
             SEEDGEN_USER_DATA_DIR,
         },
         parse::Source,
