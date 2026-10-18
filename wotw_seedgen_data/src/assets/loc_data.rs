@@ -5,19 +5,18 @@
 //! ```
 //! use wotw_seedgen_data::{assets::{LocData, LocDataEntry}, MapIcon, Position, UberIdentifier, Zone};
 //!
-//! let input = "NodeIdentifier, Zone, PickupType, PickupDetails, UberGroup, UberId, UberStateValue, X, Y, MapX, MapY
-//! Marsh.Spawn.LeftHF, Marsh, HealthFragment, , 21786, 60210, , -958.6, -4313.2, -958.6199, -4312.245
-//! Glades.MotayHut.SL, Glades, SpiritLight, 100, 42178, 57455, , -172.7, -4583.2, -392.8, -4130.6";
+//! let input = "Identifier, Condition, Zone, PickupType, PickupDetails, X, Y, MapX, MapY
+//! Marsh.Spawn.LeftHF, 21786|60210, Marsh, HealthFragment, , -958.6, -4313.2, -958.6199, -4312.245
+//! Glades.MotayHut.SL, 42178|57455, Glades, SpiritLight, 100, -172.7, -4583.2, -392.8, -4130.6";
 //! let loc_data = LocData::from_reader(input.as_bytes()).unwrap();
 //!
-// TODO excuse me why is this equal?
 //! assert_eq!(loc_data.entries, vec![
 //!     LocDataEntry {
 //!         identifier: "Marsh.Spawn.LeftHF".to_string(),
 //!         zone: Zone::Marsh,
 //!         map_icon: MapIcon::HealthFragment,
 //!         uber_identifier: UberIdentifier::new(21786, 60210),
-//!         value: Some(1),
+//!         value: None,
 //!         position: Some(Position::new(-958., -4313.)),
 //!         map_position: Some(Position::new(-958., -4313.)),
 //!     },
@@ -26,14 +25,14 @@
 //!         zone: Zone::Glades,
 //!         map_icon: MapIcon::SpiritLight,
 //!         uber_identifier: UberIdentifier::new(42178, 57455),
-//!         value: Some(1),
+//!         value: None,
 //!         position: Some(Position::new(-172., -4584.)),
 //!         map_position: Some(Position::new(-394., -4136.)),
 //!     }
 //! ]);
 //! ```
 
-use crate::{MapIcon, Position, UberIdentifier, Zone};
+use crate::{assets::LogicCondition, MapIcon, Position, UberIdentifier, Zone};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
 use std::io::Read;
@@ -107,11 +106,11 @@ impl LocData {
             };
 
             entries.push(LocDataEntry {
-                identifier: record.node_identifier,
+                identifier: record.identifier,
                 zone: record.zone,
                 map_icon: record.pickup_type,
-                uber_identifier: UberIdentifier::new(record.uber_group, record.uber_id),
-                value: record.uber_state_value,
+                uber_identifier: record.condition.uber_identifier,
+                value: record.condition.value,
                 position,
                 map_position,
             });
@@ -124,15 +123,13 @@ impl LocData {
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct LocDataInput<'a> {
-    node_identifier: String,
+    identifier: String,
+    condition: LogicCondition,
     #[serde_as(as = "DisplayFromStr")]
     zone: Zone,
     #[serde_as(as = "DisplayFromStr")]
     pickup_type: MapIcon,
     _pickup_details: &'a str,
-    uber_group: i32,
-    uber_id: i32,
-    uber_state_value: Option<i32>,
     x: Option<f32>,
     y: Option<f32>,
     map_x: Option<f32>,

@@ -6,23 +6,23 @@
 //! use wotw_seedgen_data::{assets::{StateData, StateDataEntry}, UberIdentifier};
 //!
 //! let input = "
-//! NodeIdentifier, UberGroup, UberId, UberStateValue
-//! MarshSpawn.HowlBurnt, 21786, 25095, 1
+//! Identifier, Condition
+//! MarshSpawn.TeleporterActive, 21786|10185
 //! ";
 //! let state_data = StateData::from_reader(input.as_bytes()).unwrap();
 //!
 //! assert_eq!(state_data.entries, vec![
 //!     StateDataEntry {
-//!         identifier: "MarshSpawn.HowlBurnt".to_string(),
-//!         uber_identifier: UberIdentifier::new(21786, 25095),
-//!         value: Some(1),
+//!         identifier: "MarshSpawn.TeleporterActive".to_string(),
+//!         uber_identifier: UberIdentifier::new(21786, 10185),
+//!         value: None,
 //!     }
 //! ]);
 //! ```
 
 use std::io::Read;
 
-use crate::UberIdentifier;
+use crate::{assets::LogicCondition, UberIdentifier};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -70,9 +70,9 @@ impl StateData {
             .from_reader(reader)
             .into_deserialize::<StateDataInput>()
             .map_ok(|input| StateDataEntry {
-                identifier: input.node_identifier,
-                uber_identifier: UberIdentifier::new(input.uber_group, input.uber_id),
-                value: input.uber_state_value,
+                identifier: input.identifier,
+                uber_identifier: input.condition.uber_identifier,
+                value: input.condition.value,
             })
             .collect::<Result<Vec<_>, _>>()
             .map_err(|err| err.to_string())?;
@@ -84,8 +84,6 @@ impl StateData {
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct StateDataInput {
-    node_identifier: String,
-    uber_group: i32,
-    uber_id: i32,
-    uber_state_value: Option<i32>,
+    identifier: String,
+    condition: LogicCondition,
 }

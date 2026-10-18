@@ -34,3 +34,53 @@ pub use file_access::{
 mod test_access;
 #[cfg(any(test, feature = "test_helpers"))]
 pub use test_access::{TestAccess, TEST_ASSETS};
+
+use serde::{de::Error, Deserialize};
+
+use crate::UberIdentifier;
+
+struct LogicCondition {
+    /// `UberIdentifier` where this world state is stored
+    ///
+    /// world states are either stored as booleans or as integers where being above a certain value means the world state is completed
+    pub uber_identifier: UberIdentifier,
+    /// `None` if `uber_identifier` holds a boolean value. Otherwise, has the minimum integer value at which this world state is completed
+    pub value: Option<i32>,
+}
+
+impl<'de> Deserialize<'de> for LogicCondition {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let str = <&str>::deserialize(deserializer)?;
+
+        str.split_once('|')
+            .and_then(|(group, remaining)| {
+                let group = group.parse().ok()?;
+
+                match remaining.split_once(|c: char| !c.is_ascii_digit()) {
+                    None => Some(Self {
+                        uber_identifier: UberIdentifier::new(group, remaining.parse().ok()?),
+                        value: None,
+                    }),
+                    Some((member, condition)) => {
+                        let member = member.parse().ok()?;
+
+                        let (operator, value) =
+                            condition.rsplit_once(|c: char| !c.is_ascii_digit())?;
+
+                        if operator.trim() != ">=" {
+                            return None;
+                        }
+
+                        Some(Self {
+                            uber_identifier: UberIdentifier::new(group, member),
+                            value: Some(value.parse().ok()?),
+                        })
+                    }
+                }
+            })
+            .ok_or_else(|| D::Error::custom("expected group|member or group|member >= value"))
+    }
+}
