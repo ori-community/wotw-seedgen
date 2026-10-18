@@ -341,7 +341,7 @@ anchor MarshSpawn.Cave at -707, -4419:  # At Tokk in the Cave
     moki: Combat=3xLizard  # at day there's two extra lizards
   # This state is irrelevant if you collect Marsh.TokkCave.LeftKS first, because completing the quest can be done with Marsh.TokkCave.LeftKS alone at this Tokk.
   # This state is only relevant if you talk to Tokk before collecting Marsh.TokkCave.LeftKS. If that's the case, collecting Marsh.TokkCave.LeftKS then progresses the quest to the next step (MarshSpawn.MissingKeyQICollected).
-  state MarshSpawn.MissingKeyTokkTalkedTo: free  # Start of the "Missing Key" quest. 
+  state MarshSpawn.MissingKeyTokkTalkedTo: free  # Start of the "Missing Key" quest.
 
   pickup Marsh.TokkCave.SlimeSL:
     moki: BreakWall=10
@@ -986,7 +986,7 @@ anchor MarshSpawn.FangPlatform at -218, -4406:  # Next to Howl's Fang
 
   state MarshSpawn.FangQICollected:  # Quest progression state. This is relevant because it can be used to complete the quest without picking up the fang (e.g. in a snippet)
     moki: MarshSpawn.MokkTalkedTo, Marsh.LittleBraver.Fang
-  
+
   pickup Marsh.LittleBraver.Fang: free
   pickup Marsh.Howl.FangEF:  # Make sure it's not redundant with MarshSpawn.FangPlatform->MarshSpawn.AboveHowlArena->Marsh.Howl.FangEF
     gorlek:
@@ -1582,7 +1582,7 @@ anchor MarshPastOpher.OpherSkipBranch at -643, -4270:  # Branch above Opher
       DoubleJump, Damage=20
       GlideHammerJump OR Damage=30
       AerialHammerJump  # upslash first
-      WallHammerJump, Damage=10      
+      WallHammerJump, Damage=10
 
 anchor MarshPastOpher.TrialStart at -602, -4316:  # Next to the start of the spirit trial
   refill Checkpoint
@@ -1684,7 +1684,7 @@ anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
       Bash, DoubleJump OR Dash OR Glide OR Grapple OR Launch
       Combat=Mantis+SneezeSlug, DoubleJump OR Dash OR Glide OR Grapple OR Launch
     gorlek:
-      Sword OR Hammer 
+      Sword OR Hammer
       BreakWall=20:
         Launch
         Bash, Grenade=1
@@ -1724,7 +1724,7 @@ anchor MarshPastOpher.BowPath at -494, -4294:  # checkpoint climbing up to Bow t
       Damage=10, Sword OR Hammer
       Damage=10, Bash, Grenade=1
     kii:
-      Bash, Damage=10  # Mantis used to disappear when spawning at this anchor. Slime do not spawn in easy 
+      Bash, Damage=10  # Mantis used to disappear when spawning at this anchor. Slime do not spawn in easy
       Damage=10, Blaze=3 OR Sentry=2
       GrenadeJump=1, Damage=10
     unsafe: Bash OR Shuriken=1 OR Blaze=2 OR Sentry=2 OR GrenadeJump
@@ -2512,7 +2512,7 @@ anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the por
       Damage=90, Hammer
       Damage=60, Glide  # go to the left portal
       GlideJump, Bash
-      GlideJump, DoubleJump, TripleJump      
+      GlideJump, DoubleJump, TripleJump
     unsafe:
       Damage=75 OR GlideHammerJump
       Hammer, Damage=60
@@ -2523,7 +2523,7 @@ anchor MidnightBurrows.LeverRoom at -685, -4616:  # At the lever lifting the por
       Bash, Dash OR Grenade=1
       Bash, Sword, Shuriken=1  # pogo the shuriken
       DoubleJump, TripleJump  # https://youtu.be/OMjOhM767ac
-      
+
 anchor MidnightBurrows.East at -687, -4553:  # Behind the timed-puzzle door
   refill Checkpoint
 
@@ -3804,7 +3804,7 @@ anchor EastHollow.AboveBash at -10, -4244:  # Under the breakable floor after th
       Sword, Shuriken=1  # shuriken pogo from the right wall (that you reach with sword upslash)
   conn EastHollow.KwolokPathGrapplePlant:
     kii: SentryJump=1
-    
+
 anchor EastHollow.TreeAreaJumppad at -15, -4289:  # at the jumppad bellow the depths lever
   state EastHollow.DepthsLever:
     moki: Bash
@@ -3812,7 +3812,7 @@ anchor EastHollow.TreeAreaJumppad at -15, -4289:  # at the jumppad bellow the de
       Deflector, Launch, Sword OR Hammer
       Deflector, Hammer, DoubleJump, TripleJump
       Deflector, Sword, DoubleJump, TripleJump, Damage=10
-      Deflector, SentryJump=1 OR AerialHammerJump 
+      Deflector, SentryJump=1 OR AerialHammerJump
     unsafe:
       Combat=SneezeSlug, SentryRedirect=1 OR GrenadeRedirect=1
       Launch  # launch at touch the breakable ceiling when the slug shoots so it shoots its pojectile at the ceiling
@@ -4835,7 +4835,7 @@ anchor GladesTown.AcornMoki at -355, -4184:  # At the moki near the cave
   #   unsafe: GladesTown.CaveEntrance  # Enter the cave for a refill
 
   state GladesTown.AcornMokiTalkedTo: free  # This starts the "Into the Darkness" quest
-  
+
   pickup Glades.IntoDarkness.Reward:
     moki: GladesTown.AcornQICollected
   pickup Glades.OutsideCave.HiddenSL:
@@ -4878,7 +4878,7 @@ anchor GladesTown.AcornCave at -50, -4509:  # Inside the cave with the acorn at 
   refill Energy=4:
     moki: BreakCrystal
 
-  state GladesTown.AcornQICollected:  # Quest state progression 
+  state GladesTown.AcornQICollected:  # Quest state progression
     moki: Glades.IntoDarkness.Acorn
 
   pickup Glades.IntoDarkness.Acorn:  # Only a pickup now
@@ -7791,7 +7791,7 @@ anchor WoodsEntry.ShriekMeet at 391, -4198:  # The ledge after swimming through 
       Damage=90, Spear=1
       Damage=50, WaterDash, Spear=1  # didn't managed to prevent damage from spikes above the breakable wall
       Water, SentryRedirect=1  # https://youtu.be/AIHaUnHRTF0
-      Flap, Water OR Damage=170  # Flap from the left wall to aggro the tentacle  
+      Flap, Water OR Damage=170  # Flap from the left wall to aggro the tentacle
       Flap, WaterDash, Damage=120
 
   pickup Woods.Entrance.Ore:
@@ -8232,7 +8232,7 @@ anchor WoodsMain.WallOreLedge at 982, -4175:  # Next to hidden ore, without the 
     gorlek:
       Glide, DoubleJump, TripleJump
       Glide, SentryJump=1
-    kii: Glide, DoubleJump  # OR GrenadeJump=1 
+    kii: Glide, DoubleJump  # OR GrenadeJump=1
 
 # checkpoint at 906, -4136
 
@@ -8676,7 +8676,7 @@ anchor WoodsMain.MidwayTrial at 873, -3980:  # At the checkpoint under the first
       Damage=30, Dash, Bash, Grenade=1  # https://youtu.be/EgqZvYcsLWk
       GrenadeJump, DoubleJump OR Dash  # https://youtu.be/obMRBzeM9jk
       DoubleJump, TripleJump, Bash OR GlideJump OR SpearJump=1 OR Damage=15  # make the 2nd sandball swing so you can reach the friendly spikes
-      Burrow, DoubleJump, Bash OR Damage=15  # swing the 1st sandball to get a better burrow angle 
+      Burrow, DoubleJump, Bash OR Damage=15  # swing the 1st sandball to get a better burrow angle
       Burrow, DoubleJump, TripleJump, Hammer OR Spear=1 OR Shuriken=1 OR Sentry=2  # hammer/spear reset jumps on the wall above bashable plant. shuriken/sentry goes directly to the floating platform
       AerialHammerJump OR GlideHammerJump OR AbilitySwap=6
       SentryJump=1, DoubleJump OR Bash OR Damage=15  # running sjump / hammersjump under the sandball to get redirected and reach the floating platform
@@ -8841,7 +8841,7 @@ anchor WoodsMain.Teleporter at 1083, -4052:  # At the East Woods Teleporter
       SentryJump=1, Combat=2xBalloon OR Dash
       Bash, Grenade=1, Combat=2xBalloon OR Dash
     kii, WoodsMain.LogBlobDestroyed:
-      DoubleJump, TripleJump OR Hammer OR Sword 
+      DoubleJump, TripleJump OR Hammer OR Sword
       Bash, Grenade=1
       GlideJump OR SentryJump=1
     unsafe, WoodsMain.LogBlobDestroyed:
@@ -8898,7 +8898,7 @@ anchor WoodsMain.AbovePit at 1234, -3985:  # To the left of the pit before feedi
       Hammer OR Shuriken=2 OR Blaze=4 OR Flash=2 OR Sentry=2 OR Damage=15
       Bash, Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      PauseFloat OR AbilitySwap=1 
+      PauseFloat OR AbilitySwap=1
   conn WoodsMain.OrangeTree:
     moki: Bash OR Glide OR Launch
     gorlek:
@@ -8981,13 +8981,13 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
         Glide, Bash, Grenade=1, DoubleJump OR Dash
         Bash, Grenade=2, DoubleJump
         AerialHammerJump
-      AerialHammerJump, TripleJump OR Dash OR Glide OR SentryJump=1  # Condition is for passing the wind updraft 
+      AerialHammerJump, TripleJump OR Dash OR Glide OR SentryJump=1  # Condition is for passing the wind updraft
       GlideJump, DoubleJump
       GlideJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       # GrenadeJump=2, Glide, DoubleJump OR Dash
       SentryJump=1 OR Glide:  # For the wind updraft:
         SwordSJump=2, Dash
-        SwordSJump=1, DoubleJump  # djump+upslash to the 2nd hidding spot to save one sjump over dash 
+        SwordSJump=1, DoubleJump  # djump+upslash to the 2nd hidding spot to save one sjump over dash
         HammerSJump=1, DoubleJump, Dash OR Sword
     unsafe:
       Glide, Grapple
@@ -9021,7 +9021,7 @@ anchor WoodsMain.FeedingGrounds at 1292, -3993:  # At the left entrance to feedi
       GlideJump, Sword, Shuriken=1 OR Grenade=1  # pogo
       # Dash, DoubleJump, TripleJump, Shuriken=1  # too precise for kii
       # DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1  # too precise for kii
-      
+
 anchor WoodsShrine at 1361, -4068:
   nospawn
   refill Full
@@ -9035,7 +9035,7 @@ anchor WoodsShrine at 1361, -4068:
       Bash, Combat=Balloon OR Flap OR Damage=15  # bash everything in the spikes to the left / use spider projectile. Dboost in the spikes then trigger one balloon explosion
       Combat=Hornbug+Lizard+4xEnergyRefill+Bat+4xEnergyRefill, Combat=Balloon OR Flap OR Damage=15:  # Bait the skeetos/Mantis in the spikes. Kill the miners with the bat's projectile
         Combat=4xEnergyRefill+Bat
-      
+
   pickup Woods.Shrine.SL: free
   pickup Woods.CombatShrine:
     moki: WoodsMain.CombatShrineCompleted
@@ -9207,7 +9207,7 @@ anchor WeepingRidge.AfterElementals at 1303, -3769:  # Ledge next to the spikes,
       Launch
       DoubleJump, TripleJump, Damage=40
       DoubleJump, TripleJump, Bash  # Bait elemental projectiles
-      AerialHammerJump  # continue to extend your hjump when exiting a portal before doing a new one 
+      AerialHammerJump  # continue to extend your hjump when exiting a portal before doing a new one
       GrenadeJump, DoubleJump, Damage=20  # dboost on the mine
       SwordSJump=5, Damage=20  # Pogo the first elemental, dboost on the mine
       SwordSJump=4, SwordJump, Damage=20  # Same as above, but swordjump+upslash into the top portal
@@ -9239,7 +9239,7 @@ anchor WeepingRidge.AboveTree at 1344, -3791:  # The ledge above Launch tree
       Bash, Grenade=2, DoubleJump, TripleJump
       Bash, Grenade=2, DoubleJump, Dash, Sword OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       AerialHammerJump, TripleJump OR Dash OR Glide OR Sword OR Flash=1 OR Sentry=1  # condition is for the first hjump
-      AerialHammerJump, Shuriken=1, Damage=20  # same as above but account for touching the mine with shuriken 
+      AerialHammerJump, Shuriken=1, Damage=20  # same as above but account for touching the mine with shuriken
       SentryJump=2, DoubleJump, TripleJump
       SentryJump=2, DoubleJump, Dash, Shuriken=1 OR Sentry=1
       # GrenadeJump=2, DoubleJump, TripleJump
@@ -9661,14 +9661,14 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
         Bash
         LowerReach.Lever:
           DoubleJump, TripleJump
-          DoubleJump, Dash, Hammer          
+          DoubleJump, Dash, Hammer
       LowerReach.ThawCentralFurnace:
         Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
         DoubleJump, Sword OR Hammer
         DoubleJump, Glide, Shuriken=2
     unsafe:
       Sword, DoubleJump, Hammer  # Hammer might have been to break the ceiling? Keeping it for now but needs to be checked again
-      GrenadeJump, LowerReach.DoorSLCeiling OR LowerReach.ThawCentralFurnace  # gjump on top of the tongue plant, get on the wall above it then grenade cancel to get to the mortar 
+      GrenadeJump, LowerReach.DoorSLCeiling OR LowerReach.ThawCentralFurnace  # gjump on top of the tongue plant, get on the wall above it then grenade cancel to get to the mortar
       SentryJump=2, LowerReach.DoorSLCeiling OR LowerReach.ThawCentralFurnace
       LowerReach.DoorSLCeiling, LowerReach.Lever, DoubleJump, Dash
       LowerReach.ThawCentralFurnace:
@@ -9765,7 +9765,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       Bash, DoubleJump OR Dash
       LowerReach.FreezeCentralFurnace, Bash, Sword OR Hammer
     unsafe:
-      DoubleJump, Dash  # If the icewall is here, use it otherwise do a dash ramp 
+      DoubleJump, Dash  # If the icewall is here, use it otherwise do a dash ramp
       DoubleJump, SpearJump=1 OR Damage=40
       # Bash, Grenade=1
       Bash
@@ -9773,7 +9773,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       # SentryJump=1, DoubleJump, LowerReach.ThawCentralFurnace  # djump+dash from the frozen snaptrap / bait the last snaptrap and double jump + use weapon to stall in the air
       # HammerSJump=1, DoubleJump, Glide  # double jump+upslash from the plant to get near the burrow section, climb it then glide to the right
 
-anchor LowerReach.BelowTokk at -296, -3944:  # Platform just above the TP and just below Tokk 
+anchor LowerReach.BelowTokk at -296, -3944:  # Platform just above the TP and just below Tokk
   refill Checkpoint
 
   conn LowerReach.OutsideTPRoom: free
@@ -10499,7 +10499,7 @@ anchor LowerReach.SnowEscape at 79, -3733:
 
 anchor LowerReach.SnowEscapeEnd at -585, -3870:  # At the end of the escape, before jumping down
   nospawn
-  
+
   state LowerReach.HighestReachCompleted: free
   state LowerReach.BearFullyAwake: free  # Not logically relevant beyond including LowerReach.BearSneezed
 
@@ -14880,7 +14880,7 @@ anchor KwolokFight at -1978, -4135:
 
   # lagoonStateGroup.kwolokBossState (945|58403=3) chase end, fight start. Also closes the wall on the right side until the chase is completed (=7) and removes the tentacle blocking the Ore access.
   # lagoonStateGroup.kwolokBossState (945|58403=4) arena floods
-  # lagoonStateGroup.kwolokBossState (945|58403=5) unused 
+  # lagoonStateGroup.kwolokBossState (945|58403=5) unused
   # lagoonStateGroup.kwolokBossState (945|58403=6) fight completed, kwolok is dragged up
 
   conn KwolokFightEnd:
@@ -16208,7 +16208,7 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
     kii:
       AerialHammerJump
       GlideJump, DoubleJump, TripleJump, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1  # Either directly or by going to the left platform first. Shuriken is redundant with ->BoulderHeartPath->EntryFloatingPlatform
-      # GrenadeJump=1, DoubleJump OR Dash OR Hammer      
+      # GrenadeJump=1, DoubleJump OR Dash OR Hammer
     unsafe:
       # DoubleJump, Damage=40  # Dboost on the lava thingy and jump from it to the floating platform
       DoubleJump, Damage=20  # Same as above but dboost on the mine beforehand
@@ -16845,7 +16845,7 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
       BreakWall=10, Launch, Bash:
         Glide, BreakWall=30
         DoubleJump, Dash, BreakWall=30
-    gorlek: 
+    gorlek:
       BreakWall=10, Launch, Bash, DoubleJump OR Dash OR Sword OR Hammer OR Damage=40:
         BreakWall=30
     kii:
@@ -16908,7 +16908,7 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
 
 anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
   entrance:
-    id: 31
+    id: 32
     target: WillowsEnd.ShriekArena
     enter:
       moki: WillowsEnd.GrappleWheelsHeart, WillowsEnd.BoulderHeart, WillowsEnd.RedirectHeart, WillowsEnd.BurrowHeart, WillowsEnd.MinibossHeart, WillowsEnd.SpinLasersHeart, WillowsEnd.GlideHeart, WillowsEnd.SpinPortalsHeart
@@ -17023,7 +17023,7 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
 
 anchor WillowsEnd.ShriekArena at 576, -3610:  # At the door of Shrieks arena
   entrance:
-    id: 32
+    id: 31
     target: WillowsEnd.Upper
     enter: free
 
