@@ -36,8 +36,8 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
                     | (5, 40 | 41)
                     | (30, 1 | 2)
                     | (3440, 37811)
-            ) || state.readonly
-                || !state.uber_state_type.starts_with("Serialized")
+            ) || state.r#type.is_readonly()
+                || !state.r#type.is_serialized()
             {
                 continue;
             }

@@ -8,11 +8,11 @@ use wotw_seedgen::data::assets::{
 use crate::Error;
 
 const OVERRIDES: [(&str, f32); 15] = [
+    ("player.shardSlots", 3.),
     ("player.positionX", 0.),
     ("player.positionY", 0.),
     ("player.currentArea", 13.),
     ("player.currentMapFilter", 0.),
-    ("mapSegments.segment12701", 1.),
     ("input.mouseWorldPositionX", 0.),
     ("input.mouseWorldPositionY", 0.),
     ("randomValueGenerator.randomInt", 0.),
@@ -44,6 +44,13 @@ pub fn import_uber_states() -> Result<(), Error> {
 
     let mut dump: UberStateDump =
         serde_json::from_str(&text).map_err(|err| format!("failed to parse clipboard: {err}"))?;
+
+    let map_segments = dump.groups.get_mut(&22).unwrap();
+    assert_eq!(map_segments.name, "mapSegments");
+
+    for map_segment in map_segments.states.values_mut() {
+        map_segment.value = 1.;
+    }
 
     let data = UberStateData::from_parts(dump.clone(), &Pickups::default(), &States::default());
 

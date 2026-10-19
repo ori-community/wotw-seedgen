@@ -257,25 +257,14 @@ impl UberStateData {
                     UberStateNameEntry::Rando(_) => rando_name_in_vanilla_group(&dump_group.name),
                 };
 
-                let default_value = match dump_member.value_type {
-                    UberStateDumpValueType::Boolean => {
-                        UberStateValue::Boolean(dump_member.value != 0.)
-                    }
-                    UberStateDumpValueType::Byte | UberStateDumpValueType::Integer => {
-                        UberStateValue::Integer(dump_member.value as i32)
-                    }
-                    UberStateDumpValueType::Float => UberStateValue::Float(dump_member.value),
-                    UberStateDumpValueType::Unknown => continue,
-                };
-
                 uber_state_data.id_lookup.insert(
                     UberIdentifier::new(group, member),
                     UberStateDataEntry {
                         name,
                         rando_name: None,
                         expression_aliases: Vec::new(),
-                        default_value,
-                        readonly: dump_member.readonly,
+                        default_value: dump_member.r#type.coerce(dump_member.value),
+                        readonly: dump_member.r#type.is_readonly(),
                     },
                 );
             }
@@ -376,20 +365,80 @@ pub struct UberStateDumpGroup {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UberStateDumpMember {
     pub name: String,
-    pub readonly: bool,
-    #[serde(rename = "type")]
-    pub uber_state_type: String,
+    pub r#type: UberStateDumpType,
     pub value: f32,
-    pub value_type: UberStateDumpValueType,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum UberStateDumpValueType {
-    Boolean,
-    Byte,
-    Integer,
-    Float,
-    Unknown,
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum UberStateDumpType {
+    BooleanUberState,
+    ByteUberState,
+    IntUberState,
+    FloatUberState,
+    SerializedBooleanUberState,
+    SerializedByteUberState,
+    SerializedIntUberState,
+    SerializedFloatUberState,
+    VirtualBooleanUberState,
+    VirtualByteUberState,
+    VirtualIntUberState,
+    VirtualFloatUberState,
+    ReadOnlyVirtualBooleanUberState,
+    ReadOnlyVirtualByteUberState,
+    ReadOnlyVirtualIntUberState,
+    ReadOnlyVirtualFloatUberState,
+    SavePedestalUberState,
+    CountUberState,
+    ConditionUberState,
+}
+
+impl UberStateDumpType {
+    pub fn coerce(self, value: f32) -> UberStateValue {
+        match self {
+            Self::BooleanUberState
+            | Self::SerializedBooleanUberState
+            | Self::VirtualBooleanUberState
+            | Self::ReadOnlyVirtualBooleanUberState
+            | Self::SavePedestalUberState
+            | Self::ConditionUberState => UberStateValue::Boolean(value != 0.),
+            Self::ByteUberState
+            | Self::SerializedByteUberState
+            | Self::VirtualByteUberState
+            | Self::ReadOnlyVirtualByteUberState
+            | Self::IntUberState
+            | Self::SerializedIntUberState
+            | Self::VirtualIntUberState
+            | Self::ReadOnlyVirtualIntUberState
+            | Self::CountUberState => UberStateValue::Integer(value as i32),
+            Self::FloatUberState
+            | Self::SerializedFloatUberState
+            | Self::VirtualFloatUberState
+            | Self::ReadOnlyVirtualFloatUberState => UberStateValue::Float(value),
+        }
+    }
+
+    pub fn is_serialized(self) -> bool {
+        matches!(
+            self,
+            Self::SerializedBooleanUberState
+                | Self::SerializedByteUberState
+                | Self::SerializedIntUberState
+                | Self::SerializedFloatUberState
+                | Self::SavePedestalUberState
+        )
+    }
+
+    pub fn is_readonly(self) -> bool {
+        matches!(
+            self,
+            Self::ReadOnlyVirtualBooleanUberState
+                | Self::ReadOnlyVirtualByteUberState
+                | Self::ReadOnlyVirtualIntUberState
+                | Self::ReadOnlyVirtualFloatUberState
+                | Self::CountUberState
+                | Self::ConditionUberState
+        )
+    }
 }
 
 fn serialize_sorted_map<K, V, S>(t: &FxHashMap<K, V>, ser: S) -> Result<S::Ok, S::Error>

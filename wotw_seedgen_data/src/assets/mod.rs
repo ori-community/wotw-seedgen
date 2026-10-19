@@ -9,8 +9,8 @@ pub use states::{States, StatesEntry};
 mod uber_state_data;
 pub use uber_state_data::{
     RandoUberStateGroup, UberStateAlias, UberStateData, UberStateDataEntry, UberStateDump,
-    UberStateDumpGroup, UberStateDumpMember, UberStateDumpValueType, UberStateNameEntry,
-    UberStateValue,
+    UberStateDumpGroup, UberStateDumpMember, UberStateDumpType, UberStateExpressionAlias,
+    UberStateNameEntry, UberStateValue,
 };
 mod snippet_access;
 pub use snippet_access::{ChainedSnippetAccess, InlineSnippets, SnippetAccess};
