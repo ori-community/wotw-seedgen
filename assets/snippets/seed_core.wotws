@@ -60,6 +60,7 @@ on spawn {
     // Disable slow zones that don't make sense in rando
     store(modifications.disableEastWoodsTrunkSlowZoneStateActive, true)
     store(modifications.disableEastWoodsTrunkSlowZone, true)
+    store(modifications.disableMeetKwolokUnderwaterSlowZone, true)
     // TODO this gets reset when collecting voice, does it need to be reset? Does this even do something?
     // store(questUberStateGroup.lookForKuQuestUberState, 4)
     // Always allow opening the Kwolok Statue door
