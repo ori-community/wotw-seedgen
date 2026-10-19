@@ -611,7 +611,6 @@ fun long_splinter() {
     200,
     "Arrows have longer range with " + shard_string(Splinter) + " equipped",
     long_splinter_icon,
-    Placeholder,
     BonusItem
 )
 !export(long_splinter)
