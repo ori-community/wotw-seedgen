@@ -1629,7 +1629,12 @@ fn message_with_origin_world(message: CommandString) -> CommandString {
                     id: RESERVED_STRING,
                     value: match message.into_constant() {
                         Ok(mut message) => {
-                            message.push(if message.contains('\n') { '\n' } else { ' ' });
+                            if message.contains("\\n") {
+                                message.push_str("\\n");
+                            } else {
+                                message.push(' ');
+                            }
+
                             CommandString::Concatenate {
                                 operation: Box::new(Operation {
                                     left: message.into(),
