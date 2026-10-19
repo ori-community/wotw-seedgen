@@ -1,9 +1,9 @@
 use crate::{
     seed_language::{
         ast,
-        output::{CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone},
+        output::{CommandArea, CommandBoolean, CommandFloat, CommandInteger, CommandString},
     },
-    Zone,
+    Area,
 };
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -45,7 +45,7 @@ impl ForceUtoipaRef for CommandString {
     type This = Self;
 }
 
-impl ForceUtoipaRef for CommandZone {
+impl ForceUtoipaRef for CommandArea {
     type This = Self;
 }
 
@@ -291,10 +291,10 @@ impl ExecuteOperator<String> for EqualityComparator {
     }
 }
 
-impl ExecuteOperator<Zone> for EqualityComparator {
+impl ExecuteOperator<Area> for EqualityComparator {
     type Output = bool;
 
-    fn execute(self, left: Zone, right: Zone) -> Self::Output {
+    fn execute(self, left: Area, right: Area) -> Self::Output {
         match self {
             Self::Equal => left == right,
             Self::NotEqual => left != right,
@@ -318,9 +318,9 @@ impl From<Operation<CommandString, EqualityComparator>> for CommandBoolean {
     }
 }
 
-impl From<Operation<CommandZone, EqualityComparator>> for CommandBoolean {
-    fn from(value: Operation<CommandZone, EqualityComparator>) -> Self {
-        Self::CompareZone {
+impl From<Operation<CommandArea, EqualityComparator>> for CommandBoolean {
+    fn from(value: Operation<CommandArea, EqualityComparator>) -> Self {
+        Self::CompareArea {
             operation: Box::new(value),
         }
     }

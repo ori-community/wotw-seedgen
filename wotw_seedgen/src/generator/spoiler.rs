@@ -2,7 +2,7 @@ use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Write};
 use utoipa::ToSchema;
-use wotw_seedgen_data::{assets::PickupsEntry, seed_language::output::CommandVoid, Position, Zone};
+use wotw_seedgen_data::{assets::PickupsEntry, seed_language::output::CommandVoid, Area, Position};
 
 /// Complete data to create a logic spoiler for the seed
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
@@ -92,8 +92,8 @@ pub struct NodeSummary {
     pub identifier: String,
     /// The [`Position`], if applicable
     pub position: Option<Position>,
-    /// The [`Zone`]
-    pub zone: Zone,
+    /// The [`Area`]
+    pub area: Area,
 }
 
 impl NodeSummary {
@@ -101,7 +101,7 @@ impl NodeSummary {
         Self {
             identifier: pickup.identifier.clone(),
             position: pickup.position,
-            zone: pickup.zone,
+            area: pickup.area,
         }
     }
 
@@ -109,7 +109,7 @@ impl NodeSummary {
         Self {
             identifier: "Spawn".to_string(),
             position: None,
-            zone: Zone::Spawn,
+            area: Area::Spawn,
         }
     }
 }

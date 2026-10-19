@@ -38,7 +38,20 @@ on spawn {
     store(waterMillStateGroupDescriptor.playedNaruGumoCutaway, true) // Cinematic when entering Wellspring
     store(willowsEndGroup.introPlayed, true) // Cutscene when entering Willow's End
     store(weepingRidgeElevatorFightGroup.willowsEndGateOpened, true) // Seir opening the Willow's End entrance
-    store(randoConfig.disableWillowHeartCutscenes, true)
+    store(modifications.disableRepairTheSpiritWellCutscene, true)
+    store(modifications.disableDwellingRepairsCutscene, true)
+    store(modifications.disableRoofsOverHeadsCutscene, true)
+    store(modifications.disableOnwardsAndUpwardsCutscene, true)
+    store(modifications.disableThornySituationCutscene, true)
+    store(modifications.disableClearTheCaveEntranceCutscene, true)
+    store(modifications.disableTheGorlekTouchCutscene, true)
+    store(modifications.disableSelaFlowersCutscene, true)
+    store(modifications.disableStickyGrassCutscene, true)
+    store(modifications.disableLightcatchersCutscene, true)
+    store(modifications.disableBlueMoonCutscene, true)
+    store(modifications.disableSpringPlantsCutscene, true)
+    store(modifications.disableLastTreeCutscene, true)
+    store(modifications.disableWillowHeartCutscenes, true)
     // Dialogue skips
     store(npcsStateGroup.metOpherHubAfterWatermill, true)
     store(npcsStateGroup.metOpherHubBeforeWatermill, true)
@@ -75,38 +88,38 @@ on spawn {
     if questUberStateGroup.treeKeeperQuest < 2 store(questUberStateGroup.treeKeeperQuest, 2)
 }
 
-on Hollow.Wisp store(EastHollow.VoiceDoorOpen, true)
-on skills.glide store(EastHollow.DepthsOpen, true)
-on gladesProjects.removeThornsBuilt if hubUberStateGroup.builderProjectOpenCave == 0 store(hubUberStateGroup.builderProjectOpenCave, 1)
+on Hollow.Wisp store(Hollow.Hornbug.VoiceDoor, true)
+on skills.glide store(Hollow.DepthsOpen, true)
+on gladesProjects.thornySituation if hubUberStateGroup.builderProjectOpenCave == 0 store(hubUberStateGroup.builderProjectOpenCave, 1)
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3) // Skip talking to the moki again after completing the pools wisp quest
 on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)
 
 // The game actually checks for the quests, not the wisps.
-on EastHollow.KwolokMet check_ruins_door()
-on WestPools.LostParadiseCompleted check_ruins_door()
-on LowerReach.HighestReachCompleted check_ruins_door()
-on UpperDepths.BreakingMouldCompleted check_ruins_door()
-on WindtornRuins.SiftingSandsCompleted check_ruins_door()
+on Hollow.Kwolok.Met check_ruins_door()
+on Pools.LostParadise.Completed check_ruins_door()
+on Reach.HighestReach.Completed check_ruins_door()
+on Depths.BreakingMould.Completed check_ruins_door()
+on Ruins.SiftingSands.Completed check_ruins_door()
 fun check_ruins_door() {
-    if WindtornRuins.DoorOpen == false {
+    if Ruins.Entrance == false {
         set_integer("ruins_door_count", 0)
-        if EastHollow.KwolokMet set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
-        if WestPools.LostParadiseCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
-        if LowerReach.HighestReachCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
-        if UpperDepths.BreakingMouldCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
-        if WindtornRuins.SiftingSandsCompleted set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
-        if get_integer("ruins_door_count") >= 4 store(WindtornRuins.DoorOpen, true)
+        if Hollow.Kwolok.Met set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if Pools.LostParadise.Completed set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if Reach.HighestReach.Completed set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if Depths.BreakingMould.Completed set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if Ruins.SiftingSands.Completed set_integer("ruins_door_count", get_integer("ruins_door_count") + 1)
+        if get_integer("ruins_door_count") >= 4 store(Ruins.Entrance, true)
     }
 }
 
 !if autoplant {
-    on lightcatchers if GladesTown.TuleySpawned store(tuleyShop.lightcatchers, true)
-    on sela_flowers if GladesTown.TuleySpawned store(tuleyShop.selaFlowers, true)
-    on blue_moon if GladesTown.TuleySpawned store(tuleyShop.blueMoon, true)
-    on sticky_grass if GladesTown.TuleySpawned store(tuleyShop.stickyGrass, true)
-    on spring_plants if GladesTown.TuleySpawned store(tuleyShop.springPlants, true)
-    on last_tree if GladesTown.TuleySpawned store(tuleyShop.lastTree, true)
-    on GladesTown.TuleySpawned {
+    on lightcatchers if Glades.TuleySpawned store(tuleyShop.lightcatchers, true)
+    on sela_flowers if Glades.TuleySpawned store(tuleyShop.selaFlowers, true)
+    on blue_moon if Glades.TuleySpawned store(tuleyShop.blueMoon, true)
+    on sticky_grass if Glades.TuleySpawned store(tuleyShop.stickyGrass, true)
+    on spring_plants if Glades.TuleySpawned store(tuleyShop.springPlants, true)
+    on last_tree if Glades.TuleySpawned store(tuleyShop.lastTree, true)
+    on Glades.TuleySpawned {
         store(tuleyShop.lightcatchers, lightcatchers)
         store(tuleyShop.selaFlowers, sela_flowers)
         store(tuleyShop.blueMoon, blue_moon)

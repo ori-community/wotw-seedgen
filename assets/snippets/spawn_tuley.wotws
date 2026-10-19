@@ -3,6 +3,6 @@
 #description("Tuley is always there in Glades")
 
 on spawn {
-  store(randoConfig.useSpawnTuleyRandoState, true)
-  store(GladesTown.TuleySpawned, true)
+  store(modifications.spawnTuleyStateActive, true)
+  store(Glades.TuleySpawned, true)
 }

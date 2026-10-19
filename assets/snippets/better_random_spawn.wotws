@@ -6,15 +6,15 @@ The lever door in upper wastes, the lever door at pools entry, the bone wall abo
 
 on spawn {
     // The only alternate path around this lever door would be through Ruins, which generally isn't open without all Wisps
-    store(UpperWastes.LeverDoor, true)
+    store(Wastes.MissilePuzzles.LeverDoor, true)
     // No path around this door
-    store(EastPools.EntryLever, true)
+    store(Pools.EntranceLever, true)
     // Removing Howl allows both Howl's Den and Midnight Burrows to escape
     store(swampStateGroup.nightCrawlerChaseStarted, true)
     store(swampStateGroup.nightCrawlerDefeated, true)
-    store(MarshSpawn.HowlBurnt, true)
+    store(Marsh.HowlDefeated, true)
     // For settings that can't use reverse breaks or the unintuitive Double Jump tree interaction
-    store(HowlsDen.BoneBarrier, true)
+    store(Marsh.Den.BottomAreaWall, true)
     // For settings that can't wedge past the skull
     // TODO write logic
     store(_petrifiedForestGroup.skeletonState, true)

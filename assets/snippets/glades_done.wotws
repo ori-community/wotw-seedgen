@@ -24,11 +24,11 @@ on spawn {
     store(gromShop.thornySituation, true)
     store(gromShop.clearTheCaveEntrance, true)
     // Build Stuff
-    store(GladesTown.BuildHuts, true)
-    store(GladesTown.RoofsOverHeads, true)
-    store(GladesTown.OnwardsAndUpwards, true)
-    store(GladesTown.ClearThorns, true)
-    store(GladesTown.CaveEntrance, true)
+    store(Glades.Buildings.DwellingRepairs, true)
+    store(Glades.Buildings.RoofsOverHeads, true)
+    store(Glades.Buildings.OnwardsAndUpwards, true)
+    store(Glades.Buildings.ThornySituation, true)
+    store(Glades.Buildings.ClearTheCaveEntrance, true)
     if questUberStateGroup.darkCaveQuest < 1 store(questUberStateGroup.darkCaveQuest, 1)
 }
 

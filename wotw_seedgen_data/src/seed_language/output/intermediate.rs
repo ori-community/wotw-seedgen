@@ -79,7 +79,7 @@ impl Display for Constant {
             Constant::Teleporter(value) => value.display::<false>().fmt(f),
             Constant::WeaponUpgrade(value) => value.fmt(f),
             Constant::Equipment(value) => value.fmt(f),
-            Constant::Zone(value) => value.fmt(f),
+            Constant::Area(value) => value.fmt(f),
             Constant::GenericIcon(value) => value.fmt(f),
             Constant::OpherIcon(value) => value.fmt(f),
             Constant::LupoIcon(value) => value.fmt(f),

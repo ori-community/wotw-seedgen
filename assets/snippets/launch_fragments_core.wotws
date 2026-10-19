@@ -8,22 +8,22 @@
 !include("list_core", add_row)
 
 !augment_fun(write_progress_message(), {
-    write_amount(itemTracker.launchFragmentsCount)
+    write_amount(tracker.launchFragmentsCollected)
     add_row("*Launch Fragments* " + get_string("amount"))
 })
 
 fun write_amount(amount: Integer) {
     set_string("color", "")
-    if amount >= itemTracker.launchFragmentsRequired set_string("color", "$")
-    set_string("amount", get_string("color") + "(" + amount + "/" + itemTracker.launchFragmentsRequired + ")" + get_string("color"))
+    if amount >= tracker.launchFragmentsRequired set_string("color", "$")
+    set_string("amount", get_string("color") + "(" + amount + "/" + tracker.launchFragmentsRequired + ")" + get_string("color"))
 }
 
 fun launch_fragment() {
     create_stats_entry(LaunchFragment, "Launch Fragment")
-    set_integer("amount", itemTracker.launchFragmentsCount + 1)
+    set_integer("amount", tracker.launchFragmentsCollected + 1)
     write_amount(get_integer("amount"))
     item_message("*Launch Fragment* " + get_string("amount"))
-    store(itemTracker.launchFragmentsCount, get_integer("amount"))
+    store(tracker.launchFragmentsCollected, get_integer("amount"))
 }
 !export(launch_fragment)
 
@@ -36,4 +36,4 @@ fun launch_fragment() {
     LaunchFragment
 )
 
-on itemTracker.launchFragmentsCount == itemTracker.launchFragmentsRequired skill(Launch)
+on tracker.launchFragmentsCollected == tracker.launchFragmentsRequired skill(Launch)

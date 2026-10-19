@@ -40,13 +40,13 @@ on spawn store(enabled, true)
 on enabled && collected > 0 {
     set_wheel_item_disable()
     update_bonus_wheel()
-    store(randoUpgrades.regenerateSpeedMultiplier, 1 + collected * 0.25)
+    store(bonusUpgrades.regenerateSpeedMultiplier, 1 + collected * 0.25)
 }
 
 on enabled == false && collected > 0 {
     set_wheel_item_enable()
     update_bonus_wheel()
-    store(randoUpgrades.regenerateSpeedMultiplier, 1)
+    store(bonusUpgrades.regenerateSpeedMultiplier, 1)
 }
 
 on reload if collected > 0 {

@@ -173,7 +173,7 @@ fn compile() {
                 .iter()
                 .map(|connection| graph.nodes[connection.to].identifier())
                 .collect::<Vec<_>>();
-            assert!(adjacent.contains(&"MarshSpawn.ToOpherBarrier"));
+            assert!(adjacent.contains(&"Marsh.CollapsingLog.OpherWall"));
             assert!(adjacent.contains(&"Marsh.Spawn.GrappleHF"));
             assert!(adjacent.contains(&"Teleporters"));
         }

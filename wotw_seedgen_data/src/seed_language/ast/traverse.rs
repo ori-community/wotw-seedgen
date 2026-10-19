@@ -5,19 +5,19 @@ use wotw_seedgen_parse::{
 };
 
 use crate::seed_language::ast::{
-    Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
-    BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandArgs, CommandIf,
-    CommandOnlySimulation, CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs,
-    ConfigFloatRangeArgs, ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, Content,
-    CountInZoneArgs, CountInZoneBinding, DifficultyConfirmationArgs, DifficultyLabelArgs,
-    DifficultyVisibleArgs, Event, EventContent, ExportArgs, Expression, ExpressionValue,
-    FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
+    Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AreaOfArgs,
+    AugmentFunArgs, BuiltinIconArgs, ChangeItemPoolArgs, Command, CommandArg, CommandArgs,
+    CommandIf, CommandOnlySimulation, CommandRepeat, ConfigArgs, ConfigBooleanArgs,
+    ConfigFloatArgs, ConfigFloatRangeArgs, ConfigIntegerArgs, ConfigIntegerRangeArgs,
+    ConfigRangeArgs, Content, CountInAreaArgs, CountInAreaBinding, DifficultyConfirmationArgs,
+    DifficultyLabelArgs, DifficultyVisibleArgs, Event, EventContent, ExportArgs, Expression,
+    ExpressionValue, FunctionCall, FunctionDefinition, IncludeArgs, IncludeIconArgs, ItemDataArgs,
     ItemDataDescriptionArgs, ItemDataIconArgs, ItemDataMapIconArgs, ItemDataNameArgs,
     ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal, NoRandomPlacementArgs, Operation,
     PreplaceArgs, RandomBooleanArgs, RandomFloatArgs, RandomFromPoolArgs, RandomIntegerArgs,
     RandomNumberArgs, RandomPlacementSlotsArgs, RandomPoolArgs, RemoveItemArgs,
     RemoveSpiritLightArgs, SetConfigArgs, SetLogicStateArgs, Snippet, SpawnArgs, StateArgs,
-    TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier, ZoneOfArgs,
+    TagsArg, TimerArgs, Trigger, TriggerBinding, UberIdentifier,
 };
 
 pub fn get_command_arg<T>(arg: CommandArg<T>) -> Option<T> {
@@ -439,7 +439,7 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
-            Self::ZoneOf(keyword, args) => {
+            Self::AreaOf(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
@@ -447,7 +447,7 @@ impl<H: Handler> Traverse<H> for Command<'_> {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
-            Self::CountInZone(keyword, args) => {
+            Self::CountInArea(keyword, args) => {
                 handler.command_keyword(&keyword.span);
                 args.traverse(handler);
             }
@@ -783,11 +783,11 @@ impl<H: Handler> Traverse<H> for EventContent<'_> {
 impl<H: Handler> Traverse<H> for PreplaceArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.item.traverse(handler);
-        inspect_command_arg(&self.zone, |zone| zone.traverse(handler));
+        inspect_command_arg(&self.area, |area| area.traverse(handler));
     }
 }
 
-impl<H: Handler> Traverse<H> for ZoneOfArgs<'_> {
+impl<H: Handler> Traverse<H> for AreaOfArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.identifier_def(&self.identifier);
         inspect_command_arg(&self.item, |item| item.traverse(handler));
@@ -801,17 +801,17 @@ impl<H: Handler> Traverse<H> for ItemOnArgs<'_> {
     }
 }
 
-impl<H: Handler> Traverse<H> for CountInZoneArgs<'_> {
+impl<H: Handler> Traverse<H> for CountInAreaArgs<'_> {
     fn traverse(&self, handler: &mut H) {
-        self.zone_bindings.traverse(handler);
+        self.area_bindings.traverse(handler);
         inspect_command_arg(&self.items, |items| items.traverse(handler));
     }
 }
 
-impl<H: Handler> Traverse<H> for CountInZoneBinding<'_> {
+impl<H: Handler> Traverse<H> for CountInAreaBinding<'_> {
     fn traverse(&self, handler: &mut H) {
         handler.identifier_def(&self.identifier);
-        inspect_command_arg(&self.zone, |zone| zone.traverse(handler));
+        inspect_command_arg(&self.area, |area| area.traverse(handler));
     }
 }
 

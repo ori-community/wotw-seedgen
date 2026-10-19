@@ -1,9 +1,11 @@
+mod area_spirit_light;
+mod area_unlock;
 mod compare;
 mod early_skills;
 mod first_weapon;
+mod item_area;
 mod item_location;
 mod item_unlock;
-mod item_zone;
 mod location_item;
 mod progression;
 mod spawn_item_count;
@@ -12,18 +14,18 @@ mod spawn_location;
 mod spawn_region;
 mod step_size;
 mod total_spirit_light;
-mod zone_spirit_light;
-mod zone_unlock;
 // TODO idea: progression_location analyzer for which locations get chosen for progression
 
 // TODO use contained_writes for analysis instead of common_items?
 
+pub use area_spirit_light::AreaSpiritLightStats;
+pub use area_unlock::AreaUnlockStats;
 use compare::*;
 pub use early_skills::EarlySkillsStats;
 pub use first_weapon::FirstWeaponStats;
+pub use item_area::ItemAreaStats;
 pub use item_location::ItemLocationStats;
 pub use item_unlock::ItemUnlockStats;
-pub use item_zone::ItemZoneStats;
 pub use location_item::LocationItemStats;
 pub use progression::ProgressionStats;
 pub use spawn_item_count::SpawnItemCountStats;
@@ -32,8 +34,6 @@ pub use spawn_location::SpawnLocationStats;
 pub use spawn_region::SpawnRegionStats;
 pub use step_size::StepSizeStats;
 pub use total_spirit_light::TotalSpiritLightStats;
-pub use zone_spirit_light::ZoneSpiritLightStats;
-pub use zone_unlock::ZoneUnlockStats;
 
 use std::{cmp::Ordering, num::NonZeroUsize};
 

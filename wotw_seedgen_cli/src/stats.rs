@@ -13,10 +13,10 @@ use wotw_seedgen::data::{
 };
 use wotw_seedgen_stats::{
     analyzers::{
-        Analyzer, EarlySkillsStats, FirstWeaponStats, ItemLocationStats, ItemUnlockStats,
-        ItemZoneStats, LocationItemStats, ProgressionStats, SpawnItemCountStats, SpawnItemStats,
-        SpawnLocationStats, SpawnRegionStats, StepSizeStats, TotalSpiritLightStats,
-        ZoneSpiritLightStats, ZoneUnlockStats,
+        Analyzer, AreaSpiritLightStats, AreaUnlockStats, EarlySkillsStats, FirstWeaponStats,
+        ItemAreaStats, ItemLocationStats, ItemUnlockStats, LocationItemStats, ProgressionStats,
+        SpawnItemCountStats, SpawnItemStats, SpawnLocationStats, SpawnRegionStats, StepSizeStats,
+        TotalSpiritLightStats,
     },
     storage_access, ChainedAnalyzers, Stats, StatsGenerator,
 };
@@ -164,7 +164,7 @@ impl From<cli::Analyzer> for Box<dyn Analyzer> {
                 item,
                 result_bucket_size,
             }),
-            cli::Analyzer::ItemZone { item } => Box::new(ItemZoneStats { item }),
+            cli::Analyzer::ItemArea { item } => Box::new(ItemAreaStats { item }),
             cli::Analyzer::LocationItem { location } => Box::new(LocationItemStats { location }),
             cli::Analyzer::Progression => Box::new(ProgressionStats),
             cli::Analyzer::SpawnItemCount => Box::new(SpawnItemCountStats),
@@ -177,18 +177,18 @@ impl From<cli::Analyzer> for Box<dyn Analyzer> {
             cli::Analyzer::TotalSpiritLight { result_bucket_size } => {
                 Box::new(TotalSpiritLightStats { result_bucket_size })
             }
-            cli::Analyzer::ZoneSpiritLight {
-                zone,
+            cli::Analyzer::AreaSpiritLight {
+                area,
                 result_bucket_size,
-            } => Box::new(ZoneSpiritLightStats {
-                zone,
+            } => Box::new(AreaSpiritLightStats {
+                area,
                 result_bucket_size,
             }),
-            cli::Analyzer::ZoneUnlock {
-                zone,
+            cli::Analyzer::AreaUnlock {
+                area,
                 result_bucket_size,
-            } => Box::new(ZoneUnlockStats {
-                zone,
+            } => Box::new(AreaUnlockStats {
+                area,
                 result_bucket_size,
             }),
         }

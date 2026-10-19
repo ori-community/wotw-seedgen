@@ -83,8 +83,8 @@ impl RelevantUberStates {
             Teleporter::POOLS_BOSS_ID,
             Teleporter::FEEDING_GROUNDS_ID,
             Teleporter::CENTRAL_WASTES_ID,
-            Teleporter::OUTER_RUINS_ID,
-            Teleporter::INNER_RUINS_ID,
+            Teleporter::UPPER_WASTES_ID,
+            Teleporter::RUINS_ID,
             Teleporter::WILLOW_ID,
             Teleporter::SHRIEK_ID,
             WeaponUpgrade::EXPLODING_SPEAR_ID,
@@ -98,12 +98,12 @@ impl RelevantUberStates {
         let states = states.entries.iter().map(|entry| entry.uber_identifier);
 
         let entrances = (1..=32).map(UberIdentifier::entrances);
-        let known_entrance_connections = (1..=32).map(UberIdentifier::known_entrance_connections);
+        let entrances_known = (1..=32).map(UberIdentifier::entrances_known);
 
         let identifiers = pickups
             .chain(states)
             .chain(entrances)
-            .chain(known_entrance_connections)
+            .chain(entrances_known)
             .chain(INVENTORY)
             .collect();
 

@@ -1463,7 +1463,7 @@ fn woods_exit_spawn_solutions() {
             // Woods.Shrine.SL
             [skill(Glide)],
             [skill(Launch)],
-            // WoodsMain.LogBlobDestroyed + Combat=2xBalloon
+            // Woods.ExitTP.Corruption + Combat=2xBalloon
             // [skill(Sword), skill(Bow)],
             // [skill(Sword), skill(Shuriken)],
             // [skill(Hammer), skill(Bow)],
@@ -1711,8 +1711,8 @@ fn central_wastes_spawn_solutions() {
 }
 
 #[test]
-fn outer_ruins_spawn_solutions() {
-    let mut world = spawn_solutions_prelude("UpperWastes.OuterRuinsTP");
+fn upper_wastes_spawn_solutions() {
+    let mut world = spawn_solutions_prelude("UpperWastes.Teleporter");
 
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),

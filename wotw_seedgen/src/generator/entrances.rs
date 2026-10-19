@@ -111,23 +111,20 @@ pub fn generate_entrances(
                 ArrayVec::from_iter([32]),
             ];
 
-            // enable itemTracker.showVisitedEntranceCount
+            // enable tracker.showVisitedEntranceCount
             output.push_event(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                command: store_boolean(UberIdentifier::item_tracker(200), true),
+                command: store_boolean(UberIdentifier::tracker(200), true),
             });
-            // enable randoConfig.showSmallEntrances
+            // enable modifications.showSmallEntrances
             output.push_event(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                command: store_boolean(UberIdentifier::rando_config(200), true),
+                command: store_boolean(UberIdentifier::modifications(200), true),
             });
             // mark entrance connections as unknown
             output.extend_events((1..=32).map(|entrance_id| Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                command: store_boolean(
-                    UberIdentifier::known_entrance_connections(entrance_id),
-                    false,
-                ),
+                command: store_boolean(UberIdentifier::entrances_known(entrance_id), false),
             }));
 
             let config =
@@ -157,12 +154,9 @@ pub fn generate_entrances(
         if loop_size == 2 {
             output.push_event(Event {
                 trigger: Trigger::Condition(TriggerCondition::new(CommandBoolean::FetchBoolean {
-                    uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
+                    uber_identifier: UberIdentifier::entrances_known(entrance_id),
                 })),
-                command: store_boolean(
-                    UberIdentifier::known_entrance_connections(target_entrance_id),
-                    true,
-                ),
+                command: store_boolean(UberIdentifier::entrances_known(target_entrance_id), true),
             });
         }
     }

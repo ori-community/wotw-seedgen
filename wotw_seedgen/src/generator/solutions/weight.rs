@@ -215,8 +215,8 @@ impl Cost for CommonUberIdentifier {
                 | Teleporter::PoolsBoss
                 | Teleporter::FeedingGrounds
                 | Teleporter::CentralWastes
-                | Teleporter::OuterRuins
-                | Teleporter::InnerRuins
+                | Teleporter::UpperWastes
+                | Teleporter::Ruins
                 | Teleporter::Willow
                 | Teleporter::Shriek,
             ) => 12000.,

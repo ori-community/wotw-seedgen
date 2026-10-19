@@ -23,32 +23,32 @@ all arenas are completed and all boss combat phases are skipped")
 
 !if skip_arenas {
     on spawn {
-        store(MarshPastOpher.CombatShrineCompleted, true)
-        store(HowlsDen.CombatShrineCompleted, true)
-        store(LowerDepths.CombatShrineCompleted, true)
-        store(WoodsMain.CombatShrineCompleted, true)
-        store(WestGlades.CombatShrineCompleted, true)
+        store(Marsh.Trial.CombatShrineCompleted, true)
+        store(Marsh.Den.CombatShrineCompleted, true)
+        store(Depths.CombatShrineCompleted, true)
+        store(Woods.CombatShrineCompleted, true)
+        store(Glades.CombatShrineCompleted, true)
 
-        store(MarshSpawn.CaveFight, true)
+        store(Marsh.TokkCave.LizardFight, true)
         store(inkwaterMarshStateGroup.lizardMultiWaveArenaInt, 3)
-        store(MarshSpawn.BurrowArena, true)
+        store(Marsh.Sand.Fight, true)
         store(waterMillStateGroupDescriptor.rotatingEnemyArenaStates, 5)
         // TODO no state change to detect :(
-        store(LowerReach.ArenaBeaten, true)
+        store(Reach.WispClimb.Fight, true)
         store(lumaPoolsStateGroup.arenaByteStateSerialized, 4)
         store(lumaPoolsStateGroup.arenaBByteStateSerialized, 4)
-        store(WeepingRidge.ElevatorFightCompleted, true)
+        store(Woods.Ridge.ElevatorFight, true)
     }
 }
 
 !if skip_bosses {
     on spawn {
         // Hornbug is only combat and has no external consequence, so we save the player the cutscene
-        store(EastHollow.BeetleDefeated, true)
+        store(Hollow.HornbugDefeated, true)
         store(kwolokGroupDescriptor.hornBugBossState, 4)
     }
 
-    on randoState.howlFightActive force_deal_enemy_damage(1000)
+    on bosses.howlFightActive force_deal_enemy_damage(1000)
     // No logical impact since the combat is free
 
     on lagoonStateGroup.kwolokBossState == 3 force_deal_enemy_damage(10000)

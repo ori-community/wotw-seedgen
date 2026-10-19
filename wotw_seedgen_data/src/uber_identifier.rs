@@ -27,19 +27,20 @@ pub struct UberIdentifier {
     pub member: i32,
 }
 
+const MAP_GROUP: i32 = 3;
 const PLAYER_GROUP: i32 = 5;
-const RANDO_STATE_GROUP: i32 = 6;
-const RANDO_CONFIG_GROUP: i32 = 7;
+const MODIFICATIONS_GROUP: i32 = 6;
 const CUSTOM_BOOLEANS_GROUP: i32 = 8;
 const CUSTOM_INTEGERS_GROUP: i32 = 9;
 const CUSTOM_FLOATS_GROUP: i32 = 10;
 const MULTIWORLD_GROUP: i32 = 12;
+const WORLD_EVENTS_GROUP: i32 = 16;
 const MAP_SEGMENTS_GROUP: i32 = 22;
-const ITEM_TRACKER_GROUP: i32 = 23;
+const TRACKER_GROUP: i32 = 23;
 const SKILLS_GROUP: i32 = 24;
 const SHARDS_GROUP: i32 = 25;
 const ENTRANCES_GROUP: i32 = 27;
-const KNOWN_ENTRANCE_CONNECTIONS_GROUP: i32 = 28;
+const ENTRANCES_KNOWN_GROUP: i32 = 28;
 const SETTINGS_GROUP: i32 = 29;
 
 impl UberIdentifier {
@@ -50,16 +51,16 @@ impl UberIdentifier {
         Self { group, member }
     }
 
+    pub const fn map(member: i32) -> Self {
+        Self::new(MAP_GROUP, member)
+    }
+
     pub const fn player(member: i32) -> Self {
         Self::new(PLAYER_GROUP, member)
     }
 
-    pub const fn rando_state(member: i32) -> Self {
-        Self::new(RANDO_STATE_GROUP, member)
-    }
-
-    pub const fn rando_config(member: i32) -> Self {
-        Self::new(RANDO_CONFIG_GROUP, member)
+    pub const fn modifications(member: i32) -> Self {
+        Self::new(MODIFICATIONS_GROUP, member)
     }
 
     pub const fn custom_boolean(member: i32) -> Self {
@@ -74,12 +75,16 @@ impl UberIdentifier {
         Self::new(CUSTOM_FLOATS_GROUP, member)
     }
 
-    pub const fn item_tracker(member: i32) -> Self {
-        Self::new(ITEM_TRACKER_GROUP, member)
+    pub const fn tracker(member: i32) -> Self {
+        Self::new(TRACKER_GROUP, member)
     }
 
     pub const fn multiworld(member: i32) -> Self {
         Self::new(MULTIWORLD_GROUP, member)
+    }
+
+    pub const fn world_events(member: i32) -> Self {
+        Self::new(WORLD_EVENTS_GROUP, member)
     }
 
     pub const fn map_segment(member: i32) -> Self {
@@ -98,8 +103,8 @@ impl UberIdentifier {
         Self::new(ENTRANCES_GROUP, member)
     }
 
-    pub const fn known_entrance_connections(member: i32) -> Self {
-        Self::new(KNOWN_ENTRANCE_CONNECTIONS_GROUP, member)
+    pub const fn entrances_known(member: i32) -> Self {
+        Self::new(ENTRANCES_KNOWN_GROUP, member)
     }
 
     pub const fn settings(member: i32) -> Self {
@@ -208,16 +213,16 @@ impl UberIdentifier {
     pub const GORLEK_ORE: UberIdentifier = UberIdentifier::player(1);
     pub const KEYSTONES: UberIdentifier = UberIdentifier::player(2);
     pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::player(3);
-    pub const SHRIEK_BARRIER: UberIdentifier = UberIdentifier::rando_state(0);
-    pub const CLEAN_WATER: UberIdentifier = UberIdentifier::rando_state(2000);
     pub const BASE_MAX_HEALTH: UberIdentifier = UberIdentifier::player(10);
     pub const MAX_HEALTH: UberIdentifier = UberIdentifier::player(11);
     pub const HEALTH: UberIdentifier = UberIdentifier::player(12);
     pub const BASE_MAX_ENERGY: UberIdentifier = UberIdentifier::player(20);
     pub const MAX_ENERGY: UberIdentifier = UberIdentifier::player(21);
     pub const ENERGY: UberIdentifier = UberIdentifier::player(22);
-    pub const CURRENT_ZONE: UberIdentifier = UberIdentifier::player(50);
-    pub const CURRENT_MAP_ZONE: UberIdentifier = UberIdentifier::player(51);
+    pub const PLAYER_AREA: UberIdentifier = UberIdentifier::player(50);
+    pub const MAP_FOCUSED_AREA: UberIdentifier = UberIdentifier::map(1);
+    pub const SHRIEK_BARRIER: UberIdentifier = UberIdentifier::modifications(0);
+    pub const CLEAN_WATER: UberIdentifier = UberIdentifier::world_events(2000);
     pub const RANDOM_SPIRIT_LIGHT: UberIdentifier = UberIdentifier::settings(0);
 }
 

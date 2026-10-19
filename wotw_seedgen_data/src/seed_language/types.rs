@@ -32,7 +32,7 @@ pub enum Type {
     Teleporter,
     WeaponUpgrade,
     Equipment,
-    Zone,
+    Area,
     GenericIcon,
     OpherIcon,
     LupoIcon,
@@ -196,7 +196,7 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
             | FunctionIdentifier::RemoveCleanWaterString
             | FunctionIdentifier::WeaponUpgradeString
             | FunctionIdentifier::RemoveWeaponUpgradeString => Type::String,
-            FunctionIdentifier::CurrentZone | FunctionIdentifier::CurrentMapZone => Type::Zone,
+            FunctionIdentifier::CurrentArea | FunctionIdentifier::CurrentMapArea => Type::Area,
             FunctionIdentifier::SpiritLight
             | FunctionIdentifier::RemoveSpiritLight
             | FunctionIdentifier::GorlekOre
@@ -378,7 +378,7 @@ impl Constant {
             Constant::Teleporter(_) => Type::Teleporter,
             Constant::WeaponUpgrade(_) => Type::WeaponUpgrade,
             Constant::Equipment(_) => Type::Equipment,
-            Constant::Zone(_) => Type::Zone,
+            Constant::Area(_) => Type::Area,
             Constant::GenericIcon(_) => Type::GenericIcon,
             Constant::OpherIcon(_) => Type::OpherIcon,
             Constant::LupoIcon(_) => Type::LupoIcon,
@@ -415,7 +415,7 @@ impl output::Command {
             Self::Integer(_) => Type::Integer,
             Self::Float(_) => Type::Float,
             Self::String(_) => Type::String,
-            Self::Zone(_) => Type::Zone,
+            Self::Area(_) => Type::Area,
             Self::Void(_) => Type::Void,
         }
     }

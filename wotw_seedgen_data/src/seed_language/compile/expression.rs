@@ -8,16 +8,16 @@ use crate::{
             uber_state_type_error,
         },
         output::{
-            ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger,
-            CommandString, CommandVoid, CommandZone, Comparator, Concatenator, Constant,
-            EqualityComparator, ExecuteOperator, IntoConstant, Literal, LogicOperator, Operation,
-            Reference, StringOrPlaceholder, VariableValue,
+            ArithmeticOperator, Command, CommandArea, CommandBoolean, CommandFloat, CommandInteger,
+            CommandString, CommandVoid, Comparator, Concatenator, Constant, EqualityComparator,
+            ExecuteOperator, IntoConstant, Literal, LogicOperator, Operation, Reference,
+            StringOrPlaceholder, VariableValue,
         },
         types::Type,
     },
-    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor, Icon,
-    LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, UberIdentifier,
-    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+    Alignment, Area, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
+    Icon, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, UberIdentifier,
+    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition,
 };
 use ordered_float::OrderedFloat;
 use std::{borrow::Cow, ops::Range};
@@ -137,9 +137,9 @@ impl<'source> Compile<'source> for ast::Operation<'source> {
                             None
                         }
                     }
-                    Type::Zone => {
+                    Type::Area => {
                         if let Ok(operator) = operator.try_into() {
-                            self.compile_operation::<CommandZone, _, _>(operator, compiler)
+                            self.compile_operation::<CommandArea, _, _>(operator, compiler)
                                 .map(Command::Boolean)
                         } else {
                             compiler.errors.push(operation_error(target, self.span()));
@@ -540,11 +540,11 @@ impl CompileInto for CommandString {
     }
 }
 
-impl CompileInto for CommandZone {
+impl CompileInto for CommandArea {
     fn coerce_command(command: Command) -> Result<Self, String> {
         match command {
-            Command::Zone(command) => Ok(command),
-            other => Err(type_error_message(other.command_type(), Type::Zone)),
+            Command::Area(command) => Ok(command),
+            other => Err(type_error_message(other.command_type(), Type::Area)),
         }
     }
 
@@ -553,7 +553,7 @@ impl CompileInto for CommandZone {
         span: Range<usize>,
         compiler: &mut SnippetCompiler,
     ) -> Option<Self> {
-        <Zone as CompileInto>::coerce_literal(literal, span, compiler).map(Self::from)
+        <Area as CompileInto>::coerce_literal(literal, span, compiler).map(Self::from)
     }
 
     fn coerce_reference(
@@ -563,7 +563,7 @@ impl CompileInto for CommandZone {
     ) -> Option<Self> {
         compiler
             .errors
-            .push(type_error(reference.ty(), Type::Zone, span));
+            .push(type_error(reference.ty(), Type::Area, span));
 
         None
     }
@@ -928,20 +928,21 @@ impl CompileIntoConstant for Equipment {
     }
 }
 
-impl CompileIntoConstant for Zone {
-    const TYPE: Type = Type::Zone;
+impl CompileIntoConstant for Area {
+    const TYPE: Type = Type::Area;
 
     fn coerce_constant(constant: Constant) -> Option<Self> {
         match constant {
             Constant::Teleporter(teleporter) => match teleporter {
-                Teleporter::Marsh => Some(Zone::Marsh),
-                Teleporter::Hollow => Some(Zone::Hollow),
-                Teleporter::Glades => Some(Zone::Glades),
-                Teleporter::Wellspring => Some(Zone::Wellspring),
-                Teleporter::Burrows => Some(Zone::Burrows),
-                Teleporter::Reach => Some(Zone::Reach),
-                Teleporter::Depths => Some(Zone::Depths),
-                Teleporter::Willow => Some(Zone::Willow),
+                Teleporter::Marsh => Some(Area::Marsh),
+                Teleporter::Hollow => Some(Area::Hollow),
+                Teleporter::Glades => Some(Area::Glades),
+                Teleporter::Wellspring => Some(Area::Wellspring),
+                Teleporter::Burrows => Some(Area::Burrows),
+                Teleporter::Reach => Some(Area::Reach),
+                Teleporter::Depths => Some(Area::Depths),
+                Teleporter::Ruins => Some(Area::Ruins),
+                Teleporter::Willow => Some(Area::Willow),
                 Teleporter::Den
                 | Teleporter::WoodsEntrance
                 | Teleporter::WoodsExit
@@ -949,11 +950,10 @@ impl CompileIntoConstant for Zone {
                 | Teleporter::PoolsBoss
                 | Teleporter::FeedingGrounds
                 | Teleporter::CentralWastes
-                | Teleporter::OuterRuins
-                | Teleporter::InnerRuins
+                | Teleporter::UpperWastes
                 | Teleporter::Shriek => None,
             },
-            Constant::Zone(zone) => Some(zone),
+            Constant::Area(area) => Some(area),
             _ => None,
         }
     }

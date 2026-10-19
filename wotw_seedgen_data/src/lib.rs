@@ -7,6 +7,7 @@ pub use wotw_seedgen_parse as parse;
 pub use strum::{VariantArray, VariantNames};
 
 mod action;
+mod area;
 pub mod assets;
 mod env;
 mod eq_ignore;
@@ -26,9 +27,9 @@ mod test_logger;
 mod uber_identifier;
 mod weapon_upgrade;
 mod wheel;
-mod zone;
 
 pub use action::InputAction;
+pub use area::Area;
 pub use env::env_or;
 pub use eq_ignore::EqIgnore;
 pub use equipment::{EquipSlot, Equipment};
@@ -48,4 +49,3 @@ pub use test_logger::test_logger;
 pub use uber_identifier::{CommonUberIdentifier, ShopKind, UberIdentifier};
 pub use weapon_upgrade::WeaponUpgrade;
 pub use wheel::{WheelBind, WheelItemPosition};
-pub use zone::Zone;

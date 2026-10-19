@@ -1,7 +1,7 @@
 use super::{SeedSettingsArgs, LITERAL};
 use clap::{builder::styling::Reset, error::ErrorKind, Args, Parser, ValueHint};
 use std::{num::NonZeroUsize, str::FromStr};
-use wotw_seedgen::data::Zone;
+use wotw_seedgen::data::Area;
 
 #[derive(Args)]
 pub struct StatsArgs {
@@ -62,15 +62,15 @@ pub enum Analyzer {
         result_bucket_size: NonZeroUsize,
     },
     #[command(about = format!(
-        "Analyzes what zone an item is placed in\n\
-        Use '{literal}item-zone:<item-name>{reset}' to specify which item to analyze (Example: '{literal}item-zone:Launch{reset}')",
+        "Analyzes what area an item is placed in\n\
+        Use '{literal}item-area:<item-name>{reset}' to specify which item to analyze (Example: '{literal}item-area:Launch{reset}')",
         literal = LITERAL.render(),
         reset = Reset.render(),
     ))]
-    ItemZone { item: String },
+    ItemArea { item: String },
     #[command(about = format!(
         "Analyzes what item gets placed on a location\n\
-        Use '{literal}location-item:<location>{reset}' to specify which location to analyze (Example: '{literal}location-item:Glades.RebuildGlades.Reward{reset}')",
+        Use '{literal}location-item:<location>{reset}' to specify which location to analyze (Example: '{literal}location-item:Glades.RebuildGlades.Completed{reset}')",
         literal = LITERAL.render(),
         reset = Reset.render(),
     ))]
@@ -108,26 +108,26 @@ pub enum Analyzer {
     // TODO test
     // TODO available values
     #[command(about = format!(
-        "Analyzes how much Spirit Light is in a zone\n\
-        Use '{literal}zone-spirit-light:<zone>{reset}' to specify which zone to analyze (Example: '{literal}zone-spirit-light:wellspring{reset}')\n\
-        Optionally use '{literal}zone-spirit-light:<zone>,<result-bucket-size>{reset}' to group results together in buckets",
+        "Analyzes how much Spirit Light is in a area\n\
+        Use '{literal}area-spirit-light:<area>{reset}' to specify which area to analyze (Example: '{literal}area-spirit-light:wellspring{reset}')\n\
+        Optionally use '{literal}area-spirit-light:<area>,<result-bucket-size>{reset}' to group results together in buckets",
         literal = LITERAL.render(),
         reset = Reset.render(),
     ))]
-    ZoneSpiritLight {
-        zone: Zone,
+    AreaSpiritLight {
+        area: Area,
         #[arg(default_value = "1")]
         result_bucket_size: NonZeroUsize,
     },
     #[command(about = format!(
-        "Analyzes how many locations are reachable when a zone unlocks\n\
-        Use '{literal}zone-unlock:<zone>{reset}' to specify which zone to analyze (Example: '{literal}zone-unlock:wellspring{reset}')\n\
-        Optionally use '{literal}zone-unlock:<zone>,<result-bucket-size>{reset}' to group results together in buckets",
+        "Analyzes how many locations are reachable when a area unlocks\n\
+        Use '{literal}area-unlock:<area>{reset}' to specify which area to analyze (Example: '{literal}area-unlock:wellspring{reset}')\n\
+        Optionally use '{literal}area-unlock:<area>,<result-bucket-size>{reset}' to group results together in buckets",
         literal = LITERAL.render(),
         reset = Reset.render(),
     ))]
-    ZoneUnlock {
-        zone: Zone,
+    AreaUnlock {
+        area: Area,
         #[arg(default_value = "1")]
         result_bucket_size: NonZeroUsize,
     },

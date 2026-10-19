@@ -12,7 +12,7 @@ use crate::{
         },
         types::Type,
     },
-    Position, UberIdentifier, Zone,
+    Area, Position, UberIdentifier,
 };
 use ordered_float::OrderedFloat;
 use rand::RngExt;
@@ -132,13 +132,13 @@ impl<'source> Compile<'source> for ast::Command<'source> {
             ast::Command::Preplace(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::ZoneOf(_, command) => {
+            ast::Command::AreaOf(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::ItemOn(_, command) => {
                 command.compile(compiler);
             }
-            ast::Command::CountInZone(_, command) => {
+            ast::Command::CountInArea(_, command) => {
                 command.compile(compiler);
             }
             ast::Command::RandomBoolean(_, command) => {
@@ -1254,20 +1254,20 @@ impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
 
-        let zone = get_command_arg(self.zone).and_then(|zone| zone.evaluate(compiler));
+        let area = get_command_arg(self.area).and_then(|area| area.evaluate(compiler));
 
-        if let (Some(item), Some(zone)) = (item, zone) {
+        if let (Some(item), Some(area)) = (item, area) {
             compiler
                 .global
                 .output
                 .modifiers
                 .preplacements
-                .push((item, zone));
+                .push((item, area));
         }
     }
 }
 
-impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
+impl<'source> Compile<'source> for ast::AreaOfArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
@@ -1283,7 +1283,7 @@ impl<'source> Compile<'source> for ast::ZoneOfArgs<'source> {
         if let Some(item) = item {
             compiler.define_variable(
                 self.identifier.data,
-                Literal::String(StringOrPlaceholder::ZoneOfPlaceholder(Box::new(item))),
+                Literal::String(StringOrPlaceholder::AreaOfPlaceholder(Box::new(item))),
             );
         }
     }
@@ -1304,12 +1304,12 @@ impl<'source> Compile<'source> for ast::ItemOnArgs<'source> {
     }
 }
 
-impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
+impl<'source> Compile<'source> for ast::CountInAreaArgs<'source> {
     type Output = ();
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        let zone_bindings = self
-            .zone_bindings
+        let area_bindings = self
+            .area_bindings
             .compile(compiler)
             .into_iter()
             .flatten()
@@ -1332,25 +1332,25 @@ impl<'source> Compile<'source> for ast::CountInZoneArgs<'source> {
             })
             .collect::<Vec<_>>();
 
-        for (identifier, zone) in zone_bindings {
+        for (identifier, area) in area_bindings {
             compiler.define_variable(
                 identifier,
-                Literal::String(StringOrPlaceholder::CountInZonePlaceholder(
+                Literal::String(StringOrPlaceholder::CountInAreaPlaceholder(
                     items.clone(),
-                    zone,
+                    area,
                 )),
             );
         }
     }
 }
 
-impl<'source> Compile<'source> for ast::CountInZoneBinding<'source> {
-    type Output = Option<(Identifier<'source>, Zone)>;
+impl<'source> Compile<'source> for ast::CountInAreaBinding<'source> {
+    type Output = Option<(Identifier<'source>, Area)>;
 
     fn compile(self, compiler: &mut SnippetCompiler<'source, '_, '_, '_, '_>) -> Self::Output {
-        get_command_arg(self.zone)
-            .and_then(|zone| zone.evaluate(compiler))
-            .map(|zone| (self.identifier.data, zone))
+        get_command_arg(self.area)
+            .and_then(|area| area.evaluate(compiler))
+            .map(|area| (self.identifier.data, area))
     }
 }
 

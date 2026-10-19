@@ -10,7 +10,7 @@
 !config_boolean(eyes, true, "Eyes")
 !config_boolean(heart, true, "Heart")
 
-!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, add_missing_goal_in_zone, update_goals)
+!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, add_missing_goal_in_area, update_goals)
 !include("list_core", new_row, add_row_item, add_current_row)
 
 !if randomize {
@@ -36,66 +36,66 @@
     !if wisps_required < max_wisps { !tags(tag) }
 }
 
-on spawn store(itemTracker.wispsRequired, wisps_required)
+on spawn store(tracker.wispsRequired, wisps_required)
 
 !augment_fun(check_goals_completed(), {
-    if itemTracker.wispsCount < wisps_required set_boolean("goals_completed", false)
+    if tracker.wispsCollected < wisps_required set_boolean("goals_completed", false)
 })
 
 !augment_fun(write_short_goals_row(), {
-    set_string("wisps_message", "Wisps: " + itemTracker.wispsCount + "/" + wisps_required)
-    if itemTracker.wispsCount >= wisps_required set_string("wisps_message", "$" + get_string("wisps_message") + "$")
+    set_string("wisps_message", "Wisps: " + tracker.wispsCollected + "/" + wisps_required)
+    if tracker.wispsCollected >= wisps_required set_string("wisps_message", "$" + get_string("wisps_message") + "$")
     add_row_item(get_string("wisps_message"))
 })
 
-!augment_fun(write_missing_goals(), if itemTracker.wispsCount < wisps_required write_missing_wisps())
+!augment_fun(write_missing_goals(), if tracker.wispsCollected < wisps_required write_missing_wisps())
 
-fun write_missing_wisps() { new_row("Missing Wisps (" + (wisps_required - itemTracker.wispsCount) + "): ") }
-!if voice { !augment_fun(write_missing_wisps(), if Hollow.Wisp == false add_missing_goal_in_zone("Voice", current_zone() == Hollow)) }
-!if strength { !augment_fun(write_missing_wisps(), if Pools.Wisp == false add_missing_goal_in_zone("Strength", current_zone() == Pools)) }
-!if memory { !augment_fun(write_missing_wisps(), if Reach.Wisp == false add_missing_goal_in_zone("Memory", current_zone() == Reach)) }
-!if eyes { !augment_fun(write_missing_wisps(), if Depths.Wisp == false add_missing_goal_in_zone("Eyes", current_zone() == Depths)) }
-!if heart { !augment_fun(write_missing_wisps(), if Ruins.Wisp == false add_missing_goal_in_zone("Heart", current_zone() == Ruins)) }
+fun write_missing_wisps() { new_row("Missing Wisps (" + (wisps_required - tracker.wispsCollected) + "): ") }
+!if voice { !augment_fun(write_missing_wisps(), if Hollow.Wisp == false add_missing_goal_in_area("Voice", current_area() == Hollow)) }
+!if strength { !augment_fun(write_missing_wisps(), if Pools.Wisp == false add_missing_goal_in_area("Strength", current_area() == Pools)) }
+!if memory { !augment_fun(write_missing_wisps(), if Reach.Wisp == false add_missing_goal_in_area("Memory", current_area() == Reach)) }
+!if eyes { !augment_fun(write_missing_wisps(), if Depths.Wisp == false add_missing_goal_in_area("Eyes", current_area() == Depths)) }
+!if heart { !augment_fun(write_missing_wisps(), if Ruins.Wisp == false add_missing_goal_in_area("Heart", current_area() == Ruins)) }
 !augment_fun(write_missing_wisps(), add_current_row())
 
-on change itemTracker.wispsCount update_goals()
+on change tracker.wispsCollected update_goals()
 
 !if voice {
     on Hollow.Wisp {
         create_stats_entry(Wisp, "Voice")
-        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+        store(tracker.wispsCollected, tracker.wispsCollected + 1)
     }
-    on Hollow.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+    on Hollow.Wisp == false store(tracker.wispsCollected, tracker.wispsCollected - 1)
 }
 
 !if strength {
     on Pools.Wisp {
         create_stats_entry(Wisp, "Strength")
-        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+        store(tracker.wispsCollected, tracker.wispsCollected + 1)
     }
-    on Pools.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+    on Pools.Wisp == false store(tracker.wispsCollected, tracker.wispsCollected - 1)
 }
 
 !if memory {
     on Reach.Wisp {
         create_stats_entry(Wisp, "Memory")
-        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+        store(tracker.wispsCollected, tracker.wispsCollected + 1)
     }
-    on Reach.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+    on Reach.Wisp == false store(tracker.wispsCollected, tracker.wispsCollected - 1)
 }
 
 !if eyes {
     on Depths.Wisp {
         create_stats_entry(Wisp, "Eyes")
-        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+        store(tracker.wispsCollected, tracker.wispsCollected + 1)
     }
-    on Depths.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+    on Depths.Wisp == false store(tracker.wispsCollected, tracker.wispsCollected - 1)
 }
 
 !if heart {
     on Ruins.Wisp {
         create_stats_entry(Wisp, "Heart")
-        store(itemTracker.wispsCount, itemTracker.wispsCount + 1)
+        store(tracker.wispsCollected, tracker.wispsCollected + 1)
     }
-    on Ruins.Wisp == false store(itemTracker.wispsCount, itemTracker.wispsCount - 1)
+    on Ruins.Wisp == false store(tracker.wispsCollected, tracker.wispsCollected - 1)
 }

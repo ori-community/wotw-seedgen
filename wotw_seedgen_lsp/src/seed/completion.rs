@@ -9,28 +9,28 @@ use wotw_seedgen_data::{
     },
     seed_language::{
         ast::{
-            Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AugmentFunArgs,
-            ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf, CommandOnlySimulation,
-            CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs, ConfigFloatRangeArgs,
-            ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs, ConfigType,
-            ConstantDiscriminants, Content, CountInZoneArgs, CountInZoneBinding,
+            Action, ActionCondition, AddItemArgs, AddSpiritLightArgs, Annotation, AreaOfArgs,
+            AugmentFunArgs, ChangeItemPoolArgs, ClientEvent, Command, CommandArg, CommandIf,
+            CommandOnlySimulation, CommandRepeat, ConfigArgs, ConfigBooleanArgs, ConfigFloatArgs,
+            ConfigFloatRangeArgs, ConfigIntegerArgs, ConfigIntegerRangeArgs, ConfigRangeArgs,
+            ConfigType, ConstantDiscriminants, Content, CountInAreaArgs, CountInAreaBinding,
             DifficultyConfirmationArgs, DifficultyLabelArgs, DifficultyVisibleArgs, Event,
             EventContent, Expression, ExpressionValue, FunctionCall, FunctionDefinition,
             GameDifficulty, ItemDataArgs, ItemDataDescriptionArgs, ItemDataIconArgs,
             ItemDataMapIconArgs, ItemDataNameArgs, ItemDataPriceArgs, ItemOnArgs, LetArgs, Literal,
-            RandomPlacementSlotsArgs, NoRandomPlacementArgs, Operation, PreplaceArgs, RandomFloatArgs,
-            RandomIntegerArgs, RandomNumberArgs, RandomPoolArgs, RemoveItemArgs,
+            NoRandomPlacementArgs, Operation, PreplaceArgs, RandomFloatArgs, RandomIntegerArgs,
+            RandomNumberArgs, RandomPlacementSlotsArgs, RandomPoolArgs, RemoveItemArgs,
             RemoveSpiritLightArgs, SeparatedNonEmpty, SetConfigArgs, Snippet, Span, SpawnArgs,
             StateArgs, TagsArg, Trigger, TriggerBinding, UberIdentifier, UberIdentifierName,
-            UberIdentifierNumeric, UberStateType, ZoneOfArgs,
+            UberIdentifierNumeric, UberStateType,
         },
         compile::FunctionIdentifier,
         types::Type,
     },
-    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon,
+    Alignment, Area, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon,
     HorizontalAnchor, InputAction, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter,
     TuleyIcon, VariantArray, VariantNames, VerticalAnchor, WeaponUpgrade, WheelBind,
-    WheelItemPosition, Zone,
+    WheelItemPosition,
 };
 
 // TODO add controlflow functionality to handler trait and use it here?
@@ -425,7 +425,7 @@ static EQUIPMENT_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
 });
 
 static ZONE_COMPLETION: LazyLock<Vec<CompletionItem>> =
-    LazyLock::new(|| enum_member_completions_full(Zone::VARIANTS, "Zone", |zone| *zone as u8));
+    LazyLock::new(|| enum_member_completions_full(Area::VARIANTS, "Area", |area| *area as u8));
 
 static GENERIC_ICON_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
     enum_member_completions_full(GenericIcon::VARIANTS, "GenericIcon", |generic_icon| {
@@ -527,7 +527,7 @@ fn constant_member_completion(kind: ConstantDiscriminants) -> Vec<CompletionItem
         ConstantDiscriminants::Teleporter => TELEPORTER_COMPLETION.clone(),
         ConstantDiscriminants::WeaponUpgrade => WEAPON_UPGRADE_COMPLETION.clone(),
         ConstantDiscriminants::Equipment => EQUIPMENT_COMPLETION.clone(),
-        ConstantDiscriminants::Zone => ZONE_COMPLETION.clone(),
+        ConstantDiscriminants::Area => ZONE_COMPLETION.clone(),
         ConstantDiscriminants::GenericIcon => GENERIC_ICON_COMPLETION.clone(),
         ConstantDiscriminants::OpherIcon => OPHER_ICON_COMPLETION.clone(),
         ConstantDiscriminants::LupoIcon => LUPO_ICON_COMPLETION.clone(),
@@ -906,14 +906,14 @@ impl CompletionInSpan for Command<'_> {
             Command::Preplace(preplace, args) => {
                 args.span_checked_completion((preplace, args).span(), index, cache)
             }
-            Command::ZoneOf(zone_of, args) => {
-                args.span_checked_completion((zone_of, args).span(), index, cache)
+            Command::AreaOf(area_of, args) => {
+                args.span_checked_completion((area_of, args).span(), index, cache)
             }
             Command::ItemOn(item_on, args) => {
                 args.span_checked_completion((item_on, args).span(), index, cache)
             }
-            Command::CountInZone(count_in_zone, args) => {
-                args.span_checked_completion((count_in_zone, args).span(), index, cache)
+            Command::CountInArea(count_in_area, args) => {
+                args.span_checked_completion((count_in_area, args).span(), index, cache)
             }
             Command::RandomBoolean(_, _) => None,
             Command::RandomInteger(random_integer, args) => {
@@ -1398,7 +1398,7 @@ impl CompletionInSpan for PreplaceArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
             .completion(index, cache)
-            .or_else(|| self.zone.completion(index, cache))
+            .or_else(|| self.area.completion(index, cache))
     }
 }
 
@@ -1408,13 +1408,13 @@ impl ErrCompletion for PreplaceArgs<'_> {
     }
 }
 
-impl CompletionInSpan for ZoneOfArgs<'_> {
+impl CompletionInSpan for AreaOfArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item.completion(index, cache)
     }
 }
 
-impl ErrCompletion for ZoneOfArgs<'_> {
+impl ErrCompletion for AreaOfArgs<'_> {
     fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
@@ -1432,27 +1432,27 @@ impl ErrCompletion for ItemOnArgs<'_> {
     }
 }
 
-impl CompletionInSpan for CountInZoneArgs<'_> {
+impl CompletionInSpan for CountInAreaArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        self.zone_bindings
+        self.area_bindings
             .completion(index, cache)
             .or_else(|| self.items.completion(index, cache))
     }
 }
 
-impl ErrCompletion for CountInZoneArgs<'_> {
+impl ErrCompletion for CountInAreaArgs<'_> {
     fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }
 }
 
-impl CompletionInSpan for CountInZoneBinding<'_> {
+impl CompletionInSpan for CountInAreaBinding<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
-        self.zone.completion(index, cache)
+        self.area.completion(index, cache)
     }
 }
 
-impl ErrCompletion for CountInZoneBinding<'_> {
+impl ErrCompletion for CountInAreaBinding<'_> {
     fn err_completion(_cache: &CacheValues) -> Vec<CompletionItem> {
         vec![]
     }

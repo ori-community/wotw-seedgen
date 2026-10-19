@@ -7,13 +7,13 @@
 //!
 //! let input = "
 //! Identifier, Condition
-//! MarshSpawn.TeleporterActive, 21786|10185
+//! Marsh.Spawn.Teleporter, 21786|10185
 //! ";
 //! let states = States::from_reader(input.as_bytes()).unwrap();
 //!
 //! assert_eq!(states.entries, vec![
 //!     StatesEntry {
-//!         identifier: "MarshSpawn.TeleporterActive".to_string(),
+//!         identifier: "Marsh.Spawn.Teleporter".to_string(),
 //!         uber_identifier: UberIdentifier::new(21786, 10185),
 //!         value: None,
 //!     }

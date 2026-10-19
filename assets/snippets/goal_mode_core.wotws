@@ -22,16 +22,16 @@ fun write_missing_goals() {
     new_column("")
 }
 
-!export(add_missing_goal_in_zone)
-fun add_missing_goal_in_zone(name: String, is_current_zone: Boolean) {
-    if is_current_zone add_row_item("#" + name + "#")
-    if is_current_zone == false add_row_item(name)
+!export(add_missing_goal_in_area)
+fun add_missing_goal_in_area(name: String, is_current_area: Boolean) {
+    if is_current_area add_row_item("#" + name + "#")
+    if is_current_area == false add_row_item(name)
 }
 
 !export(update_goals)
 fun update_goals() {
     check_goals_completed()
-    store(randoState.shriekBarrier, get_boolean("goals_completed") == false)
+    store(modifications.enableShriekBarrier, get_boolean("goals_completed") == false)
 
     update_progress_message()
     update_missing_goals()
@@ -48,14 +48,14 @@ fun update_goals() {
 on binding1 if disable_keybinds == false show_missing_goals()
 
 fun show_missing_goals() {
-    if randoState.shriekBarrier {
+    if modifications.enableShriekBarrier {
         if get_boolean("in_shriek_room") priority_message("Already at Shriek")
         if get_boolean("in_shriek_room") == false {
             write_missing_goals()
             controlled_priority_message("missing_goals", get_string("column"), 6)
         }
     }
-    if randoState.shriekBarrier == false priority_message("All Goals completed")
+    if modifications.enableShriekBarrier == false priority_message("All Goals completed")
 }
 
 on reload {
@@ -71,7 +71,7 @@ on reload {
     position_trigger_rectangle("shriek_room", 520, -3617, 744, -3503)
     position_trigger_enter_callback("shriek_room", {
         set_boolean("in_shriek_room", true)
-        if randoState.shriekBarrier {
+        if modifications.enableShriekBarrier {
             write_missing_goals()
             set_string("column", "<s_0.9><ls_0.9>@" + get_string("column") + "@")
             free_message("missing_goals", get_string("column"))
@@ -86,14 +86,14 @@ on reload {
     update_goals()
 }
 
-// Need this because the zone updates 1 frame delayed from the position change
-// It's also useful for snippets that highlight message parts based on the current zone
-on change player.currentArea update_missing_goals()
+// Need this because the area updates 1 frame delayed from the position change
+// It's also useful for snippets that highlight message parts based on the current area
+on change player.area update_missing_goals()
 fun update_missing_goals() {
     write_missing_goals()
     if get_boolean("in_shriek_room") set_string("column", "<s_0.9><ls_0.9>@" + get_string("column") + "@")
     set_message_text("missing_goals", get_string("column"))
 }
 
-on player.currentMapArea != -1 free_message_hide("missing_goals", false)
-on player.currentMapArea == -1 free_message_show("missing_goals", false, false)
+on map.focusedArea != -1 free_message_hide("missing_goals", false)
+on map.focusedArea == -1 free_message_show("missing_goals", false, false)

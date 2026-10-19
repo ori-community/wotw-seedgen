@@ -1,8 +1,8 @@
 use crate::seed_language::output::TriggerCondition;
 
 use super::{
-    intermediate::Literal, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-    CommandVoid, CommandZone, Event, Operation, StringOrPlaceholder, Trigger,
+    intermediate::Literal, Command, CommandArea, CommandBoolean, CommandFloat, CommandInteger,
+    CommandString, CommandVoid, Event, Operation, StringOrPlaceholder, Trigger,
 };
 use itertools::Itertools;
 use logos::Logos;
@@ -30,12 +30,12 @@ impl Display for StringOrPlaceholder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             StringOrPlaceholder::Value(string) => write!(f, "\"{string}\""),
-            StringOrPlaceholder::ZoneOfPlaceholder(item) => {
-                write!(f, "zone_of({item})")
+            StringOrPlaceholder::AreaOfPlaceholder(item) => {
+                write!(f, "area_of({item})")
             }
             StringOrPlaceholder::ItemOnPlaceholder(trigger) => write!(f, "item_on({trigger})"),
-            StringOrPlaceholder::CountInZonePlaceholder(items, zone) => {
-                write!(f, "count_in_zone({zone}, [{}])", items.iter().format(", "))
+            StringOrPlaceholder::CountInAreaPlaceholder(items, area) => {
+                write!(f, "count_in_area({area}, [{}])", items.iter().format(", "))
             }
         }
     }
@@ -76,7 +76,7 @@ impl Display for Command {
             Command::Integer(command) => command.fmt(f),
             Command::Float(command) => command.fmt(f),
             Command::String(command) => command.fmt(f),
-            Command::Zone(command) => command.fmt(f),
+            Command::Area(command) => command.fmt(f),
             Command::Void(command) => command.fmt(f),
         }
     }
@@ -92,7 +92,7 @@ impl Display for CommandBoolean {
             CommandBoolean::CompareInteger { operation } => operation.fmt(f),
             CommandBoolean::CompareFloat { operation } => operation.fmt(f),
             CommandBoolean::CompareString { operation } => operation.fmt(f),
-            CommandBoolean::CompareZone { operation } => operation.fmt(f),
+            CommandBoolean::CompareArea { operation } => operation.fmt(f),
             CommandBoolean::LogicOperation { operation } => operation.fmt(f),
             CommandBoolean::FetchBoolean { uber_identifier } => {
                 write!(f, "fetch({uber_identifier})")
@@ -161,13 +161,13 @@ impl Display for CommandString {
     }
 }
 
-impl Display for CommandZone {
+impl Display for CommandArea {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            CommandZone::Constant { value } => value.fmt(f),
-            CommandZone::Multi { commands, last } => multi(f, commands, last),
-            CommandZone::CurrentZone {} => write!(f, "current_zone()"),
-            CommandZone::CurrentMapZone {} => write!(f, "current_map_zone()"),
+            CommandArea::Constant { value } => value.fmt(f),
+            CommandArea::Multi { commands, last } => multi(f, commands, last),
+            CommandArea::PlayerArea {} => write!(f, "current_area()"),
+            CommandArea::MapFocusedArea {} => write!(f, "current_map_area()"),
         }
     }
 }

@@ -10,30 +10,30 @@
 
 !if (cards) {
   !augment_fun(check_goals_completed(), {
-    if bingoState.squares < amount set_boolean("goals_completed", false)
+    if bingo.squares < amount set_boolean("goals_completed", false)
   })
 
   !augment_fun(write_missing_goals(), {
-      if bingoState.squares < amount {
+      if bingo.squares < amount {
           set_string("color", "@")
-          add_row(get_string("color") + "Cards: " + bingoState.squares + "/" + amount + get_string("color"))
+          add_row(get_string("color") + "Cards: " + bingo.squares + "/" + amount + get_string("color"))
       }
   })
 
-  on change bingoState.squares update_goals()
+  on change bingo.squares update_goals()
 }
 
 !if (cards == false) {
   !augment_fun(check_goals_completed(), {
-    if bingoState.lines < amount set_boolean("goals_completed", false)
+    if bingo.lines < amount set_boolean("goals_completed", false)
   })
 
   !augment_fun(write_missing_goals(), {
-      if bingoState.lines < amount {
+      if bingo.lines < amount {
           set_string("color", "@")
-          add_row(get_string("color") + "Lines: " + bingoState.lines + "/" + amount + get_string("color"))
+          add_row(get_string("color") + "Lines: " + bingo.lines + "/" + amount + get_string("color"))
       }
   })
 
-  on change bingoState.lines update_goals()
+  on change bingo.lines update_goals()
 }

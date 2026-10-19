@@ -1,8 +1,8 @@
 #category("Hints")
-#name("Zone Hints")
-#description("Lupo's maps give information about the number of important items in the current zone. Lupo in Glades sells the hints for Woods and Glades.")
+#name("Area Hints")
+#description("Lupo's maps give information about the number of important items in the current area. Lupo in Glades sells the hints for Woods and Glades.")
 
-!tags("Zone Hints")
+!tags("Area Hints")
 
 !config_boolean(skill_hints, true, "Skill Hints", "Lupo reveals the amount of skills in an area")
 !config_boolean(teleporter_hints, true, "Teleporter Hints", "Lupo reveals the amount of teleporters in an area")
@@ -10,24 +10,24 @@
 !include("progress_helper", write_progress_message, write_map_progress_message)
 !include("list_core", add_row)
 
-!augment_fun(write_progress_message(), write_hints(player.currentArea))
-!augment_fun(write_map_progress_message(), write_hints(player.currentMapArea))
+!augment_fun(write_progress_message(), write_hints(player.area))
+!augment_fun(write_map_progress_message(), write_hints(map.focusedArea))
 
-fun write_hints(zone: Integer) {
+fun write_hints(area: Integer) {
     set_string("hint", "")
 
-    // TODO have to write the zone integers here, no way to pass the zone type around
-    if zone == 0 && Marsh.LupoMap write_marsh_hint()
-    if zone == 1 && Hollow.LupoMap write_hollow_hint()
-    if zone == 2 && Shop.Lupo.Slot1 write_glades_hint()
-    if zone == 3 && Wellspring.LupoMap write_wellspring_hint()
-    if zone == 4 && Shop.Lupo.Slot2 write_woods_hint()
-    if zone == 5 && Reach.LupoMap write_reach_hint()
-    if zone == 6 && Depths.LupoMap write_depths_hint()
-    if zone == 7 && Pools.LupoMap write_pools_hint()
-    if zone == 8 && Wastes.LupoMap write_wastes_hint()
-    if zone == 10 && Willow.LupoMap write_willow_hint()
-    if zone == 11 && Burrows.LupoMap write_burrows_hint()
+    // TODO have to write the area integers here, no way to pass the area type around
+    if area == 0 && Marsh.LupoMap write_marsh_hint()
+    if area == 1 && Hollow.LupoMap write_hollow_hint()
+    if area == 2 && Shop.Lupo.Slot1 write_glades_hint()
+    if area == 3 && Wellspring.LupoMap write_wellspring_hint()
+    if area == 4 && Shop.Lupo.Slot2 write_woods_hint()
+    if area == 5 && Reach.LupoMap write_reach_hint()
+    if area == 6 && Depths.LupoMap write_depths_hint()
+    if area == 7 && Pools.LupoMap write_pools_hint()
+    if area == 8 && Wastes.LupoMap write_wastes_hint()
+    if area == 10 && Willow.LupoMap write_willow_hint()
+    if area == 11 && Burrows.LupoMap write_burrows_hint()
 
     if get_string("hint") != "" add_row(get_string("hint"))
 }
@@ -49,7 +49,7 @@ fun write_burrows_hint() {}
 !if skill_hints {
     !let(description, "skills")
 
-    !count_in_zone(
+    !count_in_area(
         [
             (skills_in_marsh, Marsh),
             (skills_in_hollow, Hollow),
@@ -84,7 +84,7 @@ fun write_burrows_hint() {}
             store(skills.blaze, true),
             store(skills.sentry, true),
             store(skills.flap, true),
-            store(randoState.cleanWater, true),
+            store(worldEvents.cleanWater, true),
         ]
     )
 
@@ -133,7 +133,7 @@ fun write_burrows_hint() {}
         !let(description, "teleporters")
     }
 
-    !count_in_zone(
+    !count_in_area(
         [
             (teleporters_in_marsh, Marsh),
             (teleporters_in_hollow, Hollow),
@@ -148,24 +148,24 @@ fun write_burrows_hint() {}
             (teleporters_in_burrows, Burrows),
         ],
         [
-            store(MarshSpawn.TeleporterActive, true),
-            store(HowlsDen.TeleporterActive, true),
-            store(EastHollow.TeleporterActive, true),
-            store(GladesTown.TeleporterActive, true),
-            store(InnerWellspring.TeleporterActive, true),
-            store(MidnightBurrows.TeleporterActive, true),
-            store(WoodsEntry.TeleporterActive, true),
-            store(WoodsMain.TeleporterActive, true),
-            store(LowerReach.TeleporterActive, true),
-            store(UpperDepths.TeleporterActive, true),
-            store(EastPools.TeleporterActive, true),
-            store(WestPools.TeleporterActive, true),
-            store(LowerWastes.FeedingGroundsTeleporterActive, true),
-            store(LowerWastes.CentralTeleporterActive, true),
-            store(UpperWastes.TeleporterActive, true),
-            store(WindtornRuins.TeleporterActive, true),
-            store(WillowsEnd.InnerTeleporterActive, true),
-            store(WillowsEnd.ShriekTeleporterActive, true),
+            store(Marsh.Spawn.Teleporter, true),
+            store(Marsh.Den.Teleporter, true),
+            store(Hollow.Teleporter, true),
+            store(Glades.Teleporter, true),
+            store(Wellspring.Teleporter, true),
+            store(Burrows.Teleporter, true),
+            store(Woods.EntranceTeleporter, true),
+            store(Woods.ExitTeleporter, true),
+            store(Reach.Teleporter, true),
+            store(Depths.Teleporter, true),
+            store(Pools.CentralTeleporter, true),
+            store(Pools.BossTeleporter, true),
+            store(Woods.FeedingGrounds.Teleporter, true),
+            store(Wastes.CentralTeleporter, true),
+            store(Wastes.UpperTeleporter, true),
+            store(Ruins.Teleporter, true),
+            store(Willow.Teleporter, true),
+            store(Willow.Shriek.Teleporter, true),
         ]
     )
 

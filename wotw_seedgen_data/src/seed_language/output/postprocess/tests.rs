@@ -9,12 +9,12 @@ use crate::{
         ast::ClientEvent,
         compile::{clean_water, store_boolean},
         output::{
-            postprocess::{count_in_zone_message, postprocess},
+            postprocess::{count_in_area_message, postprocess},
             CommandString, CommandVoid, CommandsOutput, Event, IntermediateOutput, ItemMetadata,
             PlaceholderMap, StringOrPlaceholder, Trigger,
         },
     },
-    UberIdentifier, Zone,
+    Area, UberIdentifier,
 };
 
 static MARSH_TRIGGER: LazyLock<Trigger> = LazyLock::new(|| {
@@ -22,7 +22,7 @@ static MARSH_TRIGGER: LazyLock<Trigger> = LazyLock::new(|| {
         .expect_pickups()
         .entries
         .iter()
-        .find(|entry| entry.zone == Zone::Marsh && entry.value.is_none())
+        .find(|entry| entry.area == Area::Marsh && entry.value.is_none())
         .unwrap()
         .uber_identifier;
 
@@ -41,9 +41,9 @@ macro_rules! test {
 }
 
 #[test]
-fn zone_of() {
+fn area_of() {
     for command in [clean_water(), test_call_function()] {
-        let placeholder = StringOrPlaceholder::ZoneOfPlaceholder(Box::new(command.clone()));
+        let placeholder = StringOrPlaceholder::AreaOfPlaceholder(Box::new(command.clone()));
 
         test!(
             [test_output(vec![
@@ -52,7 +52,7 @@ fn zone_of() {
             ])],
             [FxHashMap::from_iter([(
                 placeholder.clone(),
-                Zone::Marsh.to_string().into()
+                Area::Marsh.to_string().into()
             )])],
         );
 
@@ -67,7 +67,7 @@ fn zone_of() {
             [
                 FxHashMap::from_iter([(
                     placeholder,
-                    format!("<world>1</>'s {}", Zone::Marsh).into()
+                    format!("<world>1</>'s {}", Area::Marsh).into()
                 )]),
                 FxHashMap::default(),
             ],
@@ -95,10 +95,10 @@ fn item_on() {
 }
 
 #[test]
-fn count_in_zone() {
+fn count_in_area() {
     for command in [clean_water(), test_call_function()] {
         let placeholder =
-            StringOrPlaceholder::CountInZonePlaceholder(vec![command.clone()], Zone::Marsh);
+            StringOrPlaceholder::CountInAreaPlaceholder(vec![command.clone()], Area::Marsh);
 
         test!(
             [test_output(vec![
@@ -107,7 +107,7 @@ fn count_in_zone() {
             ])],
             [FxHashMap::from_iter([(
                 placeholder.clone(),
-                count_in_zone_message(
+                count_in_area_message(
                     vec![(
                         &on_marsh(command.clone()),
                         TEST_ASSETS.expect_pickups().entries.first().unwrap(),
@@ -128,7 +128,7 @@ fn count_in_zone() {
             [
                 FxHashMap::from_iter([(
                     placeholder,
-                    count_in_zone_message(
+                    count_in_area_message(
                         vec![(
                             &on_marsh_multiworld(),
                             TEST_ASSETS.expect_pickups().entries.first().unwrap(),

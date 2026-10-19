@@ -3,11 +3,11 @@ use crate::{
     seed_language::{
         ast,
         output::{
-            Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone,
+            Command, CommandArea, CommandBoolean, CommandFloat, CommandInteger, CommandString,
             Constant, IntoConstant, Literal, StringOrPlaceholder,
         },
     },
-    Zone,
+    Area,
 };
 use wotw_seedgen_parse::{Error, Span};
 
@@ -61,7 +61,7 @@ evaluate_from_into_constant!(
     (i32, CommandInteger),
     (f32, CommandFloat),
     (String, CommandString),
-    (Zone, CommandZone),
+    (Area, CommandArea),
 );
 
 impl EvaluateFrom for StringOrPlaceholder {
@@ -84,8 +84,8 @@ impl EvaluateFrom for Literal {
             Command::Integer(CommandInteger::Constant { value }) => Some(Literal::Integer(value)),
             Command::Float(CommandFloat::Constant { value }) => Some(Literal::Float(value)),
             Command::String(CommandString::Constant { value }) => Some(Literal::String(value)),
-            Command::Zone(CommandZone::Constant { value }) => {
-                Some(Literal::Constant(Constant::Zone(value)))
+            Command::Area(CommandArea::Constant { value }) => {
+                Some(Literal::Constant(Constant::Area(value)))
             }
             _ => None,
         }

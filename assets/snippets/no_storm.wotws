@@ -1,5 +1,5 @@
 #category("World Changes")
-#name("No Rain")
+#name("No Storm")
 #description("Marsh starts sunny as it usually is after getting the sword tree")
 
-on spawn store(HowlsDen.RainLifted, true)
+on spawn store(Marsh.StormLifted, true)

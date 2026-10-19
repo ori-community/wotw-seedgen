@@ -95,8 +95,7 @@ impl Backend<Cache> {
             let ParseResult { parsed, mut errors } = Paths::parse(&source);
 
             if let Some(paths) = parsed {
-                let mut result =
-                    Graph::compiler().compile(paths, pickups.clone(), states.clone());
+                let mut result = Graph::compiler().compile(paths, pickups.clone(), states.clone());
 
                 errors.append(&mut result.errors);
             }

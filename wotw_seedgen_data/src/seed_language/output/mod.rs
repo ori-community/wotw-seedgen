@@ -8,8 +8,8 @@ mod operation;
 mod postprocess;
 
 pub use command::{
-    AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid,
-    CommandZone, IntoConstant,
+    AsConstant, Command, CommandArea, CommandBoolean, CommandFloat, CommandInteger, CommandString,
+    CommandVoid, IntoConstant,
 };
 pub use contained_uber_identifiers::{
     CommandVoidWrites, CommonItem, CommonItemLogName, CommonUberStateWrite, CommonWriteCommand,
@@ -29,7 +29,7 @@ pub use postprocess::{postprocess, PlaceholderMap, UniversePostprocessor};
 use serde_with::skip_serializing_none;
 use utoipa::ToSchema;
 
-use crate::{Icon, Position, UberIdentifier, Zone};
+use crate::{Area, Icon, Position, UberIdentifier};
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use std::{hash::Hash, ops::Range};
@@ -162,7 +162,7 @@ pub struct GenerationModifiers<'log> {
     pub random_placement_slots: FxHashMap<CommandBoolean, u32>,
     pub logical_state_sets: FxHashSet<String>,
     pub only_simulation_events: Vec<Range<usize>>,
-    pub preplacements: Vec<(CommandVoid, Zone)>,
+    pub preplacements: Vec<(CommandVoid, Area)>,
 }
 
 impl GenerationModifiers<'_> {
@@ -204,10 +204,10 @@ pub struct SnippetDebugOutput {
 pub enum StringOrPlaceholder {
     Value(String),
     #[schema(no_recursion)]
-    ZoneOfPlaceholder(Box<CommandVoid>),
+    AreaOfPlaceholder(Box<CommandVoid>),
     #[schema(no_recursion)]
     ItemOnPlaceholder(Box<Trigger>),
-    CountInZonePlaceholder(#[schema(no_recursion)] Vec<CommandVoid>, Zone),
+    CountInAreaPlaceholder(#[schema(no_recursion)] Vec<CommandVoid>, Area),
 }
 
 impl From<String> for StringOrPlaceholder {

@@ -8,10 +8,10 @@
 
 !include("launch_fragments_core", launch_fragment)
 
-on spawn store(itemTracker.launchFragmentsRequired, required)
+on spawn store(tracker.launchFragmentsRequired, required)
 
 !add_item(launch_fragment(), total)
 
 !remove_item(skill(Launch), 1)
 
-!only_simulation { on spawn store(itemTracker.launchFragmentsRequired, total) }
+!only_simulation { on spawn store(tracker.launchFragmentsRequired, total) }

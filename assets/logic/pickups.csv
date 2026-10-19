@@ -1,6 +1,6 @@
-Identifier, Condition, Zone, PickupType, PickupDetails, X, Y, MapX, MapY
+Identifier, Condition, Area, PickupType, PickupDetails, X, Y, MapX, MapY
 Marsh.Spawn.LeftHF, 21786|60210, Marsh, HealthFragment, , -958.6, -4313.2, -958.6199, -4312.245
-Marsh.Spawn.RightSL, 21786|49485, Marsh, SpiritLight, 50, -764.1, -4313.4, -764.07, -4313.3604
+Marsh.Spawn.FirstSL, 21786|49485, Marsh, SpiritLight, 50, -764.1, -4313.4, -764.07, -4313.3604
 Marsh.Spawn.GrappleHF, 21786|25761, Marsh, HealthFragment, , -718.5, -4277.9, -718.4848, -4276.8516
 Marsh.CollapsingLog.HiddenSL, 21786|6987, Marsh, SpiritLight, 50, -739.6, -4324.3, -739.64703, -4324.341
 Marsh.CollapsingLog.Shard, 23987|59173, Marsh, Shard, Resilience, -791.0, -4334.0, -791.0159, -4333.0396
@@ -13,19 +13,19 @@ Marsh.HowlDoor.LeverEF, 21786|17920, Marsh, EnergyFragment, , -625.9, -4418.0, -
 Marsh.TokkCave.SlimeSL, 21786|59513, Marsh, SpiritLight, 50, -755.8, -4422.9, -755.80414, -4422.9463
 Marsh.TokkCave.LizardSL, 9593|42047, Marsh, SpiritLight, 50, -783.3, -4452.0, -783.30786, -4451.996
 Marsh.TokkCave.LeftKS, 21786|64677, Marsh, Keystone, , -851.8, -4403.2, -851.8496, -4403.1885
-Marsh.MissingKey.Reward, 48248|51645 >= 3, Marsh, QuestItem, Keystone, -695, -4417, -692, -4415.9
+Marsh.MissingKey.Completed, 48248|51645 >= 3, Marsh, QuestItem, Keystone, -695, -4417, -692, -4415.9
 Marsh.TokkCave.Ore, 9593|23858, Marsh, GorlekOre, , -858.0, -4422.2, -858.04, -4422.17
 Marsh.LongSwimSL, 21786|23154, Marsh, SpiritLight, 100, -837.5, -4314.6, -837.45593, -4314.53
 Marsh.Sand.Ore, 9593|20382, Marsh, GorlekOre, , -935.1, -4356.8, -935.05, -4356.8
 Marsh.Sand.ArenaShard, 23987|50415, Marsh, Shard, LifePact, -916.7, -4398.3, -916.65, -4397.33
 Marsh.BellsApproach.LedgeSL, 24922|32076, Marsh, SpiritLight, 50, -1002.0, -4450.8, -1002.0159, -4450.79
 Marsh.Bells.CrusherSwimSL, 24922|62138, Marsh, SpiritLight, 200, -979.7, -4509.3, -979.67, -4509.34
-Marsh.IntoBurrows.Reward, 48248|18458 >= 4, Marsh, QuestItem, 1000 SpiritLight, -932, -4494, -928.5, -4491.8
+Marsh.IntoBurrows.Completed, 48248|18458 >= 4, Marsh, QuestItem, 1000 SpiritLight, -932, -4494, -928.5, -4491.8
 Marsh.Howl.Shard, 23987|9864, Marsh, Shard, Reckless, -499.2, -4411.0, -499.24, -4409.98
 Marsh.Howl.DenEntranceSL, 21786|43668, Marsh, SpiritLight, 50, -434.3, -4419.8, -434.31998, -4419.7603
 Marsh.Howl.FangEF, 21786|61706, Marsh, EnergyFragment, , -233.4, -4384.4, -233.37244, -4383.35
 Marsh.LittleBraver.Fang, 14019|27539, Marsh, QuestItem, Fang, -221.9, -4406.5, -221.93663, -4406.473
-Marsh.LittleBraver.Reward, 14019|15983 >= 3, Marsh, QuestItem, GorlekOre, -391, -4414, -388.5, -4412.6
+Marsh.LittleBraver.Completed, 14019|15983 >= 3, Marsh, QuestItem, GorlekOre, -391, -4414, -388.5, -4412.6
 Marsh.AncestralLightTree, 0|121, Marsh, Skill, AncestralLight, -840, -4488, -840.43994, -4484.155
 Marsh.LeftPoolsPath.SL, 21786|21727, Marsh, SpiritLight, 200, -1014.5, -4268.0, -1014.5, -4268
 Marsh.Den.ExitLoopHF, 21786|28908, Marsh, HealthFragment, , -332.3, -4438.6, -332.26, -4437.58
@@ -45,7 +45,7 @@ Marsh.Trial.Ore, 9593|25989, Marsh, GorlekOre, , -501.5, -4340.0, -501.49002, -4
 Marsh.Trial.EF, 9593|27562, Marsh, EnergyFragment, , -473.8, -4339.6, -473.83002, -4338.5796
 Marsh.Trial.MantisLureHF, 21786|20194, Marsh, HealthFragment, , -437.7, -4380.8, -437.67, -4379.8403
 Marsh.Trial.MantisLureSL, 21786|10413, Marsh, SpiritLight, 100, -344.1, -4356.9, -344.07, -4356.92
-Marsh.SpiritTrial, 44964|45951 >= 2, Marsh, RaceStart, 1000, -614, -4319, -614.2, -4317.2
+Marsh.SpiritTrial.Completed, 44964|45951 >= 2, Marsh, RaceStart, 1000, -614, -4319, -614.2, -4317.2
 Marsh.Trial.CombatShrine, 21786|18109, Marsh, ShardSlot, , -382.6, -4338.3, -382.63397, -4337.3223
 Marsh.OpherRoom.SwingPoleSL, 9593|59344, Marsh, SpiritLight, 50, -492.7, -4261.3, -492.66, -4261.27
 Marsh.LeftEyestone, 21786|27433, Marsh, Keystone, Eyestone, -461.3, -4195.3, -461.27002, -4195.29
@@ -70,7 +70,7 @@ Hollow.Drain.CrushersShard, 23987|61017, Hollow, Shard, Quickshot, -311.2, -4325
 Hollow.SwimEF, 937|24175, Hollow, EnergyFragment, , -177.8, -4354.2, -177.8136, -4353.2246
 Hollow.LupoMap, 48248|3638, Hollow, Lupo, Hollow, -146, -4321, -146, -4321
 Hollow.Trial.HF, 937|2463, Hollow, HealthFragment, , -122.0, -4268.2, -121.979996, -4267.23
-Hollow.SpiritTrial, 44964|25545 >= 2, Hollow, RaceStart, 1000, -115, -4259, -115, -4257.2
+Hollow.SpiritTrial.Completed, 44964|25545 >= 2, Hollow, RaceStart, 1000, -115, -4259, -115, -4257.2
 Hollow.Trial.FallingSlugSL, 937|48192, Hollow, SpiritLight, 50, -82.3, -4369.6, -82.32001, -4369.565
 Hollow.DashTree.AboveDoorSL, 937|61744, Hollow, SpiritLight, 50, -100.0, -4407.2, -99.98999, -4407.225
 Hollow.DashTree.VineSL, 937|37926, Hollow, SpiritLight, 50, 11.6, -4401.1, 11.600098, -4401.12
@@ -86,12 +86,12 @@ Hollow.BashTreeApproach.EF, 937|23772, Hollow, EnergyFragment, , 46.8, -4236.6, 
 Hollow.OutsideDepths.MortarHF, 13428|59730, Hollow, HealthFragment, , 84.0, -4263.0, 84.0289, -4262.0195
 Hollow.BashTree.SL, 937|30182, Hollow, SpiritLight, 100, -31.4, -4302.3, -31.656738, -4301.913
 Hollow.BashTree, 0|0, Hollow, Skill, Bash, -20, -4326, -20.328445, -4319.618
-Hollow.KwoloksWisdom.Reward, 14019|50597 >= 4, Hollow, QuestItem, 500 SpiritLight, 240, -4207, 240.1, -4207.5
+Hollow.KwoloksWisdom.Completed, 14019|50597 >= 4, Hollow, QuestItem, 500 SpiritLight, 240, -4207, 240.1, -4207.5
 Hollow.WoodsSwim.MortarSL, 58674|20983, Hollow, SpiritLight, 100, 289.0, -4195.7, 289.0374, -4195.708
 Hollow.WoodsSwim.EF, 58674|9583, Hollow, EnergyFragment, , 331.9, -4191.3, 331.87, -4190.344
 Hollow.OutsideDepths.Shard, 23987|62973, Hollow, Shard, Splinter, 216.2, -4307.3, 216.17882, -4306.3125
 Hollow.Wisp, 46462|59806, Hollow, Wisp, Voice, 186, -4213, 180, -4210
-Hollow.SilentTeeth.Reward, 937|34641 >= 4, Hollow, QuestItem, 500 SpiritLight, 191, -4212, 191.054, -4212.027
+Hollow.SilentTeeth.Completed, 937|34641 >= 4, Hollow, QuestItem, 500 SpiritLight, 191, -4212, 191.054, -4212.027
 Hollow.Kwolok.SwimOre, 46462|37897, Hollow, GorlekOre, , 243.4, -4223.5, 243.44835, -4223.517
 Hollow.Kwolok.SwimLeftSL, 46462|29054, Hollow, SpiritLight, 200, 113.0, -4228.5, 113, -4228.5
 Hollow.Kwolok.SwimRightSL, 46462|20780, Hollow, SpiritLight, 50, 161.5, -4244.8, 161.49835, -4244.7866
@@ -101,7 +101,7 @@ Glades.HandToHand.Lantern, 14019|26318 >= 6, Glades, QuestItem, Lantern, -426, -
 Glades.HandToHand.Canteen, 14019|26318 >= 9, Glades, QuestItem, Canteen, -410, -4142, -403.2, -4142
 Glades.FamilyReunion.Key, 6|500, Glades, QuestItem, Key, -385, -4161, -382, -4155.3
 Glades.IntoDarkness.Acorn, 14019|2782, Glades, QuestItem, Acorn, -10.5, -4549.7, -374, -4183.6
-Glades.IntoDarkness.Reward, 14019|33776 >= 3, Glades, QuestItem, 500 SpiritLight, -358, -4185, -360.1, -4183.6
+Glades.IntoDarkness.Completed, 14019|33776 >= 3, Glades, QuestItem, 500 SpiritLight, -358, -4185, -360.1, -4183.6
 Glades.TreeHut.EF, 42178|52786, Glades, EnergyFragment, , -116.0, -4538.5, -227.72, -4092.33
 Glades.AboveGrom.HF, 44310|29043, Glades, HealthFragment, , -326.3, -4102.1, -326.30994, -4101.12
 Glades.LupoSwim.HF, 44310|17523, Glades, HealthFragment, , -160.4, -4192.2, -160.3623, -4191.1562
@@ -124,9 +124,9 @@ Glades.LupoSwim.ThornsSL, 42178|37028, Glades, SpiritLight, 50, -277.1, -4171.8,
 Glades.CoalUpdraft.CeilingSL, 42178|63404, Glades, SpiritLight, 50, -239.6, -4129.9, -239.55182, -4129.9424
 Glades.Veral.LeafPileSL, 42178|44748, Glades, SpiritLight, 50, -160.6, -4098.2, -160.66998, -4096.58
 Glades.AncestralLightTree, 0|120, Glades, Skill, AncestralLight, -368, -4158, -368.17413, -4153.7295
-Glades.RebuildGlades.Reward, 14019|44578 >= 2, Glades, QuestItem, 1000 SpiritLight, -322, -4153, -328.5, -4150.1
-Glades.RoughDiamond.Reward, 23987|14832, Glades, QuestItem, Shard, -408, -4162, -406, -4158.9
-Glades.RegrowGlades.Reward, 14019|26394 >= 2, Glades, QuestItem, 1000 SpiritLight, -173, -4139, -176, -4134.7
+Glades.RebuildGlades.Completed, 14019|44578 >= 2, Glades, QuestItem, 1000 SpiritLight, -322, -4153, -328.5, -4150.1
+Glades.RoughDiamondShard, 23987|14832, Glades, QuestItem, Shard, -408, -4162, -406, -4158.9
+Glades.RegrowGlades.Completed, 14019|26394 >= 2, Glades, QuestItem, 1000 SpiritLight, -173, -4139, -176, -4134.7
 Glades.LowerLake.GrappleSL, 53632|12019, Glades, SpiritLight, 100, -515.3, -4102.5, -515.32, -4102.47
 Glades.LowerLake.CeilingSL, 937|31036, Glades, SpiritLight, 100, -586.1, -4090.3, -586.0541, -4090.2927
 Glades.LowerLake.SwimSL, 937|40657, Glades, SpiritLight, 50, -586.0, -4128.8, -586.03, -4128.8
@@ -140,25 +140,25 @@ Wellspring.OutsideRight.Ore, 53632|25556, Wellspring, GorlekOre, , -738.7, -4017
 Wellspring.OutsideRight.EF, 53632|1911, Wellspring, EnergyFragment, , -735.3, -3988.3, -735.25366, -3987.25
 Wellspring.TrialStart.CeilingSL, 53632|51706, Wellspring, SpiritLight, 100, -745.1, -3942.0, -745.0513, -3941.9956
 Wellspring.TrialStart.Ore, 37858|58286, Wellspring, GorlekOre, , -677.7, -3933.2, -677.7317, -3933.1733
-Wellspring.SpiritTrial, 44964|11512 >= 2, Wellspring, RaceStart, 1000, -668, -3937, -668.35, -3935.0403
+Wellspring.SpiritTrial.Completed, 44964|11512 >= 2, Wellspring, RaceStart, 1000, -668, -3937, -668.35, -3935.0403
 Wellspring.OutsideTopDoor.Shard, 23987|12104, Wellspring, Shard, UltraGrapple, -798.7, -3912.2, -798.66003, -3911.1501
 Wellspring.OutsideLeftDoor.HF, 53632|17403, Wellspring, HealthFragment, , -877.8, -3961.0, -877.8399, -3959.99
 Wellspring.OutsideBottomDoor.CeilingSL, 53632|42264, Wellspring, SpiritLight, 100, -848.9, -4023.5, -848.91876, -4023.5227
-Wellspring.OutsideBottom.WheelSL, 53632|6500, Wellspring, SpiritLight, 100, -898.5, -4066.7, -898.4592, -4061.278
-Wellspring.OutsideBottom.EF, 53632|6869, Wellspring, EnergyFragment, , -857.0, -4115.5, -857.0315, -4114.5103
+Wellspring.Foundation.WheelSL, 53632|6500, Wellspring, SpiritLight, 100, -898.5, -4066.7, -898.4592, -4061.278
+Wellspring.Foundation.EF, 53632|6869, Wellspring, EnergyFragment, , -857.0, -4115.5, -857.0315, -4114.5103
 Wellspring.OutsideLeft.Shard, 23987|53934, Wellspring, Shard, LifeHarvest, -999.2, -4029.4, -999.22, -4028.35
 Wellspring.Outside.SwimSL, 53632|62356, Wellspring, SpiritLight, 100, -824.6, -4084.8, -824.5987, -4084.8445
 Wellspring.Outside.SwimOre, 53632|21124, Wellspring, GorlekOre, , -760.5, -4093.2, -760.547, -4093.22
-Wellspring.LostCompass.Reward, 14019|20667 >= 3, Wellspring, QuestItem, GorlekOre, -811, -3973, -805, -3970.9
+Wellspring.LostCompass.Completed, 14019|20667 >= 3, Wellspring, QuestItem, GorlekOre, -811, -3973, -805, -3970.9
 Wellspring.FirstFloor.Shard, 23987|31426, Wellspring, Shard, Thorn, -1375.8, -3994.2, -1375.77, -3993.22
 Wellspring.FirstFloor.ShardSL, 37858|22107, Wellspring, SpiritLight, 100, -1371.9, -3938.5, -1371.89, -3938.49
 Wellspring.FirstFloor.ThreeWheelsSL, 37858|45906, Wellspring, SpiritLight, 50, -1247.0, -3926.7, -1247.04, -3926.73
-Wellspring.FirstFloor.SwimSwitchSL, 37858|45656, Wellspring, SpiritLight, 100, -1197.2, -3971.9, -1197.15, -3971.94
-Wellspring.FirstFloor.DrainHF, 37858|25833, Wellspring, HealthFragment, , -1168.6, -3989.6, -1168.589, -3988.6418
-Wellspring.FirstFloor.DrainSL, 37858|41380, Wellspring, SpiritLight, 100, -1063.4, -3961.1, -1063.43, -3961.1272
-Wellspring.FirstFloor.PullPoleOre, 37858|58846, Wellspring, GorlekOre, , -1077.3, -3936.4, -1077.2742, -3936.3518
-Wellspring.FirstFloor.DrainLeverEF, 37858|57552, Wellspring, EnergyFragment, , -1109.4, -3864.0, -1109.36, -3862.95
-Wellspring.FirstFloor.DrainLeverLeftSL, 37858|41911, Wellspring, SpiritLight, 100, -1142.4, -3861.8, -1142.36, -3861.79
+Wellspring.FirstFloor.WaterDashSL, 37858|45656, Wellspring, SpiritLight, 100, -1197.2, -3971.9, -1197.15, -3971.94
+Wellspring.DrainSecret.HF, 37858|25833, Wellspring, HealthFragment, , -1168.6, -3989.6, -1168.589, -3988.6418
+Wellspring.DrainSecret.SL, 37858|41380, Wellspring, SpiritLight, 100, -1063.4, -3961.1, -1063.43, -3961.1272
+Wellspring.DrainClimb.PullPoleOre, 37858|58846, Wellspring, GorlekOre, , -1077.3, -3936.4, -1077.2742, -3936.3518
+Wellspring.DrainClimb.LeverEF, 37858|57552, Wellspring, EnergyFragment, , -1109.4, -3864.0, -1109.36, -3862.95
+Wellspring.DrainClimb.LeverLeftSL, 37858|41911, Wellspring, SpiritLight, 100, -1142.4, -3861.8, -1142.36, -3861.79
 Wellspring.LupoMap, 48248|1590, Wellspring, Lupo, Wellspring, -1190, -3861, -1190, -3861
 Wellspring.FirstFloor.ShortcutSL, 37858|33063, Wellspring, SpiritLight, 200, -1227.6, -3910.5, -1227.6171, -3910.532
 Wellspring.GrappleTree.SL, 37858|31136, Wellspring, SpiritLight, 100, -1307.6, -3884.3, -1307.8835, -3883.543
@@ -173,7 +173,7 @@ Wellspring.ThirdFloor.TPSL, 37858|2797, Wellspring, SpiritLight, 50, -1316.6, -3
 Wellspring.ThirdFloor.Seed, 14019|24142, Wellspring, Seed, , -1185.4, -3668.8, -1185.4348, -3668.7515
 Wellspring.ThirdFloor.SwimOre, 37858|32932, Wellspring, GorlekOre, , -1203.9, -3715.7, -1203.8998, -3715.6865
 Wellspring.Escape.RevisitSL, 37858|56444, Wellspring, SpiritLight, 100, -1313.1, -3640.1, -1313.1079, -3640.099
-Wellspring.EscapeReward, 37858|12379, Wellspring, QuestItem, Water, -481, -3763, -1159, -3635
+Wellspring.Escape.Reward, 37858|12379, Wellspring, QuestItem, Water, -481, -3763, -1159, -3635
 Woods.TreeKeeper.Branch, 14019|59708 >= 1, Woods, QuestItem, Branch, 513, -4158, 513, -4158
 Woods.FamilyReunion.Doll, 14019|57399, Woods, QuestItem, Doll, 426.7, -4114.9, 469.2, -4178
 Woods.TreeKeeper.Seed, 14019|7470, Woods, Seed, , 513, -4159, 511, -4157
@@ -197,7 +197,7 @@ Woods.CollapsingOwl.SL, 58674|54516, Woods, SpiritLight, 100, 936.3, -4044.2, 93
 Woods.BelowKuKSRoom.CeilingSL, 58674|23186, Woods, SpiritLight, 50, 941.8, -4185.9, 941.81433, -4185.8574
 Woods.Skull.CeilingSL, 58674|64057, Woods, SpiritLight, 100, 968.6, -4123.3, 968.604, -4123.2627
 Woods.PetrifiedHowl.SL, 58674|17974, Woods, SpiritLight, 50, 904.7, -4076.7, 904.6666, -4076.6702
-Woods.SpiritTrial, 44964|22703 >= 2, Woods, RaceStart, 1000, 820, -4047, 819.55, -4045.1
+Woods.SpiritTrial.Completed, 44964|22703 >= 2, Woods, RaceStart, 1000, 820, -4047, 819.55, -4045.1
 Woods.Trial.Shard, 23987|25183, Woods, Shard, Overflow, 826.6, -3940.1, 826.62494, -3939.051
 Woods.CombatShrine, 58674|29265, Woods, ShardSlot, , 1361.1, -4064.0, 1361.1, -4063.04
 Woods.Shrine.SL, 58674|32647, Woods, SpiritLight, 100, 1406.0, -4064.4, 1405.9546, -4064.3982
@@ -233,7 +233,7 @@ Reach.TrialLeftLoop.TopKS, 28895|10823, Reach, Keystone, , -83.6, -4024.8, -83.5
 Reach.Trial.DeadEndKS, 28895|37444, Reach, Keystone, , -80.6, -4040.1, -80.55005, -4040.1401
 Reach.TrialLeftLoop.BottomKS, 28895|18358, Reach, Keystone, , -58.0, -4054.9, -58.03015, -4054.9102
 Reach.Trial.HiddenSL, 28895|22761, Reach, SpiritLight, 100, -38.7, -4017.7, -38.670044, -4017.73
-Reach.SpiritTrial, 44964|23661 >= 2, Reach, RaceStart, 1000, 75, -4046, 76.59375, -4035.2827
+Reach.SpiritTrial.Completed, 44964|23661 >= 2, Reach, RaceStart, 1000, 75, -4046, 76.59375, -4035.2827
 Reach.Veral.Shard, 23987|897, Reach, Shard, Catalyst, -90.2, -4096.5, -90.165726, -4095.3179
 Reach.HandToHand.Soup, 14019|26318 >= 4, Reach, QuestItem, Soup, -110, -4090, -110, -4090
 Reach.BurrowRoom.Shard, 23987|19630, Reach, Shard, Lifeforce, -400.8, -3860.5, -400.7699, -3859.5312
@@ -265,7 +265,7 @@ Depths.SecondKSRoom.HF, 18793|42235, Depths, HealthFragment, , 530.9, -4451.7, 5
 Depths.IlluminableTunnel.HiveSL, 18793|6573, Depths, SpiritLight, 100, 425.4, -4384.8, 425.41998, -4384.77
 Depths.Wisp, 18793|63291, Depths, Wisp, Eyes, 687, -4386, 687, -4386
 Depths.TrialStart.HF, 18793|62694, Depths, HealthFragment, , 496.4, -4498.2, 496.37314, -4497.1514
-Depths.SpiritTrial, 44964|28552 >= 2, Depths, RaceStart, 1000, 478, -4517, 478.3, -4515.7
+Depths.SpiritTrial.Completed, 44964|28552 >= 2, Depths, RaceStart, 1000, 478, -4517, 478.3, -4515.7
 Depths.BeforeTrialLoop.Ore, 18793|836, Depths, GorlekOre, , 437.0, -4507.1, 436.98193, -4507.07
 Depths.TrialLoop.Shard, 23987|986, Depths, Shard, SpiritSurge, 564.2, -4570.2, 564.18604, -4569.2515
 Depths.HandToHand.Silk, 14019|26318 >= 7, Depths, QuestItem, Silk, 317, -4508, 317, -4508
@@ -283,16 +283,16 @@ Pools.WellspringPath.CeilingSL, 945|58723, Pools, SpiritLight, 100, -894.4, -413
 Pools.FirstBubble.Ore, 5377|34852, Pools, GorlekOre, , -1134.6, -4115.9, -1134.4833, -4115.717
 Pools.KwoloksWisdom.Amulet, 14019|53103, Pools, QuestItem, Amulet, -1173, -4154, -1175.1, -4153.1
 Pools.FirstBubble.CrushersSL, 5377|13832, Pools, SpiritLight, 100, -1176.4, -4177.9, -1176.3883, -4177.9414
-Pools.LeverRoom.CurrentSL, 5377|17396, Pools, SpiritLight, 100, -1214.3, -4182.0, -1214.2803, -4181.966
-Pools.LeverRoom.BreakFloorBubbleSL, 5377|27204, Pools, SpiritLight, 100, -1230.6, -4125.7, -1230.6019, -4125.742
+Pools.EntranceLeverRoom.CurrentSL, 5377|17396, Pools, SpiritLight, 100, -1214.3, -4182.0, -1214.2803, -4181.966
+Pools.EntranceLeverRoom.BubbleSL, 5377|27204, Pools, SpiritLight, 100, -1230.6, -4125.7, -1230.6019, -4125.742
 Pools.CentralTPApproach.AboveDoorOre, 5377|19694, Pools, GorlekOre, , -1248.7, -4139.0, -1248.6624, -4139.0425
 Pools.AboveCentralTP.PurpleWallHF, 5377|63201, Pools, HealthFragment, , -1277.9, -4086.0, -1277.9425, -4085.0483
 Pools.HandToHand.Spyglass, 14019|26318 >= 8, Pools, QuestItem, Spyglass, -1284, -4126, -1281.5, -4124.4
 Pools.AboveCentralTP.SL, 5377|7540, Pools, SpiritLight, 100, -1336.2, -4102.9, -1336.2295, -4102.91
 Pools.CentralTPSwim.Ore, 5377|12235, Pools, GorlekOre, , -1370.0, -4166.2, -1369.9664, -4166.21
 Pools.CentralTPSwim.Shard, 23987|25996, Pools, Shard, UltraBash, -1284.6, -4196.2, -1284.62, -4195.23
-Pools.WaterDashArena.HF, 5377|45774, Pools, HealthFragment, , -1365.2, -4109.5, -1365.1549, -4108.4673
-Pools.SpiritTrial, 44964|54686 >= 2, Pools, RaceStart, 1000, -1417, -4126, -1416.7532, -4124.448
+Pools.WaterArena.HF, 5377|45774, Pools, HealthFragment, , -1365.2, -4109.5, -1365.1549, -4108.4673
+Pools.SpiritTrial.Completed, 44964|54686 >= 2, Pools, RaceStart, 1000, -1417, -4126, -1416.7532, -4124.448
 Pools.TrialStart.Shard, 5377|40328, Pools, Shard, EnergyHarvest, -1441.4, -4129.7, -1441.3499, -4128.7153
 Pools.Lupo.SL, 5377|35440, Pools, SpiritLight, 100, -1414.3, -4154.6, -1414.3197, -4154.631
 Pools.LupoMap, 48248|1557, Pools, Lupo, Pools, -1391, -4167, -1391, -4167
@@ -319,13 +319,13 @@ Pools.Wisp, 945|49747, Pools, Wisp, Strength, -1928, -4066, -1928, -4066
 Wastes.FeedingGrounds.Ore, 7228|54494, Wastes, GorlekOre, , 1504.3, -4007.0, 1504.34, -4006.9902
 Wastes.TornBridge.PurpleWallSL, 7228|56821, Wastes, SpiritLight, 100, 1534.1, -3996.6, 1534.09, -3996.6396
 Wastes.TornBridge.HiddenSL, 7228|52086, Wastes, SpiritLight, 100, 1607.3, -3974.5, 1607.25, -3974.4702
-Wastes.SpiritTrial, 44964|30767 >= 2, Wastes, RaceStart, 1000, 1527, -4009, 1526.2, -4007.7002
+Wastes.SpiritTrial.Completed, 44964|30767 >= 2, Wastes, RaceStart, 1000, 1527, -4009, 1526.2, -4007.7002
 Wastes.DigSite.Ore, 20120|46919, Wastes, GorlekOre, , 1657.9, -3972.7, 1657.88, -3972.6895
 Wastes.RoughDiamond.Gem, 14019|58342, Wastes, QuestItem, Gem, 1640.4, -4004.1, 1640.4, -4004.1
 Wastes.SandMuncherTunnel.EF, 20120|11785, Wastes, EnergyFragment, , 1652.9, -4014.4, 1652.92, -4013.37
 Wastes.SandPot.HF, 20120|62264, Wastes, HealthFragment, , 1698.3, -3976.8, 1698.3113, -3975.7695
 Wastes.SandPot.SL, 20120|57781, Wastes, SpiritLight, 100, 1718.8, -3961.0, 1718.82, -3961
-Wastes.BelowBridge.SL, 20120|10397, Wastes, SpiritLight, 100, 1795.1, -3997.7, 1795.0698, -3997.7295
+Wastes.DoubleBridge.SL, 20120|10397, Wastes, SpiritLight, 100, 1795.1, -3997.7, 1795.0698, -3997.7295
 Wastes.RuinsShortcut.SL, 20120|224, Wastes, SpiritLight, 200, 1886.7, -3972.6, 1886.6628, -3972.5933
 Wastes.RuinsShortcut.HF, 20120|12941, Wastes, HealthFragment, , 1859.5, -4020.9, 1859.4789, -4019.8506
 Wastes.SandPuzzle.Shard, 23987|50364, Wastes, Shard, LastStand, 1832.9, -3934.8, 1832.9, -3933.81
@@ -357,7 +357,7 @@ Wastes.Seed, 14019|20601, Wastes, Seed, , 1995.7, -3650.6, 1995.6826, -3650.5928
 Wastes.OutsideRuins.Ore, 7228|8370, Wastes, GorlekOre, , 1951.6, -3615.8, 1951.6055, -3615.8252
 Ruins.Escape.RevisitEF, 10289|44555, Ruins, EnergyFragment, , 2053.7, -4050.2, 2053.74, -4049.1924
 Ruins.Wisp, 10289|22102, Ruins, Wisp, Seir, 2151, -3568, 2151, -3568
-Ruins.HandToHand.Reward, 14019|26318 >= 11, Ruins, QuestItem, Secrets, 1969, -4024, 1969, -4024
+Ruins.HandToHand.Completed, 14019|26318 >= 11, Ruins, QuestItem, Secrets, 1969, -4024, 1969, -4024
 Willow.SecretPortal.Ore, 16155|38979, Willow, GorlekOre, , 557.0, -3876.3, 556.97656, -3876.315
 Willow.Entrance.SL, 16155|49381, Willow, SpiritLight, 200, 469.5, -3914.6, 469.46002, -3914.6375
 Willow.MossWheelsHeart.HF, 16155|46270, Willow, HealthFragment, , 410.8, -3972.5, 410.8423, -3971.4604

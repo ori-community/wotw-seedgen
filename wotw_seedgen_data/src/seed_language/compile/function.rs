@@ -9,9 +9,9 @@ use crate::{
             store_integer, ORIGIN_WORLD_STRING, RESERVED_BOOLEAN, RESERVED_STRING,
         },
         output::{
-            ArithmeticOperator, AsConstant, Command, CommandBoolean, CommandFloat, CommandInteger,
-            CommandString, CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator,
-            IntoConstant, Operation, StringOrPlaceholder,
+            ArithmeticOperator, AsConstant, Command, CommandArea, CommandBoolean, CommandFloat,
+            CommandInteger, CommandString, CommandVoid, Comparator, Concatenator,
+            EqualityComparator, IntoConstant, Operation, StringOrPlaceholder,
         },
         types::Type,
     },
@@ -285,8 +285,8 @@ pub enum FunctionIdentifier {
     RemoveCleanWaterString,
     WeaponUpgradeString,
     RemoveWeaponUpgradeString,
-    CurrentZone,
-    CurrentMapZone,
+    CurrentArea,
+    CurrentMapArea,
     SpiritLight,
     RemoveSpiritLight,
     GorlekOre,
@@ -462,8 +462,8 @@ impl FunctionIdentifier {
             RemoveCleanWaterString() -> String,
             WeaponUpgradeString(weapon_upgrade: WeaponUpgrade) -> String,
             RemoveWeaponUpgradeString(weapon_upgrade: WeaponUpgrade) -> String,
-            CurrentZone() -> Zone,
-            CurrentMapZone() -> Zone,
+            CurrentArea() -> Area,
+            CurrentMapArea() -> Area,
             SpiritLight(amount: Integer),
             RemoveSpiritLight(amount: Integer),
             GorlekOre(),
@@ -882,8 +882,8 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveWeaponUpgradeString => {
                 Command::String(weapon_upgrade_string(arg(&mut context)?, true))
             }
-            FunctionIdentifier::CurrentZone => Command::Zone(CommandZone::CurrentZone {}),
-            FunctionIdentifier::CurrentMapZone => Command::Zone(CommandZone::CurrentMapZone {}),
+            FunctionIdentifier::CurrentArea => Command::Area(CommandArea::PlayerArea {}),
+            FunctionIdentifier::CurrentMapArea => Command::Area(CommandArea::MapFocusedArea {}),
             FunctionIdentifier::SpiritLight => {
                 Command::Void(spirit_light(arg(&mut context)?, &mut context.compiler.rng))
             }

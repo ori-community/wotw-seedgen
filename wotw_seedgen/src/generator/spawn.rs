@@ -281,8 +281,8 @@ impl<'world, 'graph, 'settings, 'perf, 'index, 'pool, 'output, 'log>
             | "WestPools.Teleporter"
             | "LowerWastes.FeedingGroundsTP"
             | "LowerWastes.CentralTP"
-            | "UpperWastes.OuterRuinsTP"
-            | "WindtornRuins.RuinsTP"
+            | "UpperWastes.Teleporter"
+            | "WindtornRuins.Teleporter"
             | "WillowsEnd.InnerTP"
             | "WillowsEnd.ShriekArena" => {}
             _ => {

@@ -25,12 +25,12 @@ use crate::{
     seed_language::{
         ast::ClientEvent,
         output::{
-            Command, CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandVoid,
-            CommandZone, CommandsOutput, ExecuteOperator, Operation, StringOrPlaceholder, Trigger,
+            Command, CommandArea, CommandBoolean, CommandFloat, CommandInteger, CommandString,
+            CommandVoid, CommandsOutput, ExecuteOperator, Operation, StringOrPlaceholder, Trigger,
             TriggerCondition,
         },
     },
-    UberIdentifier, Zone,
+    Area, UberIdentifier,
 };
 
 pub trait Simulate<S: Simulation> {
@@ -91,7 +91,7 @@ impl<S: Simulation> Simulate<S> for Command {
             Command::String(command) => {
                 command.simulate(simulation, output);
             }
-            Command::Zone(command) => {
+            Command::Area(command) => {
                 command.simulate(simulation, output);
             }
             Command::Void(command) => {
@@ -132,7 +132,7 @@ impl<S: Simulation> Simulate<S> for CommandBoolean {
             CommandBoolean::CompareInteger { operation } => operation.simulate(simulation, output),
             CommandBoolean::CompareFloat { operation } => operation.simulate(simulation, output),
             CommandBoolean::CompareString { operation } => operation.simulate(simulation, output),
-            CommandBoolean::CompareZone { operation } => operation.simulate(simulation, output),
+            CommandBoolean::CompareArea { operation } => operation.simulate(simulation, output),
             CommandBoolean::LogicOperation { operation } => operation.simulate(simulation, output),
             CommandBoolean::FetchBoolean { uber_identifier } => {
                 simulation.fetch(*uber_identifier).as_boolean()
@@ -223,17 +223,17 @@ impl<S: Simulation> Simulate<S> for CommandString {
     }
 }
 
-impl<S: Simulation> Simulate<S> for CommandZone {
-    type Return = Zone;
+impl<S: Simulation> Simulate<S> for CommandArea {
+    type Return = Area;
 
     fn simulate(&self, simulation: &mut S, output: &CommandsOutput) -> Self::Return {
         match self {
-            CommandZone::Constant { value } => *value,
-            CommandZone::Multi { commands, last } => {
+            CommandArea::Constant { value } => *value,
+            CommandArea::Multi { commands, last } => {
                 commands.simulate(simulation, output);
                 last.simulate(simulation, output)
             }
-            CommandZone::CurrentZone {} | CommandZone::CurrentMapZone {} => Zone::Void,
+            CommandArea::PlayerArea {} | CommandArea::MapFocusedArea {} => Area::Void,
         }
     }
 }

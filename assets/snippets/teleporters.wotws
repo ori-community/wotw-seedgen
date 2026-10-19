@@ -18,8 +18,8 @@
 !config_boolean(pools_boss, false, "Pools Boss Teleporter")
 !config_boolean(feeding_grounds, true, "Feeding Grounds Teleporter")
 !config_boolean(central_wastes, true, "Central Wastes Teleporter")
-!config_boolean(outer_ruins, true, "Outer Ruins Teleporter")
-!config_boolean(inner_ruins, false, "Inner Ruins Teleporter")
+!config_boolean(upper_wastes, true, "Upper Wastes Teleporter")
+!config_boolean(ruins, false, "Ruins Teleporter")
 !config_boolean(willow, true, "Willow Teleporter")
 !config_boolean(shriek, false, "Shriek Teleporter")
 
@@ -37,7 +37,7 @@
 !if pools_boss { !add_item(teleporter(PoolsBoss), 1) }
 !if feeding_grounds { !add_item(teleporter(FeedingGrounds), 1) }
 !if central_wastes { !add_item(teleporter(CentralWastes), 1) }
-!if outer_ruins { !add_item(teleporter(OuterRuins), 1) }
-!if inner_ruins { !add_item(teleporter(InnerRuins), 1) }
+!if upper_wastes { !add_item(teleporter(UpperWastes), 1) }
+!if ruins { !add_item(teleporter(Ruins), 1) }
 !if willow { !add_item(teleporter(Willow), 1) }
 !if shriek { !add_item(teleporter(Shriek), 1) }

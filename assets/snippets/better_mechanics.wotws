@@ -8,8 +8,8 @@
 !config_boolean(teleport_refill, true, "Teleport Refill", "Heals you to full when warping to a spirit well")
 
 !if better_stomp {
-    on spawn store(randoConfig.stompThroughPortals, true)
-    on spawn store(randoConfig.stompIntoWater, true)
+    on spawn store(modifications.stompThroughPortals, true)
+    on spawn store(modifications.stompIntoWater, true)
 }
 
 !if fragment_overflow {
@@ -17,7 +17,7 @@
 }
 
 !if shriek_escape_health_bar {
-    on spawn store(randoConfig.keepShriekHealthBarDuringEscape, true)
+    on spawn store(modifications.showShriekHealthDuringEscape, true)
 }
 
 !if teleport_refill {

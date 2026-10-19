@@ -14,9 +14,9 @@ use crate::{
         token::{Token, Tokenizer, TOKENIZER},
         types::Type,
     },
-    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
+    Alignment, Area, CoordinateSystem, Corner, EquipSlot, Equipment, GromIcon, HorizontalAnchor,
     LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon, VerticalAnchor,
-    WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+    WeaponUpgrade, WheelBind, WheelItemPosition,
 };
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
@@ -405,7 +405,7 @@ pub enum Constant {
     Teleporter(#[ast(with = "teleporter_ast::<E>")] Teleporter),
     WeaponUpgrade(#[ast(with = "constant_ast::<WeaponUpgrade, E>")] WeaponUpgrade),
     Equipment(#[ast(with = "constant_ast::<Equipment, E>")] Equipment),
-    Zone(#[ast(with = "constant_ast::<Zone, E>")] Zone),
+    Area(#[ast(with = "constant_ast::<Area, E>")] Area),
     GenericIcon(#[ast(with = "constant_ast::<GenericIcon, E>")] GenericIcon),
     OpherIcon(#[ast(with = "constant_ast::<OpherIcon, E>")] OpherIcon),
     LupoIcon(#[ast(with = "constant_ast::<LupoIcon, E>")] LupoIcon),
@@ -588,11 +588,11 @@ pub enum Command<'source> {
     ),
     OnlySimulation(Spanned<OnlySimulation>, CommandOnlySimulation<'source>),
     Preplace(Spanned<Preplace>, CommandArgs<PreplaceArgs<'source>>),
-    ZoneOf(Spanned<ZoneOf>, CommandArgs<ZoneOfArgs<'source>>),
+    AreaOf(Spanned<AreaOf>, CommandArgs<AreaOfArgs<'source>>),
     ItemOn(Spanned<ItemOn>, CommandArgs<ItemOnArgs<'source>>),
-    CountInZone(
-        Spanned<CountInZone>,
-        CommandArgs<Box<CountInZoneArgs<'source>>>,
+    CountInArea(
+        Spanned<CountInArea>,
+        CommandArgs<Box<CountInAreaArgs<'source>>>,
     ),
     RandomBoolean(
         Spanned<RandomBoolean>,
@@ -999,15 +999,15 @@ pub struct Preplace;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct PreplaceArgs<'source> {
     pub item: Action<'source>,
-    pub zone: CommandArg<Expression<'source>>,
+    pub area: CommandArg<Expression<'source>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct ZoneOf;
+pub struct AreaOf;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct ZoneOfArgs<'source> {
+pub struct AreaOfArgs<'source> {
     pub identifier: Spanned<Identifier<'source>>,
     pub item: CommandArg<Action<'source>>,
 }
@@ -1024,22 +1024,22 @@ pub struct ItemOnArgs<'source> {
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]
 #[ast(case = "snake_case")]
-pub struct CountInZone;
+pub struct CountInArea;
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct CountInZoneArgs<'source> {
-    pub zone_bindings: Delimited<
+pub struct CountInAreaArgs<'source> {
+    pub area_bindings: Delimited<
         '[',
-        Punctuated<Delimited<'(', Once<CountInZoneBinding<'source>>, ')'>, ','>,
+        Punctuated<Delimited<'(', Once<CountInAreaBinding<'source>>, ')'>, ','>,
         ']',
     >,
     pub items: CommandArg<Delimited<'[', Punctuated<Action<'source>, ','>, ']'>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
-pub struct CountInZoneBinding<'source> {
+pub struct CountInAreaBinding<'source> {
     pub identifier: Spanned<Identifier<'source>>,
-    pub zone: CommandArg<Expression<'source>>,
+    pub area: CommandArg<Expression<'source>>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

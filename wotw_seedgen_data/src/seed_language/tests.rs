@@ -8,9 +8,9 @@ use crate::{
         compile::{Compiler, FREE_INTEGERS_START},
         output::{CommandVoid, IntermediateOutput},
     },
-    Alignment, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon,
+    Alignment, Area, CoordinateSystem, Corner, EquipSlot, Equipment, GenericIcon, GromIcon,
     HorizontalAnchor, LupoIcon, MapIcon, OpherIcon, Shard, Skill, Teleporter, TuleyIcon,
-    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition, Zone,
+    VerticalAnchor, WeaponUpgrade, WheelBind, WheelItemPosition,
 };
 use rustc_hash::FxHashMap;
 use std::{
@@ -101,44 +101,44 @@ fn uber_identifier() {
 
 #[test]
 fn function_call() {
-    let source = "set(WestHollow.TrialActivation, 2)";
+    let source = "store(Hollow.SpiritTrial, 2)";
     let expected = FunctionCall {
         identifier: Spanned {
-            data: Identifier("set"),
-            span: 0..3,
+            data: Identifier("store"),
+            span: 0..5,
         },
         parameters: Delimited {
             open: Spanned {
                 data: Symbol::<'('>,
-                span: 3..4,
+                span: 5..6,
             },
             content: Some(Punctuated {
                 items: vec![(
                     Expression::Value(ExpressionValue::Literal(Spanned {
                         data: Literal::UberIdentifier(UberIdentifier::Name(UberIdentifierName {
                             group: Spanned {
-                                data: Identifier("WestHollow"),
-                                span: 4..14,
+                                data: Identifier("Hollow"),
+                                span: 6..12,
                             },
                             period: Symbol::<'.'>,
                             member: Recoverable::some(Spanned {
-                                data: Identifier("TrialActivation"),
-                                span: 15..30,
+                                data: Identifier("SpiritTrial"),
+                                span: 13..24,
                             }),
-                            pickup: SpannedOption::None(30),
+                            pickup: SpannedOption::None(24),
                         })),
-                        span: 4..30,
+                        span: 6..24,
                     })),
                     Symbol::<','>,
                 )],
                 last: Some(Expression::Value(ExpressionValue::Literal(Spanned {
                     data: Literal::Integer(2),
-                    span: 32..33,
+                    span: 26..27,
                 }))),
             }),
             close: SpannedOption::Some(Spanned {
                 data: Symbol::<')'>,
-                span: 33..34,
+                span: 27..28,
             }),
         },
     };
@@ -220,8 +220,8 @@ fn coersions() {
             ConstantDiscriminants::Equipment => {
                 test_variants::<Equipment>(|equipment| format!("unequip({equipment})"))
             }
-            ConstantDiscriminants::Zone => {
-                test_variants::<Zone>(|zone| format!("if current_zone() == {zone} {{}}"))
+            ConstantDiscriminants::Area => {
+                test_variants::<Area>(|area| format!("if current_area() == {area} {{}}"))
             }
             ConstantDiscriminants::GenericIcon => test_variants::<GenericIcon>(|generic_icon| {
                 format!("set_shop_item_icon(Shop.Opher.Slot9, {generic_icon})")

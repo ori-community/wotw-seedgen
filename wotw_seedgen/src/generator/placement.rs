@@ -34,7 +34,7 @@ use wotw_seedgen_data::{
         },
         simulate::{Simulate, Simulation},
     },
-    UberIdentifier, UniverseSettings, Zone,
+    Area, UberIdentifier, UniverseSettings,
 };
 use wotw_seedgen_log_capture::LogCapture;
 use wotw_seedgen_seed::SeedgenInfo;
@@ -1024,15 +1024,15 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
         self.hi_torin(preplacement_spoiler);
 
-        let mut zone_reachable = FxHashMap::default();
-        let mut zone_unreachable = FxHashMap::default();
+        let mut area_reachable = FxHashMap::default();
+        let mut area_unreachable = FxHashMap::default();
 
-        for (command, zone) in mem::take(&mut self.output.modifiers.preplacements) {
+        for (command, area) in mem::take(&mut self.output.modifiers.preplacements) {
             let pickup = self.choose_preplacement_location(
                 &command,
-                &mut zone_reachable,
-                &mut zone_unreachable,
-                zone,
+                &mut area_reachable,
+                &mut area_unreachable,
+                area,
             )?;
 
             self.preplace(pickup, command, preplacement_spoiler);
@@ -1044,39 +1044,39 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
     fn choose_preplacement_location(
         &mut self,
         command: &CommandVoid,
-        zone_reachable: &mut FxHashMap<Zone, Vec<usize>>,
-        zone_unreachable: &mut FxHashMap<Zone, Vec<usize>>,
-        zone: Zone,
+        area_reachable: &mut FxHashMap<Area, Vec<usize>>,
+        area_unreachable: &mut FxHashMap<Area, Vec<usize>>,
+        area: Area,
     ) -> Result<&'graph PickupsEntry, String> {
-        fn zone_pickups<'a>(
-            zone_pickups: &'a mut FxHashMap<Zone, Vec<usize>>,
-            zone: Zone,
+        fn area_pickups<'a>(
+            area_pickups: &'a mut FxHashMap<Area, Vec<usize>>,
+            area: Area,
             pickups: &[&PickupsEntry],
         ) -> &'a mut Vec<usize> {
-            zone_pickups.entry(zone).or_insert_with(|| {
+            area_pickups.entry(area).or_insert_with(|| {
                 pickups
                     .iter()
                     .enumerate()
-                    .filter(|(_, pickup)| pickup.zone == zone)
+                    .filter(|(_, pickup)| pickup.area == area)
                     .map(|(index, _)| index)
                     .collect()
             })
         }
 
-        let zone_reachable = zone_pickups(zone_reachable, zone, &self.needs_placement);
+        let area_reachable = area_pickups(area_reachable, area, &self.needs_placement);
 
-        if let Some(index) = zone_reachable.pop() {
+        if let Some(index) = area_reachable.pop() {
             return Ok(self.needs_placement.swap_remove(index));
         }
 
-        let zone_unreachable = zone_pickups(zone_unreachable, zone, &self.unreachable);
+        let area_unreachable = area_pickups(area_unreachable, area, &self.unreachable);
 
-        if let Some(index) = zone_unreachable.pop() {
+        if let Some(index) = area_unreachable.pop() {
             let pickup = self.unreachable.swap_remove(index);
 
             warn!(
                 logger: self.item_pool.log_capture,
-                "{log_index}No reachable locations to preplace {command} in {zone}. Forcing into unreachable location {pickup}",
+                "{log_index}No reachable locations to preplace {command} in {area}. Forcing into unreachable location {pickup}",
                 log_index = self.log_index,
                 command = self.log_name(command),
                 pickup = pickup.identifier,
@@ -1085,22 +1085,22 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             return Ok(pickup);
         }
 
-        let zone_disabled =
+        let area_disabled =
             self.world
                 .graph
                 .nodes
                 .choose_weighted(&mut self.rng, |node| match node {
-                    Node::Pickup(pickup) if pickup.zone == zone => 1,
+                    Node::Pickup(pickup) if pickup.area == area => 1,
                     _ => 0,
                 });
 
-        match zone_disabled {
+        match area_disabled {
             Ok(node) => {
                 let pickup = node.expect_pickup();
 
                 warn!(
                     logger: self.item_pool.log_capture,
-                    "{log_index}No locations to preplace {command} in {zone}. Forcing into disabled location {pickup}",
+                    "{log_index}No locations to preplace {command} in {area}. Forcing into disabled location {pickup}",
                     log_index = self.log_index,
                     command = self.log_name(command),
                     pickup = pickup.identifier,
@@ -1109,7 +1109,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 Ok(pickup)
             }
             Err(_) => Err(format!(
-                "{log_index}No locations exist to preplace {command} in {zone}",
+                "{log_index}No locations exist to preplace {command} in {area}",
                 log_index = self.log_index,
                 command = self.log_name(command),
             )),

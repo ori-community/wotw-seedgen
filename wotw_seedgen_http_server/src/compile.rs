@@ -60,10 +60,7 @@ pub fn compile(
 
     let mut errors = Vec::new();
 
-    let pickups = cache
-        .pickups()
-        .map_err(|message| errors.push(message))
-        .ok();
+    let pickups = cache.pickups().map_err(|message| errors.push(message)).ok();
     let uber_state_data = cache
         .uber_state_data()
         .map_err(|message| errors.push(message))

@@ -51,11 +51,11 @@ pub struct StatsGenerator<
     /// Any number of [`Analyzer`]s that will analyze the seeds
     ///
     /// Each instance of [`ChainedAnalyzers`] will be treated separately (as though you would call [`stats`] multiple times with each of them),
-    /// but the [`Analyzer`]s within one [`ChainedAnalyzers`] will be chained together, e.g. chaining [`SpawnLocationStats`] with [`ZoneUnlockStats`]
-    /// would analyze the zone unlocks for each spawn
+    /// but the [`Analyzer`]s within one [`ChainedAnalyzers`] will be chained together, e.g. chaining [`SpawnLocationStats`] with [`AreaUnlockStats`]
+    /// would analyze the area unlocks for each spawn
     ///
     /// [`SpawnLocationStats`]: (analyzers::SpawnLocationStats)
-    /// [`ZoneUnlockStats`]: (analyzers::ZoneUnlockStats)
+    /// [`AreaUnlockStats`]: (analyzers::AreaUnlockStats)
     pub analyzers: Vec<ChainedAnalyzers>,
     /// The logical [`Graph`] passed to seedgen
     ///
@@ -365,6 +365,7 @@ impl Stats {
             .map(|analyzer| analyzer.title())
             .join(" and ")
     }
+
     pub fn csv(&self) -> String {
         let mut csv = self.title();
         csv.push_str(", Count\n");

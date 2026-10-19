@@ -18,7 +18,7 @@
 !config_boolean(rebuilding_the_glades, true, "Rebuilding the Glades")
 !config_boolean(regrowing_the_glades, true, "Regrowing the Glades")
 
-!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, add_missing_goal_in_zone, update_goals)
+!include("goal_mode_core", write_short_goals_row, check_goals_completed, write_missing_goals, add_missing_goal_in_area, update_goals)
 !include("list_core", new_row, add_row_item, add_current_row)
 
 !if randomize {
@@ -63,190 +63,190 @@
     }
 }
 
-on spawn store(itemTracker.questsRequired, quests_required)
+on spawn store(tracker.questsRequired, quests_required)
 
 !augment_fun(check_goals_completed(), {
-    if itemTracker.questsCount < quests_required set_boolean("goals_completed", false)
+    if tracker.questsFinished < quests_required set_boolean("goals_completed", false)
 })
 
 !augment_fun(write_short_goals_row(), {
-    set_string("quests_message", "Quests: " + itemTracker.questsCount + "/" + quests_required)
-    if itemTracker.questsCount >= quests_required set_string("quests_message", "$" + get_string("quests_message") + "$")
+    set_string("quests_message", "Quests: " + tracker.questsFinished + "/" + quests_required)
+    if tracker.questsFinished >= quests_required set_string("quests_message", "$" + get_string("quests_message") + "$")
     add_row_item(get_string("quests_message"))
 })
 
-!augment_fun(write_missing_goals(), if itemTracker.questsCount < quests_required write_missing_quests())
+!augment_fun(write_missing_goals(), if tracker.questsFinished < quests_required write_missing_quests())
 
-fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - itemTracker.questsCount) + "): ") }
-!if silent_teeth { !augment_fun(write_missing_quests(), if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 add_missing_goal_in_zone(
+fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tracker.questsFinished) + "): ") }
+!if silent_teeth { !augment_fun(write_missing_quests(), if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 add_missing_goal_in_area(
     "Silent Teeth",
-    (kwolokGroupDescriptor.cleanseWellspringQuestUberState != 3 && current_zone() == Wellspring)
-    || (kwolokGroupDescriptor.cleanseWellspringQuestUberState == 3 && current_zone() == Hollow)
+    (kwolokGroupDescriptor.cleanseWellspringQuestUberState != 3 && current_area() == Wellspring)
+    || (kwolokGroupDescriptor.cleanseWellspringQuestUberState == 3 && current_area() == Hollow)
 )) }
-!if missing_key { !augment_fun(write_missing_quests(), if Marsh.MissingKey.Reward == false add_missing_goal_in_zone(
+!if missing_key { !augment_fun(write_missing_quests(), if Marsh.MissingKey.Completed == false add_missing_goal_in_area(
     // TODO any other permanents Tokks? Or toggle this based on the conditions for the Tokks to appear? Also relevant in hand to hand
     "Missing Key",
-    (npcsStateGroup.marshKeystoneQuest != 2 && current_zone() == Marsh)
-    || (npcsStateGroup.marshKeystoneQuest == 2 && (current_zone() == Marsh || current_zone() == Glades))
+    (npcsStateGroup.marshKeystoneQuest != 2 && current_area() == Marsh)
+    || (npcsStateGroup.marshKeystoneQuest == 2 && (current_area() == Marsh || current_area() == Glades))
 )) }
-!if into_burrows { !augment_fun(write_missing_quests(), if Marsh.IntoBurrows.Reward == false add_missing_goal_in_zone(
+!if into_burrows { !augment_fun(write_missing_quests(), if Marsh.IntoBurrows.Completed == false add_missing_goal_in_area(
     "Into Burrows",
-    (npcsStateGroup.inkwaterWellQuest != 3 && current_zone() == Burrows)
-    || (npcsStateGroup.inkwaterWellQuest == 3 && current_zone() == Marsh)
+    (npcsStateGroup.inkwaterWellQuest != 3 && current_area() == Burrows)
+    || (npcsStateGroup.inkwaterWellQuest == 3 && current_area() == Marsh)
 )) }
-!if lost_compass { !augment_fun(write_missing_quests(), if Wellspring.LostCompass.Reward == false add_missing_goal_in_zone(
-    "Lost Compass", current_zone() == Wellspring
+!if lost_compass { !augment_fun(write_missing_quests(), if Wellspring.LostCompass.Completed == false add_missing_goal_in_area(
+    "Lost Compass", current_area() == Wellspring
 )) }
-!if little_braver { !augment_fun(write_missing_quests(), if Marsh.LittleBraver.Reward == false add_missing_goal_in_zone(
-    "Little Braver", current_zone() == Marsh
+!if little_braver { !augment_fun(write_missing_quests(), if Marsh.LittleBraver.Completed == false add_missing_goal_in_area(
+    "Little Braver", current_area() == Marsh
 )) }
-!if family_reunion { !augment_fun(write_missing_quests(), if GladesTown.FamilyReunion == false add_missing_goal_in_zone(
+!if family_reunion { !augment_fun(write_missing_quests(), if Glades.FamilyReunion.Completed == false add_missing_goal_in_area(
     "Family Reunion",
-    (questUberStateGroup.familyReunionQuest != 2 && current_zone() == Glades)
-    || (questUberStateGroup.familyReunionQuest == 2 && current_zone() == Woods)
+    (questUberStateGroup.familyReunionQuest != 2 && current_area() == Glades)
+    || (questUberStateGroup.familyReunionQuest == 2 && current_area() == Woods)
 )) }
-!if tree_keeper { !augment_fun(write_missing_quests(), if GladesTown.LastTree == false add_missing_goal_in_zone(
+!if tree_keeper { !augment_fun(write_missing_quests(), if Glades.Plants.LastTree == false add_missing_goal_in_area(
     "Tree Keeper",
-    (questUberStateGroup.treeKeeperQuest != 1 && current_zone() == Woods)
-    || (questUberStateGroup.treeKeeperQuest == 1 && current_zone() == Glades)
+    (questUberStateGroup.treeKeeperQuest != 1 && current_area() == Woods)
+    || (questUberStateGroup.treeKeeperQuest == 1 && current_area() == Glades)
 )) }
-!if rough_diamond { !augment_fun(write_missing_quests(), if questUberStateGroup.desertCogQuest < 5 add_missing_goal_in_zone(
+!if rough_diamond { !augment_fun(write_missing_quests(), if questUberStateGroup.desertCogQuest < 5 add_missing_goal_in_area(
     "Rough Diamond",
-    (questUberStateGroup.desertCogQuest != 4 && current_zone() == Wastes)
-    || (questUberStateGroup.desertCogQuest == 4 && (current_zone() == Hollow || current_zone() == Glades))
+    (questUberStateGroup.desertCogQuest != 4 && current_area() == Wastes)
+    || (questUberStateGroup.desertCogQuest == 4 && (current_area() == Hollow || current_area() == Glades))
 )) }
-!if hand_to_hand { !augment_fun(write_missing_quests(), if Ruins.HandToHand.Reward == false add_missing_goal_in_zone(
+!if hand_to_hand { !augment_fun(write_missing_quests(), if Ruins.HandToHand.Completed == false add_missing_goal_in_area(
     "Hand to Hand",
-    (questUberStateGroup.tradeSequenceQuest == 0 && current_zone() == Hollow)
-    || (questUberStateGroup.tradeSequenceQuest == 1 && (current_zone() == Marsh || current_zone() == Glades))
-    || (questUberStateGroup.tradeSequenceQuest == 2 && current_zone() == Wellspring)
-    || ((questUberStateGroup.tradeSequenceQuest == 3 || questUberStateGroup.tradeSequenceQuest == 5 || questUberStateGroup.tradeSequenceQuest == 8) && current_zone() == Glades)
-    || (questUberStateGroup.tradeSequenceQuest == 4 && current_zone() == Reach)
-    || (questUberStateGroup.tradeSequenceQuest == 6 && current_zone() == Depths)
-    || (questUberStateGroup.tradeSequenceQuest == 7 && current_zone() == Pools)
-    || (questUberStateGroup.tradeSequenceQuest == 9 && current_zone() == Wastes)
-    || (questUberStateGroup.tradeSequenceQuest == 10 && current_zone() == Ruins)
+    (questUberStateGroup.tradeSequenceQuest == 0 && current_area() == Hollow)
+    || (questUberStateGroup.tradeSequenceQuest == 1 && (current_area() == Marsh || current_area() == Glades))
+    || (questUberStateGroup.tradeSequenceQuest == 2 && current_area() == Wellspring)
+    || ((questUberStateGroup.tradeSequenceQuest == 3 || questUberStateGroup.tradeSequenceQuest == 5 || questUberStateGroup.tradeSequenceQuest == 8) && current_area() == Glades)
+    || (questUberStateGroup.tradeSequenceQuest == 4 && current_area() == Reach)
+    || (questUberStateGroup.tradeSequenceQuest == 6 && current_area() == Depths)
+    || (questUberStateGroup.tradeSequenceQuest == 7 && current_area() == Pools)
+    || (questUberStateGroup.tradeSequenceQuest == 9 && current_area() == Wastes)
+    || (questUberStateGroup.tradeSequenceQuest == 10 && current_area() == Ruins)
 )) }
-!if into_darkness { !augment_fun(write_missing_quests(), if Glades.IntoDarkness.Reward == false add_missing_goal_in_zone(
-    "Into Darkness", current_zone() == Glades
+!if into_darkness { !augment_fun(write_missing_quests(), if Glades.IntoDarkness.Completed == false add_missing_goal_in_area(
+    "Into Darkness", current_area() == Glades
 )) }
-!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if Hollow.KwoloksWisdom.Reward == false add_missing_goal_in_zone(
+!if kwoloks_wisdom { !augment_fun(write_missing_quests(), if Hollow.KwoloksWisdom.Completed == false add_missing_goal_in_area(
     "Kwolok's Wisdom",
-    (questUberStateGroup.kwoloksWisdomQuest != 3 && current_zone() == Pools)
-    || (questUberStateGroup.kwoloksWisdomQuest == 3 && current_zone() == Hollow)
+    (questUberStateGroup.kwoloksWisdomQuest != 3 && current_area() == Pools)
+    || (questUberStateGroup.kwoloksWisdomQuest == 3 && current_area() == Hollow)
 )) }
-!if rebuilding_the_glades { !augment_fun(write_missing_quests(), if Glades.RebuildGlades.Reward == false add_missing_goal_in_zone(
-    "Rebuilding the Glades", current_zone() == Glades
+!if rebuilding_the_glades { !augment_fun(write_missing_quests(), if Glades.RebuildGlades.Completed == false add_missing_goal_in_area(
+    "Rebuilding the Glades", current_area() == Glades
 )) }
-!if regrowing_the_glades { !augment_fun(write_missing_quests(), if Glades.RegrowGlades.Reward == false add_missing_goal_in_zone(
-    "Regrowing the Glades", current_zone() == Glades
+!if regrowing_the_glades { !augment_fun(write_missing_quests(), if Glades.RegrowGlades.Completed == false add_missing_goal_in_area(
+    "Regrowing the Glades", current_area() == Glades
 )) }
 !augment_fun(write_missing_quests(), add_current_row())
 
-on change itemTracker.questsCount update_goals()
+on change tracker.questsFinished update_goals()
 
 !if silent_teeth {
     on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 4 {
         create_stats_entry(QuestEnd, "The Silent Teeth")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if missing_key {
-    on Marsh.MissingKey.Reward {
+    on Marsh.MissingKey.Completed {
         create_stats_entry(QuestEnd, "The Missing Key")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
     // TODO optimization for state > n == false?
-    on Marsh.MissingKey.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Marsh.MissingKey.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if into_burrows {
-    on Marsh.IntoBurrows.Reward {
+    on Marsh.IntoBurrows.Completed {
         create_stats_entry(QuestEnd, "Into the Burrows")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Marsh.IntoBurrows.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Marsh.IntoBurrows.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if lost_compass {
-    on Wellspring.LostCompass.Reward {
+    on Wellspring.LostCompass.Completed {
         create_stats_entry(QuestEnd, "The Lost Compass")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Wellspring.LostCompass.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Wellspring.LostCompass.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if little_braver {
-    on Marsh.LittleBraver.Reward {
+    on Marsh.LittleBraver.Completed {
         create_stats_entry(QuestEnd, "A Little Braver")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Marsh.LittleBraver.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Marsh.LittleBraver.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if family_reunion {
-    on GladesTown.FamilyReunion {
+    on Glades.FamilyReunion.Completed {
         create_stats_entry(QuestEnd, "Family Reunion")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on GladesTown.FamilyReunion == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.FamilyReunion.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if tree_keeper {
-    on GladesTown.LastTree {
+    on Glades.Plants.LastTree {
         create_stats_entry(QuestEnd, "The Tree Keeper")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on GladesTown.LastTree == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.Plants.LastTree == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 // TODO we lack fully accurate simulation in cases where quests set multiple states.
 !if rough_diamond {
     on questUberStateGroup.desertCogQuest >= 5 {
         create_stats_entry(QuestEnd, "A Diamond in the Rough")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on questUberStateGroup.desertCogQuest < 5 store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on questUberStateGroup.desertCogQuest < 5 store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if hand_to_hand {
-    on Ruins.HandToHand.Reward {
+    on Ruins.HandToHand.Completed {
         create_stats_entry(QuestEnd, "Hand To Hand")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Ruins.HandToHand.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Ruins.HandToHand.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if into_darkness {
-    on Glades.IntoDarkness.Reward {
+    on Glades.IntoDarkness.Completed {
         create_stats_entry(QuestEnd, "Into the Darkness")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Glades.IntoDarkness.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.IntoDarkness.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if kwoloks_wisdom {
-    on Hollow.KwoloksWisdom.Reward {
+    on Hollow.KwoloksWisdom.Completed {
         create_stats_entry(QuestEnd, "Kwolok's Wisdom")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Hollow.KwoloksWisdom.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Hollow.KwoloksWisdom.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if rebuilding_the_glades {
-    on Glades.RebuildGlades.Reward {
+    on Glades.RebuildGlades.Completed {
         create_stats_entry(QuestEnd, "Rebuilding the Glades")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Glades.RebuildGlades.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.RebuildGlades.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if regrowing_the_glades {
-    on Glades.RegrowGlades.Reward {
+    on Glades.RegrowGlades.Completed {
         create_stats_entry(QuestEnd, "Regrowing the Glades")
-        store(itemTracker.questsCount, itemTracker.questsCount + 1)
+        store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Glades.RegrowGlades.Reward == false store(itemTracker.questsCount, itemTracker.questsCount - 1)
+    on Glades.RegrowGlades.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }

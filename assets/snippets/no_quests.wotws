@@ -16,7 +16,7 @@ on spawn {
     store(Woods.TreeKeeper.Seed, true)
     store(Pools.KwoloksWisdom.Amulet, true)
     store(Wastes.RoughDiamond.Gem, true)
-    store(Glades.RoughDiamond.Reward, true)
+    store(Glades.RoughDiamondShard, true)
     if questUberStateGroup.familyReunionQuest < 2 store(questUberStateGroup.familyReunionQuest, 2)
     store(questUberStateGroup.darkCaveQuest, 3)
     store(questUberStateGroup.rebuildGladesQuest, 2)
@@ -27,7 +27,7 @@ on spawn {
     store(_petrifiedForestGroup.hutDoorUnlocked, true)
     store(questUberStateGroup.desertCogQuest, 5)
 }
-on GladesTown.BuildHuts {
+on Glades.Buildings.DwellingRepairs {
     store(hubUberStateGroup.fatherMokiGone, true)
     store(questUberStateGroup.familyReunionQuest, 4)
 }

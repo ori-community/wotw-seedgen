@@ -19,7 +19,7 @@ pub struct UberStateData {
     /// Vanilla UberState names are usually written as camelCase `<group>.<member>`.
     /// Resolve by `<group>` first, then `<member>`. This should yield a [`Vec<UberIdentifier>`].
     ///
-    /// Rando names are usually written as PascalCase `<zone>[.<region>].<item>`.
+    /// Rando names are usually written as PascalCase `<area>[.<region>].<item>`.
     /// Resolve by the first two parts, then continue as desired in the resulting [`RandoUberStateGroup`].
     ///
     /// In both cases once you have resolved to an [`UberIdentifier`],
@@ -296,17 +296,17 @@ impl UberStateData {
         value: Option<i32>,
     ) {
         let mut parts = name.split('.');
-        let zone = parts.next().unwrap();
+        let area = parts.next().unwrap();
         let region_or_pickup = parts.next().expect("Invalid UberState name");
 
         let rando_group = match self
             .name_lookup
-            .entry(zone.to_string())
+            .entry(area.to_string())
             .or_default()
             .entry(region_or_pickup.to_string())
             .or_insert(UberStateNameEntry::Rando(RandoUberStateGroup::default()))
         {
-            UberStateNameEntry::Vanilla(_) => rando_name_in_vanilla_group(zone),
+            UberStateNameEntry::Vanilla(_) => rando_name_in_vanilla_group(area),
             UberStateNameEntry::Rando(rando_group) => rando_group,
         };
 

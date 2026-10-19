@@ -21,7 +21,7 @@ use crate::{
         output::{Anchor, Connection, Graph, Node, Requirement},
     },
     seed_language::simulate::UberStates,
-    Difficulty, MapIcon, UberIdentifier, WorldSettings, Zone,
+    Area, Difficulty, MapIcon, UberIdentifier, WorldSettings,
 };
 
 const ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../assets");
@@ -247,7 +247,7 @@ impl TestGraph {
         )));
         graph.nodes.push(Node::Pickup(PickupsEntry {
             identifier: "yummy".to_owned(),
-            zone: Zone::Marsh,
+            area: Area::Marsh,
             map_icon: MapIcon::SpiritLight,
             uber_identifier: UberIdentifier::new(0, 0),
             value: None,

@@ -2,7 +2,7 @@ use std::iter;
 
 use crate::{
     seed_language::output::{
-        CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone, Operation,
+        CommandArea, CommandBoolean, CommandFloat, CommandInteger, CommandString, Operation,
         Trigger, TriggerCondition,
     },
     UberIdentifier,
@@ -55,7 +55,7 @@ impl ContainedReads for CommandBoolean {
             Self::CompareInteger { operation } => operation.contained_reads(),
             Self::CompareFloat { operation } => operation.contained_reads(),
             Self::CompareString { operation } => operation.contained_reads(),
-            Self::CompareZone { operation } => operation.contained_reads(),
+            Self::CompareArea { operation } => operation.contained_reads(),
             Self::LogicOperation { operation } => operation.contained_reads(),
             Self::FetchBoolean { uber_identifier } => one(*uber_identifier),
             Self::Constant { .. }
@@ -121,13 +121,13 @@ impl ContainedReads for CommandString {
     }
 }
 
-impl ContainedReads for CommandZone {
+impl ContainedReads for CommandArea {
     fn contained_reads(&self) -> Box<dyn Iterator<Item = UberIdentifier> + '_> {
         debug_assert!(!matches!(self, Self::Multi { .. }));
 
         match self {
-            Self::CurrentZone {} => one(UberIdentifier::CURRENT_ZONE),
-            Self::CurrentMapZone {} => one(UberIdentifier::CURRENT_MAP_ZONE),
+            Self::PlayerArea {} => one(UberIdentifier::PLAYER_AREA),
+            Self::MapFocusedArea {} => one(UberIdentifier::MAP_FOCUSED_AREA),
             Self::Constant { .. } | Self::Multi { .. } => none(),
         }
     }

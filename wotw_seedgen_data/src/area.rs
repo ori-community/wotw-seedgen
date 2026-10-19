@@ -3,7 +3,7 @@ use strum::{Display, VariantArray};
 use utoipa::ToSchema;
 use wotw_seedgen_derive::FromStr;
 
-/// World zones as indicated on the map
+/// World areas as indicated on the map
 #[derive(
     Debug,
     Clone,
@@ -21,7 +21,7 @@ use wotw_seedgen_derive::FromStr;
     VariantArray,
 )]
 #[repr(u8)]
-pub enum Zone {
+pub enum Area {
     Marsh = 0,
     Hollow = 1,
     Glades = 2,

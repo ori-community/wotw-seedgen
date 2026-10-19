@@ -2,7 +2,7 @@ use std::fmt::{self, Display};
 
 use crate::{
     assets::{PickupsEntry, StatesEntry},
-    Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, Zone,
+    Area, Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier,
 };
 use itertools::Itertools;
 use rustc_hash::FxHashMap;
@@ -58,9 +58,9 @@ impl Node {
         }
     }
 
-    pub fn zone(&self) -> Option<Zone> {
+    pub fn area(&self) -> Option<Area> {
         match self {
-            Node::Pickup(pickup) => Some(pickup.zone),
+            Node::Pickup(pickup) => Some(pickup.area),
             _ => None,
         }
     }

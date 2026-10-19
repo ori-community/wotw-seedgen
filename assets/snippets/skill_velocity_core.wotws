@@ -39,23 +39,23 @@ on spawn store(enabled, true)
 on enabled && collected > 0 {
     set_wheel_item_disable()
     update_bonus_wheel()
-    store(randoUpgrades.launchSpeedMultiplier, 1 + collected * 0.16)
-    store(randoUpgrades.dashDistanceMultiplier, 1 + collected * 0.16)
-    store(randoUpgrades.bashSpeedMultiplier, 1 + collected * 0.16)
-    store(randoUpgrades.burrowDashSpeedMultiplier, 1 + collected * 0.16)
-    store(randoUpgrades.waterDashSpeedMultiplier, 1 + collected * 0.16)
-    store(randoUpgrades.grappleSpeedMultiplier, 1 + collected * 0.16)
+    store(bonusUpgrades.launchSpeedMultiplier, 1 + collected * 0.16)
+    store(bonusUpgrades.dashDistanceMultiplier, 1 + collected * 0.16)
+    store(bonusUpgrades.bashSpeedMultiplier, 1 + collected * 0.16)
+    store(bonusUpgrades.burrowDashSpeedMultiplier, 1 + collected * 0.16)
+    store(bonusUpgrades.waterDashSpeedMultiplier, 1 + collected * 0.16)
+    store(bonusUpgrades.grappleSpeedMultiplier, 1 + collected * 0.16)
 }
 
 on enabled == false && collected > 0 {
     set_wheel_item_enable()
     update_bonus_wheel()
-    store(randoUpgrades.launchSpeedMultiplier, 1)
-    store(randoUpgrades.dashDistanceMultiplier, 1)
-    store(randoUpgrades.bashSpeedMultiplier, 1)
-    store(randoUpgrades.burrowDashSpeedMultiplier, 1)
-    store(randoUpgrades.waterDashSpeedMultiplier, 1)
-    store(randoUpgrades.grappleSpeedMultiplier, 1)
+    store(bonusUpgrades.launchSpeedMultiplier, 1)
+    store(bonusUpgrades.dashDistanceMultiplier, 1)
+    store(bonusUpgrades.bashSpeedMultiplier, 1)
+    store(bonusUpgrades.burrowDashSpeedMultiplier, 1)
+    store(bonusUpgrades.waterDashSpeedMultiplier, 1)
+    store(bonusUpgrades.grappleSpeedMultiplier, 1)
 }
 
 on reload if collected > 0 {

@@ -5,7 +5,7 @@ pub(super) fn order_index(s: &str, order: &[&str]) -> usize {
     order
         .iter()
         .enumerate()
-        .find(|(_, zone)| s == **zone)
+        .find(|(_, area)| s == **area)
         .map_or(usize::MAX, |(index, _)| index)
 }
 
@@ -61,8 +61,8 @@ impl FixedOrder for RegionFixedOrder {
     ];
 }
 
-pub(super) struct ZoneFixedOrder;
-impl FixedOrder for ZoneFixedOrder {
+pub(super) struct AreaFixedOrder;
+impl FixedOrder for AreaFixedOrder {
     const ORDER: &'static [&'static str] = &[
         "Marsh",
         "Hollow",

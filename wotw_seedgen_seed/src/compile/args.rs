@@ -2,7 +2,7 @@ use super::{command::MemoryUsed, Compile};
 use crate::{assembly::Command, compile::CompileContext};
 use wotw_seedgen_data::seed_language::{
     compile::ARG_MEMORY,
-    output::{CommandBoolean, CommandFloat, CommandInteger, CommandString, CommandZone},
+    output::{CommandArea, CommandBoolean, CommandFloat, CommandInteger, CommandString},
 };
 
 pub struct Args<'a> {
@@ -45,7 +45,7 @@ impl<'a> Args<'a> {
         self.arg(ArgDestination::String(index), arg)
     }
 
-    pub fn zone(self, index: usize, arg: CommandZone) -> Self {
+    pub fn area(self, index: usize, arg: CommandArea) -> Self {
         let arg = arg.compile(self.context);
         self.arg(ArgDestination::Integer(index), arg)
     }

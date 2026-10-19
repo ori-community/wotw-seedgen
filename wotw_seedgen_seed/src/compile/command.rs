@@ -71,7 +71,7 @@ impl Compile for input::Command {
             Self::Integer(command) => command.compile(context),
             Self::Float(command) => command.compile(context),
             Self::String(command) => command.compile(context),
-            Self::Zone(command) => command.compile(context),
+            Self::Area(command) => command.compile(context),
             Self::Void(command) => command.compile(context),
         }
     }
@@ -118,9 +118,9 @@ impl Compile for input::CommandBoolean {
                     Command::CompareString(operation.operator),
                     MemoryUsed::ONE_BOOLEAN,
                 ),
-            Self::CompareZone { operation } => Args::new(context)
-                .zone(0, operation.left)
-                .zone(1, operation.right)
+            Self::CompareArea { operation } => Args::new(context)
+                .area(0, operation.left)
+                .area(1, operation.right)
                 .call(
                     Command::CompareInteger(match operation.operator {
                         EqualityComparator::Equal => Comparator::Equal,
@@ -285,7 +285,7 @@ impl Compile for input::StringOrPlaceholder {
     }
 }
 
-impl Compile for input::CommandZone {
+impl Compile for input::CommandArea {
     type Output = (Vec<Command>, MemoryUsed);
 
     fn compile(self, context: &mut CompileContext) -> Self::Output {
@@ -297,11 +297,11 @@ impl Compile for input::CommandZone {
                 MemoryUsed::ONE_INTEGER,
             ),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
-            Self::CurrentZone {} => (
+            Self::PlayerArea {} => (
                 vec![Command::FetchInteger(UberIdentifier::player(50))],
                 MemoryUsed::ONE_INTEGER,
             ),
-            Self::CurrentMapZone {} => (
+            Self::MapFocusedArea {} => (
                 vec![Command::FetchInteger(UberIdentifier::player(51))],
                 MemoryUsed::ONE_INTEGER,
             ),

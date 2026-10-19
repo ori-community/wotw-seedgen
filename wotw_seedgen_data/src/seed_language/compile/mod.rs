@@ -466,7 +466,7 @@ impl<'source, 'compiler, 'snippets, 'uberstates, 'log>
             (Type::Skill, Type::Equipment) | (Type::Equipment, Type::Skill) => {
                 Some(Type::Equipment)
             }
-            (Type::Teleporter, Type::Zone) | (Type::Zone, Type::Teleporter) => Some(Type::Zone),
+            (Type::Teleporter, Type::Area) | (Type::Area, Type::Teleporter) => Some(Type::Area),
             (Type::Skill | Type::WeaponUpgrade, Type::OpherIcon)
             | (Type::OpherIcon, Type::Skill | Type::WeaponUpgrade) => Some(Type::OpherIcon),
             (Type::EquipSlot, Type::WheelBind) | (Type::WheelBind, Type::EquipSlot) => {

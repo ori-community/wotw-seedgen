@@ -3,21 +3,21 @@ use std::num::NonZeroUsize;
 use wotw_seedgen::{
     data::{
         seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
-        Zone,
+        Area,
     },
     spoiler::SeedSpoiler,
 };
 
-/// Analyzes how much Spirit Light is in a zone
-pub struct ZoneSpiritLightStats {
-    pub zone: Zone,
+/// Analyzes how much Spirit Light is in a area
+pub struct AreaSpiritLightStats {
+    pub area: Area,
     /// How many adjacent result to group together
     pub result_bucket_size: NonZeroUsize,
 }
 
-impl Analyzer for ZoneSpiritLightStats {
+impl Analyzer for AreaSpiritLightStats {
     fn title(&self) -> String {
-        format!("Spirit Light in {}", self.zone)
+        format!("Spirit Light in {}", self.area)
     }
 
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
@@ -25,7 +25,7 @@ impl Analyzer for ZoneSpiritLightStats {
             .groups
             .iter()
             .flat_map(|group| group.placements.iter())
-            .filter(|placement| placement.location.zone == self.zone)
+            .filter(|placement| placement.location.area == self.area)
             .flat_map(|placement| {
                 placement
                     .item

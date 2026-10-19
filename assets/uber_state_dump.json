@@ -185,8 +185,38 @@
         }
       }
     },
+    "3": {
+      "name": "map",
+      "states": {
+        "1": {
+          "name": "focusedArea",
+          "type": "ReadOnlyVirtualIntUberState",
+          "value": -1.0
+        },
+        "2": {
+          "name": "filter",
+          "type": "VirtualIntUberState",
+          "value": 0.0
+        },
+        "12": {
+          "name": "inLogicFilterAvailable",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "100": {
+          "name": "spoilerFilterAvailable",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "600": {
+          "name": "darkenTopLeftCorner",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        }
+      }
+    },
     "4": {
-      "name": "randoUpgrades",
+      "name": "bonusUpgrades",
       "states": {
         "0": {
           "name": "hammerSpeedMultiplier",
@@ -199,84 +229,99 @@
           "value": 1.0
         },
         "2": {
-          "name": "blazeCostMultiplier",
+          "name": "blazeCost",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
         "3": {
-          "name": "spearCostMultiplier",
+          "name": "chargeBlazeCost",
           "type": "SerializedFloatUberState",
-          "value": 1.0
+          "value": 2.0
         },
         "4": {
-          "name": "shurikenCostMultiplier",
+          "name": "spearCost",
           "type": "SerializedFloatUberState",
-          "value": 1.0
+          "value": 2.0
         },
         "5": {
-          "name": "sentryCostMultiplier",
+          "name": "shurikenCost",
           "type": "SerializedFloatUberState",
-          "value": 1.0
+          "value": 0.5
         },
         "6": {
-          "name": "bowCostMultiplier",
+          "name": "sentryCost",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
         "7": {
-          "name": "regenerateCostMultiplier",
+          "name": "bowCost",
           "type": "SerializedFloatUberState",
-          "value": 1.0
+          "value": 0.25
         },
         "8": {
-          "name": "flashCostMultiplier",
+          "name": "chargeBowCost",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
         "9": {
-          "name": "grenadeCostMultiplier",
+          "name": "regenerateCost",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
         "10": {
-          "name": "bowRapidFireIntervalDurationMultiplier",
+          "name": "flashCostInitial",
+          "type": "SerializedFloatUberState",
+          "value": 0.4
+        },
+        "11": {
+          "name": "flashCostPerSecond",
+          "type": "SerializedFloatUberState",
+          "value": 0.1
+        },
+        "12": {
+          "name": "grenadeCost",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
-        "11": {
+        "13": {
+          "name": "quickshotIntervalDurationMultiplier",
+          "type": "SerializedFloatUberState",
+          "value": 1.0
+        },
+        "14": {
           "name": "spearSpeedMultiplier",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
         "35": {
-          "name": "extraDoubleJumps",
+          "name": "maxDoubleJumps",
           "type": "SerializedByteUberState",
-          "value": 0.0
+          "value": 1.0
         },
         "36": {
-          "name": "extraDashes",
+          "name": "maxAirDashes",
           "type": "SerializedByteUberState",
-          "value": 0.0
+          "value": 1.0
         },
         "37": {
-          "name": "extraSentries",
+          "name": "maxSentries",
           "type": "SerializedByteUberState",
-          "value": 0.0
+          "value": 3.0
         },
         "38": {
-          "name": "extraShurikens",
+          "name": "maxShurikens",
           "type": "SerializedByteUberState",
-          "value": 0.0
+          "value": 1.0
         },
         "39": {
-          "name": "extraLaunches",
+          "name": "maxLaunches",
           "type": "SerializedByteUberState",
-          "value": 0.0
+          "value": 1.0
         },
         "40": {
-          "name": "extraGrenades",
+          "name": "maxGrenades",
           "type": "SerializedByteUberState",
-          "value": 0.0
+          "value": 1.0
         },
         "41": {
           "name": "grenadesExplodeOnCollision",
@@ -289,7 +334,7 @@
           "value": 0.0
         },
         "43": {
-          "name": "chargedAirGrenades",
+          "name": "grenadesChargeWhileAirborne",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -299,57 +344,57 @@
           "value": 1.0
         },
         "45": {
-          "name": "grenadeMultishotCount",
+          "name": "splinterGrenadeCount",
           "type": "SerializedByteUberState",
           "value": 0.0
         },
         "46": {
-          "name": "sentryShots",
+          "name": "sentryShotsPerBurst",
           "type": "SerializedByteUberState",
           "value": 3.0
         },
         "47": {
-          "name": "sentryFireRateSpeed",
+          "name": "sentryFireRateMultiplier",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
         "48": {
-          "name": "shurikenMultishotCount",
+          "name": "splinterShurikenCount",
           "type": "SerializedByteUberState",
           "value": 0.0
         },
         "49": {
-          "name": "shurikenMultishotSpread",
+          "name": "splinterShurikenAngle",
           "type": "SerializedFloatUberState",
           "value": 35.0
         },
         "70": {
-          "name": "bowAsFireSource",
+          "name": "meltingBow",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "71": {
-          "name": "blazeAsFireSource",
+          "name": "meltingBlaze",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "72": {
-          "name": "swordAsFireSource",
+          "name": "meltingSword",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "73": {
-          "name": "hammerAsFireSource",
+          "name": "meltingHammer",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "74": {
-          "name": "spearAsFireSource",
+          "name": "meltingSpear",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "75": {
-          "name": "shurikenAsFireSource",
+          "name": "meltingShuriken",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -394,12 +439,12 @@
           "value": 1.0
         },
         "88": {
-          "name": "wallJumpHeightMultiplier",
+          "name": "wallJumpSpeedMultiplier",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
         "89": {
-          "name": "doubleJumpHeightMultiplier",
+          "name": "doubleJumpSpeedMultiplier",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
@@ -424,7 +469,7 @@
           "value": 1.0
         },
         "94": {
-          "name": "flashTickInterval",
+          "name": "flashDamageIntervalDurationMultiplier",
           "type": "SerializedFloatUberState",
           "value": 1.0
         },
@@ -509,22 +554,27 @@
           "value": 0.0
         },
         "50": {
-          "name": "currentArea",
+          "name": "area",
           "type": "ReadOnlyVirtualIntUberState",
           "value": 13.0
         },
-        "51": {
-          "name": "currentMapArea",
-          "type": "ReadOnlyVirtualIntUberState",
-          "value": -1.0
-        },
-        "52": {
-          "name": "currentMapFilter",
-          "type": "VirtualIntUberState",
-          "value": 0.0
-        },
         "100": {
           "name": "isTeleporting",
+          "type": "ReadOnlyVirtualBooleanUberState",
+          "value": 0.0
+        },
+        "200": {
+          "name": "mouseWorldPositionX",
+          "type": "ReadOnlyVirtualFloatUberState",
+          "value": 0.0
+        },
+        "201": {
+          "name": "mouseWorldPositionY",
+          "type": "ReadOnlyVirtualFloatUberState",
+          "value": 0.0
+        },
+        "300": {
+          "name": "wheelOpen",
           "type": "ReadOnlyVirtualBooleanUberState",
           "value": 0.0
         },
@@ -536,20 +586,140 @@
       }
     },
     "6": {
-      "name": "randoState",
+      "name": "modifications",
       "states": {
         "0": {
-          "name": "shriekBarrier",
+          "name": "enableShriekBarrier",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
-        "36": {
-          "name": "eastWoodsTrunkSlowWalkZoneEnabledState",
+        "1": {
+          "name": "disableTeleporterMapActivation",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "8": {
+          "name": "disablePickupCollision",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "9": {
+          "name": "stompThroughPortals",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "10": {
+          "name": "stompIntoWater",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "11": {
+          "name": "disableKuInHollow",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "13": {
+          "name": "fixMeetKwolokUnderwaterOOB",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "14": {
+          "name": "fixTeleporterChainOOB",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "15": {
+          "name": "fixBelowPoolsEscapeStartSoftlock",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "16": {
+          "name": "fixShopAnywhere",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "17": {
+          "name": "patch2Knockback",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "18": {
+          "name": "fastTravelUnderwater",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "19": {
+          "name": "fastTravelDuringCombatShrine",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "20": {
+          "name": "disableWillowHeartCutscenes",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "21": {
+          "name": "fastTravelAtMapstone",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "22": {
+          "name": "showShriekHealthDuringEscape",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "23": {
+          "name": "fixCatAndMouseSoftlock",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "37": {
+          "name": "fixPauseFloat",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "38": {
+          "name": "fixMoraTriggerSkip",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "40": {
+          "name": "disableEastWoodsTrunkSlowZone",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "41": {
+          "name": "disableEastWoodsTrunkSlowZoneStateActive",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "50": {
+          "name": "disableMeetKwolokUnderwaterSlowZone",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "100": {
-          "name": "enableSpoilerFilter",
+          "name": "disableShriekEscapeSand",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "101": {
+          "name": "disableWeepingRidgeEntranceSand",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "102": {
+          "name": "knockKnockWellspring",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "103": {
+          "name": "disableDespawningNearbyEnemies",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "200": {
+          "name": "showSmallEntrances",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -559,22 +729,57 @@
           "value": 0.0
         },
         "301": {
+          "name": "spawnTuleyStateActive",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "310": {
           "name": "spawnOpherEverywhere",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
-        "302": {
+        "311": {
+          "name": "spawnOpherEverywhereStateActive",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "320": {
           "name": "spawnTwillenEverywhere",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
-        "401": {
-          "name": "rainLiftedInMarsh",
+        "321": {
+          "name": "spawnTwillenEverywhereStateActive",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
-        "402": {
-          "name": "regenTreeDrained",
+        "400": {
+          "name": "stormLiftedInMarsh",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "401": {
+          "name": "stormLiftedInMarshStateActive",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "410": {
+          "name": "regenerateTreeDrained",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "411": {
+          "name": "regenerateTreeDrainedStateActive",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "420": {
+          "name": "baurSneezeWithBlaze",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "421": {
+          "name": "baurSneezeWithFlash",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -584,12 +789,82 @@
           "value": 0.0
         },
         "501": {
-          "name": "allowOpeningEyestoneDoor",
+          "name": "canOpenMokiFatherHutStateActive",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "510": {
+          "name": "canOpenEyestoneDoor",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "511": {
+          "name": "canOpenEyestoneDoorStateActive",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "600": {
-          "name": "darkenTopLeftCornerOfMap",
+          "name": "disableRepairTheSpiritWellCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "601": {
+          "name": "disableRoofsOverHeadsCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "602": {
+          "name": "disableOnwardsAndUpwardsCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "603": {
+          "name": "disableDwellingRepairsCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "604": {
+          "name": "disableThornySituationCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "605": {
+          "name": "disableClearTheCaveEntranceCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "606": {
+          "name": "disableTheGorlekTouchCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "610": {
+          "name": "disableLightcatchersCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "611": {
+          "name": "disableSelaFlowersCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "612": {
+          "name": "disableBlueMoonCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "613": {
+          "name": "disableStickyGrassCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "614": {
+          "name": "disableSpringPlantsCutscene",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "615": {
+          "name": "disableLastTreeCutscene",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -636,271 +911,6 @@
         "709": {
           "name": "bell9",
           "type": "SerializedByteUberState",
-          "value": 0.0
-        },
-        "800": {
-          "name": "howlFightActive",
-          "type": "ReadOnlyVirtualBooleanUberState",
-          "value": 0.0
-        },
-        "2000": {
-          "name": "cleanWater",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        }
-      }
-    },
-    "7": {
-      "name": "randoConfig",
-      "states": {
-        "1": {
-          "name": "preventMapReactivateTps",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "6": {
-          "name": "useAllowOpeningEyestoneDoorState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "8": {
-          "name": "preventPickup",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "9": {
-          "name": "stompThroughPortals",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "10": {
-          "name": "stompIntoWater",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "11": {
-          "name": "goodHollow",
-          "type": "SerializedBooleanUberState",
-          "value": 1.0
-        },
-        "12": {
-          "name": "inLogicFilterEnabled",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "13": {
-          "name": "fixMeetingKwolokUnderwaterTrigger",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "14": {
-          "name": "fixTeleporterChainOutOfBounds",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "15": {
-          "name": "fixKwolokBossEscapeUnderwaterSpiritLightSoftlock",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "16": {
-          "name": "fixShopAnywhere",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "17": {
-          "name": "patch2Kickback",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "18": {
-          "name": "allowTeleportingUnderwater",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "19": {
-          "name": "allowTeleportingDuringCombatShrineFights",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "20": {
-          "name": "disableWillowHeartCutscenes",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "21": {
-          "name": "allowTeleportingAtRuinsMapstone",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "22": {
-          "name": "keepShriekHealthBarDuringEscape",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "23": {
-          "name": "fixCatAndMouseSoftlock",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "30": {
-          "name": "useSpawnTuleyRandoState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "31": {
-          "name": "useSpawnOpherEverywhereRandoState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "32": {
-          "name": "useSpawnTwillenEverywhereRandoState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "33": {
-          "name": "useCanOpenMokiFatherHutRandoState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "34": {
-          "name": "useRainLiftedInMarshRandoState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "35": {
-          "name": "useRegenTreeDrainedRandoState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "36": {
-          "name": "useEastWoodsTrunkSlowWalkZoneEnabledState",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "37": {
-          "name": "preventPauseFloats",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "38": {
-          "name": "fixMoraArenaTrigger",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "39": {
-          "name": "drawPositionTriggersInDebugRenderer",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "40": {
-          "name": "fixMeetingKwolokUnderwaterAbilityRestriction",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "100": {
-          "name": "removeShriekEscapeSand",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "101": {
-          "name": "removeFeedingGroundsToElevatorSand",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "102": {
-          "name": "knockKnockWellspring",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "103": {
-          "name": "allowSpawningEnemiesNearby",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "200": {
-          "name": "showSmallEntrances",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "300": {
-          "name": "enableDebugRenderer",
-          "type": "VirtualBooleanUberState",
-          "value": 0.0
-        },
-        "420": {
-          "name": "baurSneezeWithBlaze",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "421": {
-          "name": "baurSneezeWithFlash",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "500": {
-          "name": "spiritWellPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "501": {
-          "name": "housesAPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "502": {
-          "name": "housesBPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "503": {
-          "name": "housesCPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "504": {
-          "name": "removeThornsPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "505": {
-          "name": "openCavePlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "506": {
-          "name": "beautifyPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "510": {
-          "name": "lightcatchersPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "511": {
-          "name": "selaFlowersPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "512": {
-          "name": "blueMoonPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "513": {
-          "name": "stickyGrassPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "514": {
-          "name": "springPlantsPlayCutscene",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "515": {
-          "name": "lastTreePlayCutscene",
-          "type": "SerializedBooleanUberState",
           "value": 0.0
         }
       }
@@ -2421,7 +2431,7 @@
       }
     },
     "11": {
-      "name": "bingoState",
+      "name": "bingo",
       "states": {
         "0": {
           "name": "squares",
@@ -12445,8 +12455,18 @@
         }
       }
     },
+    "13": {
+      "name": "bosses",
+      "states": {
+        "800": {
+          "name": "howlFightActive",
+          "type": "ReadOnlyVirtualBooleanUberState",
+          "value": 0.0
+        }
+      }
+    },
     "14": {
-      "name": "randoStats",
+      "name": "stats",
       "states": {
         "0": {
           "name": "pickupsCollected",
@@ -12730,6 +12750,16 @@
         }
       }
     },
+    "16": {
+      "name": "worldEvents",
+      "states": {
+        "2000": {
+          "name": "cleanWater",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        }
+      }
+    },
     "17": {
       "name": "gromShop",
       "states": {
@@ -12765,6 +12795,21 @@
         },
         "51230": {
           "name": "dwellingRepairs",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        }
+      }
+    },
+    "18": {
+      "name": "debugRenderer",
+      "states": {
+        "1": {
+          "name": "enable",
+          "type": "VirtualBooleanUberState",
+          "value": 0.0
+        },
+        "2": {
+          "name": "positionTriggers",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         }
@@ -12839,7 +12884,7 @@
       "name": "gladesProjects",
       "states": {
         "15068": {
-          "name": "beautifyBuilt",
+          "name": "theGorlekTouch",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -12849,22 +12894,22 @@
           "value": 0.0
         },
         "16586": {
-          "name": "openCaveBuilt",
+          "name": "clearTheCaveEntrance",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "16825": {
-          "name": "spiritWellBuilt",
+          "name": "repairTheSpiritWell",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "18751": {
-          "name": "removeThornsBuilt",
+          "name": "thornySituation",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "23607": {
-          "name": "housesBBuilt",
+          "name": "roofsOverHeads",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -12884,7 +12929,7 @@
           "value": 0.0
         },
         "40448": {
-          "name": "housesCBuilt",
+          "name": "onwardsAndUpwards",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -12894,7 +12939,7 @@
           "value": 0.0
         },
         "51230": {
-          "name": "housesABuilt",
+          "name": "dwellingRepairs",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -18231,10 +18276,10 @@
       }
     },
     "23": {
-      "name": "itemTracker",
+      "name": "tracker",
       "states": {
         "1": {
-          "name": "launchFragmentsCount",
+          "name": "launchFragmentsCollected",
           "type": "SerializedIntUberState",
           "value": 0.0
         },
@@ -18244,7 +18289,7 @@
           "value": 0.0
         },
         "100": {
-          "name": "treesCount",
+          "name": "treesCollected",
           "type": "SerializedIntUberState",
           "value": 0.0
         },
@@ -18254,7 +18299,7 @@
           "value": 0.0
         },
         "102": {
-          "name": "wispsCount",
+          "name": "wispsCollected",
           "type": "SerializedIntUberState",
           "value": 0.0
         },
@@ -18264,7 +18309,7 @@
           "value": 0.0
         },
         "104": {
-          "name": "questsCount",
+          "name": "questsFinished",
           "type": "SerializedIntUberState",
           "value": 0.0
         },
@@ -18274,7 +18319,7 @@
           "value": 0.0
         },
         "106": {
-          "name": "relicsCount",
+          "name": "relicsCollected",
           "type": "SerializedIntUberState",
           "value": 0.0
         },
@@ -18866,7 +18911,7 @@
       }
     },
     "28": {
-      "name": "knownEntranceConnections",
+      "name": "entrancesKnown",
       "states": {
         "1": {
           "name": "lupoShopOutside",
@@ -19034,34 +19079,14 @@
       "name": "settings",
       "states": {
         "0": {
-          "name": "randomSpiritLight",
-          "type": "ReadOnlyVirtualBooleanUberState",
-          "value": 0.0
-        }
-      }
-    },
-    "30": {
-      "name": "input",
-      "states": {
-        "1": {
-          "name": "mouseWorldPositionX",
-          "type": "ReadOnlyVirtualFloatUberState",
-          "value": 0.0
-        },
-        "2": {
-          "name": "mouseWorldPositionY",
-          "type": "ReadOnlyVirtualFloatUberState",
-          "value": 0.0
-        },
-        "3": {
-          "name": "wheelOpen",
+          "name": "randomCurrencyNames",
           "type": "ReadOnlyVirtualBooleanUberState",
           "value": 0.0
         }
       }
     },
     "31": {
-      "name": "randomValueGenerator",
+      "name": "rng",
       "states": {
         "0": {
           "name": "seed",
@@ -19069,12 +19094,12 @@
           "value": 0.0
         },
         "1": {
-          "name": "useSeed",
+          "name": "seedStateActive",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
         "10": {
-          "name": "randomInt",
+          "name": "randomInteger",
           "type": "ReadOnlyVirtualIntUberState",
           "value": 0.0
         },

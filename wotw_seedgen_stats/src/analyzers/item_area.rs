@@ -2,14 +2,14 @@ use super::Analyzer;
 use std::cmp::Ordering;
 use wotw_seedgen::spoiler::SeedSpoiler;
 
-/// Analyzes what zone an item gets placed in
-pub struct ItemZoneStats {
+/// Analyzes what area an item gets placed in
+pub struct ItemAreaStats {
     pub item: String,
 }
 
-impl Analyzer for ItemZoneStats {
+impl Analyzer for ItemAreaStats {
     fn title(&self) -> String {
-        format!("Zone {} is placed in", self.item)
+        format!("Area {} is placed in", self.item)
     }
 
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
@@ -17,11 +17,11 @@ impl Analyzer for ItemZoneStats {
             .iter()
             .flat_map(|group| group.placements.iter())
             .filter(|placement| placement.item.name == self.item)
-            .map(|placement| placement.location.zone.to_string())
+            .map(|placement| placement.location.area.to_string())
             .collect()
     }
 
     fn compare_keys(&self) -> fn(&str, &str) -> Ordering {
-        super::compare_fixed_order::<super::ZoneFixedOrder>
+        super::compare_fixed_order::<super::AreaFixedOrder>
     }
 }

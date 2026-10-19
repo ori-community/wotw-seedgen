@@ -39,17 +39,17 @@ on spawn store(enabled, true)
 on enabled && collected > 0 {
     set_wheel_item_disable()
     update_bonus_wheel()
-    store(randoUpgrades.jumpHeightMultiplier, 1 + collected * 0.33)
-    store(randoUpgrades.wallJumpHeightMultiplier, 1 + collected * 0.15)
-    store(randoUpgrades.doubleJumpHeightMultiplier, 1 + collected * 0.15)
+    store(bonusUpgrades.jumpHeightMultiplier, 1 + collected * 0.33)
+    store(bonusUpgrades.wallJumpSpeedMultiplier, 1 + collected * 0.15)
+    store(bonusUpgrades.doubleJumpSpeedMultiplier, 1 + collected * 0.15)
 }
 
 on enabled == false && collected > 0 {
     set_wheel_item_enable()
     update_bonus_wheel()
-    store(randoUpgrades.jumpHeightMultiplier, 1)
-    store(randoUpgrades.wallJumpHeightMultiplier, 1)
-    store(randoUpgrades.doubleJumpHeightMultiplier, 1)
+    store(bonusUpgrades.jumpHeightMultiplier, 1)
+    store(bonusUpgrades.wallJumpSpeedMultiplier, 1)
+    store(bonusUpgrades.doubleJumpSpeedMultiplier, 1)
 }
 
 on reload if collected > 0 {

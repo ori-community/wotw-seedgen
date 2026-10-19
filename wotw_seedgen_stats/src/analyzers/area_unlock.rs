@@ -1,19 +1,19 @@
 use super::Analyzer;
 use std::num::NonZeroUsize;
-use wotw_seedgen::{data::Zone, spoiler::SeedSpoiler};
+use wotw_seedgen::{data::Area, spoiler::SeedSpoiler};
 
-/// Analyzes when zones unlock
+/// Analyzes when areas unlock
 ///
-/// A zone is considered unlocked once the first item within that zone is unlocked
-pub struct ZoneUnlockStats {
-    pub zone: Zone,
+/// A area is considered unlocked once the first item within that area is unlocked
+pub struct AreaUnlockStats {
+    pub area: Area,
     /// How many adjacent result to group together
     pub result_bucket_size: NonZeroUsize,
 }
 
-impl Analyzer for ZoneUnlockStats {
+impl Analyzer for AreaUnlockStats {
     fn title(&self) -> String {
-        format!("Reachables on {} unlock", self.zone)
+        format!("Reachables on {} unlock", self.area)
     }
 
     fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
@@ -22,7 +22,7 @@ impl Analyzer for ZoneUnlockStats {
                 .reachable
                 .iter()
                 .flatten()
-                .any(|node| node.zone == self.zone)
+                .any(|node| node.area == self.area)
         });
         let reachable_count = groups_until_unlocked
             .flat_map(|group| group.reachable.iter().map(Vec::len))

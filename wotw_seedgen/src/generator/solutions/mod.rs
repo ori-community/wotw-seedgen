@@ -5,7 +5,7 @@
 // being able to really look into it.
 // Maybe storing the missing instance would be more fruitful?
 
-// TODO there seems to be some infinite loop condition on the unoptimized shapes of requirements like MarshSpawn.BurrowArena.
+// TODO there seems to be some infinite loop condition on the unoptimized shapes of requirements like Marsh.Sand.Fight.
 
 #[cfg(test)]
 mod tests;

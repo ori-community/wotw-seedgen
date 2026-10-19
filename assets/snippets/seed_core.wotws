@@ -8,33 +8,33 @@
 
 on spawn {
     // For generated seeds, logic filter should always be available
-    store(randoConfig.inLogicFilterEnabled, true)
+    store(map.inLogicFilterAvailable, true)
     // At Voice it's very easy to accidentally clip OOB, we disable this to make the rules easier to follow
-    store(randoConfig.fixMeetingKwolokUnderwaterTrigger, true)
+    store(modifications.fixMeetKwolokUnderwaterOOB, true)
     // Teleporting twice in quick succession can happen easily and may violate no OOB rules and also creates an annoying permanent sound
-    store(randoConfig.fixTeleporterChainOutOfBounds, true)
+    store(modifications.fixTeleporterChainOOB, true)
     // In vanilla you can softlock if you don't trigger the Kwolok fight and swim too far left below the starting trigger
-    store(randoConfig.fixKwolokBossEscapeUnderwaterSpiritLightSoftlock, true)
+    store(modifications.fixBelowPoolsEscapeStartSoftlock, true)
     // If you leave the cat and mouse sequence without going to Wastes, you can save a state with killplanes locking you out. This adds rocks preventing you from leaving.
     // It also prevents an accidental OOB when retriggering the cracking bones after respawning in cat and mouse.
-    store(randoConfig.fixCatAndMouseSoftlock, true)
+    store(modifications.fixCatAndMouseSoftlock, true)
     // Shop anywhere breaks the economy
-    store(randoConfig.fixShopAnywhere, true)
+    store(modifications.fixShopAnywhere, true)
     // Patch 2 knockback is generally preferred by high level players and may be assumed in logic
-    store(randoConfig.patch2Kickback, true)
+    store(modifications.patch2Knockback, true)
     // Being unable to teleport can be very confusing or even softlock
-    store(randoConfig.allowTeleportingUnderwater, true)
-    store(randoConfig.allowTeleportingDuringCombatShrineFights, true)
+    store(modifications.fastTravelUnderwater, true)
+    store(modifications.fastTravelDuringCombatShrine, true)
     // Moving npcs cannot be used logically, so we keep them spawned everywhere
-    store(randoConfig.useSpawnOpherEverywhereRandoState, true)
-    store(randoState.spawnOpherEverywhere, true)
-    store(randoConfig.useSpawnTwillenEverywhereRandoState, true)
-    store(randoState.spawnTwillenEverywhere, true)
+    store(modifications.spawnOpherEverywhereStateActive, true)
+    store(modifications.spawnOpherEverywhere, true)
+    store(modifications.spawnTwillenEverywhereStateActive, true)
+    store(modifications.spawnTwillenEverywhere, true)
     // The flooded regen tree room cannot be used logically, so to improve logic intuition we always drain the room
-    store(randoConfig.useRegenTreeDrainedRandoState, true)
-    store(randoState.regenTreeDrained, true)
+    store(modifications.regenerateTreeDrainedStateActive, true)
+    store(modifications.regenerateTreeDrained, true)
     // Enemies despawning if you spawn too close causes a lot of logic headaches
-    store(randoConfig.allowSpawningEnemiesNearby, true)
+    store(modifications.disableDespawningNearbyEnemies, true)
     // Fast travel is necessary to prevent softlocks where you can't return to your spawn
     store(npcsStateGroup.fastTravelEnabledUberState, 1)
     // The spawn cutscene pulls you in as soon as it's loaded, which allows warping through walls and such
@@ -57,29 +57,30 @@ on spawn {
     store(questUberStateGroup.lagoonWispQuestUberState, 1)
     store(questUberStateGroup.desertWispQuestUberState, 1)
     store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 1)
-    // Disable the slow walk zone in east woods
-    store(randoConfig.useEastWoodsTrunkSlowWalkZoneEnabledState, true)
+    // Disable slow zones that don't make sense in rando
+    store(modifications.disableEastWoodsTrunkSlowZoneStateActive, true)
+    store(modifications.disableEastWoodsTrunkSlowZone, true)
     // TODO this gets reset when collecting voice, does it need to be reset? Does this even do something?
     // store(questUberStateGroup.lookForKuQuestUberState, 4)
     // Always allow opening the Kwolok Statue door
-    store(randoConfig.useAllowOpeningEyestoneDoorState, true)
-    store(randoState.allowOpeningEyestoneDoor, true)
+    store(modifications.canOpenEyestoneDoorStateActive, true)
+    store(modifications.canOpenEyestoneDoor, true)
     // Makes the Mora fight start trigger wider so you don't fly through it at high velocities
-    store(randoConfig.fixMoraArenaTrigger, true)
+    store(modifications.fixMoraTriggerSkip, true)
 }
 
 // Lower water around pools TP when collecting it
-on EastPools.TeleporterActive {
+on Pools.CentralTeleporter {
   store(lumaPoolsStateGroup.waterLowered, true)
 }
 
-on gladesProjects.spiritWellBuilt
-&& gladesProjects.housesABuilt
-&& gladesProjects.housesBBuilt
-&& gladesProjects.housesCBuilt
-&& gladesProjects.removeThornsBuilt
-&& gladesProjects.openCaveBuilt
-&& gladesProjects.beautifyBuilt
+on gladesProjects.repairTheSpiritWell
+&& gladesProjects.dwellingRepairs
+&& gladesProjects.roofsOverHeads
+&& gladesProjects.onwardsAndUpwards
+&& gladesProjects.thornySituation
+&& gladesProjects.clearTheCaveEntrance
+&& gladesProjects.theGorlekTouch
     store(questUberStateGroup.rebuildGladesQuest, 2)
 
 on gladesProjects.lightcatchersPlanted
@@ -90,16 +91,16 @@ on gladesProjects.lightcatchersPlanted
 && gladesProjects.lastTreePlanted
     store(questUberStateGroup.regrowGladesQuest, 2)
 
-// In vanilla, the rain is lifted when getting the ability Sword.
-// In rando, we instead want the rain to be lifted when collecting the Sword tree location.
-on spawn store(randoConfig.useRainLiftedInMarshRandoState, true)
-on Marsh.SwordTree store(randoState.rainLiftedInMarsh, true)
+// In vanilla, the storm is lifted when getting the ability Sword.
+// In rando, we instead want the storm to be lifted when collecting the Sword tree location.
+on spawn store(modifications.stormLiftedInMarshStateActive, true)
+on Marsh.SwordTree store(modifications.stormLiftedInMarsh, true)
 // This progresses the Diamond in the Rough quest to 3 immediately after turning in the diamond at Twillen.
 // This prevents the black screen cutscene in Glades from ever playing. When you turn in the diamond in
 // Hollow, which is usually not possible in vanilla, and then walk into Glades, that cutscene would play otherwise.
 on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneState == 2 {
     store(hubUberStateGroup.craftCutsceneState, 3)
-    store(Glades.RoughDiamond.Reward, true)
+    store(Glades.RoughDiamondShard, true)
 }
 // In vanilla, completing the Wellspring escape increases the Silent Teeth quest uberstate by 1 instead of directly setting it to 3.
 // In vanilla, there is an additional check after watching the soggy cutscene, the quest state updating, and autosaving: if the quest's value is 2, it gets set to 3.
@@ -108,24 +109,24 @@ on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneS
 // To prevent quest softlocks, before the vanilla logic happens, we set the quest to 2 (cutscene outside watched) if it is 1 (quest started) or 0 (quest not started).
 // The vanilla logic then increases the quest to 3 (escape cleared) and saves properly.
 // This fix does not prevent abusing the glitch to benefit, for example by finishing the quest through multiple wellspring escapes (although no such OOB is known).
-on Wellspring.EscapeReward if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store_without_triggers(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
+on Wellspring.Escape.Reward if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store_without_triggers(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
 // No one remembers what this does anymore.
 on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState, 8)
 // This is presumed to fix some multiplayer bug but no one really knows.
-on WillowsEnd.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
+on Willow.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
 
 // In door rando or with warps/oob, collecting the DollQI can skip earlier quest steps and lock you out of obtaining the key.
-on spawn store(randoConfig.useCanOpenMokiFatherHutRandoState, true)
+on spawn store(modifications.canOpenMokiFatherHutStateActive, true)
 // When receiving the key, allow opening the hut
 on questUberStateGroup.familyReunionQuest == 2 {
-    store(randoState.canOpenMokiFatherHut, true)
+    store(modifications.canOpenMokiFatherHut, true)
     // If DollQI is already collected and we have previously reverted this state, skip the DollQI quest step
     if Woods.FamilyReunion.Doll store(questUberStateGroup.familyReunionQuest, 3)
 }
 // If DollQI is collected without having opened the hut, revert the quest state to its previous value
-on questUberStateGroup.familyReunionQuest > 2 if randoState.canOpenMokiFatherHut == false {
-    if gladesProjects.housesABuilt == false store(questUberStateGroup.familyReunionQuest, 0)
-    if gladesProjects.housesABuilt store(questUberStateGroup.familyReunionQuest, 1)
+on questUberStateGroup.familyReunionQuest > 2 if modifications.canOpenMokiFatherHut == false {
+    if gladesProjects.dwellingRepairs == false store(questUberStateGroup.familyReunionQuest, 0)
+    if gladesProjects.dwellingRepairs store(questUberStateGroup.familyReunionQuest, 1)
 }
 // Patience Skip can lock you out of the escape reward. This fix gives the expected rewards when teleporting away in the cutscene area.
 on windtornRuinsGroup.desertRuinsEscape == 3 if is_in_rectangle(2048, -3573, 2154, -3539) {
@@ -142,6 +143,6 @@ on windtornRuinsGroup.desertRuinsEscape == 3 if is_in_rectangle(2048, -3573, 215
 // Enable the spoiler map on game finished
 // TODO: Move this to a separate snippet to allow for more customization?
 on gameStateGroup.gameFinished {
-    store(randoState.enableSpoilerFilter, true)
-    store(player.currentMapFilter, 4)
+    store(map.spoilerFilterAvailable, true)
+    store(map.filter, 4)
 }

@@ -525,7 +525,11 @@ impl WorldPresetSettings {
                     | "fragment_overflow"
                     | "tp_refill"
                     | "shriek_escape_health_bar" => *snippet = "better_mechanics".to_string(),
-                    "no_rain" => snippets.push("no_howl".to_string()),
+                    "no_rain" => {
+                        *snippet = "no_storm".to_string();
+                        snippets.push("no_howl".to_string());
+                    }
+                    "zone_hints" => *snippet = "area_hints".to_string(),
                     _ => {}
                 }
             }

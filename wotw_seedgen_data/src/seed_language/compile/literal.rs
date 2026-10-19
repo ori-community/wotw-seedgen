@@ -150,8 +150,8 @@ impl ast::UberIdentifierName<'_> {
                             ),
                             ..Error::error(
                                 format!(
-                                    "Group \"{zone}.{region}\" contains members, but does not name anything by itself",
-                                    zone = self.group.data.0,
+                                    "Group \"{area}.{region}\" contains members, but does not name anything by itself",
+                                    area = self.group.data.0,
                                     region = member.data.0
                                 ),
                                 member.span()

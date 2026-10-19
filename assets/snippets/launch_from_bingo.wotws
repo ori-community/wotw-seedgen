@@ -7,4 +7,4 @@
 !tags("Launch from Bingo")
 
 !remove_item(skill(Launch), 1)
-on bingoState.lines >= lines if skills.launch == false skill(Launch)
+on bingo.lines >= lines if skills.launch == false skill(Launch)

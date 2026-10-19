@@ -10,8 +10,8 @@ use std::{
 };
 
 use super::{
-    ArithmeticOperator, Command, CommandBoolean, CommandFloat, CommandInteger, CommandString,
-    CommandVoid, CommandZone, Comparator, Concatenator, EqualityComparator, Event,
+    ArithmeticOperator, Command, CommandArea, CommandBoolean, CommandFloat, CommandInteger,
+    CommandString, CommandVoid, Comparator, Concatenator, EqualityComparator, Event,
     IntermediateOutput, ItemMetadata, Operation, StringOrPlaceholder, Trigger,
 };
 
@@ -24,7 +24,7 @@ use crate::{
         AsConstant, ClientEvent, CommandsOutput, ContainedWrites, ContainedWritesExt, IntoConstant,
         ItemMetadataRef, TriggerCondition,
     },
-    Position, ShopKind, UberIdentifier, Zone,
+    Area, Position, ShopKind, UberIdentifier,
 };
 use indexmap::IndexMap;
 use itertools::Itertools;
@@ -59,7 +59,7 @@ pub fn postprocess(
     placeholder_maps
 }
 
-// TODO maybe zone_of should be a typed zone placeholder?
+// TODO maybe area_of should be a typed area placeholder?
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct PlaceholderMap {
     pub strings: FxHashMap<StringOrPlaceholder, CommandString>,
@@ -132,7 +132,7 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
             .map(move |world| self.generate_defaults_for(world, &price_noise, rng))
     }
 
-    fn resolve_zone_of(&self, item: &CommandVoid, target_world_index: usize) -> CommandString {
+    fn resolve_area_of(&self, item: &CommandVoid, target_world_index: usize) -> CommandString {
         fn command_contains(command: &CommandVoid, item: &CommandVoid) -> bool {
             item == command
                 || match command {
@@ -151,11 +151,11 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
             .events
             .iter()
             .filter(|event| command_contains(&event.command, item))
-            .filter_map(|event| self.zone_of_trigger(&event.trigger, target_world_index))
-            .map(|(origin_world_index, zone)| ZoneOfMatch {
+            .filter_map(|event| self.area_of_trigger(&event.trigger, target_world_index))
+            .map(|(origin_world_index, area)| AreaOfMatch {
                 origin_world_index,
                 target_world_index,
-                zone,
+                area,
             })
             .collect::<Vec<_>>();
 
@@ -166,19 +166,19 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
         matches.sort_unstable_by(|a, b| {
             a.is_multiworld()
                 .cmp(&b.is_multiworld())
-                .then(a.zone.cmp(&b.zone))
+                .then(a.area.cmp(&b.area))
         });
 
         matches.into_iter().join(" or ").into()
     }
 
-    fn zone_of_trigger(
+    fn area_of_trigger(
         &self,
         trigger: &Trigger,
         origin_world_index: usize,
-    ) -> Option<(usize, Zone)> {
+    ) -> Option<(usize, Area)> {
         if let Trigger::ClientEvent(ClientEvent::Spawn) = trigger {
-            return Some((origin_world_index, Zone::Spawn));
+            return Some((origin_world_index, Area::Spawn));
         }
 
         if let Some(id) = trigger.as_multiworld() {
@@ -186,7 +186,7 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
                 .multiworld_lookup
                 .get(&id)
                 .and_then(|multiworld_event| {
-                    self.zone_of_trigger(
+                    self.area_of_trigger(
                         multiworld_event.origin_trigger,
                         multiworld_event.origin_world_index,
                     )
@@ -195,17 +195,17 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
 
         self.pickup_triggers
             .get(trigger)
-            .map(|entry| (origin_world_index, entry.zone))
+            .map(|entry| (origin_world_index, entry.area))
     }
 
     fn resolve_item_on(&self, trigger: &Trigger, origin_world_index: usize) -> CommandString {
         self.worlds[origin_world_index].resolve_item_on(trigger)
     }
 
-    fn resolve_count_in_zone(
+    fn resolve_count_in_area(
         &self,
         items: &[CommandVoid],
-        zone: Zone,
+        area: Area,
         origin_world_index: usize,
     ) -> CommandString {
         let origin_world = &self.worlds[origin_world_index];
@@ -214,7 +214,7 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
             .pickup_events
             .iter()
             .map(|(trigger, events)| (&self.pickup_triggers[trigger], events))
-            .filter(|(entry, _)| entry.zone == zone)
+            .filter(|(entry, _)| entry.area == area)
             .flat_map(|(entry, events)| {
                 events
                     .iter()
@@ -223,7 +223,7 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
             })
             .collect::<Vec<_>>();
 
-        count_in_zone_message(matches, &origin_world.output.modifiers.item_metadata)
+        count_in_area_message(matches, &origin_world.output.modifiers.item_metadata)
     }
 
     fn command_contains_any(&self, command: &CommandVoid, items: &[CommandVoid]) -> bool {
@@ -728,7 +728,7 @@ impl ResolvePlaceholders for Command {
             Self::Integer(command) => command.resolve(context),
             Self::Float(command) => command.resolve(context),
             Self::String(command) => command.resolve(context),
-            Self::Zone(command) => command.resolve(context),
+            Self::Area(command) => command.resolve(context),
             Self::Void(command) => command.resolve(context),
         }
     }
@@ -745,7 +745,7 @@ impl ResolvePlaceholders for CommandBoolean {
             Self::CompareInteger { operation } => operation.resolve(context),
             Self::CompareFloat { operation } => operation.resolve(context),
             Self::CompareString { operation } => operation.resolve(context),
-            Self::CompareZone { operation } => operation.resolve(context),
+            Self::CompareArea { operation } => operation.resolve(context),
             Self::LogicOperation { operation } => operation.resolve(context),
             Self::IsInCircle { x, y, r } => {
                 x.resolve(context);
@@ -816,15 +816,15 @@ impl ResolvePlaceholders for CommandString {
 
                 let resolved = match value {
                     StringOrPlaceholder::Value(_) => return,
-                    StringOrPlaceholder::ZoneOfPlaceholder(item) => context
+                    StringOrPlaceholder::AreaOfPlaceholder(item) => context
                         .postprocessor
-                        .resolve_zone_of(item, context.world_index),
+                        .resolve_area_of(item, context.world_index),
                     StringOrPlaceholder::ItemOnPlaceholder(trigger) => context
                         .postprocessor
                         .resolve_item_on(trigger, context.world_index),
-                    StringOrPlaceholder::CountInZonePlaceholder(items, zone) => context
+                    StringOrPlaceholder::CountInAreaPlaceholder(items, area) => context
                         .postprocessor
-                        .resolve_count_in_zone(items, *zone, context.world_index),
+                        .resolve_count_in_area(items, *area, context.world_index),
                 };
 
                 context
@@ -847,14 +847,14 @@ impl ResolvePlaceholders for CommandString {
     }
 }
 
-impl ResolvePlaceholders for CommandZone {
+impl ResolvePlaceholders for CommandArea {
     fn resolve(&self, context: &mut ResolveContext) {
         match self {
             Self::Multi { commands, last } => {
                 commands.resolve(context);
                 last.resolve(context);
             }
-            Self::Constant { .. } | Self::CurrentZone {} | Self::CurrentMapZone {} => {}
+            Self::Constant { .. } | Self::PlayerArea {} | Self::MapFocusedArea {} => {}
         }
     }
 }
@@ -999,25 +999,25 @@ impl ResolvePlaceholders for CommandVoid {
     }
 }
 
-struct ZoneOfMatch {
+struct AreaOfMatch {
     origin_world_index: usize,
     target_world_index: usize,
-    zone: Zone,
+    area: Area,
 }
 
-impl ZoneOfMatch {
+impl AreaOfMatch {
     fn is_multiworld(&self) -> bool {
         self.origin_world_index != self.target_world_index
     }
 }
 
-impl Display for ZoneOfMatch {
+impl Display for AreaOfMatch {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.origin_world_index != self.target_world_index {
             write!(f, "<world>{}</>'s ", self.origin_world_index)?;
         }
 
-        write!(f, "{}", self.zone)
+        write!(f, "{}", self.area)
     }
 }
 
@@ -1109,7 +1109,7 @@ where
     }
 }
 
-fn count_in_zone_message(
+fn count_in_area_message(
     matches: Vec<(&Event, &PickupsEntry)>,
     item_metadata: &ItemMetadata,
 ) -> CommandString {

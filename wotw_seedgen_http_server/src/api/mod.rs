@@ -16,7 +16,7 @@ use utoipa::{IntoParams, OpenApi, PartialSchema, ToSchema, openapi};
 use utoipa_swagger_ui::SwaggerUi;
 use wotw_seedgen::data::UniverseSettings;
 use wotw_seedgen::data::assets::ChangedAssets;
-use wotw_seedgen::data::seed_language::output::{CommandZone, Trigger};
+use wotw_seedgen::data::seed_language::output::{CommandArea, Trigger};
 
 use crate::generate::{GenerateError, GenerateResult};
 use crate::{RouterState, generate};
@@ -72,10 +72,10 @@ pub fn router(cache: RouterState) -> Router {
         // Trigger is missed because for no_recursion it makes more sense to consider it high in the hierarchy
         // but in current practice it's a relatively low leaf of spoiler and gets filtered
         Trigger,
-        // CommandZone is missed because it's currently only referenced inside an operation which is forced to
+        // CommandArea is missed because it's currently only referenced inside an operation which is forced to
         // add no_recursion indiscriminately because it's impossible to add the attribute on specific generic
         // types passed to it
-        CommandZone,
+        CommandArea,
         // LogLevelFilter is missed because oriShrug
         LogLevelFilter,
         ChangedAssets

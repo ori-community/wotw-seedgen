@@ -36,7 +36,7 @@
 on change player.spiritLight {
     set_integer("delta", player.spiritLight - previous_spirit_light_collected)
 
-    if get_integer("delta") > 0 store(randoStats.spiritLightCollected, randoStats.spiritLightCollected + get_integer("delta"))
+    if get_integer("delta") > 0 store(stats.spiritLightCollected, stats.spiritLightCollected + get_integer("delta"))
 
     store(previous_spirit_light_collected, player.spiritLight)
 }
@@ -46,7 +46,7 @@ on change player.spiritLight {
 on change player.keystones {
     set_integer("delta", player.keystones - previous_keystones_collected)
 
-    if get_integer("delta") > 0 store(randoStats.keystonesCollected, randoStats.keystonesCollected + get_integer("delta"))
+    if get_integer("delta") > 0 store(stats.keystonesCollected, stats.keystonesCollected + get_integer("delta"))
 
     store(previous_keystones_collected, player.keystones)
 }
@@ -56,7 +56,7 @@ on change player.keystones {
 on change player.gorlekOre {
     set_integer("delta", player.gorlekOre - previous_ore_collected)
 
-    if get_integer("delta") > 0 store(randoStats.oreCollected, randoStats.oreCollected + get_integer("delta"))
+    if get_integer("delta") > 0 store(stats.oreCollected, stats.oreCollected + get_integer("delta"))
 
     store(previous_ore_collected, player.gorlekOre)
 }
@@ -64,1590 +64,1590 @@ on change player.gorlekOre {
 !state(after_spawn, Boolean)
 on change statsUberStateGroup.distanceTravelledStatSettingSerializedFloatUberState store(after_spawn, true)
 on after_spawn {
-    store(randoStats.pickupsTotalMarsh, total_pickups_marsh - randoStats.pickupsCollectedMarsh)
-    store(randoStats.pickupsCollectedMarsh, 0)
-    store(randoStats.pickupsTotalHollow, total_pickups_hollow - randoStats.pickupsCollectedHollow)
-    store(randoStats.pickupsCollectedHollow, 0)
-    store(randoStats.pickupsTotalGlades, total_pickups_glades - randoStats.pickupsCollectedGlades)
-    store(randoStats.pickupsCollectedGlades, 0)
-    store(randoStats.pickupsTotalWellspring, total_pickups_wellspring - randoStats.pickupsCollectedWellspring)
-    store(randoStats.pickupsCollectedWellspring, 0)
-    store(randoStats.pickupsTotalWoods, total_pickups_woods - randoStats.pickupsCollectedWoods)
-    store(randoStats.pickupsCollectedWoods, 0)
-    store(randoStats.pickupsTotalReach, total_pickups_reach - randoStats.pickupsCollectedReach)
-    store(randoStats.pickupsCollectedReach, 0)
-    store(randoStats.pickupsTotalDepths, total_pickups_depths - randoStats.pickupsCollectedDepths)
-    store(randoStats.pickupsCollectedDepths, 0)
-    store(randoStats.pickupsTotalPools, total_pickups_pools - randoStats.pickupsCollectedPools)
-    store(randoStats.pickupsCollectedPools, 0)
-    store(randoStats.pickupsTotalWastes, total_pickups_wastes - randoStats.pickupsCollectedWastes)
-    store(randoStats.pickupsCollectedWastes, 0)
-    store(randoStats.pickupsTotalRuins, total_pickups_ruins - randoStats.pickupsCollectedRuins)
-    store(randoStats.pickupsCollectedRuins, 0)
-    store(randoStats.pickupsTotalWillow, total_pickups_willow - randoStats.pickupsCollectedWillow)
-    store(randoStats.pickupsCollectedWillow, 0)
-    store(randoStats.pickupsTotalBurrows, total_pickups_burrows - randoStats.pickupsCollectedBurrows)
-    store(randoStats.pickupsCollectedBurrows, 0)
-    store(randoStats.pickupsTotalShop, total_pickups_shop - randoStats.pickupsCollectedShop)
-    store(randoStats.pickupsCollectedShop, 0)
-    store(randoStats.pickupsTotal, total_pickups - randoStats.pickupsCollected)
-    store(randoStats.pickupsCollected, 0)
+    store(stats.pickupsTotalMarsh, total_pickups_marsh - stats.pickupsCollectedMarsh)
+    store(stats.pickupsCollectedMarsh, 0)
+    store(stats.pickupsTotalHollow, total_pickups_hollow - stats.pickupsCollectedHollow)
+    store(stats.pickupsCollectedHollow, 0)
+    store(stats.pickupsTotalGlades, total_pickups_glades - stats.pickupsCollectedGlades)
+    store(stats.pickupsCollectedGlades, 0)
+    store(stats.pickupsTotalWellspring, total_pickups_wellspring - stats.pickupsCollectedWellspring)
+    store(stats.pickupsCollectedWellspring, 0)
+    store(stats.pickupsTotalWoods, total_pickups_woods - stats.pickupsCollectedWoods)
+    store(stats.pickupsCollectedWoods, 0)
+    store(stats.pickupsTotalReach, total_pickups_reach - stats.pickupsCollectedReach)
+    store(stats.pickupsCollectedReach, 0)
+    store(stats.pickupsTotalDepths, total_pickups_depths - stats.pickupsCollectedDepths)
+    store(stats.pickupsCollectedDepths, 0)
+    store(stats.pickupsTotalPools, total_pickups_pools - stats.pickupsCollectedPools)
+    store(stats.pickupsCollectedPools, 0)
+    store(stats.pickupsTotalWastes, total_pickups_wastes - stats.pickupsCollectedWastes)
+    store(stats.pickupsCollectedWastes, 0)
+    store(stats.pickupsTotalRuins, total_pickups_ruins - stats.pickupsCollectedRuins)
+    store(stats.pickupsCollectedRuins, 0)
+    store(stats.pickupsTotalWillow, total_pickups_willow - stats.pickupsCollectedWillow)
+    store(stats.pickupsCollectedWillow, 0)
+    store(stats.pickupsTotalBurrows, total_pickups_burrows - stats.pickupsCollectedBurrows)
+    store(stats.pickupsCollectedBurrows, 0)
+    store(stats.pickupsTotalShop, total_pickups_shop - stats.pickupsCollectedShop)
+    store(stats.pickupsCollectedShop, 0)
+    store(stats.pickupsTotal, total_pickups - stats.pickupsCollected)
+    store(stats.pickupsCollected, 0)
     save()
 }
 
 on Marsh.Spawn.LeftHF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Spawn.RightSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Marsh.Spawn.FirstSL {
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Spawn.GrappleHF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.CollapsingLog.HiddenSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.CollapsingLog.Shard {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.CollapsingLog.SwimOre {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.CollapsingLog.BashEF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.CollapsingLog.LupoSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.LupoMap {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.RegenerateTree {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.HowlDoor.LeverEF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.TokkCave.SlimeSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.TokkCave.LizardSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.TokkCave.LeftKS {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.MissingKey.Reward {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Marsh.MissingKey.Completed {
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.TokkCave.Ore {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.LongSwimSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Sand.Ore {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Sand.ArenaShard {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.BellsApproach.LedgeSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Bells.CrusherSwimSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.IntoBurrows.Reward {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Marsh.IntoBurrows.Completed {
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Howl.Shard {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Howl.DenEntranceSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Howl.FangEF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.LittleBraver.Fang {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.LittleBraver.Reward {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Marsh.LittleBraver.Completed {
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.AncestralLightTree {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.LeftPoolsPath.SL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Burrows.SpikesKS {
-    store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Burrows.DenWallKS {
-    store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Burrows.PortalTunnelKS {
-    store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Burrows.LeverKS {
-    store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Burrows.LupoMap {
-    store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Burrows.Shard {
-    store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Burrows.IntoBurrows.Tablet {
-    store(randoStats.pickupsCollectedBurrows, randoStats.pickupsCollectedBurrows + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Den.ExitLoopHF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Den.SecretHF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Den.AboveDoorKS {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.SwordTree.Shard {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.SwordTree {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Den.BoneOre {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Den.AboveTPSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Den.LaserKS {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Den.CombatShrine {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.DoubleJumpTree.SL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.DoubleJumpTree.Shard {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.DoubleJumpTree {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Trial.LeftLS {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Trial.Ore {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Trial.EF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Trial.MantisLureHF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Trial.MantisLureSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.SpiritTrial {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Marsh.SpiritTrial.Completed {
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.Trial.CombatShrine {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.OpherRoom.SwingPoleSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.LeftEyestone {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.RightEyestone {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.BowTree.EF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.BowTree {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.OpherRoom.CeilingSL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.UpperPoolsPath.EF {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Marsh.UpperPoolsPath.SL {
-    store(randoStats.pickupsCollectedMarsh, randoStats.pickupsCollectedMarsh + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.TwillenRoom.HF {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Drain.SecondLeverSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Drain.RockPuzzleSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Drain.BreakWallEF {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Drain.CrushersShard {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.SwimEF {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.LupoMap {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Trial.HF {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Hollow.SpiritTrial {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Hollow.SpiritTrial.Completed {
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Trial.FallingSlugSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.DashTree.AboveDoorSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.DashTree.VineSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.DashTree.CrusherSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.DashTree {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.HandToHand.Map {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.GladesApproach.Ore {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Hornbug.CeilingSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Hornbug.LanternsSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.KwolokApproach.LeftSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.KwolokApproach.RightSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.BashTreeApproach.EF {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.OutsideDepths.MortarHF {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.BashTree.SL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.BashTree {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Hollow.KwoloksWisdom.Reward {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Hollow.KwoloksWisdom.Completed {
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.WoodsSwim.MortarSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.WoodsSwim.EF {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.OutsideDepths.Shard {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Wisp {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Kwolok.SwimOre {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Kwolok.SwimLeftSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.Kwolok.SwimRightSL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Hollow.OutsideDepths.SL {
-    store(randoStats.pickupsCollectedHollow, randoStats.pickupsCollectedHollow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.HandToHand.Pouch {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.HandToHand.Lantern {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.HandToHand.Canteen {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.FamilyReunion.Key {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.IntoDarkness.Acorn {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Glades.IntoDarkness.Reward {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Glades.IntoDarkness.Completed {
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.TreeHut.EF {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.AboveGrom.HF {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LupoSwim.HF {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.AboveMotay.Ore {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.Twillen.BreakFloorOre {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.AboveGrom.Shard {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.AboveTokk.Shard {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LupoHome.PotSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LastHut.SL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.MotayHut.SL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.TreeHut.SL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.AboveGrom.SL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LupoSwim.CeilingSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.OutsideCave.SandSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.OutsideTreeHut.SL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.FatherMokiHut.SL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.AboveTokk.SL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.OutsideCave.HiddenSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LupoSwim.ThornsSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.CoalUpdraft.CeilingSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.Veral.LeafPileSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.AncestralLightTree {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Glades.RebuildGlades.Reward {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Glades.RebuildGlades.Completed {
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Glades.RoughDiamond.Reward {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Glades.RoughDiamondShard {
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Glades.RegrowGlades.Reward {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Glades.RegrowGlades.Completed {
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LowerLake.GrappleSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LowerLake.CeilingSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LowerLake.SwimSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.UpperLake.SwimSL {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LowerLake.SwimEF {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.LowerLake.GrappleOre {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.BetweenLakes.Ore {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.Shrine.HF {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Glades.CombatShrine {
-    store(randoStats.pickupsCollectedGlades, randoStats.pickupsCollectedGlades + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.OutsideRight.Ore {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.OutsideRight.EF {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.TrialStart.CeilingSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.TrialStart.Ore {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.SpiritTrial {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.SpiritTrial.Completed {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.OutsideTopDoor.Shard {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.OutsideLeftDoor.HF {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.OutsideBottomDoor.CeilingSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.OutsideBottom.WheelSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.Foundation.WheelSL {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.OutsideBottom.EF {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.Foundation.EF {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.OutsideLeft.Shard {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.Outside.SwimSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.Outside.SwimOre {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.LostCompass.Reward {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.LostCompass.Completed {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.FirstFloor.Shard {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.FirstFloor.ShardSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.FirstFloor.ThreeWheelsSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.FirstFloor.SwimSwitchSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.FirstFloor.WaterDashSL {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.FirstFloor.DrainHF {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.DrainSecret.HF {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.FirstFloor.DrainSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.DrainSecret.SL {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.FirstFloor.PullPoleOre {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.DrainClimb.PullPoleOre {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.FirstFloor.DrainLeverEF {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.DrainClimb.LeverEF {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.FirstFloor.DrainLeverLeftSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.DrainClimb.LeverLeftSL {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.LupoMap {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.FirstFloor.ShortcutSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.GrappleTree.SL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.GrappleTree {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.SecondFloor.EntranceLeftSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.HandToHand.Herbs {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.RotatingRoom.SL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.RotatingRoom.Ore {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.LostCompass.Needle {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.ThirdFloor.EntranceSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.ThirdFloor.TPSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.ThirdFloor.Seed {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.ThirdFloor.SwimOre {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wellspring.Escape.RevisitSL {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.EscapeReward {
-    store(randoStats.pickupsCollectedWellspring, randoStats.pickupsCollectedWellspring + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wellspring.Escape.Reward {
+    store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Wheel.CurrentSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Wheel.HiddenSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.WellspringPath.MunchersHF {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.WellspringPath.BreakWallEF {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.WellspringPath.CeilingSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.FirstBubble.Ore {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.KwoloksWisdom.Amulet {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.FirstBubble.CrushersSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Pools.LeverRoom.CurrentSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Pools.EntranceLeverRoom.CurrentSL {
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Pools.LeverRoom.BreakFloorBubbleSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Pools.EntranceLeverRoom.BubbleSL {
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.CentralTPApproach.AboveDoorOre {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.AboveCentralTP.PurpleWallHF {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.HandToHand.Spyglass {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.AboveCentralTP.SL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.CentralTPSwim.Ore {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.CentralTPSwim.Shard {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Pools.WaterDashArena.HF {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Pools.WaterArena.HF {
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Pools.SpiritTrial {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Pools.SpiritTrial.Completed {
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.TrialStart.Shard {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Lupo.SL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.LupoMap {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Lupo.CrusherSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Seed {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.MissileKS {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BubbleKS {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.SpikesKS {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.GrappleKS {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BubbleSpam.FishSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BubbleSpam.RightOre {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BubbleSpam.EF {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BubbleSpam.BreakWallSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BubbleSpam.LeftSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.WaterDashTree {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.WaterDashTree.CurrentSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.WaterDashTree.CeilingSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.WaterDashDrain.EF {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BossTP.SandSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Escape.RevisitOre {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.BossTP.CeilingSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Escape.RevisitSL {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Pools.Wisp {
-    store(randoStats.pickupsCollectedPools, randoStats.pickupsCollectedPools + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.TreeKeeper.Branch {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.FamilyReunion.Doll {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.TreeKeeper.Seed {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.Entrance.AboveSwampSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.Entrance.Ore {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.Entrance.LeafPileSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.EntranceTP.SL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.FirstDoor.LowerKS {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.FirstDoor.UpperKS {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.KuKSRoom.HiddenKS {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.KuKSRoom.CorruptionKS {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.KuKSRoom.BalloonKS {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.BelowKuKSRoom.KS {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.BelowKuKSRoom.BreakWallOre {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.BelowKuKSRoom.LeafPileSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.KuKSRoom.LeafPileSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.Skull.LeafPileSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.BehindSkull.YellowWallSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.BehindSkull.CeilingOre {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.CollapsingOwl.SL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.BelowKuKSRoom.CeilingSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.Skull.CeilingSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.PetrifiedHowl.SL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Woods.SpiritTrial {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Woods.SpiritTrial.Completed {
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.Trial.Shard {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.CombatShrine {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.Shrine.SL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.FeedingGrounds.SL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.BelowBaur.SL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.AboveBaur.SnaptrapSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.AboveBaur.TongueSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.BaurIcefall.Ore {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.BaurIcefall.SL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.LeverDoor.CeilingSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TPMortar.Ore {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.LupoMap {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.JuggleSoup.MeltIceSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.JuggleSoup.SnowSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.BelowTPMortar.SL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.GorlekFurnace.SL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TPWind.BreakWallSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TPWind.BottomSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TPWind.HiddenSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.HandToHand.Hat {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Snowball.SnowHF {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Snowball.CeilingSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.IceCave.CeilingSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.IceCave.SwimShard {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Escape.RevisitSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Wisp {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Trial.RightKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TrialLeftLoop.TopKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Trial.DeadEndKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TrialLeftLoop.BottomKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Trial.HiddenSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Reach.SpiritTrial {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Reach.SpiritTrial.Completed {
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Veral.Shard {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.HandToHand.Soup {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.BurrowRoom.Shard {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.BurrowRoom.ShardSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TopKSRoom.TongueKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TopKSRoom.CeilingKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TopKSRoom.SnaptrapKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TopKSRoom.IcefallKS {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TopKSRoom.SoupOre {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TopKSRoom.SwingPoleSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.TopKSRoom.SwimSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.GrenadeTree {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.GrenadeTree.Ore {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.GrenadeTree.WellSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.Seed {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Reach.GrenadeTree.MeltIceSL {
-    store(randoStats.pickupsCollectedReach, randoStats.pickupsCollectedReach + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.Wind.SpikesSL {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.BehindWind.CeilingSL {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.BehindWind.CeilingOre {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.FirstKSRoom.RightKS {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.FirstKSRoom.LeftKS {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.FirstKSRoom.SwimEF {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.TP.LeftSL {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.SecondKSRoom.LeftKS {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.SecondKSRoom.RightKS {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.Seed {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.MoraPath.SL {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.SecondKSRoom.HF {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.IlluminableTunnel.HiveSL {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.Wisp {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.TrialStart.HF {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Depths.SpiritTrial {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Depths.SpiritTrial.Completed {
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.BeforeTrialLoop.Ore {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.TrialLoop.Shard {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.HandToHand.Silk {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.CombatShrine {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.Shrine.SwimEF {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.LupoMap {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.BeforeTrialLoop.SL {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.FlashTree.SL {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Depths.FlashTree {
-    store(randoStats.pickupsCollectedDepths, randoStats.pickupsCollectedDepths + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.FeedingGrounds.Ore {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.TornBridge.PurpleWallSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.TornBridge.HiddenSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wastes.SpiritTrial {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wastes.SpiritTrial.Completed {
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.DigSite.Ore {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.RoughDiamond.Gem {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.SandMuncherTunnel.EF {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.SandPot.HF {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.SandPot.SL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wastes.BelowBridge.SL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Wastes.DoubleBridge.SL {
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.RuinsShortcut.SL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.RuinsShortcut.HF {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.SandPuzzle.Shard {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.SandPuzzle.ShardSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.GrappleMuncherClimb.SL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.TrialToTreeTunnel.SL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.HandToHand.Mapstone {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.LupoMap {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.BurrowTree {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.BurrowTree.SL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.TreeToCentralTPArc.SandEF {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.TreeToCentralTPArc.FloatingSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.TreeToCentralTPArc.HiddenSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.TreeToCentralTPArc.SandHF {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.CentralTP.BreakWallOre {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.KSRoom.LowerKS {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.KSRoom.UpperKS {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.KSRoom.Shard {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.KSRoom.SL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.MissilePuzzles.EntranceEF {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.MissilePuzzles.EntranceSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.MissilePuzzles.PurpleWallSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.MissilePuzzles.PurpleWallHF {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.BeforeSpinLasers.SpikesSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.BeforeSpinLasers.SandSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.SpinLasers.MiddleSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.SpinLasers.LowerSL {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.Seed {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Wastes.OutsideRuins.Ore {
-    store(randoStats.pickupsCollectedWastes, randoStats.pickupsCollectedWastes + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Ruins.Escape.RevisitEF {
-    store(randoStats.pickupsCollectedRuins, randoStats.pickupsCollectedRuins + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedRuins, stats.pickupsCollectedRuins + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Ruins.Wisp {
-    store(randoStats.pickupsCollectedRuins, randoStats.pickupsCollectedRuins + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedRuins, stats.pickupsCollectedRuins + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Ruins.HandToHand.Reward {
-    store(randoStats.pickupsCollectedRuins, randoStats.pickupsCollectedRuins + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+on Ruins.HandToHand.Completed {
+    store(stats.pickupsCollectedRuins, stats.pickupsCollectedRuins + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.LaunchTree.ElementalOre {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.LaunchTree {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.LaunchTree.RightSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Woods.LaunchTree.PortalSL {
-    store(randoStats.pickupsCollectedWoods, randoStats.pickupsCollectedWoods + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.SecretPortal.Ore {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.Entrance.SL {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.MossWheelsHeart.HF {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.LupoMap {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.WindHeart.SpinOre {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.RedirectHeart.SL {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.TopHeart.LeftSL {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Willow.TopHeart.RightSL {
-    store(randoStats.pickupsCollectedWillow, randoStats.pickupsCollectedWillow + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot1 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot2 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot3 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot4 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot5 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot6 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot7 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Twillen.Slot8 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot1 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot2 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot3 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot4 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot5 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot6 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot7 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot8 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot9 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot10 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot11 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Opher.Slot12 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Lupo.Slot1 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Lupo.Slot2 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
 on Shop.Lupo.Slot3 {
-    store(randoStats.pickupsCollectedShop, randoStats.pickupsCollectedShop + 1)
-    store(randoStats.pickupsCollected, randoStats.pickupsCollected + 1)
+    store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+    store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }

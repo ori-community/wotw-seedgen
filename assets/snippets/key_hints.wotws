@@ -2,22 +2,22 @@
 #name("Key Hints")
 #description("
 Npcs sell hints:
-Opher after the Water escape tells the zones holding Water, Glide, Flap
-Lupo in Glades tells the zones holding Burrow, Water Dash, Grenade and Flash
-Twillen tells the zones holding Bow and Bash")
+Opher after the Water escape tells the areas holding Water, Glide, Flap
+Lupo in Glades tells the areas holding Burrow, Water Dash, Grenade and Flash
+Twillen tells the areas holding Bow and Bash")
 
 !tags("Key Hints")
 
 // TODO have to stringify constant before compilation because they will be turned into numbers otherwise
-!zone_of(burrow_zone, store(skills.burrow, true))
-!zone_of(water_dash_zone, store(skills.waterDash, true))
-!zone_of(grenade_zone, store(skills.grenade, true))
-!zone_of(flash_zone, store(skills.flash, true))
-!zone_of(clean_water_zone, store(randoState.cleanWater, true))
-!zone_of(flap_zone, store(skills.flap, true))
-!zone_of(glide_zone, store(skills.glide, true))
-!zone_of(bash_zone, store(skills.bash, true))
-!zone_of(bow_zone, store(skills.bow, true))
+!area_of(burrow_area, store(skills.burrow, true))
+!area_of(water_dash_area, store(skills.waterDash, true))
+!area_of(grenade_area, store(skills.grenade, true))
+!area_of(flash_area, store(skills.flash, true))
+!area_of(clean_water_area, store(worldEvents.cleanWater, true))
+!area_of(flap_area, store(skills.flap, true))
+!area_of(glide_area, store(skills.glide, true))
+!area_of(bash_area, store(skills.bash, true))
+!area_of(bow_area, store(skills.bow, true))
 
 !include("progress_helper", write_progress_message, write_map_progress_message)
 !include("list_core", add_row)
@@ -51,24 +51,24 @@ fun write_lupo_hint() {
     if skills.flash set_string("flash_color", "$")
 
     set_string("hint",
-        get_string("burrow_color") + "Burrow: " + burrow_zone + get_string("burrow_color") + ", " +
-        get_string("water_dash_color") + "Water Dash: " + water_dash_zone + get_string("water_dash_color") + ", " +
-        get_string("grenade_color") + "Grenade: " + grenade_zone + get_string("grenade_color") + ", " +
-        get_string("flash_color") + "Flash: " + flash_zone + get_string("flash_color")
+        get_string("burrow_color") + "Burrow: " + burrow_area + get_string("burrow_color") + ", " +
+        get_string("water_dash_color") + "Water Dash: " + water_dash_area + get_string("water_dash_color") + ", " +
+        get_string("grenade_color") + "Grenade: " + grenade_area + get_string("grenade_color") + ", " +
+        get_string("flash_color") + "Flash: " + flash_area + get_string("flash_color")
     )
 }
 fun write_opher_hint() {
     set_string("clean_water_color", "")
-    if randoState.cleanWater set_string("clean_water_color", "$")
+    if worldEvents.cleanWater set_string("clean_water_color", "$")
     set_string("flap_color", "")
     if skills.flap set_string("flap_color", "$")
     set_string("glide_color", "")
     if skills.glide set_string("glide_color", "$")
 
     set_string("hint",
-        get_string("clean_water_color") + "Clean Water: " + clean_water_zone + get_string("clean_water_color") + ", " +
-        get_string("flap_color") + "Flap: " + flap_zone + get_string("flap_color") + ", " +
-        get_string("glide_color") + "Glide: " + glide_zone + get_string("glide_color")
+        get_string("clean_water_color") + "Clean Water: " + clean_water_area + get_string("clean_water_color") + ", " +
+        get_string("flap_color") + "Flap: " + flap_area + get_string("flap_color") + ", " +
+        get_string("glide_color") + "Glide: " + glide_area + get_string("glide_color")
     )
 }
 fun write_twillen_hint() {
@@ -78,8 +78,8 @@ fun write_twillen_hint() {
     if skills.bow set_string("bow_color", "$")
 
     set_string("hint",
-        get_string("bash_color") + "Bash: " + bash_zone + get_string("bash_color") + ", " +
-        get_string("bow_color") + "Bow: " + bow_zone + get_string("bow_color")
+        get_string("bash_color") + "Bash: " + bash_area + get_string("bash_color") + ", " +
+        get_string("bow_color") + "Bow: " + bow_area + get_string("bow_color")
     )
 }
 
@@ -98,7 +98,7 @@ on spawn {
         "Costs 500 less for every item you found already",
         ShardsMap,
     )
-    if Wellspring.EscapeReward == false {
+    if Wellspring.Escape.Reward == false {
         set_shop_item_description(Shop.Opher.Slot11, "Complete the Wellspring escape to unlock")
         set_shop_item_hidden(Shop.Opher.Slot11, true)
     }
@@ -113,7 +113,7 @@ on spawn {
     updateOpherHintPrice()
     updateTwillenHintPrice()
 }
-on Wellspring.EscapeReward {
+on Wellspring.Escape.Reward {
     set_shop_item_description(Shop.Opher.Slot11, "Costs 500 less for every item you found already")
     set_shop_item_hidden(Shop.Opher.Slot11, false)
 }
@@ -129,7 +129,7 @@ fun updateLupoHintPrice() {
 }
 fun updateOpherHintPrice() {
     set_integer("opher_hint_price", 2500)
-    if randoState.cleanWater set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
+    if worldEvents.cleanWater set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
     if skills.flap set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
     if skills.glide set_integer("opher_hint_price", get_integer("opher_hint_price") - 500)
     if get_integer("opher_hint_price") == 1000 set_integer("opher_hint_price", 0)
@@ -147,7 +147,7 @@ on skills.burrow updateLupoHintPrice()
 on skills.waterDash updateLupoHintPrice()
 on skills.grenade updateLupoHintPrice()
 on skills.flash updateLupoHintPrice()
-on randoState.cleanWater updateOpherHintPrice()
+on worldEvents.cleanWater updateOpherHintPrice()
 on skills.flap updateOpherHintPrice()
 on skills.glide updateOpherHintPrice()
 on skills.bash updateTwillenHintPrice()

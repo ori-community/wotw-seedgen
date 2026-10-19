@@ -38,8 +38,8 @@ pub enum Teleporter {
     PoolsBoss = 13,
     FeedingGrounds = 9,
     CentralWastes = 10,
-    OuterRuins = 11,
-    InnerRuins = 14,
+    UpperWastes = 11,
+    Ruins = 14,
     Willow = 12,
     Shriek = 15,
 }
@@ -59,8 +59,8 @@ impl Teleporter {
     pub const POOLS_BOSS_ID: UberIdentifier = UberIdentifier::new(945, 1370);
     pub const FEEDING_GROUNDS_ID: UberIdentifier = UberIdentifier::new(58674, 10029);
     pub const CENTRAL_WASTES_ID: UberIdentifier = UberIdentifier::new(20120, 49994);
-    pub const OUTER_RUINS_ID: UberIdentifier = UberIdentifier::new(20120, 41398);
-    pub const INNER_RUINS_ID: UberIdentifier = UberIdentifier::new(10289, 4928);
+    pub const UPPER_WASTES_ID: UberIdentifier = UberIdentifier::new(20120, 41398);
+    pub const RUINS_ID: UberIdentifier = UberIdentifier::new(10289, 4928);
     pub const WILLOW_ID: UberIdentifier = UberIdentifier::new(16155, 41465);
     pub const SHRIEK_ID: UberIdentifier = UberIdentifier::new(16155, 50867);
 
@@ -81,8 +81,8 @@ impl Teleporter {
             Self::PoolsBoss => Self::POOLS_BOSS_ID,
             Self::FeedingGrounds => Self::FEEDING_GROUNDS_ID,
             Self::CentralWastes => Self::CENTRAL_WASTES_ID,
-            Self::OuterRuins => Self::OUTER_RUINS_ID,
-            Self::InnerRuins => Self::INNER_RUINS_ID,
+            Self::UpperWastes => Self::UPPER_WASTES_ID,
+            Self::Ruins => Self::RUINS_ID,
             Self::Willow => Self::WILLOW_ID,
             Self::Shriek => Self::SHRIEK_ID,
         }
@@ -105,8 +105,8 @@ impl Teleporter {
             Self::POOLS_BOSS_ID => Some(Self::PoolsBoss),
             Self::FEEDING_GROUNDS_ID => Some(Self::FeedingGrounds),
             Self::CENTRAL_WASTES_ID => Some(Self::CentralWastes),
-            Self::OUTER_RUINS_ID => Some(Self::OuterRuins),
-            Self::INNER_RUINS_ID => Some(Self::InnerRuins),
+            Self::UPPER_WASTES_ID => Some(Self::UpperWastes),
+            Self::RUINS_ID => Some(Self::Ruins),
             Self::WILLOW_ID => Some(Self::Willow),
             Self::SHRIEK_ID => Some(Self::Shriek),
             _ => None,
@@ -130,8 +130,8 @@ impl Teleporter {
             Teleporter::PoolsBoss => UberIdentifier::map_segment(86148),
             Teleporter::FeedingGrounds => UberIdentifier::map_segment(66967),
             Teleporter::CentralWastes => UberIdentifier::map_segment(116092),
-            Teleporter::OuterRuins => UberIdentifier::map_segment(116119),
-            Teleporter::InnerRuins => UberIdentifier::map_segment(135448),
+            Teleporter::UpperWastes => UberIdentifier::map_segment(116119),
+            Teleporter::Ruins => UberIdentifier::map_segment(135448),
             Teleporter::Willow => UberIdentifier::map_segment(146124),
             Teleporter::Shriek => UberIdentifier::map_segment(146432),
         }

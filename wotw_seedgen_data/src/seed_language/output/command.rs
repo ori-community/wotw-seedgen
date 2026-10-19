@@ -4,8 +4,8 @@ use super::{
 };
 use crate::{
     seed_language::{ast::ClientEvent, output::operation::Concatenator},
-    Alignment, CoordinateSystem, EquipSlot, Equipment, HorizontalAnchor, MapIcon, UberIdentifier,
-    VerticalAnchor, WheelBind, WheelItemPosition, Zone,
+    Alignment, Area, CoordinateSystem, EquipSlot, Equipment, HorizontalAnchor, MapIcon,
+    UberIdentifier, VerticalAnchor, WheelBind, WheelItemPosition,
 };
 use ordered_float::OrderedFloat;
 use serde::{Deserialize, Serialize};
@@ -22,8 +22,8 @@ pub enum Command {
     Float(CommandFloat),
     /// Commands returning [`StringOrPlaceholder`]
     String(CommandString),
-    /// Commands returning [`Zone`]
-    Zone(CommandZone),
+    /// Commands returning [`Area`]
+    Area(CommandArea),
     /// Commands returning nothing
     Void(CommandVoid),
 }
@@ -76,8 +76,8 @@ pub enum CommandBoolean {
         operation: Box<Operation<CommandString, EqualityComparator>>,
     },
     /// Return the result of `operation`
-    CompareZone {
-        operation: Box<Operation<CommandZone, EqualityComparator>>,
+    CompareArea {
+        operation: Box<Operation<CommandArea, EqualityComparator>>,
     },
     /// Return the result of `operation`
     LogicOperation {
@@ -384,27 +384,27 @@ impl From<&str> for CommandString {
     }
 }
 
-/// Command which returns [`Zone`]
+/// Command which returns [`Area`]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all_fields = "camelCase")]
-pub enum CommandZone {
+pub enum CommandArea {
     /// Return `value`
-    Constant { value: Zone },
+    Constant { value: Area },
     /// Execute `commands`, then use `last` for the return value
     Multi {
         #[schema(no_recursion)]
         commands: Vec<CommandVoid>,
         #[schema(no_recursion)]
-        last: Box<CommandZone>,
+        last: Box<CommandArea>,
     },
-    /// Return the zone Ori is currently in
-    CurrentZone {},
-    /// Return the zone currently selected in the map
-    CurrentMapZone {},
+    /// Return the area Ori is currently in
+    PlayerArea {},
+    /// Return the area currently focused in the map
+    MapFocusedArea {},
 }
 
-impl AsConstant for CommandZone {
-    type Output<'a> = Zone;
+impl AsConstant for CommandArea {
+    type Output<'a> = Area;
 
     fn as_constant(&self) -> Option<Self::Output<'static>> {
         match self {
@@ -414,8 +414,8 @@ impl AsConstant for CommandZone {
     }
 }
 
-impl IntoConstant for CommandZone {
-    type Output = Zone;
+impl IntoConstant for CommandArea {
+    type Output = Area;
 
     fn into_constant(self) -> Result<Self::Output, Self> {
         match self {
@@ -425,8 +425,8 @@ impl IntoConstant for CommandZone {
     }
 }
 
-impl From<Zone> for CommandZone {
-    fn from(value: Zone) -> Self {
+impl From<Area> for CommandArea {
+    fn from(value: Area) -> Self {
         Self::Constant { value }
     }
 }

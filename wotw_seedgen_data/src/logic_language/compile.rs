@@ -11,8 +11,8 @@ use crate::{
         },
         token::Tokenizer,
     },
-    Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, WorldSettings,
-    WorldSettingsHelpers, Zone,
+    Area, Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, WorldSettings,
+    WorldSettingsHelpers,
 };
 use rustc_hash::FxHashMap;
 use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
@@ -159,7 +159,7 @@ impl<'source, 'log> Compiler<'source, 'log> {
             let identifier = pickup.identifier.as_str();
             let pickup_data = PickupData {
                 index,
-                shop_identifier: matches!(pickup.zone, Zone::Shop)
+                shop_identifier: matches!(pickup.area, Area::Shop)
                     .then_some(pickup.uber_identifier),
             };
 
@@ -316,7 +316,7 @@ impl<'source, 'log> Compiler<'source, 'log> {
             // TODO during seedgen this should be 1, but start as 0 in the true seed
             self.nodes.push(Node::State(StatesEntry {
                 identifier: format!("{anchor_identifier}Visited"),
-                uber_identifier: UberIdentifier::known_entrance_connections(entrance_id),
+                uber_identifier: UberIdentifier::entrances_known(entrance_id),
                 value: None,
             }));
 

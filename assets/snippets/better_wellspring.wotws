@@ -6,4 +6,4 @@
 
 !tags("Better Wellspring")
 
-on spawn store(InnerWellspring.TopDoorOpen, true)
+on spawn store(Wellspring.TopDoor, true)

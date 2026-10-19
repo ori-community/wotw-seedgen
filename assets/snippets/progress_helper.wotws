@@ -40,59 +40,59 @@ By default those are bound to
 !export(write_progress_message)
 fun write_progress_message() {
     new_column("")
-    add_pickups_row("", randoStats.pickupsCollected, randoStats.pickupsTotal)
-    add_zone_pickups_row(player.currentArea)
+    add_pickups_row("", stats.pickupsCollected, stats.pickupsTotal)
+    add_area_pickups_row(player.area)
 }
 
 !export(write_map_progress_message)
 fun write_map_progress_message() {
     new_column("")
-    add_zone_pickups_row(player.currentMapArea)
+    add_area_pickups_row(map.focusedArea)
 }
 
-fun add_zone_pickups_row(zone: Integer) {
-    if zone == 0 {
-        add_pickups_row("Marsh ", randoStats.pickupsCollectedMarsh, randoStats.pickupsTotalMarsh)
+fun add_area_pickups_row(area: Integer) {
+    if area == 0 {
+        add_pickups_row("Marsh ", stats.pickupsCollectedMarsh, stats.pickupsTotalMarsh)
     }
-    if zone == 1 {
-        add_pickups_row("Hollow ", randoStats.pickupsCollectedHollow, randoStats.pickupsTotalHollow)
+    if area == 1 {
+        add_pickups_row("Hollow ", stats.pickupsCollectedHollow, stats.pickupsTotalHollow)
     }
-    if zone == 2 {
-        add_pickups_row("Glades ", randoStats.pickupsCollectedGlades, randoStats.pickupsTotalGlades)
+    if area == 2 {
+        add_pickups_row("Glades ", stats.pickupsCollectedGlades, stats.pickupsTotalGlades)
     }
-    if zone == 3 {
-        add_pickups_row("Wellspring ", randoStats.pickupsCollectedWellspring, randoStats.pickupsTotalWellspring)
+    if area == 3 {
+        add_pickups_row("Wellspring ", stats.pickupsCollectedWellspring, stats.pickupsTotalWellspring)
     }
-    if zone == 4 {
-        add_pickups_row("Woods ", randoStats.pickupsCollectedWoods, randoStats.pickupsTotalWoods)
+    if area == 4 {
+        add_pickups_row("Woods ", stats.pickupsCollectedWoods, stats.pickupsTotalWoods)
     }
-    if zone == 5 {
-        add_pickups_row("Reach ", randoStats.pickupsCollectedReach, randoStats.pickupsTotalReach)
+    if area == 5 {
+        add_pickups_row("Reach ", stats.pickupsCollectedReach, stats.pickupsTotalReach)
     }
-    if zone == 6 {
-        add_pickups_row("Depths ", randoStats.pickupsCollectedDepths, randoStats.pickupsTotalDepths)
+    if area == 6 {
+        add_pickups_row("Depths ", stats.pickupsCollectedDepths, stats.pickupsTotalDepths)
     }
-    if zone == 7 {
-        add_pickups_row("Pools ", randoStats.pickupsCollectedPools, randoStats.pickupsTotalPools)
+    if area == 7 {
+        add_pickups_row("Pools ", stats.pickupsCollectedPools, stats.pickupsTotalPools)
     }
-    if zone == 8 {
-        add_pickups_row("Wastes ", randoStats.pickupsCollectedWastes, randoStats.pickupsTotalWastes)
+    if area == 8 {
+        add_pickups_row("Wastes ", stats.pickupsCollectedWastes, stats.pickupsTotalWastes)
     }
-    if zone == 9 {
-        add_pickups_row("Ruins ", randoStats.pickupsCollectedRuins, randoStats.pickupsTotalRuins)
+    if area == 9 {
+        add_pickups_row("Ruins ", stats.pickupsCollectedRuins, stats.pickupsTotalRuins)
     }
-    if zone == 10 {
-        add_pickups_row("Willow ", randoStats.pickupsCollectedWillow, randoStats.pickupsTotalWillow)
+    if area == 10 {
+        add_pickups_row("Willow ", stats.pickupsCollectedWillow, stats.pickupsTotalWillow)
     }
-    if zone == 11 {
-        add_pickups_row("Burrows ", randoStats.pickupsCollectedBurrows, randoStats.pickupsTotalBurrows)
+    if area == 11 {
+        add_pickups_row("Burrows ", stats.pickupsCollectedBurrows, stats.pickupsTotalBurrows)
     }
 }
 
-fun add_pickups_row(zone: String, collected: Integer, total: Integer) {
+fun add_pickups_row(area: String, collected: Integer, total: Integer) {
     set_string("color", "")
     if collected >= total set_string("color", "$")
-    add_row(zone + "Pickups: " + get_string("color") + collected + "/" + total + get_string("color"))
+    add_row(area + "Pickups: " + get_string("color") + collected + "/" + total + get_string("color"))
 }
 
 !state(disable_keybinds, Boolean)
@@ -182,9 +182,9 @@ fun update_progress_message() {
     set_message_text("progress_message", get_string("column"))
 }
 
-on change randoStats.pickupsCollected update_progress_message()
-on change randoStats.pickupsTotal update_progress_message()
-on change player.currentArea update_progress_message()
+on change stats.pickupsCollected update_progress_message()
+on change stats.pickupsTotal update_progress_message()
+on change player.area update_progress_message()
 
 on reload {
     free_message("map_message", "")
@@ -193,9 +193,8 @@ on reload {
     set_message_background("map_message", false)
 }
 
-// TODO we call this "zone", not "area"
-on change player.currentMapArea {
-    if player.currentMapArea != -1 {
+on change map.focusedArea {
+    if map.focusedArea != -1 {
         write_map_progress_message()
         set_integer("length", string_length(get_string("column")))
 
@@ -210,7 +209,7 @@ on change player.currentMapArea {
 
         set_message_text("map_message", get_string("column"))
     }
-    if player.currentMapArea == -1 set_message_text("map_message", "")
+    if map.focusedArea == -1 set_message_text("map_message", "")
 }
 
 on binding2 if disable_keybinds == false {
@@ -395,11 +394,11 @@ fun write_quest_progress() {
     if questUberStateGroup.kwoloksWisdomQuest == 3 set_string("quest_progress", get_string("quest_progress") + "Take the Amulet to Kwolok's Altar")
     if questUberStateGroup.kwoloksWisdomQuest == 4 set_string("quest_progress", get_string("quest_progress") + "$Complete$")
     set_string("quest_progress", get_string("quest_progress") + "\n#Rebuilding the Glades# - ")
-    if Glades.RebuildGlades.Reward == false set_string("quest_progress", get_string("quest_progress") + "Help Grom rebuild the Wellspring Glades")
-    if Glades.RebuildGlades.Reward set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    if Glades.RebuildGlades.Completed == false set_string("quest_progress", get_string("quest_progress") + "Help Grom rebuild the Wellspring Glades")
+    if Glades.RebuildGlades.Completed set_string("quest_progress", get_string("quest_progress") + "$Complete$")
     set_string("quest_progress", get_string("quest_progress") + "\n#Regrowing the Glades# - ")
-    if Glades.RegrowGlades.Reward == false set_string("quest_progress", get_string("quest_progress") + "Help Tuley regrow the flora of the Wellspring Glades")
-    if Glades.RegrowGlades.Reward set_string("quest_progress", get_string("quest_progress") + "$Complete$")
+    if Glades.RegrowGlades.Completed == false set_string("quest_progress", get_string("quest_progress") + "Help Tuley regrow the flora of the Wellspring Glades")
+    if Glades.RegrowGlades.Completed set_string("quest_progress", get_string("quest_progress") + "$Complete$")
 }
 
 fun show_teleporter_progress() {
@@ -407,24 +406,24 @@ fun show_teleporter_progress() {
     controlled_priority_message("teleporter_progress", get_string("row"), 4)
 }
 
-on change MarshSpawn.TeleporterActive update_teleporter_progress()
-on change HowlsDen.TeleporterActive update_teleporter_progress()
-on change EastHollow.TeleporterActive update_teleporter_progress()
-on change GladesTown.TeleporterActive update_teleporter_progress()
-on change InnerWellspring.TeleporterActive update_teleporter_progress()
-on change MidnightBurrows.TeleporterActive update_teleporter_progress()
-on change WoodsEntry.TeleporterActive update_teleporter_progress()
-on change WoodsMain.TeleporterActive update_teleporter_progress()
-on change LowerReach.TeleporterActive update_teleporter_progress()
-on change UpperDepths.TeleporterActive update_teleporter_progress()
-on change EastPools.TeleporterActive update_teleporter_progress()
-on change WestPools.TeleporterActive update_teleporter_progress()
-on change LowerWastes.FeedingGroundsTeleporterActive update_teleporter_progress()
-on change LowerWastes.CentralTeleporterActive update_teleporter_progress()
-on change UpperWastes.TeleporterActive update_teleporter_progress()
-on change WindtornRuins.TeleporterActive update_teleporter_progress()
-on change WillowsEnd.InnerTeleporterActive update_teleporter_progress()
-on change WillowsEnd.ShriekTeleporterActive update_teleporter_progress()
+on change Marsh.Spawn.Teleporter update_teleporter_progress()
+on change Marsh.Den.Teleporter update_teleporter_progress()
+on change Hollow.Teleporter update_teleporter_progress()
+on change Glades.Teleporter update_teleporter_progress()
+on change Wellspring.Teleporter update_teleporter_progress()
+on change Burrows.Teleporter update_teleporter_progress()
+on change Woods.EntranceTeleporter update_teleporter_progress()
+on change Woods.ExitTeleporter update_teleporter_progress()
+on change Reach.Teleporter update_teleporter_progress()
+on change Depths.Teleporter update_teleporter_progress()
+on change Pools.CentralTeleporter update_teleporter_progress()
+on change Pools.BossTeleporter update_teleporter_progress()
+on change Woods.FeedingGrounds.Teleporter update_teleporter_progress()
+on change Wastes.CentralTeleporter update_teleporter_progress()
+on change Wastes.UpperTeleporter update_teleporter_progress()
+on change Ruins.Teleporter update_teleporter_progress()
+on change Willow.Teleporter update_teleporter_progress()
+on change Willow.Shriek.Teleporter update_teleporter_progress()
 fun update_teleporter_progress() {
     write_teleporter_progress()
     set_message_text("teleporter_progress", get_string("row"))
@@ -433,24 +432,24 @@ fun update_teleporter_progress() {
 fun write_teleporter_progress() {
     new_colored_row("#Teleporters activated#: ")
 
-    if MarshSpawn.TeleporterActive add_colored_row_item("Inkwater Marsh")
-    if HowlsDen.TeleporterActive add_colored_row_item("Howl's Den")
-    if EastHollow.TeleporterActive add_colored_row_item("Kwolok's Hollow")
-    if GladesTown.TeleporterActive add_colored_row_item("Glades")
-    if InnerWellspring.TeleporterActive add_colored_row_item("Wellspring")
-    if MidnightBurrows.TeleporterActive add_colored_row_item("Midnight Burrows")
-    if WoodsEntry.TeleporterActive add_colored_row_item("Woods Entrance")
-    if WoodsMain.TeleporterActive add_colored_row_item("Woods Exit")
-    if LowerReach.TeleporterActive add_colored_row_item("Baur's Reach")
-    if UpperDepths.TeleporterActive add_colored_row_item("Mouldwood Depths")
-    if EastPools.TeleporterActive add_colored_row_item("Central Pools")
-    if WestPools.TeleporterActive add_colored_row_item("Pools Boss")
-    if LowerWastes.FeedingGroundsTeleporterActive add_colored_row_item("Feeding Grounds")
-    if LowerWastes.CentralTeleporterActive add_colored_row_item("Central Wastes")
-    if UpperWastes.TeleporterActive add_colored_row_item("Outer Ruins")
-    if WindtornRuins.TeleporterActive add_colored_row_item("Inner Ruins")
-    if WillowsEnd.InnerTeleporterActive add_colored_row_item("Willow's End")
-    if WillowsEnd.ShriekTeleporterActive add_colored_row_item("Shriek")
+    if Marsh.Spawn.Teleporter add_colored_row_item("Inkwater Marsh")
+    if Marsh.Den.Teleporter add_colored_row_item("Howl's Den")
+    if Hollow.Teleporter add_colored_row_item("Kwolok's Hollow")
+    if Glades.Teleporter add_colored_row_item("Glades")
+    if Wellspring.Teleporter add_colored_row_item("Wellspring")
+    if Burrows.Teleporter add_colored_row_item("Midnight Burrows")
+    if Woods.EntranceTeleporter add_colored_row_item("Woods Entrance")
+    if Woods.ExitTeleporter add_colored_row_item("Woods Exit")
+    if Reach.Teleporter add_colored_row_item("Baur's Reach")
+    if Depths.Teleporter add_colored_row_item("Mouldwood Depths")
+    if Pools.CentralTeleporter add_colored_row_item("Central Pools")
+    if Pools.BossTeleporter add_colored_row_item("Pools Boss")
+    if Woods.FeedingGrounds.Teleporter add_colored_row_item("Feeding Grounds")
+    if Wastes.CentralTeleporter add_colored_row_item("Central Wastes")
+    if Wastes.UpperTeleporter add_colored_row_item("Outer Ruins")
+    if Ruins.Teleporter add_colored_row_item("Inner Ruins")
+    if Willow.Teleporter add_colored_row_item("Willow's End")
+    if Willow.Shriek.Teleporter add_colored_row_item("Shriek")
 
     if get_integer("next_item") == next_item_first set_string("row", get_string("row") + "None")
 }
@@ -492,38 +491,38 @@ on change entrances.willowBottomOutside update_entrance_progress()
 on change entrances.willowBottomInside update_entrance_progress()
 on change entrances.willowTopOutside update_entrance_progress()
 on change entrances.willowTopInside update_entrance_progress()
-on change knownEntranceConnections.lupoShopOutside update_entrance_progress()
-on change knownEntranceConnections.lupoShopInside update_entrance_progress()
-on change knownEntranceConnections.lastHutOutside update_entrance_progress()
-on change knownEntranceConnections.lastHutInside update_entrance_progress()
-on change knownEntranceConnections.hutAboveMotayOutside update_entrance_progress()
-on change knownEntranceConnections.hutAboveMotayInside update_entrance_progress()
-on change knownEntranceConnections.treeHutOutside update_entrance_progress()
-on change knownEntranceConnections.treeHutInside update_entrance_progress()
-on change knownEntranceConnections.mokiFatherHutOutside update_entrance_progress()
-on change knownEntranceConnections.mokiFatherHutInside update_entrance_progress()
-on change knownEntranceConnections.storageHutOutside update_entrance_progress()
-on change knownEntranceConnections.storageHutInside update_entrance_progress()
-on change knownEntranceConnections.caveOutside update_entrance_progress()
-on change knownEntranceConnections.caveInside update_entrance_progress()
-on change knownEntranceConnections.wellspring1stFloorBottomOutside update_entrance_progress()
-on change knownEntranceConnections.wellspring1stFloorBottomInside update_entrance_progress()
-on change knownEntranceConnections.wellspring1stFloorTopOutside update_entrance_progress()
-on change knownEntranceConnections.wellspring1stFloorTopInside update_entrance_progress()
-on change knownEntranceConnections.wellspring2ndFloorOutside update_entrance_progress()
-on change knownEntranceConnections.wellspring2ndFloorInside update_entrance_progress()
-on change knownEntranceConnections.wellspring3rdFloorOutside update_entrance_progress()
-on change knownEntranceConnections.wellspring3rdFloorInside update_entrance_progress()
-on change knownEntranceConnections.reachSeedOutside update_entrance_progress()
-on change knownEntranceConnections.reachSeedInside update_entrance_progress()
-on change knownEntranceConnections.teddyHutOutside update_entrance_progress()
-on change knownEntranceConnections.teddyHutInside update_entrance_progress()
-on change knownEntranceConnections.ruinsOutside update_entrance_progress()
-on change knownEntranceConnections.ruinsInside update_entrance_progress()
-on change knownEntranceConnections.willowBottomOutside update_entrance_progress()
-on change knownEntranceConnections.willowBottomInside update_entrance_progress()
-on change knownEntranceConnections.willowTopOutside update_entrance_progress()
-on change knownEntranceConnections.willowTopInside update_entrance_progress()
+on change entrancesKnown.lupoShopOutside update_entrance_progress()
+on change entrancesKnown.lupoShopInside update_entrance_progress()
+on change entrancesKnown.lastHutOutside update_entrance_progress()
+on change entrancesKnown.lastHutInside update_entrance_progress()
+on change entrancesKnown.hutAboveMotayOutside update_entrance_progress()
+on change entrancesKnown.hutAboveMotayInside update_entrance_progress()
+on change entrancesKnown.treeHutOutside update_entrance_progress()
+on change entrancesKnown.treeHutInside update_entrance_progress()
+on change entrancesKnown.mokiFatherHutOutside update_entrance_progress()
+on change entrancesKnown.mokiFatherHutInside update_entrance_progress()
+on change entrancesKnown.storageHutOutside update_entrance_progress()
+on change entrancesKnown.storageHutInside update_entrance_progress()
+on change entrancesKnown.caveOutside update_entrance_progress()
+on change entrancesKnown.caveInside update_entrance_progress()
+on change entrancesKnown.wellspring1stFloorBottomOutside update_entrance_progress()
+on change entrancesKnown.wellspring1stFloorBottomInside update_entrance_progress()
+on change entrancesKnown.wellspring1stFloorTopOutside update_entrance_progress()
+on change entrancesKnown.wellspring1stFloorTopInside update_entrance_progress()
+on change entrancesKnown.wellspring2ndFloorOutside update_entrance_progress()
+on change entrancesKnown.wellspring2ndFloorInside update_entrance_progress()
+on change entrancesKnown.wellspring3rdFloorOutside update_entrance_progress()
+on change entrancesKnown.wellspring3rdFloorInside update_entrance_progress()
+on change entrancesKnown.reachSeedOutside update_entrance_progress()
+on change entrancesKnown.reachSeedInside update_entrance_progress()
+on change entrancesKnown.teddyHutOutside update_entrance_progress()
+on change entrancesKnown.teddyHutInside update_entrance_progress()
+on change entrancesKnown.ruinsOutside update_entrance_progress()
+on change entrancesKnown.ruinsInside update_entrance_progress()
+on change entrancesKnown.willowBottomOutside update_entrance_progress()
+on change entrancesKnown.willowBottomInside update_entrance_progress()
+on change entrancesKnown.willowTopOutside update_entrance_progress()
+on change entrancesKnown.willowTopInside update_entrance_progress()
 fun update_entrance_progress() {
     write_entrance_progress()
     set_message_text("entrance_progress", get_string("entrance_progress"))
@@ -573,38 +572,38 @@ fun write_entrance_progress() {
     if get_boolean("default_entrance_connections") == false {
         // negative margin hack
         set_string("entrance_progress", "<ls_-1.5>" + invisible + ".</></>\n<s_0.7><ls_0.7>")
-        entrance_string_piece(moki_father_hut_outside, knownEntranceConnections.mokiFatherHutOutside, entrances.mokiFatherHutOutside)
-        entrance_string_piece("\n" + moki_father_hut_inside, knownEntranceConnections.mokiFatherHutInside, entrances.mokiFatherHutInside)
-        entrance_string_piece("\n" + hut_above_motay_outside, knownEntranceConnections.hutAboveMotayOutside, entrances.hutAboveMotayOutside)
-        entrance_string_piece("\n" + hut_above_motay_inside, knownEntranceConnections.hutAboveMotayInside, entrances.hutAboveMotayInside)
-        entrance_string_piece("\n" + storage_hut_outside, knownEntranceConnections.storageHutOutside, entrances.storageHutOutside)
-        entrance_string_piece("\n" + storage_hut_inside, knownEntranceConnections.storageHutInside, entrances.storageHutInside)
-        entrance_string_piece("\n" + tree_hut_outside, knownEntranceConnections.treeHutOutside, entrances.treeHutOutside)
-        entrance_string_piece("\n" + tree_hut_inside, knownEntranceConnections.treeHutInside, entrances.treeHutInside)
-        entrance_string_piece("\n" + last_hut_outside, knownEntranceConnections.lastHutOutside, entrances.lastHutOutside)
-        entrance_string_piece("\n" + last_hut_inside, knownEntranceConnections.lastHutInside, entrances.lastHutInside)
-        entrance_string_piece("\n" + cave_outside, knownEntranceConnections.caveOutside, entrances.caveOutside)
-        entrance_string_piece("\n" + cave_inside, knownEntranceConnections.caveInside, entrances.caveInside)
-        entrance_string_piece("\n" + lupo_shop_outside, knownEntranceConnections.lupoShopOutside, entrances.lupoShopOutside)
-        entrance_string_piece("\n" + lupo_shop_inside, knownEntranceConnections.lupoShopInside, entrances.lupoShopInside)
-        entrance_string_piece("\n" + wellspring_1st_floor_bottom_outside, knownEntranceConnections.wellspring1stFloorBottomOutside, entrances.wellspring1stFloorBottomOutside)
-        entrance_string_piece("\n" + wellspring_1st_floor_bottom_inside, knownEntranceConnections.wellspring1stFloorBottomInside, entrances.wellspring1stFloorBottomInside)
-        entrance_string_piece("\n" + wellspring_1st_floor_top_outside, knownEntranceConnections.wellspring1stFloorTopOutside, entrances.wellspring1stFloorTopOutside)
-        entrance_string_piece("\n" + wellspring_1st_floor_top_inside, knownEntranceConnections.wellspring1stFloorTopInside, entrances.wellspring1stFloorTopInside)
-        entrance_string_piece("\n" + wellspring_2nd_floor_outside, knownEntranceConnections.wellspring2ndFloorOutside, entrances.wellspring2ndFloorOutside)
-        entrance_string_piece("\n" + wellspring_2nd_floor_inside, knownEntranceConnections.wellspring2ndFloorInside, entrances.wellspring2ndFloorInside)
-        entrance_string_piece("\n" + wellspring_3rd_floor_outside, knownEntranceConnections.wellspring3rdFloorOutside, entrances.wellspring3rdFloorOutside)
-        entrance_string_piece("\n" + wellspring_3rd_floor_inside, knownEntranceConnections.wellspring3rdFloorInside, entrances.wellspring3rdFloorInside)
-        entrance_string_piece("\n" + teddy_hut_outside, knownEntranceConnections.teddyHutOutside, entrances.teddyHutOutside)
-        entrance_string_piece("\n" + teddy_hut_inside, knownEntranceConnections.teddyHutInside, entrances.teddyHutInside)
-        entrance_string_piece("\n" + reach_hut_outside, knownEntranceConnections.reachSeedOutside, entrances.reachSeedOutside)
-        entrance_string_piece("\n" + reach_hut_inside, knownEntranceConnections.reachSeedInside, entrances.reachSeedInside)
-        entrance_string_piece("\n" + ruins_outside, knownEntranceConnections.ruinsOutside, entrances.ruinsOutside)
-        entrance_string_piece("\n" + ruins_inside, knownEntranceConnections.ruinsInside, entrances.ruinsInside)
-        entrance_string_piece("\n" + willow_bottom_outside, knownEntranceConnections.willowBottomOutside, entrances.willowBottomOutside)
-        entrance_string_piece("\n" + willow_bottom_inside, knownEntranceConnections.willowBottomInside, entrances.willowBottomInside)
-        entrance_string_piece("\n" + willow_top_outside, knownEntranceConnections.willowTopOutside, entrances.willowTopOutside)
-        entrance_string_piece("\n" + willow_top_inside, knownEntranceConnections.willowTopInside, entrances.willowTopInside)
+        entrance_string_piece(moki_father_hut_outside, entrancesKnown.mokiFatherHutOutside, entrances.mokiFatherHutOutside)
+        entrance_string_piece("\n" + moki_father_hut_inside, entrancesKnown.mokiFatherHutInside, entrances.mokiFatherHutInside)
+        entrance_string_piece("\n" + hut_above_motay_outside, entrancesKnown.hutAboveMotayOutside, entrances.hutAboveMotayOutside)
+        entrance_string_piece("\n" + hut_above_motay_inside, entrancesKnown.hutAboveMotayInside, entrances.hutAboveMotayInside)
+        entrance_string_piece("\n" + storage_hut_outside, entrancesKnown.storageHutOutside, entrances.storageHutOutside)
+        entrance_string_piece("\n" + storage_hut_inside, entrancesKnown.storageHutInside, entrances.storageHutInside)
+        entrance_string_piece("\n" + tree_hut_outside, entrancesKnown.treeHutOutside, entrances.treeHutOutside)
+        entrance_string_piece("\n" + tree_hut_inside, entrancesKnown.treeHutInside, entrances.treeHutInside)
+        entrance_string_piece("\n" + last_hut_outside, entrancesKnown.lastHutOutside, entrances.lastHutOutside)
+        entrance_string_piece("\n" + last_hut_inside, entrancesKnown.lastHutInside, entrances.lastHutInside)
+        entrance_string_piece("\n" + cave_outside, entrancesKnown.caveOutside, entrances.caveOutside)
+        entrance_string_piece("\n" + cave_inside, entrancesKnown.caveInside, entrances.caveInside)
+        entrance_string_piece("\n" + lupo_shop_outside, entrancesKnown.lupoShopOutside, entrances.lupoShopOutside)
+        entrance_string_piece("\n" + lupo_shop_inside, entrancesKnown.lupoShopInside, entrances.lupoShopInside)
+        entrance_string_piece("\n" + wellspring_1st_floor_bottom_outside, entrancesKnown.wellspring1stFloorBottomOutside, entrances.wellspring1stFloorBottomOutside)
+        entrance_string_piece("\n" + wellspring_1st_floor_bottom_inside, entrancesKnown.wellspring1stFloorBottomInside, entrances.wellspring1stFloorBottomInside)
+        entrance_string_piece("\n" + wellspring_1st_floor_top_outside, entrancesKnown.wellspring1stFloorTopOutside, entrances.wellspring1stFloorTopOutside)
+        entrance_string_piece("\n" + wellspring_1st_floor_top_inside, entrancesKnown.wellspring1stFloorTopInside, entrances.wellspring1stFloorTopInside)
+        entrance_string_piece("\n" + wellspring_2nd_floor_outside, entrancesKnown.wellspring2ndFloorOutside, entrances.wellspring2ndFloorOutside)
+        entrance_string_piece("\n" + wellspring_2nd_floor_inside, entrancesKnown.wellspring2ndFloorInside, entrances.wellspring2ndFloorInside)
+        entrance_string_piece("\n" + wellspring_3rd_floor_outside, entrancesKnown.wellspring3rdFloorOutside, entrances.wellspring3rdFloorOutside)
+        entrance_string_piece("\n" + wellspring_3rd_floor_inside, entrancesKnown.wellspring3rdFloorInside, entrances.wellspring3rdFloorInside)
+        entrance_string_piece("\n" + teddy_hut_outside, entrancesKnown.teddyHutOutside, entrances.teddyHutOutside)
+        entrance_string_piece("\n" + teddy_hut_inside, entrancesKnown.teddyHutInside, entrances.teddyHutInside)
+        entrance_string_piece("\n" + reach_hut_outside, entrancesKnown.reachSeedOutside, entrances.reachSeedOutside)
+        entrance_string_piece("\n" + reach_hut_inside, entrancesKnown.reachSeedInside, entrances.reachSeedInside)
+        entrance_string_piece("\n" + ruins_outside, entrancesKnown.ruinsOutside, entrances.ruinsOutside)
+        entrance_string_piece("\n" + ruins_inside, entrancesKnown.ruinsInside, entrances.ruinsInside)
+        entrance_string_piece("\n" + willow_bottom_outside, entrancesKnown.willowBottomOutside, entrances.willowBottomOutside)
+        entrance_string_piece("\n" + willow_bottom_inside, entrancesKnown.willowBottomInside, entrances.willowBottomInside)
+        entrance_string_piece("\n" + willow_top_outside, entrancesKnown.willowTopOutside, entrances.willowTopOutside)
+        entrance_string_piece("\n" + willow_top_inside, entrancesKnown.willowTopInside, entrances.willowTopInside)
     }
 }
 
@@ -612,38 +611,38 @@ fun has_default_entrance_connections() {
     // TODO manual right-to-left ordering is currently required to compile this expression
     set_boolean(
         "default_entrance_connections",
-        knownEntranceConnections.mokiFatherHutOutside && (entrances.mokiFatherHutOutside == 10
-        && (knownEntranceConnections.mokiFatherHutInside && (entrances.mokiFatherHutInside == 9
-        && (knownEntranceConnections.hutAboveMotayOutside && (entrances.hutAboveMotayOutside == 6
-        && (knownEntranceConnections.hutAboveMotayInside && (entrances.hutAboveMotayInside == 5
-        && (knownEntranceConnections.storageHutOutside && (entrances.storageHutOutside == 12
-        && (knownEntranceConnections.storageHutInside && (entrances.storageHutInside == 11
-        && (knownEntranceConnections.treeHutOutside && (entrances.treeHutOutside == 8
-        && (knownEntranceConnections.treeHutInside && (entrances.treeHutInside == 7
-        && (knownEntranceConnections.lastHutOutside && (entrances.lastHutOutside == 4
-        && (knownEntranceConnections.lastHutInside && (entrances.lastHutInside == 3
-        && (knownEntranceConnections.caveOutside && (entrances.caveOutside == 14
-        && (knownEntranceConnections.caveInside && (entrances.caveInside == 13
-        && (knownEntranceConnections.lupoShopOutside && (entrances.lupoShopOutside == 2
-        && (knownEntranceConnections.lupoShopInside && (entrances.lupoShopInside == 1
-        && (knownEntranceConnections.wellspring1stFloorBottomOutside && (entrances.wellspring1stFloorBottomOutside == 16
-        && (knownEntranceConnections.wellspring1stFloorBottomInside && (entrances.wellspring1stFloorBottomInside == 15
-        && (knownEntranceConnections.wellspring1stFloorTopOutside && (entrances.wellspring1stFloorTopOutside == 18
-        && (knownEntranceConnections.wellspring1stFloorTopInside && (entrances.wellspring1stFloorTopInside == 17
-        && (knownEntranceConnections.wellspring2ndFloorOutside && (entrances.wellspring2ndFloorOutside == 20
-        && (knownEntranceConnections.wellspring2ndFloorInside && (entrances.wellspring2ndFloorInside == 19
-        && (knownEntranceConnections.wellspring3rdFloorOutside && (entrances.wellspring3rdFloorOutside == 22
-        && (knownEntranceConnections.wellspring3rdFloorInside && (entrances.wellspring3rdFloorInside == 21
-        && (knownEntranceConnections.teddyHutOutside && (entrances.teddyHutOutside == 26
-        && (knownEntranceConnections.teddyHutInside && (entrances.teddyHutInside == 25
-        && (knownEntranceConnections.reachSeedOutside && (entrances.reachSeedOutside == 24
-        && (knownEntranceConnections.reachSeedInside && (entrances.reachSeedInside == 23
-        && (knownEntranceConnections.ruinsOutside && (entrances.ruinsOutside == 28
-        && (knownEntranceConnections.ruinsInside && (entrances.ruinsInside == 27
-        && (knownEntranceConnections.willowBottomOutside && (entrances.willowBottomOutside == 30
-        && (knownEntranceConnections.willowBottomInside && (entrances.willowBottomInside == 29
-        && (knownEntranceConnections.willowTopOutside && (entrances.willowTopOutside == 31
-        && (knownEntranceConnections.willowTopInside && entrances.willowTopInside == 32))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+        entrancesKnown.mokiFatherHutOutside && (entrances.mokiFatherHutOutside == 10
+        && (entrancesKnown.mokiFatherHutInside && (entrances.mokiFatherHutInside == 9
+        && (entrancesKnown.hutAboveMotayOutside && (entrances.hutAboveMotayOutside == 6
+        && (entrancesKnown.hutAboveMotayInside && (entrances.hutAboveMotayInside == 5
+        && (entrancesKnown.storageHutOutside && (entrances.storageHutOutside == 12
+        && (entrancesKnown.storageHutInside && (entrances.storageHutInside == 11
+        && (entrancesKnown.treeHutOutside && (entrances.treeHutOutside == 8
+        && (entrancesKnown.treeHutInside && (entrances.treeHutInside == 7
+        && (entrancesKnown.lastHutOutside && (entrances.lastHutOutside == 4
+        && (entrancesKnown.lastHutInside && (entrances.lastHutInside == 3
+        && (entrancesKnown.caveOutside && (entrances.caveOutside == 14
+        && (entrancesKnown.caveInside && (entrances.caveInside == 13
+        && (entrancesKnown.lupoShopOutside && (entrances.lupoShopOutside == 2
+        && (entrancesKnown.lupoShopInside && (entrances.lupoShopInside == 1
+        && (entrancesKnown.wellspring1stFloorBottomOutside && (entrances.wellspring1stFloorBottomOutside == 16
+        && (entrancesKnown.wellspring1stFloorBottomInside && (entrances.wellspring1stFloorBottomInside == 15
+        && (entrancesKnown.wellspring1stFloorTopOutside && (entrances.wellspring1stFloorTopOutside == 18
+        && (entrancesKnown.wellspring1stFloorTopInside && (entrances.wellspring1stFloorTopInside == 17
+        && (entrancesKnown.wellspring2ndFloorOutside && (entrances.wellspring2ndFloorOutside == 20
+        && (entrancesKnown.wellspring2ndFloorInside && (entrances.wellspring2ndFloorInside == 19
+        && (entrancesKnown.wellspring3rdFloorOutside && (entrances.wellspring3rdFloorOutside == 22
+        && (entrancesKnown.wellspring3rdFloorInside && (entrances.wellspring3rdFloorInside == 21
+        && (entrancesKnown.teddyHutOutside && (entrances.teddyHutOutside == 26
+        && (entrancesKnown.teddyHutInside && (entrances.teddyHutInside == 25
+        && (entrancesKnown.reachSeedOutside && (entrances.reachSeedOutside == 24
+        && (entrancesKnown.reachSeedInside && (entrances.reachSeedInside == 23
+        && (entrancesKnown.ruinsOutside && (entrances.ruinsOutside == 28
+        && (entrancesKnown.ruinsInside && (entrances.ruinsInside == 27
+        && (entrancesKnown.willowBottomOutside && (entrances.willowBottomOutside == 30
+        && (entrancesKnown.willowBottomInside && (entrances.willowBottomInside == 29
+        && (entrancesKnown.willowTopOutside && (entrances.willowTopOutside == 31
+        && (entrancesKnown.willowTopInside && entrances.willowTopInside == 32))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
     )
 }
 

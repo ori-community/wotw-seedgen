@@ -190,7 +190,7 @@ fn optimize_graph_fishing_pool() {
     );
 }
 
-// MarshSpawn.BurrowFightArena -> MarshSpawn.BurrowArena
+// MarshSpawn.BurrowFightArena -> Marsh.Sand.Fight
 #[test]
 fn optimize_graph_burrow_arena() {
     test_logger();

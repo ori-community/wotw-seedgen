@@ -3,9 +3,9 @@
 //! # Examples
 //!
 //! ```
-//! use wotw_seedgen_data::{assets::{Pickups, PickupsEntry}, MapIcon, Position, UberIdentifier, Zone};
+//! use wotw_seedgen_data::{assets::{Pickups, PickupsEntry}, MapIcon, Position, UberIdentifier, Area};
 //!
-//! let input = "Identifier, Condition, Zone, PickupType, PickupDetails, X, Y, MapX, MapY
+//! let input = "Identifier, Condition, Area, PickupType, PickupDetails, X, Y, MapX, MapY
 //! Marsh.Spawn.LeftHF, 21786|60210, Marsh, HealthFragment, , -958.6, -4313.2, -958.6199, -4312.245
 //! Glades.MotayHut.SL, 42178|57455, Glades, SpiritLight, 100, -172.7, -4583.2, -392.8, -4130.6";
 //! let pickups = Pickups::from_reader(input.as_bytes()).unwrap();
@@ -13,7 +13,7 @@
 //! assert_eq!(pickups.entries, vec![
 //!     PickupsEntry {
 //!         identifier: "Marsh.Spawn.LeftHF".to_string(),
-//!         zone: Zone::Marsh,
+//!         area: Area::Marsh,
 //!         map_icon: MapIcon::HealthFragment,
 //!         uber_identifier: UberIdentifier::new(21786, 60210),
 //!         value: None,
@@ -22,7 +22,7 @@
 //!     },
 //!     PickupsEntry {
 //!         identifier: "Glades.MotayHut.SL".to_string(),
-//!         zone: Zone::Glades,
+//!         area: Area::Glades,
 //!         map_icon: MapIcon::SpiritLight,
 //!         uber_identifier: UberIdentifier::new(42178, 57455),
 //!         value: None,
@@ -32,7 +32,7 @@
 //! ]);
 //! ```
 
-use crate::{assets::LogicCondition, MapIcon, Position, UberIdentifier, Zone};
+use crate::{assets::LogicCondition, Area, MapIcon, Position, UberIdentifier};
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
 use std::io::Read;
@@ -52,8 +52,8 @@ pub struct Pickups {
 pub struct PickupsEntry {
     /// Unique identifier for this pickup location which is used in `paths.wotwl`
     pub identifier: String,
-    /// Map zone containing this pickup location
-    pub zone: Zone,
+    /// Map area containing this pickup location
+    pub area: Area,
     /// Vanilla map icon
     pub map_icon: MapIcon,
     /// `UberIdentifier` where this pickup location's corresponding world state is stored
@@ -107,7 +107,7 @@ impl Pickups {
 
             entries.push(PickupsEntry {
                 identifier: record.identifier,
-                zone: record.zone,
+                area: record.area,
                 map_icon: record.pickup_type,
                 uber_identifier: record.condition.uber_identifier,
                 value: record.condition.value,
@@ -126,7 +126,7 @@ struct PickupsInput<'a> {
     identifier: String,
     condition: LogicCondition,
     #[serde_as(as = "DisplayFromStr")]
-    zone: Zone,
+    area: Area,
     #[serde_as(as = "DisplayFromStr")]
     pickup_type: MapIcon,
     _pickup_details: &'a str,

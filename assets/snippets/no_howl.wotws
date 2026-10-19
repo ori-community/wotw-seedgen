@@ -7,5 +7,5 @@
 on spawn {
     store(swampStateGroup.nightCrawlerEscaped, true)
     store(swampStateGroup.nightCrawlerChaseStarted, true)
-    store(MarshSpawn.HowlBurnt, true)
+    store(Marsh.HowlDefeated, true)
 }

@@ -5,11 +5,11 @@
 on hubUberStateGroup.builderProjectHouses > 0 || gromShop.dwellingRepairs show_dwelling_repairs()
 on hubUberStateGroup.builderProjectHouses == 0 && gromShop.dwellingRepairs == false hide_dwelling_repairs()
 
-on gladesProjects.housesABuilt store(hubUberStateGroup.builderProjectHousesB, 1)
+on gladesProjects.dwellingRepairs store(hubUberStateGroup.builderProjectHousesB, 1)
 on hubUberStateGroup.builderProjectHousesB > 0 || gromShop.roofsOverHeads show_roofs_over_heads()
 on hubUberStateGroup.builderProjectHousesB == 0 && gromShop.roofsOverHeads == false hide_roofs_over_heads()
 
-on gladesProjects.housesBBuilt store(hubUberStateGroup.builderProjectHousesC, 1)
+on gladesProjects.roofsOverHeads store(hubUberStateGroup.builderProjectHousesC, 1)
 on hubUberStateGroup.builderProjectHousesC > 0 || gromShop.onwardsAndUpwards show_onwards_and_upwards()
 on hubUberStateGroup.builderProjectHousesC == 0 && gromShop.onwardsAndUpwards == false hide_onwards_and_upwards()
 
@@ -20,13 +20,13 @@ on hubUberStateGroup.builderProjectBeautify > 0 || gromShop.theGorlekTouch show_
 on hubUberStateGroup.builderProjectBeautify == 0 && gromShop.theGorlekTouch == false hide_the_gorlek_touch()
 
 // TODO inconsistent glades project names
-on gromShop.repairTheSpiritWell store(gladesProjects.spiritWellBuilt, true)
-on gromShop.dwellingRepairs store(gladesProjects.housesABuilt, true)
-on gromShop.roofsOverHeads store(gladesProjects.housesBBuilt, true)
-on gromShop.onwardsAndUpwards store(gladesProjects.housesCBuilt, true)
-on gromShop.thornySituation store(gladesProjects.removeThornsBuilt, true)
-on gromShop.clearTheCaveEntrance store(gladesProjects.openCaveBuilt, true)
-on gromShop.theGorlekTouch store(gladesProjects.beautifyBuilt, true)
+on gromShop.repairTheSpiritWell store(gladesProjects.repairTheSpiritWell, true)
+on gromShop.dwellingRepairs store(gladesProjects.dwellingRepairs, true)
+on gromShop.roofsOverHeads store(gladesProjects.roofsOverHeads, true)
+on gromShop.onwardsAndUpwards store(gladesProjects.onwardsAndUpwards, true)
+on gromShop.thornySituation store(gladesProjects.thornySituation, true)
+on gromShop.clearTheCaveEntrance store(gladesProjects.clearTheCaveEntrance, true)
+on gromShop.theGorlekTouch store(gladesProjects.theGorlekTouch, true)
 
 on spawn {
     set_shop_item_data(

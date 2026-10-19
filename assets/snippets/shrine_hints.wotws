@@ -20,23 +20,23 @@
 
 on shrines.marshWave == 1 {
     store(marsh_visited, true)
-    if MarshPastOpher.CombatShrineCompleted == false item_message("Complete the Marsh Combat Shrine to gain\n" + marsh_shrine_item)
+    if Marsh.Trial.CombatShrineCompleted == false item_message("Complete the Marsh Combat Shrine to gain\n" + marsh_shrine_item)
 }
 on shrines.howlsDenWave == 1 {
     store(howls_den_visited, true)
-    if HowlsDen.CombatShrineCompleted == false item_message("Complete the Howl's Den Combat Shrine to gain\n" + den_shrine_item)
+    if Marsh.Den.CombatShrineCompleted == false item_message("Complete the Howl's Den Combat Shrine to gain\n" + den_shrine_item)
 }
 on shrines.gladesWave == 1 {
     store(glades_visited, true)
-    if WestGlades.CombatShrineCompleted == false item_message("Complete the Glades Combat Shrine to gain\n" + glades_shrine_item)
+    if Glades.CombatShrineCompleted == false item_message("Complete the Glades Combat Shrine to gain\n" + glades_shrine_item)
 }
 on shrines.woodsWave == 1 {
     store(woods_visited, true)
-    if WoodsMain.CombatShrineCompleted == false item_message("Complete the Woods Combat Shrine to gain\n" + woods_shrine_item)
+    if Woods.CombatShrineCompleted == false item_message("Complete the Woods Combat Shrine to gain\n" + woods_shrine_item)
 }
 on shrines.depthsWave == 1 {
     store(depths_visited, true)
-    if LowerDepths.CombatShrineCompleted == false item_message("Complete the Depths Combat Shrine to gain\n" + depths_shrine_item)
+    if Depths.CombatShrineCompleted == false item_message("Complete the Depths Combat Shrine to gain\n" + depths_shrine_item)
 }
 
 on reload {
@@ -54,11 +54,11 @@ on change howls_den_visited update_wheel()
 on change glades_visited update_wheel()
 on change woods_visited update_wheel()
 on change depths_visited update_wheel()
-on change MarshPastOpher.CombatShrineCompleted update_wheel()
-on change HowlsDen.CombatShrineCompleted update_wheel()
-on change WestGlades.CombatShrineCompleted update_wheel()
-on change WoodsMain.CombatShrineCompleted update_wheel()
-on change LowerDepths.CombatShrineCompleted update_wheel()
+on change Marsh.Trial.CombatShrineCompleted update_wheel()
+on change Marsh.Den.CombatShrineCompleted update_wheel()
+on change Glades.CombatShrineCompleted update_wheel()
+on change Woods.CombatShrineCompleted update_wheel()
+on change Depths.CombatShrineCompleted update_wheel()
 fun update_wheel() {
     set_boolean(
         "any_unlocked",
@@ -67,11 +67,11 @@ fun update_wheel() {
         || glades_visited
         || woods_visited
         || depths_visited
-        || MarshPastOpher.CombatShrineCompleted
-        || HowlsDen.CombatShrineCompleted
-        || WestGlades.CombatShrineCompleted
-        || WoodsMain.CombatShrineCompleted
-        || LowerDepths.CombatShrineCompleted
+        || Marsh.Trial.CombatShrineCompleted
+        || Marsh.Den.CombatShrineCompleted
+        || Glades.CombatShrineCompleted
+        || Woods.CombatShrineCompleted
+        || Depths.CombatShrineCompleted
     )
 
     if get_boolean("any_unlocked") {
@@ -89,11 +89,11 @@ on change howls_den_visited update_shrine_hints()
 on change glades_visited update_shrine_hints()
 on change woods_visited update_shrine_hints()
 on change depths_visited update_shrine_hints()
-on change MarshPastOpher.CombatShrineCompleted update_shrine_hints()
-on change HowlsDen.CombatShrineCompleted update_shrine_hints()
-on change WestGlades.CombatShrineCompleted update_shrine_hints()
-on change WoodsMain.CombatShrineCompleted update_shrine_hints()
-on change LowerDepths.CombatShrineCompleted update_shrine_hints()
+on change Marsh.Trial.CombatShrineCompleted update_shrine_hints()
+on change Marsh.Den.CombatShrineCompleted update_shrine_hints()
+on change Glades.CombatShrineCompleted update_shrine_hints()
+on change Woods.CombatShrineCompleted update_shrine_hints()
+on change Depths.CombatShrineCompleted update_shrine_hints()
 fun update_shrine_hints() {
     write_shrine_hints()
     set_message_text("shrine_hints", get_string("column"))
@@ -102,19 +102,19 @@ fun update_shrine_hints() {
 fun write_shrine_hints() {
     new_column("")
 
-    if marsh_visited && MarshPastOpher.CombatShrineCompleted == false add_row("#Marsh Reward#: " + marsh_shrine_item)
-    if howls_den_visited && HowlsDen.CombatShrineCompleted == false add_row("#Den Reward#: " + den_shrine_item)
-    if glades_visited && WestGlades.CombatShrineCompleted == false add_row("#Glades Reward#: " + glades_shrine_item)
-    if woods_visited && WoodsMain.CombatShrineCompleted == false add_row("#Woods Reward#: " + woods_shrine_item)
-    if depths_visited && LowerDepths.CombatShrineCompleted == false add_row("#Depths Reward#: " + depths_shrine_item)
+    if marsh_visited && Marsh.Trial.CombatShrineCompleted == false add_row("#Marsh Reward#: " + marsh_shrine_item)
+    if howls_den_visited && Marsh.Den.CombatShrineCompleted == false add_row("#Den Reward#: " + den_shrine_item)
+    if glades_visited && Glades.CombatShrineCompleted == false add_row("#Glades Reward#: " + glades_shrine_item)
+    if woods_visited && Woods.CombatShrineCompleted == false add_row("#Woods Reward#: " + woods_shrine_item)
+    if depths_visited && Depths.CombatShrineCompleted == false add_row("#Depths Reward#: " + depths_shrine_item)
 
     new_row("$Completed$: ")
 
-    if MarshPastOpher.CombatShrineCompleted add_row_item("Marsh")
-    if HowlsDen.CombatShrineCompleted add_row_item("Den")
-    if WestGlades.CombatShrineCompleted add_row_item("Glades")
-    if WoodsMain.CombatShrineCompleted add_row_item("Woods")
-    if LowerDepths.CombatShrineCompleted add_row_item("Depths")
+    if Marsh.Trial.CombatShrineCompleted add_row_item("Marsh")
+    if Marsh.Den.CombatShrineCompleted add_row_item("Den")
+    if Glades.CombatShrineCompleted add_row_item("Glades")
+    if Woods.CombatShrineCompleted add_row_item("Woods")
+    if Depths.CombatShrineCompleted add_row_item("Depths")
 
     add_current_row()
 

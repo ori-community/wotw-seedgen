@@ -472,18 +472,18 @@ impl<'graph> World<'graph, '_, '_, '_> {
         for state in self.reached_nodes().filter_map(Node::try_as_state_ref) {
             match state.identifier.as_str() {
                 // TODO derive from logic? Also maybe don't recompute all the time?
-                "MarshSpawn.KeystoneDoor" => keystone_cost += 2,
-                "HowlsDen.KeystoneDoor" => keystone_cost += 2,
-                "MarshPastOpher.EyestoneDoor" => keystone_cost += 2,
-                "MidnightBurrows.KeystoneDoor" => keystone_cost += 4,
-                "WoodsEntry.KeystoneDoor" => keystone_cost += 2,
-                "WoodsMain.KeystoneDoor" => keystone_cost += 4,
-                "LowerReach.KeystoneDoor" => keystone_cost += 4,
-                "UpperReach.KeystoneDoor" => keystone_cost += 4,
-                "UpperDepths.EntryKeystoneDoor" => keystone_cost += 2,
-                "UpperDepths.CentralKeystoneDoor" => keystone_cost += 2,
-                "UpperPools.KeystoneDoor" => keystone_cost += 4,
-                "UpperWastes.KeystoneDoor" => keystone_cost += 2,
+                "Marsh.Howl.KeystoneDoor" => keystone_cost += 2,
+                "Marsh.Den.KeystoneDoor" => keystone_cost += 2,
+                "Marsh.EyestoneDoor" => keystone_cost += 2,
+                "Burrows.KeystoneDoor" => keystone_cost += 4,
+                "Woods.FirstKeystoneDoor" => keystone_cost += 2,
+                "Woods.KuKeystoneDoor" => keystone_cost += 4,
+                "Reach.Trial.KeystoneDoor" => keystone_cost += 4,
+                "Reach.TopKeystoneDoor" => keystone_cost += 4,
+                "Depths.FirstKeystoneDoor" => keystone_cost += 2,
+                "Depths.SecondKeystoneDoor" => keystone_cost += 2,
+                "Pools.KeystoneDoor" => keystone_cost += 4,
+                "Wastes.KeystoneDoor" => keystone_cost += 2,
                 _ => {}
             }
         }
