@@ -68,6 +68,8 @@ on spawn {
     store(modifications.canOpenEyestoneDoor, true)
     // Makes the Mora fight start trigger wider so you don't fly through it at high velocities
     store(modifications.fixMoraTriggerSkip, true)
+    // remove *sleeping* ku from hollow for less sadness
+    store(modifications.disableKuInHollow, true)
 }
 
 // Lower water around pools TP when collecting it
