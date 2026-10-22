@@ -4,15 +4,14 @@
 "Removes some barriers so random spawn works better, especially with no teleporters:
 The lever door in upper wastes, the lever door at pools entry, the bone wall above howl's den teleporter, the Howl fight and the falling skull in Woods.")
 
+// Removing Howl allows both Howl's Den and Midnight Burrows to escape
+!include("no_howl")
+
 on spawn {
     // The only alternate path around this lever door would be through Ruins, which generally isn't open without all Wisps
     store(Wastes.MissilePuzzles.LeverDoor, true)
     // No path around this door
     store(Pools.EntranceLever, true)
-    // Removing Howl allows both Howl's Den and Midnight Burrows to escape
-    store(swampStateGroup.nightCrawlerChaseStarted, true)
-    store(swampStateGroup.nightCrawlerDefeated, true)
-    store(Marsh.HowlDefeated, true)
     // For settings that can't use reverse breaks or the unintuitive Double Jump tree interaction
     store(Marsh.Den.BottomAreaWall, true)
     // For settings that can't wedge past the skull
