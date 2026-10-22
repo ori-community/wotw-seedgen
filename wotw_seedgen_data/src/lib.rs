@@ -30,7 +30,7 @@ mod wheel;
 
 pub use action::InputAction;
 pub use area::Area;
-pub use env::env_or;
+pub use env::{env_or, env_or_else};
 pub use eq_ignore::EqIgnore;
 pub use equipment::{EquipSlot, Equipment};
 pub use icon::{GenericIcon, GromIcon, Icon, LupoIcon, MapIcon, OpherIcon, TuleyIcon};

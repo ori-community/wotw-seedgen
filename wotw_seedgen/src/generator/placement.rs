@@ -23,7 +23,7 @@ use rustc_hash::FxHashMap;
 use std::{cmp::Ordering, iter, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::{
     assets::{Pickups, PickupsEntry},
-    env_or,
+    env_or, env_or_else,
     logic_language::output::Node,
     seed_language::{
         compile::{self, ORIGIN_WORLD_STRING},
@@ -44,9 +44,13 @@ pub(super) static SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| env_or("SPAWN_
 
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
 
-const MIN_PLACEHOLDERS: usize = 3;
-static MAX_PLACEHOLDERS: LazyLock<usize> =
-    LazyLock::new(|| 10 + SOLUTION_MAX_ITEMS.saturating_mul(2));
+static MIN_PLACEHOLDERS: LazyLock<usize> = LazyLock::new(|| env_or("MIN_PLACEHOLDERS", 3));
+
+static MAX_PLACEHOLDERS: LazyLock<usize> = LazyLock::new(|| {
+    env_or_else("MAX_PLACEHOLDERS", || {
+        10 + SOLUTION_MAX_ITEMS.saturating_mul(2)
+    })
+});
 
 pub struct Context<'graph, 'settings, 'perf, 'log> {
     rng: Pcg64Mcg,
@@ -1230,7 +1234,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             .extend(self.reached_needs_placement.iter().copied());
 
         let desired_placeholders = usize::max(
-            MIN_PLACEHOLDERS,
+            *MIN_PLACEHOLDERS,
             usize::min(
                 *MAX_PLACEHOLDERS,
                 usize::max(
