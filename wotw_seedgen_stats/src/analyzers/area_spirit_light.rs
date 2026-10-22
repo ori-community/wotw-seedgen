@@ -8,7 +8,7 @@ use wotw_seedgen::{
     spoiler::SeedSpoiler,
 };
 
-/// Analyzes how much Spirit Light is in a area
+/// Analyzes how much Spirit Light is in an area
 pub struct AreaSpiritLightStats {
     pub area: Area,
     /// How many adjacent result to group together

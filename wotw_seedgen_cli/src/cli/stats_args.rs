@@ -108,7 +108,7 @@ pub enum Analyzer {
     // TODO test
     // TODO available values
     #[command(about = format!(
-        "Analyzes how much Spirit Light is in a area\n\
+        "Analyzes how much Spirit Light is in an area\n\
         Use '{literal}area-spirit-light:<area>{reset}' to specify which area to analyze (Example: '{literal}area-spirit-light:wellspring{reset}')\n\
         Optionally use '{literal}area-spirit-light:<area>,<result-bucket-size>{reset}' to group results together in buckets",
         literal = LITERAL.render(),
@@ -120,7 +120,14 @@ pub enum Analyzer {
         result_bucket_size: NonZeroUsize,
     },
     #[command(about = format!(
-        "Analyzes how many locations are reachable when a area unlocks\n\
+        "Analyzes how many skills are in an area\n\
+        Use '{literal}area-skills:<area>{reset}' to specify which area to analyze (Example: '{literal}area-skills:marsh{reset}'",
+        literal = LITERAL.render(),
+        reset = Reset.render(),
+    ))]
+    AreaSkills { area: Area },
+    #[command(about = format!(
+        "Analyzes how many locations are reachable when an area unlocks\n\
         Use '{literal}area-unlock:<area>{reset}' to specify which area to analyze (Example: '{literal}area-unlock:wellspring{reset}')\n\
         Optionally use '{literal}area-unlock:<area>,<result-bucket-size>{reset}' to group results together in buckets",
         literal = LITERAL.render(),

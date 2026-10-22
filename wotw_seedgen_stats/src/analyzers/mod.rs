@@ -1,3 +1,4 @@
+mod area_skills;
 mod area_spirit_light;
 mod area_unlock;
 mod compare;
@@ -18,6 +19,7 @@ mod total_spirit_light;
 
 // TODO use contained_writes for analysis instead of common_items?
 
+pub use area_skills::AreaSkillsStats;
 pub use area_spirit_light::AreaSpiritLightStats;
 pub use area_unlock::AreaUnlockStats;
 use compare::*;

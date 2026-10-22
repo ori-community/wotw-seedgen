@@ -4,7 +4,7 @@ use wotw_seedgen::{data::Area, spoiler::SeedSpoiler};
 
 /// Analyzes when areas unlock
 ///
-/// A area is considered unlocked once the first item within that area is unlocked
+/// An area is considered unlocked once the first item within that area is unlocked
 pub struct AreaUnlockStats {
     pub area: Area,
     /// How many adjacent result to group together

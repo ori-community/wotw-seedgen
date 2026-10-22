@@ -13,10 +13,10 @@ use wotw_seedgen::data::{
 };
 use wotw_seedgen_stats::{
     analyzers::{
-        Analyzer, AreaSpiritLightStats, AreaUnlockStats, EarlySkillsStats, FirstWeaponStats,
-        ItemAreaStats, ItemLocationStats, ItemUnlockStats, LocationItemStats, ProgressionStats,
-        SpawnItemCountStats, SpawnItemStats, SpawnLocationStats, SpawnRegionStats, StepSizeStats,
-        TotalSpiritLightStats,
+        Analyzer, AreaSkillsStats, AreaSpiritLightStats, AreaUnlockStats, EarlySkillsStats,
+        FirstWeaponStats, ItemAreaStats, ItemLocationStats, ItemUnlockStats, LocationItemStats,
+        ProgressionStats, SpawnItemCountStats, SpawnItemStats, SpawnLocationStats,
+        SpawnRegionStats, StepSizeStats, TotalSpiritLightStats,
     },
     storage_access, ChainedAnalyzers, Stats, StatsGenerator,
 };
@@ -184,6 +184,7 @@ impl From<cli::Analyzer> for Box<dyn Analyzer> {
                 area,
                 result_bucket_size,
             }),
+            cli::Analyzer::AreaSkills { area } => Box::new(AreaSkillsStats { area }),
             cli::Analyzer::AreaUnlock {
                 area,
                 result_bucket_size,
