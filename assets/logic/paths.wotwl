@@ -494,7 +494,7 @@ anchor MarshSpawn.PoolsBurrowsSignpost at -898, -4435:  # the waypoint between p
       Dash  # Dash ramp
       # Wavedash, Combat=Bat
       Sword OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR FlashSwap
-      # Insert theorical stupid PauseFlaot from where the bat is
+      # Insert theorical stupid PauseFloat from where the bat is
   pickup Marsh.BellsApproach.LedgeSL:  # Make sure it's not redundant with MarshSpawn.PoolsBurrowsSignpost->MarshSpawn.BeforeBurrows->Marsh.BellsApproach.LedgeSL
     moki: Bash, DoubleJump
     gorlek: Bash, Dash OR Glide
@@ -3991,12 +3991,17 @@ anchor EastHollow.AboveDepths at 47, -4302:  # To the right of the lever door bl
       AerialHammerJump OR GlideHammerJump OR HammerSJump=1 OR BlazeSwap=4 OR FlashSwap
       SwordSJump=1, DoubleJump
 
-  conn UpperDepths.Entry:
-    moki: Hollow.DepthsOpen
   conn EastHollow.DepthsLeverDoor:
     moki, Hollow.BashTreeApproach.Lever: Combat=SneezeSlug OR Bash
     gorlek, Hollow.BashTreeApproach.Lever: Damage=5
     kii: Hollow.BashTreeApproach.Lever
+  conn UpperDepths.Entry:
+    moki, Hollow.DepthsOpen: Glide
+    gorlek, Hollow.DepthsOpen: DoubleJump, TripleJump OR Sword OR Hammer OR Dash
+    kii, Hollow.DepthsOpen: DoubleJump OR Sword OR Hammer OR Dash
+    unsafe: Hollow.DepthsOpen  # Small ledge on the way down, or just jump oriCool
+  conn UpperDepths.FirstFirefly:  # Paths that cannot reach from UpperDepths.Entry
+    unsafe, Hollow.DepthsOpen: Unpopular, Bash  # Fake bash the branch slug. https://youtu.be/0yagLd-HEJ8
 
 anchor EastHollow.KwolokPathGrapplePlant at 21, -4220:  # Checkpoint at the first mortar on the way to Kwolok
   refill Checkpoint
@@ -11329,9 +11334,17 @@ anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the
       Damage=40, Dash OR Sword OR Shuriken=4
       Glide
       Damage=70, Sentry=4 OR Flash=4
-    unsafe:
-      Unpopular, Bash  # Fake bash the falling slug. https://youtu.be/0yagLd-HEJ8
-      Bash, DoubleJump OR Damage=10  # Same as above but either bash the slime or avoid it completely. https://youtu.be/kVYfydMo4js
+      Launch, Damage=60
+      Damage=130  # Damage=10,Damage=90,Damage=30 is doable but enemies keep shotting at you
+      DoubleJump, TripleJump, Dash OR Damage=30
+    unsafe:  # The second BombSlug will explode on the spiky branch after ~35 seconds. The first bat will immediately die to spikes if you spawn in this anchor (no checkpoint).
+      Damage=40  # https://youtu.be/HNLFpZUOaVQ
+      Sword OR Hammer OR DoubleJump OR PauseFloat
+      Shuriken=3 OR Sentry=3  # Explode first slug, use above bombslug branch, use below bombslug branch
+      Damage=30, Flash=3 OR Dash OR Launch
+      Spear=2, Damage=10  # Spear the first slug. Use the branch bombslug's explosion for augmented dboost
+      Spear=1, Damage=20  # Dboost on the spikes. Use the branch bombslug's explosion for augmented dboost
+      Bash, Damage=10  # Take 10 damage on the spikes beneath the first slug and fake bash the second slug. Similar routing to https://youtu.be/0yagLd-HEJ8
   conn EastHollow.AboveDepths:
     moki: Hollow.DepthsOpen, Glide
     gorlek, Hollow.DepthsOpen:
@@ -11339,11 +11352,16 @@ anchor UpperDepths.Entry at 161, -4340:  # The little standable ground below the
       SentryJump=1, Launch
     kii, Hollow.DepthsOpen:
       Bash, DoubleJump, TripleJump, Grenade=1, Damage=30
-    unsafe, Hollow.DepthsOpen:
       Launch
+      AerialHammerJump, TripleJump
+      SwordSJump=1, DoubleJump, Damage=20
+      HammerSJump=1, DoubleJump, Damage=10
+    unsafe, Hollow.DepthsOpen:
+      AerialHammerJump OR GroundedHammerJump OR SentryJump=2 OR AbilitySwap=4
+      WallHammerJump, Damage=10  # Tiny spike on the wall. Hard to avoid if you're aiming for a wall hammer jump
       Bash, Grenade=1, DoubleJump, TripleJump
-      Bash, Grenade=2, DoubleJump  # wall jump on the right wall, go to the safe spot in the spikes, grenade bash again from here
-      SentryJump=2, DoubleJump  # same as above
+      Bash, Grenade=2, DoubleJump  # go to the safe spot in the spikes, grenade bash again from here
+      GrenadeCancel, DoubleJump
 
 # checkpoint at 147, -4392
 
