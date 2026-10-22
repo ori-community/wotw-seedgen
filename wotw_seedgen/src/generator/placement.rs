@@ -255,6 +255,11 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
         loop {
             self.next_step();
+
+            if self.force_keystones() {
+                continue;
+            }
+
             self.update_reached();
 
             if self.is_everything_reached() {
@@ -262,10 +267,6 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 self.sort_spoiler_placements();
 
                 break;
-            }
-
-            if self.force_keystones() {
-                continue;
             }
 
             if !self.place_random() {
