@@ -1,9 +1,8 @@
 use std::fmt::Display;
 
-use crate::{add_bound, find_attributes, Result};
-use heck::{
-    ToKebabCase, ToLowerCamelCase, ToPascalCase, ToShoutyKebabCase, ToShoutySnekCase, ToSnekCase,
-    ToTitleCase, ToTrainCase,
+use crate::{
+    helpers::{add_bound, find_attributes, require_str, unrecognized_attr, Case},
+    Result,
 };
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens};
@@ -61,7 +60,7 @@ pub fn ast_impl(input: syn::DeriveInput) -> Result<proc_macro::TokenStream> {
 struct Attributes {
     debug: bool,
     token: Option<syn::Expr>,
-    case: Option<for<'a> fn(&'a str) -> String>,
+    case: Option<Case>,
     rename: Option<syn::LitStr>,
     with: Option<syn::LitStr>,
 }
@@ -73,62 +72,16 @@ impl Attributes {
         for meta in find_attributes(attrs, "ast")? {
             match meta {
                 syn::Meta::Path(path) if path.is_ident("debug") => attributes.debug = true,
-                syn::Meta::NameValue(meta) if meta.path.is_ident("token") => {
-                    attributes.token = Some(meta.value);
+                syn::Meta::NameValue(meta) => {
+                    match meta.path.require_ident()?.to_string().as_str() {
+                        "token" => attributes.token = Some(meta.value),
+                        "case" => attributes.case = Some(Case::from_expr(meta.value)?),
+                        "rename" => attributes.rename = Some(require_str(meta.value)?),
+                        "with" => attributes.with = Some(require_str(meta.value)?),
+                        _ => return Err(unrecognized_attr(meta)),
+                    }
                 }
-                syn::Meta::NameValue(meta) if meta.path.is_ident("case") => {
-                    let case = match meta.value {
-                        syn::Expr::Lit(syn::ExprLit {
-                            lit: syn::Lit::Str(lit),
-                            ..
-                        }) => match lit.value().as_str() {
-                            "camelCase" => str::to_lower_camel_case,
-                            "PascalCase" => str::to_pascal_case,
-                            "kebab-case" => str::to_kebab_case,
-                            "snake_case" => str::to_snek_case,
-                            "SCREAMING_SNAKE_CASE" => str::TO_SHOUTY_SNEK_CASE,
-                            "SCREAMING-KEBAB-CASE" => str::to_shouty_kebab_case,
-                            "lowercase" => str::to_lowercase,
-                            "UPPERCASE" => str::to_uppercase,
-                            "title_case" => str::to_title_case,
-                            "mixed_case" => str::to_lower_camel_case,
-                            "Train-Case" => str::to_train_case,
-                            _ => return Err(syn::Error::new_spanned(lit, "Unsupported case")),
-                        },
-                        other => {
-                            return Err(syn::Error::new_spanned(other, "Expected string literal"))
-                        }
-                    };
-
-                    attributes.case = Some(case);
-                }
-                syn::Meta::NameValue(meta) if meta.path.is_ident("rename") => {
-                    let rename = match meta.value {
-                        syn::Expr::Lit(syn::ExprLit {
-                            lit: syn::Lit::Str(lit),
-                            ..
-                        }) => lit,
-                        other => {
-                            return Err(syn::Error::new_spanned(other, "Expected string literal"))
-                        }
-                    };
-
-                    attributes.rename = Some(rename);
-                }
-                syn::Meta::NameValue(meta) if meta.path.is_ident("with") => {
-                    let with = match meta.value {
-                        syn::Expr::Lit(syn::ExprLit {
-                            lit: syn::Lit::Str(lit),
-                            ..
-                        }) => lit,
-                        other => {
-                            return Err(syn::Error::new_spanned(other, "Expected string literal"))
-                        }
-                    };
-
-                    attributes.with = Some(with);
-                }
-                _ => return Err(syn::Error::new_spanned(meta, "Unrecognized attribute")),
+                _ => return Err(unrecognized_attr(meta)),
             }
         }
 
@@ -301,7 +254,7 @@ fn ast_fields_unit<const IN_ENUM: bool, const NO_ERRORS_MODE: bool>(
             let mut str = ident.to_string();
             if let Some(case) = attrs.case {
                 // TODO should we make assumptions about the original case?
-                str = case(&str);
+                str = case.apply(&str);
             }
             str
         }

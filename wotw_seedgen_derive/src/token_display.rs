@@ -1,4 +1,7 @@
-use crate::{find_attributes, Result};
+use crate::{
+    helpers::{find_attributes, require_str},
+    Result,
+};
 use itertools::Itertools;
 use quote::quote;
 
@@ -18,13 +21,8 @@ pub fn token_display_impl(input: syn::ItemEnum) -> Result<proc_macro::TokenStrea
 
             let token_attrs = find_attributes(&attrs, "token")?
                 .into_iter()
-                .filter_map(|expr| match expr {
-                    syn::Expr::Lit(syn::ExprLit {
-                        lit: syn::Lit::Str(lit),
-                        ..
-                    }) => Some(lit.token()),
-                    _ => None,
-                })
+                .flat_map(require_str)
+                .map(|str| str.token())
                 .join(" or ");
 
             let display = if token_attrs.is_empty() {

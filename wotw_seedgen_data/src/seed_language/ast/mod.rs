@@ -400,10 +400,10 @@ pub enum Literal<'source> {
 #[strum_discriminants(derive(VariantArray))]
 pub enum Constant {
     ClientEvent(ClientEvent),
-    Skill(#[ast(with = "constant_ast::<Skill, E>")] Skill),
-    Shard(#[ast(with = "constant_ast::<Shard, E>")] Shard),
+    Skill(#[ast(with = "skill_ast::<E>")] Skill),
+    Shard(#[ast(with = "shard_ast::<E>")] Shard),
     Teleporter(#[ast(with = "teleporter_ast::<E>")] Teleporter),
-    WeaponUpgrade(#[ast(with = "constant_ast::<WeaponUpgrade, E>")] WeaponUpgrade),
+    WeaponUpgrade(#[ast(with = "weapon_upgrade_ast::<E>")] WeaponUpgrade),
     Equipment(#[ast(with = "constant_ast::<Equipment, E>")] Equipment),
     Area(#[ast(with = "constant_ast::<Area, E>")] Area),
     GenericIcon(#[ast(with = "constant_ast::<GenericIcon, E>")] GenericIcon),
@@ -429,8 +429,22 @@ where
     constant_ast_with_label::<T, _, E>(parser, |t| t.to_string())
 }
 
+fn skill_ast<E: ErrorMode>(parser: &mut Parser<Tokenizer>) -> Option<Skill> {
+    constant_ast_with_label::<Skill, _, E>(parser, |skill| skill.code_name().to_string())
+}
+
+fn shard_ast<E: ErrorMode>(parser: &mut Parser<Tokenizer>) -> Option<Shard> {
+    constant_ast_with_label::<Shard, _, E>(parser, |shard| shard.code_name().to_string())
+}
+
 fn teleporter_ast<E: ErrorMode>(parser: &mut Parser<Tokenizer>) -> Option<Teleporter> {
-    constant_ast_with_label::<Teleporter, _, E>(parser, |tp| tp.display::<false>().to_string())
+    constant_ast_with_label::<Teleporter, _, E>(parser, |tp| tp.code_name().to_string())
+}
+
+fn weapon_upgrade_ast<E: ErrorMode>(parser: &mut Parser<Tokenizer>) -> Option<WeaponUpgrade> {
+    constant_ast_with_label::<WeaponUpgrade, _, E>(parser, |weapon_upgrade| {
+        weapon_upgrade.code_name().to_string()
+    })
 }
 
 fn constant_ast_with_label<T, F, E: ErrorMode>(
@@ -449,12 +463,7 @@ where
         parser.errors.push(Error::all_failed(
             T::VARIANTS
                 .iter()
-                .map(|t| {
-                    Error::new(
-                        ErrorKind::ExpectedToken(f(*t).to_string()),
-                        identifier.span.clone(),
-                    )
-                })
+                .map(|t| Error::new(ErrorKind::ExpectedToken(f(*t)), identifier.span.clone()))
                 .collect(),
         ));
     });

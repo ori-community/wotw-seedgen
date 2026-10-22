@@ -18,7 +18,6 @@ use crate::{
     Alignment, Corner, HorizontalAnchor, Shard, ShopKind, Skill, Teleporter, UberIdentifier,
     VerticalAnchor, WeaponUpgrade, WheelBind,
 };
-use heck::ToTitleCase;
 use itertools::Itertools;
 use rand::seq::IndexedRandom;
 use rand_pcg::Pcg64Mcg;
@@ -1886,39 +1885,33 @@ fn energy_fragment_string(remove: bool) -> CommandString {
 }
 
 fn skill_string(skill: Skill, remove: bool) -> CommandString {
-    let skill_cased = skill.to_string().to_title_case();
-
     if remove {
-        format!("@Remove {skill_cased}@")
+        format!("@Remove {}@", skill.display_name())
     } else {
         match skill {
             Skill::GladesAncestralLight | Skill::MarshAncestralLight => {
-                format!("#{skill_cased}#")
+                format!("#{}#", skill.display_name())
             }
-            _ => format!("*{skill_cased}*"),
+            _ => format!("*{}*", skill.display_name()),
         }
     }
     .into()
 }
 
 fn shard_string(shard: Shard, remove: bool) -> CommandString {
-    let shard_cased = shard.to_string().to_title_case();
-
     if remove {
-        format!("@Remove {shard_cased}@")
+        format!("@Remove {}@", shard.display_name())
     } else {
-        format!("${shard_cased}$")
+        format!("${}$", shard.display_name())
     }
     .into()
 }
 
 fn teleporter_string(teleporter: Teleporter, remove: bool) -> CommandString {
-    let teleporter = teleporter.display::<false>().to_string().to_title_case();
-
     if remove {
-        format!("@Remove {teleporter} Teleporter@")
+        format!("@Remove {}@", teleporter.display_name())
     } else {
-        format!("#{teleporter} Teleporter#")
+        format!("#{}#", teleporter.display_name())
     }
     .into()
 }
@@ -1934,12 +1927,10 @@ fn clean_water_string(remove: bool) -> CommandString {
 
 // TODO remove as const?
 fn weapon_upgrade_string(weapon_upgrade: WeaponUpgrade, remove: bool) -> CommandString {
-    let weapon_upgrade_cased = weapon_upgrade.to_string().to_title_case();
-
     if remove {
-        format!("@Remove {weapon_upgrade_cased}@")
+        format!("@Remove {}@", weapon_upgrade.display_name())
     } else {
-        format!("#{weapon_upgrade_cased}#")
+        format!("#{}#", weapon_upgrade.display_name())
     }
     .into()
 }

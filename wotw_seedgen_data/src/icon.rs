@@ -29,7 +29,7 @@ impl Display for Icon {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Icon::Generic(generic_icon) => write!(f, "{generic_icon} icon"),
-            Icon::Shard(shard) => write!(f, "{shard} icon"),
+            Icon::Shard(shard) => write!(f, "{} icon", shard.code_name()),
             Icon::Equipment(equipment) => write!(f, "{equipment} icon"),
             Icon::Opher(opher_icon) => write!(f, "{opher_icon} icon"),
             Icon::Lupo(lupo_icon) => write!(f, "{lupo_icon} icon"),

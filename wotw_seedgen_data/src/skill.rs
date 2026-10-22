@@ -1,8 +1,8 @@
 use crate::{Equipment, OpherIcon, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, FromRepr, VariantArray};
+use strum::{FromRepr, VariantArray};
 use utoipa::ToSchema;
-use wotw_seedgen_derive::FromStr;
+use wotw_seedgen_derive::{FromStr, Names};
 
 /// Skills, sometimes also called Abilities
 ///
@@ -20,12 +20,13 @@ use wotw_seedgen_derive::FromStr;
     Deserialize_repr,
     Serialize_repr,
     ToSchema,
-    Display,
+    Names,
     FromStr,
     FromRepr,
     VariantArray,
 )]
 #[repr(u8)]
+#[names(display_name(case = "title_case"), code_name(case = "PascalCase"))]
 pub enum Skill {
     Bash = 0,
     // ChargeFlame = 2,

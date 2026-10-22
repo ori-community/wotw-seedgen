@@ -1,4 +1,4 @@
-use crate::{add_bound, Result};
+use crate::{helpers::add_bound, Result};
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{parse_quote, spanned::Spanned};

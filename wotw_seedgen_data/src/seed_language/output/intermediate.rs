@@ -74,10 +74,10 @@ impl Display for Constant {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Constant::ClientEvent(value) => value.fmt(f),
-            Constant::Skill(value) => value.fmt(f),
-            Constant::Shard(value) => value.fmt(f),
-            Constant::Teleporter(value) => value.display::<false>().fmt(f),
-            Constant::WeaponUpgrade(value) => value.fmt(f),
+            Constant::Skill(value) => value.code_name().fmt(f),
+            Constant::Shard(value) => value.code_name().fmt(f),
+            Constant::Teleporter(value) => value.code_name().fmt(f),
+            Constant::WeaponUpgrade(value) => value.code_name().fmt(f),
             Constant::Equipment(value) => value.fmt(f),
             Constant::Area(value) => value.fmt(f),
             Constant::GenericIcon(value) => value.fmt(f),

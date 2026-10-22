@@ -1,10 +1,8 @@
-use std::fmt::{self, Display};
-
 use crate::UberIdentifier;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::VariantArray;
 use utoipa::ToSchema;
-use wotw_seedgen_derive::FromStr;
+use wotw_seedgen_derive::{FromStr, Names};
 
 /// Spirit Wells which exist in the base game
 #[derive(
@@ -19,10 +17,16 @@ use wotw_seedgen_derive::FromStr;
     Deserialize_repr,
     Serialize_repr,
     ToSchema,
+    Names,
     FromStr,
     VariantArray,
 )]
 #[repr(u8)]
+#[names(
+    display_name(case = "title_case", suffix = " Teleporter"),
+    code_name(case = "PascalCase"),
+    logic_name(case = "PascalCase", suffix = "TP")
+)]
 pub enum Teleporter {
     Marsh = 16,
     Den = 1,
@@ -136,24 +140,6 @@ impl Teleporter {
             Teleporter::Shriek => UberIdentifier::map_segment(146432),
         }
     }
-
-    pub const fn display<const SUFFIX: bool>(self) -> TeleporterDisplay<SUFFIX> {
-        TeleporterDisplay(self)
-    }
-}
-
-pub struct TeleporterDisplay<const SUFFIX: bool>(Teleporter);
-
-impl<const SUFFIX: bool> Display for TeleporterDisplay<SUFFIX> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self.0)?;
-
-        if SUFFIX {
-            f.write_str("TP")?;
-        }
-
-        Ok(())
-    }
 }
 
 #[cfg(test)]
@@ -172,7 +158,7 @@ mod tests {
                     .id_lookup
                     .contains_key(&teleporter.uber_identifier()),
                 "invalid UberIdentifier for {}",
-                teleporter.display::<true>()
+                teleporter.display_name()
             );
 
             assert!(
@@ -180,7 +166,7 @@ mod tests {
                     .id_lookup
                     .contains_key(&teleporter.map_segment()),
                 "invalid map segment UberIdentifier for {}",
-                teleporter.display::<true>()
+                teleporter.display_name()
             );
         }
     }

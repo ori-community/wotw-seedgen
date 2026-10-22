@@ -351,14 +351,18 @@ impl Display for Requirement {
             Self::Difficulty(difficulty) => difficulty.fmt(f),
             Self::NormalGameDifficulty => write!(f, "NormalGameDifficulty"),
             Self::Trick(trick) => trick.fmt(f),
-            Self::Skill(skill) => skill.fmt(f),
-            Self::EnergySkill(skill, amount) => write!(f, "{skill}={amount}"),
-            Self::NonConsumingEnergySkill(skill) => write!(f, "NonConsuming{skill}"),
+            Self::Skill(skill) => skill.code_name().fmt(f),
+            Self::EnergySkill(skill, amount) => {
+                write!(f, "{skill}={amount}", skill = skill.code_name())
+            }
+            Self::NonConsumingEnergySkill(skill) => {
+                write!(f, "NonConsuming{skill}", skill = skill.code_name())
+            }
             Self::SpiritLight(amount) => write!(f, "SpiritLight={amount}"),
             Self::GorlekOre(amount) => write!(f, "GorlekOre={amount}"),
             Self::Keystone(amount) => write!(f, "Keystone={amount}"),
-            Self::Shard(shard) => shard.fmt(f),
-            Self::Teleporter(teleporter) => teleporter.display::<true>().fmt(f),
+            Self::Shard(shard) => shard.code_name().fmt(f),
+            Self::Teleporter(teleporter) => teleporter.logic_name().fmt(f),
             Self::Water => write!(f, "Water"),
             Self::State(state) => write!(f, "{{{state}}}"),
             Self::ShopItemVisible(shop_identifier) => {

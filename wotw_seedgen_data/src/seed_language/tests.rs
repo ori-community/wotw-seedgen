@@ -203,10 +203,10 @@ fn coersions() {
                 format!("trigger_client_event({client_event})")
             }),
             ConstantDiscriminants::Skill => {
-                test_variants::<Skill>(|skill| format!("skill({skill})"))
+                test_variants::<Skill>(|skill| format!("skill({})", skill.code_name()))
             }
             ConstantDiscriminants::Shard => {
-                test_variants::<Shard>(|shard| format!("shard({shard})"))
+                test_variants::<Shard>(|shard| format!("shard({})", shard.code_name()))
             }
             ConstantDiscriminants::Teleporter => {
                 // TODO maybe the TP suffix shouldn't be in the Teleporter Display impl
@@ -214,7 +214,7 @@ fn coersions() {
             }
             ConstantDiscriminants::WeaponUpgrade => {
                 test_variants::<WeaponUpgrade>(|weapon_upgrade| {
-                    format!("weapon_upgrade({weapon_upgrade})")
+                    format!("weapon_upgrade({})", weapon_upgrade.code_name())
                 })
             }
             ConstantDiscriminants::Equipment => {

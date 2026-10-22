@@ -586,10 +586,10 @@ impl Display for CommonItemLogName<'_> {
             CommonItem::GorlekOre => f.write_str("Gorlek Ore"),
             CommonItem::Keystone => f.write_str("Keystone"),
             CommonItem::ShardSlot => f.write_str("Shard Slot"),
-            CommonItem::WeaponUpgrade(weapon_upgrade) => weapon_upgrade.fmt(f),
-            CommonItem::Shard(shard) => shard.fmt(f),
-            CommonItem::Teleporter(teleporter) => teleporter.display::<true>().fmt(f),
-            CommonItem::Skill(skill) => skill.fmt(f),
+            CommonItem::WeaponUpgrade(weapon_upgrade) => weapon_upgrade.display_name().fmt(f),
+            CommonItem::Shard(shard) => shard.display_name().fmt(f),
+            CommonItem::Teleporter(teleporter) => teleporter.display_name().fmt(f),
+            CommonItem::Skill(skill) => skill.display_name().fmt(f),
             CommonItem::CleanWater => f.write_str("Clean Water"),
         }
     }

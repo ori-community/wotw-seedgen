@@ -397,25 +397,40 @@ where
 static CLIENT_EVENT_COMPLETION: LazyLock<Vec<CompletionItem>> =
     LazyLock::new(|| enum_member_completions_detailed(ClientEvent::VARIANTS, "ClientEvent"));
 
-static SKILL_COMPLETION: LazyLock<Vec<CompletionItem>> =
-    LazyLock::new(|| enum_member_completions_full(Skill::VARIANTS, "Skill", |skill| *skill as u8));
+static SKILL_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full_with_label(
+        Skill::VARIANTS,
+        "Skill",
+        |skill| skill.code_name().to_string(),
+        |skill| *skill as u8,
+    )
+});
 
-static SHARD_COMPLETION: LazyLock<Vec<CompletionItem>> =
-    LazyLock::new(|| enum_member_completions_full(Shard::VARIANTS, "Shard", |shard| *shard as u8));
+static SHARD_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
+    enum_member_completions_full_with_label(
+        Shard::VARIANTS,
+        "Shard",
+        |shard| shard.code_name().to_string(),
+        |shard| *shard as u8,
+    )
+});
 
 static TELEPORTER_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
     enum_member_completions_full_with_label(
         Teleporter::VARIANTS,
         "Teleporter",
-        |tp| tp.display::<false>().to_string(),
+        |tp| tp.code_name().to_string(),
         |tp| *tp as u8,
     )
 });
 
 static WEAPON_UPGRADE_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {
-    enum_member_completions_full(WeaponUpgrade::VARIANTS, "WeaponUpgrade", |weapon_upgrade| {
-        *weapon_upgrade as u8
-    })
+    enum_member_completions_full_with_label(
+        WeaponUpgrade::VARIANTS,
+        "WeaponUpgrade",
+        |weapon_upgrade| weapon_upgrade.code_name().to_string(),
+        |weapon_upgrade| *weapon_upgrade as u8,
+    )
 });
 
 static EQUIPMENT_COMPLETION: LazyLock<Vec<CompletionItem>> = LazyLock::new(|| {

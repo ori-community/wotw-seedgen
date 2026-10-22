@@ -1,8 +1,8 @@
 use crate::UberIdentifier;
 use serde_repr::{Deserialize_repr, Serialize_repr};
-use strum::{Display, FromRepr, VariantArray};
+use strum::{FromRepr, VariantArray};
 use utoipa::ToSchema;
-use wotw_seedgen_derive::FromStr;
+use wotw_seedgen_derive::{FromStr, Names};
 
 /// Spirit Shards
 #[derive(
@@ -17,12 +17,13 @@ use wotw_seedgen_derive::FromStr;
     Deserialize_repr,
     Serialize_repr,
     ToSchema,
-    Display,
+    Names,
     FromStr,
     FromRepr,
     VariantArray,
 )]
 #[repr(u8)]
+#[names(display_name(case = "title_case"), code_name(case = "PascalCase"))]
 pub enum Shard {
     /// None = 0. Not technically a shard and only used as an icon -> `Icon::Placeholder`.
     /// GlassCannon
