@@ -44,7 +44,8 @@ pub(super) static SPAWN_SLOTS: LazyLock<usize> = LazyLock::new(|| env_or("SPAWN_
 
 const UNSHARED_ITEMS: usize = 5; // How many items to place per world that are guaranteed not being sent to another world
 
-static MIN_PLACEHOLDERS: LazyLock<usize> = LazyLock::new(|| env_or("MIN_PLACEHOLDERS", 3));
+static MIN_PLACEHOLDERS: LazyLock<usize> =
+    LazyLock::new(|| env_or_else("MIN_PLACEHOLDERS", || 2 + *SOLUTION_MAX_ITEMS));
 
 static MAX_PLACEHOLDERS: LazyLock<usize> = LazyLock::new(|| {
     env_or_else("MAX_PLACEHOLDERS", || {
@@ -1239,7 +1240,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 *MAX_PLACEHOLDERS,
                 usize::max(
                     self.placeholders.len(),
-                    usize::midpoint(self.reached_needs_placement.len(), self.placeholders.len()),
+                    (self.reached_needs_placement.len() + self.placeholders.len()) * 2 / 3,
                 ),
             ),
         );
