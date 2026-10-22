@@ -320,8 +320,8 @@ impl<'log> ItemPool<'log> {
     ) -> Option<CommandVoid> {
         // TODO also precompute reroll chance? Or maintain a list of weights?
         match self.items.iter().rposition(|item| {
-            item.cost <= 10000. || {
-                let choose = self.rng.random_bool(10000. / f64::from(item.cost));
+            item.cost <= 5000. || {
+                let choose = self.rng.random_bool(5000. / f64::from(item.cost));
 
                 if !choose {
                     trace!(
@@ -335,9 +335,18 @@ impl<'log> ItemPool<'log> {
                 choose
             }
         }) {
-            None => self.items.pop().map(|item| item.command),
-            Some(index) => Some(self.remove(index)),
+            None => {
+                // Everything rerolled, pass through and take whatever
+            }
+            Some(index) => {
+                if index < self.items.len() - 1 {
+                    // Something rerolled, move the chosen item to the end and ensure we don't immediately retry the rerolled items next time
+                    self.items.rotate_left(index + 1);
+                }
+            }
         }
+
+        self.items.pop().map(|item| item.command)
     }
 
     pub fn take(&mut self) -> impl Iterator<Item = CommandVoid> {
