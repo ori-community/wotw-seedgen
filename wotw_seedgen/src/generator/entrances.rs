@@ -111,15 +111,13 @@ pub fn generate_entrances(
                 ArrayVec::from_iter([32]),
             ];
 
-            // enable tracker.showVisitedEntranceCount
             output.push_event(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                command: store_boolean(UberIdentifier::tracker(200), true),
+                command: store_boolean(UberIdentifier::TRACKER_SHOW_VISITED_ENTRANCE_COUNT, true),
             });
-            // enable modifications.showSmallEntrances
             output.push_event(Event {
                 trigger: Trigger::ClientEvent(ClientEvent::Spawn),
-                command: store_boolean(UberIdentifier::modifications(200), true),
+                command: store_boolean(UberIdentifier::SHOW_SMALL_ENTRANCES, true),
             });
             // mark entrance connections as unknown
             output.extend_events((1..=32).map(|entrance_id| Event {

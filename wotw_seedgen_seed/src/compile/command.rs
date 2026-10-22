@@ -298,11 +298,11 @@ impl Compile for input::CommandArea {
             ),
             Self::Multi { commands, last } => multi_with_return(commands, *last, context),
             Self::PlayerArea {} => (
-                vec![Command::FetchInteger(UberIdentifier::player(50))],
+                vec![Command::FetchInteger(UberIdentifier::PLAYER_AREA)],
                 MemoryUsed::ONE_INTEGER,
             ),
             Self::MapFocusedArea {} => (
-                vec![Command::FetchInteger(UberIdentifier::player(51))],
+                vec![Command::FetchInteger(UberIdentifier::MAP_FOCUSED_AREA)],
                 MemoryUsed::ONE_INTEGER,
             ),
         }
