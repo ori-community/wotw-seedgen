@@ -229,7 +229,7 @@ impl Cost for CommonUberIdentifier {
 impl Cost for CommonWriteCommand {
     fn cost(&self) -> f32 {
         match self {
-            CommonWriteCommand::SetBooleanTrue => 1.,
+            CommonWriteCommand::SetBooleanTrue | CommonWriteCommand::SetIntegerOne => 1.,
             CommonWriteCommand::AddInteger(amount) => *amount as f32,
             CommonWriteCommand::AddFloat(amount) => **amount,
         }

@@ -451,6 +451,7 @@ pub type CommonUberStateWrite = UberStateWriteGeneric<CommonUberIdentifier, Comm
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum CommonWriteCommand {
     SetBooleanTrue,
+    SetIntegerOne,
     AddInteger(i32),
     AddFloat(OrderedFloat<f32>),
 }
@@ -487,6 +488,9 @@ impl CommonWriteCommand {
         match write.command {
             WriteCommand::Boolean(CommandBoolean::Constant { value: true }) => {
                 Some(CommonWriteCommand::SetBooleanTrue)
+            }
+            WriteCommand::Integer(CommandInteger::Constant { value: 1 }) => {
+                Some(CommonWriteCommand::SetIntegerOne)
             }
             WriteCommand::Integer(CommandInteger::Arithmetic { operation }) => match &**operation {
                 Operation {
@@ -558,7 +562,7 @@ impl CommonItem {
             } => Some(Self::Teleporter(teleporter)),
             CommonUberStateWrite {
                 uber_identifier: CommonUberIdentifier::WeaponUpgrade(weapon_upgrade),
-                command: CommonWriteCommand::SetBooleanTrue,
+                command: CommonWriteCommand::SetIntegerOne,
             } => Some(Self::WeaponUpgrade(weapon_upgrade)),
             _ => None,
         }
