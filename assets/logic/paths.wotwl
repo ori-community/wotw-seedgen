@@ -964,6 +964,7 @@ anchor MarshSpawn.AboveHowlArena at -298, -4388:  # Ledge after the vine on the 
       Wavedash, RegenJump  # From the health plant
       AbilitySwap=2
       Dash, BlazeSwap=1 OR SentrySwap=1  # coyote dash on last suspended platform then swap to the right side of the wooden wall under the EF
+      Dash, PauseFloat  # dash ramp to reach the ceiling then pausefloat
       GlideJump, BlazeSwap=1 OR SentrySwap=1  # same as above
       GrenadeJump, Dash, Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Gjump from the last wooden platform then dash into either one of the ceiling planks
       Marsh.StormLifted, GlideBashChain  # Avoid bashing the lizard against the ceiling as it makes it despawn https://youtu.be/BafiLyq5-gk
