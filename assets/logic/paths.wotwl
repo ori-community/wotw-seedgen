@@ -4289,7 +4289,8 @@ anchor GladesTown.Teleporter at -307, -4153:  # The glades teleporter
   # pickup Glades.OutsideCave.SandSL:
   # unsafe: NonGladesTeleporter  # From anywhere else, TP to Glades. Then when your screen is fully white TP somewhere else.
 
-  conn Teleporters: free
+  conn Teleporters: 
+    moki: Glades.Buildings.RepairTheSpiritWell
   conn GromShop: free
   conn GladesTown.TwillenHome: free
   conn GladesTown.ThornyBranch:
@@ -17365,6 +17366,7 @@ anchor OpherShop:  # Opher's offers
 anchor GromShop at -319, -4152:
   nospawn
   
+  # state Glades.Buildings.RepairTheSpiritWell  # Set to true by default in seed_core
   state Glades.Buildings.DwellingRepairs:
     moki: Ore=15
   state Glades.Buildings.RoofsOverHeads:
@@ -17375,7 +17377,7 @@ anchor GromShop at -319, -4152:
     moki: Ore=23
   state Glades.Buildings.ClearTheCaveEntrance:
     moki: Glades.Buildings.ThornySituation, Ore=29
-  # decoration not accounted for
+  # state Glades.Buildings.TheGorlekTouch  # Set to true by default in seed_core
 
   # This is an override by seed_core. This pickup in vanilla would be obtained when all the building projects have been completed and the cutscenes watched.
   pickup Glades.RebuildGlades.Completed:
@@ -17383,7 +17385,7 @@ anchor GromShop at -319, -4152:
     # Moki requirements have been relaxed so that players are more likely to find the real required amount (29) before it comes into logic.
     # Full context: https://discord.com/channels/942484331572658196/942484861569105990/952083829642895381
     moki: Ore=40  # Feelsgood amount
-    unsafe: Ore=29  # Real requirement
+    unsafe: Glades.Buildings.RepairTheSpiritWell, Glades.Buildings.DwellingRepairs, Glades.Buildings.RoofsOverHeads, Glades.Buildings.OnwardsAndUpwards, Glades.Buildings.ThornySituation, Glades.Buildings.ClearTheCaveEntrance, Glades.Buildings.TheGorlekTouch
 
 anchor TuleyShop at -173, -4139:
   nospawn
