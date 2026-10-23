@@ -2,6 +2,7 @@
 #name("Vanilla Grom Shop")
 #description("Places the building projects in the Grom shop and unlocks them by the vanilla logic")
 
+on questUberStateGroup.familyReunionQuest >= 1 store(hubUberStateGroup.builderProjectHouses, 1)  // Softlock fix for vanilla never enabling the houses if a quest step is skipped
 on hubUberStateGroup.builderProjectHouses > 0 || gromShop.dwellingRepairs show_dwelling_repairs()
 on hubUberStateGroup.builderProjectHouses == 0 && gromShop.dwellingRepairs == false hide_dwelling_repairs()
 
@@ -13,13 +14,13 @@ on gladesProjects.roofsOverHeads store(hubUberStateGroup.builderProjectHousesC, 
 on hubUberStateGroup.builderProjectHousesC > 0 || gromShop.onwardsAndUpwards show_onwards_and_upwards()
 on hubUberStateGroup.builderProjectHousesC == 0 && gromShop.onwardsAndUpwards == false hide_onwards_and_upwards()
 
+on questUberStateGroup.darkCaveQuest >= 1 store(hubUberStateGroup.builderProjectOpenCave, 1)  // Softlock fix for vanilla never enabling the cave if a quest step is skipped
 on hubUberStateGroup.builderProjectOpenCave > 0 || gromShop.clearTheCaveEntrance show_clear_the_cave_entrance()
 on hubUberStateGroup.builderProjectOpenCave == 0 && gromShop.clearTheCaveEntrance == false hide_clear_the_cave_entrance()
 
 on hubUberStateGroup.builderProjectBeautify > 0 || gromShop.theGorlekTouch show_the_gorlek_touch()
 on hubUberStateGroup.builderProjectBeautify == 0 && gromShop.theGorlekTouch == false hide_the_gorlek_touch()
 
-// TODO inconsistent glades project names
 on gromShop.repairTheSpiritWell store(gladesProjects.repairTheSpiritWell, true)
 on gromShop.dwellingRepairs store(gladesProjects.dwellingRepairs, true)
 on gromShop.roofsOverHeads store(gladesProjects.roofsOverHeads, true)
