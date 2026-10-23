@@ -509,8 +509,10 @@ on binding4 if get_integer("bind_pointer") == 0 world_reset()
 fun world_reset() {
     store_defaults_exclude(
         "^("
+        // map
+        + "3\|"
         // player
-        + "5\|"
+        + "|5\|"
         // modifications
         + "|6\|"
         // custom
@@ -536,8 +538,8 @@ fun world_reset() {
         + "|20120\|(49994|41398)"
         + "|10289\|4928"
         + "|16155\|(41465|50867)"
-        // grom shop
-        + "|17\|(16825|15068)"
+        // default-finished grom projects and shop slots
+        + "|(17|21)\|(16825|15068)"
         // playerUberStateGroupDescriptor
         + "|3440\|"
         // fast travel
