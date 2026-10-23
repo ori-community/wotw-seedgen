@@ -113,6 +113,10 @@ on hubUberStateGroup.craftCutsceneState == 1 || hubUberStateGroup.craftCutsceneS
 // The vanilla logic then increases the quest to 3 (escape cleared) and saves properly.
 // This fix does not prevent abusing the glitch to benefit, for example by finishing the quest through multiple wellspring escapes (although no such OOB is known).
 on Wellspring.Escape.Reward if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store_without_triggers(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2)
+// The behaviour described above can make the quest exceed its intended values, which causes Tuley to despawn again.
+// We may not be able to set the quest down in multiplayer synced games (or currently in general - client prevents it) so we manually reimplement Tuley.
+on spawn store(modifications.spawnTuleyStateActive, true)
+on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 4 store(modifications.spawnTuley, true)
 // No one remembers what this does anymore.
 on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState, 8)
 // This is presumed to fix some multiplayer bug but no one really knows.
