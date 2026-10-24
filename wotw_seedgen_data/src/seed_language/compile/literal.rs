@@ -1,6 +1,6 @@
 use super::{Compile, SnippetCompiler};
 use crate::{
-    assets::{UberStateAlias, UberStateData, UberStateNameEntry},
+    assets::{RandoUberStateGroup, UberStateAlias, UberStateData, UberStateNameEntry},
     seed_language::{ast, compile::helpers::suggestion, output::Literal},
     UberIdentifier,
 };
@@ -142,21 +142,33 @@ impl ast::UberIdentifierName<'_> {
                 }
                 SpannedOption::None(_) => {
                     if rando_group.root_member.is_none() {
-                        compiler.errors.push(Error {
-                            help: unknown_member_help(
-                                compiler.global.uber_state_data,
-                                group,
-                                member.data.0,
+                        let mut error = Error::error(
+                            format!(
+                                "Group \"{area}.{region}\" contains members, but does not name anything by itself",
+                                area = self.group.data.0,
+                                region = member.data.0,
                             ),
-                            ..Error::error(
-                                format!(
-                                    "Group \"{area}.{region}\" contains members, but does not name anything by itself",
-                                    area = self.group.data.0,
-                                    region = member.data.0
-                                ),
-                                member.span()
-                            )
-                        });
+                            member.span()
+                        );
+
+                        error.help = unknown_member_help(
+                            compiler.global.uber_state_data,
+                            group
+                                .iter()
+                                .filter(|(_, entry)| {
+                                    matches!(
+                                        entry,
+                                        UberStateNameEntry::Rando(RandoUberStateGroup {
+                                            root_member: Some(_),
+                                            ..
+                                        })
+                                    )
+                                })
+                                .map(|(member, _)| member),
+                            member.data.0,
+                        );
+
+                        compiler.errors.push(error);
                     }
 
                     rando_group.root_member.clone()
@@ -172,19 +184,22 @@ fn unknown_member_error<V>(
     member: &Spanned<ast::Identifier>,
 ) -> Error {
     Error {
-        help: unknown_member_help(uber_state_data, group, member.data.0),
+        help: unknown_member_help(uber_state_data, group.keys(), member.data.0),
         ..Error::error("Unknown UberState member".to_string(), member.span())
     }
 }
 
-fn unknown_member_help<V>(
+fn unknown_member_help<'s, I>(
     uber_state_data: &UberStateData,
-    group: &FxHashMap<String, V>,
+    other_members: I,
     member: &str,
-) -> Option<String> {
+) -> Option<String>
+where
+    I: IntoIterator<Item = &'s String>,
+{
     let other_groups = find_member(uber_state_data, member);
     if other_groups.is_empty() {
-        suggestion(member, group.keys())
+        suggestion(member, other_members)
     } else {
         Some(if other_groups.len() == 1 {
             format!("It exists in another group: {}", other_groups[0])
@@ -202,14 +217,18 @@ fn find_member(uber_state_data: &UberStateData, member: &str) -> Vec<String> {
 
     for (group, members) in &uber_state_data.name_lookup {
         for (member_or_region, entry) in members {
-            if member_or_region == member {
-                other_groups.push(format!("\"{group}.{member}\""));
-            }
-
             if let UberStateNameEntry::Rando(rando_group) = entry {
                 if rando_group.members.contains_key(member) {
                     other_groups.push(format!("\"{group}.{member_or_region}.{member}\""));
                 }
+
+                if rando_group.root_member.is_none() {
+                    continue;
+                }
+            }
+
+            if member_or_region == member {
+                other_groups.push(format!("\"{group}.{member}\""));
             }
         }
     }
