@@ -8523,7 +8523,9 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
       DoubleJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
     unsafe:
       Woods.GiantSkull.Corruption, DoubleJump  # Specific bait to jump over the tentacle. You can take 10hp of contact damage instead. https://youtu.be/oE3V_4WgTnY
-      Launch OR Sword OR Hammer  # side swing while ducking / launch while ducking
+      Woods.GiantSkull.Corruption, PauseFloat OR AbilitySwap=1 OR Damage=15
+      Launch OR Sword  # side swing while ducking / launch while ducking
+      Hammer, DoubleJump OR Dash OR Bash OR Glide OR PauseFloat OR AbilitySwap=1 OR Damage=15  # Side swing while ducking. Condition to get on top of skull
 
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
   state Woods.BehindSkull.Corruption:
