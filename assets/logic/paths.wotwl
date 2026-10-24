@@ -7414,7 +7414,14 @@ anchor InnerWellspring.EastDoor at -1190, -3732:  # Inside the door leading to t
   state Wellspring.RotatingRoom.Entrance:  # Breaking the corruption which opens the spinning room
     moki: Wellspring.SecondFloor.SpinArena, BreakWall=16, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Wellspring.SecondFloor.SpinArena, BreakWall=16
-  # It's possible to solve Wellspring.TopDoor from there with ChargedBlaze but logic doesn't have any keyword for it
+    unsafe: ChargeBlaze=1  # Enter the arena but ChargeBlaze through the wall instead of defeating the enemies then warp out to exit the arena
+  state Wellspring.TopDoor:
+    unsafe:
+      Launch OR SwordSJump=1 OR AerialHammerJump OR GlideHammerJump:  # land on the ledge above the grapple plant
+        ChargeBlaze=1
+      Grapple, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1:
+        ChargeBlaze=1
+      DoubleJump, TripleJump, ChargeBlaze=1  # walljump on the wall just right of the tentacle. Might be a ceiling jump?
 
   pickup Wellspring.HandToHand.Herbs:
     moki: Glades.HandToHand.Pouch
@@ -8466,8 +8473,8 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
 anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind column next to the giant falling skull
   # refill Checkpoint  # Checkpoint at 1056, -4144 but not accounting for it because it respawns you inside a tentacle
 
-  # state Woods.GiantSkull.Corruption:
-  #   unsafe: ChargeBlaze=1  # Skull is reachable with a normal jump from the tentacle's checkpoint before the corruption gets destroy
+  state Woods.GiantSkull.Corruption:
+    unsafe: ChargeBlaze=1  # Skull is reachable with a normal jump from the tentacle's checkpoint before the corruption gets destroy
   state Woods.BehindSkull.Corruption:
     moki: BreakWall=3, Glide
     gorlek: BreakWall=3, Launch
@@ -16579,7 +16586,7 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
           BreakWall=30
       SwordSJump=2, Bow=3 OR Shuriken=2 OR Sentry=2 OR Grenade=1  # condition to break the blob https://youtu.be/5piLqd-7kmg
 
-  pickup Willow.SecretPortal.Ore:
+  conn WillowsEnd.Ore:
     moki: Launch, Dash OR Glide
     gorlek:
       Launch, DoubleJump OR Sword OR Hammer OR Damage=40
@@ -16610,7 +16617,6 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Damage=80, DoubleJump, TripleJump OR Dash OR Glide OR Sword OR Sentry=5  # Dboost twice to reach the moss
       DoubleJump, TripleJump, Damage=40  # Wheel core, wall beneath the spikes, dboost, moss
       AerialHammerJump
-
   conn WillowsEnd.Entry:
     moki: DoubleJump OR Dash OR Launch
     gorlek:
@@ -16642,6 +16648,18 @@ anchor WillowsEnd.BoulderHeartPath at 555, -3939:  # below the shortcut back fro
       Grapple, DoubleJump, TripleJump, Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       # Grapple, Dash, DoubleJump OR Sword OR Hammer OR Spear=2 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Reset dash into ceiling
       Grapple, Dash  # Reset dash into ceiling twice
+
+anchor WillowsEnd.Ore at 553, -3877:  # At Willow.SecretPortal.Ore
+  refill Checkpoint
+  refill Energy=2:
+    moki: BreakCrystal
+
+  state Willow.BoulderHeart:
+    unsafe: ChargeBlaze=2  # Can technically be ChargeBlaze=1 if you have enough damage upgrades
+
+  pickup Willow.SecretPortal.Ore: free
+
+  # TODO: connection towards WillowsEnd.BoulderHeartPath
 
 anchor WillowsEnd.InnerTP at 422, -3864:  # The teleporter inside
   refill Full
@@ -16896,7 +16914,7 @@ anchor WillowsEnd.RedirectHeartPuzzle at 614, -3836:  # standing in front of the
       Bash, DoubleJump, TripleJump, Hammer, Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, AerialHammerJump, TripleJump OR Glide  # refresh tjump on the wall right to the pickup. Possible with sword/dash but cycles are anoying to figure out
     unsafe:
-      Spear=2  # Through the purple wall
+      Spear=2 OR ChargeBlaze=2  # Through the purple wall. Could technically be =1 if you have enough damage upgrades
       BreakWall=10, Glide, Bash, BreakWall=30
       Deflector, Sword, Dash, Damage=20, Damage=20  # Dboost on the 2nd laser to reach the elemental, later dboost on the horizontal lasers to go down
       BreakWall=30, Damage=60, DashBashChain  # Dboost on spikes then laser, fetch a projectile to open the purple wall
@@ -17203,7 +17221,9 @@ anchor WillowsEnd.GlideHeartPath at 374, -3824:  # one room before the first win
   refill Health=1
 
   state Willow.SpinLasersHeart:
-    unsafe: SentryBreak=30  # Sentry will target the heart through the wall
+    unsafe:
+      SentryBreak=30  # Sentry will target the heart through the wall
+      ChargeBlaze=2  # Can technically be ChargeBlaze=1 if you have enough damage upgrades
   conn WillowsEnd.GlideRooms:
     moki: DoubleJump, Launch
     gorlek:
