@@ -11,8 +11,8 @@ use crate::{
         },
         token::Tokenizer,
     },
-    Area, Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, WorldSettings,
-    WorldSettingsHelpers,
+    Area, Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, WeaponUpgrade,
+    WorldSettings, WorldSettingsHelpers,
 };
 use rustc_hash::FxHashMap;
 use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
@@ -1184,6 +1184,8 @@ impl Compile for ast::PlainRequirement<'_> {
             .and_then(|identifier| Teleporter::from_str(identifier).ok())
         {
             no_amount().map(|()| Requirement::Teleporter(teleporter))
+        } else if let Ok(weapon_upgrade) = WeaponUpgrade::from_str(identifier) {
+            no_amount().map(|()| Requirement::WeaponUpgrade(weapon_upgrade))
         } else {
             match identifier {
                 // TODO free is lowercase but impossible is uppercase

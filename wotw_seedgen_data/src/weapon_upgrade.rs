@@ -1,6 +1,7 @@
 use crate::{OpherIcon, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{FromRepr, VariantArray};
+use utoipa::ToSchema;
 use wotw_seedgen_derive::{FromStr, Names};
 
 // TODO maybe descriptions should exist for random placements as well? Supposedly these are the weapon upgrade descriptions:
@@ -21,6 +22,7 @@ use wotw_seedgen_derive::{FromStr, Names};
     Hash,
     Deserialize_repr,
     Serialize_repr,
+    ToSchema,
     Names,
     FromStr,
     FromRepr,

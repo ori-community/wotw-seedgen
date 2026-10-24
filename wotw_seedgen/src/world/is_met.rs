@@ -14,12 +14,12 @@ use strum::Display;
 use wotw_seedgen_data::assets::{PickupsEntry, StatesEntry};
 use wotw_seedgen_data::logic_language::output::Node;
 use wotw_seedgen_data::seed_language::simulate::ShopItemVisibility;
-use wotw_seedgen_data::Teleporter;
 use wotw_seedgen_data::{
     logic_language::output::{Enemy, Requirement},
     seed_language::simulate::Simulation,
     Difficulty, EqIgnore, Shard, Skill, UberIdentifier,
 };
+use wotw_seedgen_data::{Teleporter, WeaponUpgrade};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Missing<'graph> {
@@ -219,6 +219,7 @@ impl<'graph> World<'graph, '_, '_, '_> {
                 }
             }
             Requirement::Water => self.boolean_met(self.clean_water(), UberIdentifier::CLEAN_WATER),
+            Requirement::WeaponUpgrade(weapon_upgrade) => self.weapon_upgrade_met(*weapon_upgrade),
             Requirement::Skill(skill) => self.skill_met(*skill),
             Requirement::Shard(shard) => self.shard_met(*shard),
             Requirement::Teleporter(teleporter) => self.teleporter_met(*teleporter),
@@ -445,6 +446,14 @@ impl<'graph> World<'graph, '_, '_, '_> {
 
     fn teleporter_met(&self, teleporter: Teleporter) -> ControlFlow<Missing<'static>> {
         self.boolean_met(self.teleporter(teleporter), teleporter.uber_identifier())
+    }
+
+    fn weapon_upgrade_met(&self, weapon_upgrade: WeaponUpgrade) -> ControlFlow<Missing<'static>> {
+        self.integer_met(
+            self.weapon_upgrade(weapon_upgrade) as i32,
+            1,
+            weapon_upgrade.uber_identifier(),
+        )
     }
 
     fn boolean_met(

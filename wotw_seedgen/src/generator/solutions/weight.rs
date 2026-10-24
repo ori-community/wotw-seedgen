@@ -175,7 +175,6 @@ impl Cost for CommonUberIdentifier {
             CommonUberIdentifier::BaseMaxEnergy
             | CommonUberIdentifier::Skill(Skill::Regenerate | Skill::WaterBreath) => 100., // Quality-of-Life Skills
             CommonUberIdentifier::Keystones => 160.,
-            CommonUberIdentifier::WeaponUpgrade(_) => 200.,
             CommonUberIdentifier::Skill(
                 Skill::WallJump
                 | Skill::SpiritFlame
@@ -187,7 +186,8 @@ impl Cost for CommonUberIdentifier {
             CommonUberIdentifier::Skill(
                 Skill::GladesAncestralLight | Skill::MarshAncestralLight,
             )
-            | CommonUberIdentifier::Shard(_) => 500.,
+            | CommonUberIdentifier::Shard(_)
+            | CommonUberIdentifier::WeaponUpgrade(_) => 500.,
             CommonUberIdentifier::Skill(Skill::Dash | Skill::Flap) => 600., // Counteracting bias because these unlock rather little
             CommonUberIdentifier::Skill(Skill::Glide | Skill::Grapple) => 700., // Feel-Good Finds
             CommonUberIdentifier::Skill(

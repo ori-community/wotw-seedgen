@@ -2,7 +2,7 @@ use std::fmt::{self, Display};
 
 use crate::{
     assets::{PickupsEntry, StatesEntry},
-    Area, Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier,
+    Area, Difficulty, Position, Shard, Skill, Teleporter, Trick, UberIdentifier, WeaponUpgrade,
 };
 use itertools::Itertools;
 use rustc_hash::FxHashMap;
@@ -215,12 +215,13 @@ pub enum Requirement {
     Skill(Skill),
     Shard(Shard),
     Teleporter(Teleporter),
+    WeaponUpgrade(WeaponUpgrade),
     // TODO resources as i32?
     SpiritLight(usize),
     GorlekOre(usize),
     Keystone(usize),
-    Danger(f32),
     Damage(f32),
+    Danger(f32),
     NonConsumingEnergySkill(Skill),
     // TODO wrapper for f32::total_cmp and cut orderedfloat?
     EnergySkill(Skill, f32),
@@ -307,21 +308,22 @@ impl Requirement {
             Self::Skill(_) => 8,
             Self::Shard(_) => 9,
             Self::Teleporter(_) => 10,
-            Self::SpiritLight(_) => 11,
-            Self::GorlekOre(_) => 12,
+            Self::WeaponUpgrade(_) => 11,
+            Self::SpiritLight(_) => 12,
+            Self::GorlekOre(_) => 13,
             Self::Keystone(_) => 14,
-            Self::Danger(_) => 13,
             Self::Damage(_) => 15,
-            Self::NonConsumingEnergySkill(_) => 16,
-            Self::EnergySkill(..) => 17,
-            Self::ShurikenBreak(_) => 18,
-            Self::SentryBreak(_) => 19,
-            Self::Extern(_) => 20,
-            Self::BreakWall(_) => 21,
-            Self::Boss(_) => 22,
-            Self::Combat(_) => 23,
-            Self::And(_) => 24,
-            Self::Or(_) => 25,
+            Self::Danger(_) => 16,
+            Self::NonConsumingEnergySkill(_) => 17,
+            Self::EnergySkill(..) => 18,
+            Self::ShurikenBreak(_) => 19,
+            Self::SentryBreak(_) => 20,
+            Self::Extern(_) => 21,
+            Self::BreakWall(_) => 22,
+            Self::Boss(_) => 23,
+            Self::Combat(_) => 24,
+            Self::And(_) => 25,
+            Self::Or(_) => 26,
         }
     }
 
@@ -364,6 +366,7 @@ impl Display for Requirement {
             Self::Shard(shard) => shard.code_name().fmt(f),
             Self::Teleporter(teleporter) => teleporter.logic_name().fmt(f),
             Self::Water => write!(f, "Water"),
+            Self::WeaponUpgrade(weapon_upgrade) => weapon_upgrade.code_name().fmt(f),
             Self::State(state) => write!(f, "{{{state}}}"),
             Self::ShopItemVisible(shop_identifier) => {
                 write!(f, "ShopItemVisible={shop_identifier}")

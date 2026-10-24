@@ -421,6 +421,7 @@ impl Requirement {
             (Self::Skill(a), Self::Skill(b)) => a.cmp(b),
             (Self::Shard(a), Self::Shard(b)) => a.cmp(b),
             (Self::Teleporter(a), Self::Teleporter(b)) => a.cmp(b),
+            (Self::WeaponUpgrade(a), Self::WeaponUpgrade(b)) => a.cmp(b),
             _ => Ordering::Equal,
         }
     }
@@ -627,6 +628,7 @@ impl Requirement {
             | (Self::Skill(a), Self::Skill(b)) => (a == b).then_some(Ordering::Equal),
             (Self::Shard(a), Self::Shard(b)) => (a == b).then_some(Ordering::Equal),
             (Self::Teleporter(a), Self::Teleporter(b)) => (a == b).then_some(Ordering::Equal),
+            (Self::WeaponUpgrade(a), Self::WeaponUpgrade(b)) => (a == b).then_some(Ordering::Equal),
             (Self::SpiritLight(a), Self::SpiritLight(b))
             | (Self::GorlekOre(a), Self::GorlekOre(b))
             | (Self::Keystone(a), Self::Keystone(b)) => Some(a.cmp(b)),
