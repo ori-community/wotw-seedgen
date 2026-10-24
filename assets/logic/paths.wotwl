@@ -8390,6 +8390,32 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
 
   state Woods.KuKeystoneDoor:
     moki: Keystone=4
+  state Woods.GiantSkull.Corruption:
+    moki, Combat=Balloon, BreakWall=3: Glide
+    gorlek:
+      Launch, Sword OR Hammer
+      Launch, BreakWall=3, DoubleJump OR Dash
+    kii:
+      BreakWall=3, Launch OR Glide
+      DoubleJump, TripleJump, Dash, BreakWall=3  # Coyote dash
+      DoubleJump, Sword
+      DoubleJump, Hammer, TripleJump OR Dash
+      Damage=15, Sword OR Hammer
+      Damage=30, Grenade=1 OR Blaze=1 OR Sentry=1
+    unsafe:  # No gjump paths because if you have enough energy to do one, then you can just throw the grenade instead of canceling it then refill and come back
+      DoubleJump, BreakWall=3, Dash OR TripleJump
+      AbilitySwap=1, BreakWall=3
+      PauseFloat, BreakWall=3
+      DoubleJump, Hammer
+      Flap  # push the balloon towards the skull
+      Bow=1 OR Grenade=1  # use it mid air and TP while the projectile is traveling
+      Bash, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Sentry=1  # doesn't work with blaze
+      Dash OR Damage=15:
+        Shuriken=1 OR Blaze=1
+      DoubleJump OR Dash OR Shuriken=1 OR Sentry=1 OR SpearJump=1 OR Damage=15:
+        Sentry=1
+      DoubleJump OR Dash OR Bash OR SpearJump=1:  # Spear can't autoaim form the spikes. Use this 
+        Spear=1
 
   pickup Woods.Skull.LeafPileSL:
     moki: Flap
@@ -8419,16 +8445,16 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
       GrenadeJump, DoubleJump OR Sword OR Hammer
 
   conn WoodsMain.BalloonLure:
-    moki: Combat=2xBalloon, Bash, DoubleJump OR Dash OR Glide OR Launch  # bash for the rude placement of the tentacle
-    gorlek, Combat=2xBalloon: Bash, Sword OR Grenade=1 OR HammerSJump=1
-    kii:
+    moki, Woods.GiantSkull.Corruption, Combat=2xBalloon, Bash, DoubleJump OR Dash OR Glide OR Launch  # bash for the rude placement of the tentacle
+    gorlek, Woods.GiantSkull.Corruption, Combat=2xBalloon: Bash, Sword OR Grenade=1 OR HammerSJump=1
+    kii, Woods.GiantSkull.Corruption:
       # Moki/gorlek paths ignoring balloons
       Bash, Grenade=1 OR DoubleJump OR Dash OR Sword
       # new paths
       Bash, Hammer OR Shuriken=1 OR Damage=15
       Launch OR Glide OR SentryJump=1
       Combat=Tentacle, DoubleJump
-    unsafe:
+    unsafe, Woods.GiantSkull.Corruption:  # While Sword and Hammer can pass through the gap without breaking the corruption, landing on top of the skull to do so will always let you break the corruption itself
       Bash OR Sword OR Hammer
       Combat=Tentacle OR Damage=10:
         Dash OR PauseFloat OR AbilitySwap=2
@@ -8440,6 +8466,8 @@ anchor WoodsMain.GiantSkull at 957, -4138:  # Behind the four keystone room door
 anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind column next to the giant falling skull
   # refill Checkpoint  # Checkpoint at 1056, -4144 but not accounting for it because it respawns you inside a tentacle
 
+  # state Woods.GiantSkull.Corruption:
+  #   unsafe: ChargeBlaze=1  # Skull is reachable with a normal jump from the tentacle's checkpoint before the corruption gets destroy
   state Woods.BehindSkull.Corruption:
     moki: BreakWall=3, Glide
     gorlek: BreakWall=3, Launch
@@ -8482,19 +8510,20 @@ anchor WoodsMain.BalloonLure at 1047, -4123:  # Left of the Balloon in the wind 
       GrenadeJump  # land on the ledge near the spikes bellow the blob
       AbilitySwap=2
       Damage=15, BlazeSwap=1 OR SentrySwap=1
-  conn WoodsMain.GiantSkull:
-    moki:
+  conn WoodsMain.GiantSkull:  # solving Woods.GiantSkull.Corruption is a negative for getting onto the skull so check that it's possible with the corruption destroyed
+    moki, Woods.GiantSkull.Corruption:
       Glide OR Launch
       DoubleJump, Dash, Bash OR Combat=Tentacle
-    gorlek:
+    gorlek, Woods.GiantSkull.Corruption:
       Combat=Tentacle, DoubleJump, TripleJump OR Sword
       Damage=10, DoubleJump, TripleJump OR Dash OR Sword
       Bash, DoubleJump OR Dash
-    kii:
+    kii, Woods.GiantSkull.Corruption:
       Dash OR Bash
       DoubleJump, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=15
     unsafe:
-      DoubleJump  # Specific bait to jump over the tentacle. You can take 10hp of contact damage instead. https://youtu.be/oE3V_4WgTnY
+      Woods.GiantSkull.Corruption, DoubleJump  # Specific bait to jump over the tentacle. You can take 10hp of contact damage instead. https://youtu.be/oE3V_4WgTnY
+      Launch OR Sword OR Hammer  # side swing while ducking / launch while ducking
 
 anchor WoodsMain.BelowHiddenOre at 1038, -4101:  # Below and to the right of the hidden ore, close to the yellow wall
   state Woods.BehindSkull.Corruption:
