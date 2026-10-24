@@ -2,7 +2,7 @@ use crate::generator::solutions::{cost_from_iter, Cost};
 
 use derivative::Derivative;
 use itertools::Itertools;
-use log::{trace, warn};
+use log::trace;
 use rand::{seq::SliceRandom, RngExt, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
@@ -295,7 +295,7 @@ impl<'log> ItemPool<'log> {
     }
 
     fn log_find_remove_failed(&self, item: &CommandVoid, output: &IntermediateOutput) {
-        warn!(
+        trace!(
             logger: self.log_capture,
             "{log_index}Attempted to remove {item} from the item pool, but it didn't exist",
             log_index = self.log_index,
