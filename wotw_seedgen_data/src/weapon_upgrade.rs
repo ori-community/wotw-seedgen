@@ -1,4 +1,4 @@
-use crate::{OpherIcon, UberIdentifier};
+use crate::{OpherIcon, Skill, UberIdentifier};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use strum::{FromRepr, VariantArray};
 use utoipa::ToSchema;
@@ -65,6 +65,26 @@ impl WeaponUpgrade {
             Self::CHARGE_BLAZE_ID => Some(Self::ChargeBlaze),
             Self::RAPID_SENTRY_ID => Some(Self::RapidSentry),
             _ => None,
+        }
+    }
+
+    pub const fn base_weapon(self) -> Skill {
+        match self {
+            Self::ExplodingSpear => Skill::Spear,
+            Self::HammerShockwave => Skill::Hammer,
+            Self::StaticShuriken => Skill::Shuriken,
+            Self::ChargeBlaze => Skill::Blaze,
+            Self::RapidSentry => Skill::Sentry,
+        }
+    }
+
+    pub const fn energy_cost_multiplier(self) -> f32 {
+        match self {
+            WeaponUpgrade::ExplodingSpear
+            | WeaponUpgrade::HammerShockwave
+            | WeaponUpgrade::StaticShuriken
+            | WeaponUpgrade::RapidSentry => 1.,
+            WeaponUpgrade::ChargeBlaze => 2.,
         }
     }
 

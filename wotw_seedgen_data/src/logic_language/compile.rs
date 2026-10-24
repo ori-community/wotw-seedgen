@@ -1185,7 +1185,23 @@ impl Compile for ast::PlainRequirement<'_> {
         {
             no_amount().map(|()| Requirement::Teleporter(teleporter))
         } else if let Ok(weapon_upgrade) = WeaponUpgrade::from_str(identifier) {
-            no_amount().map(|()| Requirement::WeaponUpgrade(weapon_upgrade))
+            let weapon = weapon_upgrade.base_weapon();
+
+            let weapon_requirement = if weapon.energy_cost() == 0. {
+                no_amount().map(|()| Requirement::Skill(weapon))
+            } else {
+                get_amount().map(|amount| {
+                    let amount = amount as f32 * weapon_upgrade.energy_cost_multiplier();
+                    Requirement::EnergySkill(weapon, amount)
+                })
+            };
+
+            weapon_requirement.map(|weapon_requirement| {
+                Requirement::And(vec![
+                    Requirement::WeaponUpgrade(weapon_upgrade),
+                    weapon_requirement,
+                ])
+            })
         } else {
             match identifier {
                 // TODO free is lowercase but impossible is uppercase

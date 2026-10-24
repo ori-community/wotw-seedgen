@@ -14078,7 +14078,7 @@ anchor UpperPools.KeystoneRoomBubbleSpawner at -1566, -4115:  # Between the bubb
       Grenade=1 OR Spear=1 OR Bow=1
       Shuriken=1, Water OR Damage=20
       Sentry=1, Water OR Damage=20
-    # unsafe: ChargeBlaze=1
+    unsafe: ChargeBlaze=1
 
   pickup Pools.BubbleKS:  # connections using the bubble have to start from here, others use the higher anchor
     moki: Pools.KSRoom.BubbleFree, Flap, DoubleJump
