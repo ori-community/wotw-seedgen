@@ -94,8 +94,8 @@ pub fn generate_entrances(
 
             let entrance_groups: EntranceGroups = [
                 ArrayVec::from([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]),
-                ArrayVec::from_iter([2]),
-                ArrayVec::from_iter([4]),
+                ArrayVec::from_iter([2]),  // lupoShopInside
+                ArrayVec::from_iter([4]),  // lastHutInside
                 ArrayVec::from_iter([6]),
                 ArrayVec::from_iter([8]),
                 ArrayVec::from_iter([10]),
@@ -107,8 +107,8 @@ pub fn generate_entrances(
                 ArrayVec::from_iter([24]),
                 ArrayVec::from_iter([26]),
                 ArrayVec::from_iter([28]),
-                ArrayVec::from_iter([30, 31]),
-                ArrayVec::from_iter([32]),
+                ArrayVec::from_iter([30, 32]),
+                ArrayVec::from_iter([31]),
             ];
 
             output.push_event(Event {
