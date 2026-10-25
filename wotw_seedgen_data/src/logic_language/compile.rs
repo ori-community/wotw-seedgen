@@ -351,6 +351,47 @@ impl<'source, 'log> Compiler<'source, 'log> {
     }
 }
 
+const fn swap_skills(skill: Skill) -> [Skill; 11] {
+    const ABILITY_WHEEL_SKILLS: [Skill; 12] = [
+        Skill::Sword,
+        Skill::Bow,
+        Skill::Spear,
+        Skill::Hammer,
+        Skill::Shuriken,
+        Skill::Grenade,
+        Skill::Regenerate,
+        Skill::Flap,
+        Skill::Blaze,
+        Skill::Flash,
+        Skill::Sentry,
+        Skill::Launch,
+    ];
+
+    let mut swap_skills = [Skill::Bash; 11];
+
+    let mut read = 0;
+    let mut write = 0;
+
+    while read < ABILITY_WHEEL_SKILLS.len() {
+        let ability_wheel_skill = ABILITY_WHEEL_SKILLS[read];
+        read += 1;
+
+        if ability_wheel_skill as u8 == skill as u8 {
+            continue;
+        }
+
+        swap_skills[write] = ability_wheel_skill;
+        write += 1;
+    }
+
+    swap_skills
+}
+
+const BLAZE_SWAP_SKILLS: [Skill; 11] = swap_skills(Skill::Blaze);
+const FLASH_SWAP_SKILLS: [Skill; 11] = swap_skills(Skill::Flash);
+const SENTRY_SWAP_SKILLS: [Skill; 11] = swap_skills(Skill::Sentry);
+const LAUNCH_SWAP_SKILLS: [Skill; 11] = swap_skills(Skill::Launch);
+
 struct RequirementRepository {
     difficulty: DifficultyRequirements,
     trick: TrickRequirements,
@@ -416,18 +457,22 @@ impl RequirementRepository {
             Trick::LaunchSwap => Requirement::and([
                 self.trick.launch_swap.clone(),
                 Requirement::Skill(Skill::Launch),
+                Requirement::or(LAUNCH_SWAP_SKILLS.map(Requirement::Skill)),
             ]),
             Trick::SentrySwap => Requirement::and([
                 self.trick.sentry_swap.clone(),
                 Requirement::EnergySkill(Skill::Sentry, amount.take()? as f32),
+                Requirement::or(SENTRY_SWAP_SKILLS.map(Requirement::Skill)),
             ]),
             Trick::FlashSwap => Requirement::and([
                 self.trick.flash_swap.clone(),
                 Requirement::NonConsumingEnergySkill(Skill::Flash),
+                Requirement::or(FLASH_SWAP_SKILLS.map(Requirement::Skill)),
             ]),
             Trick::BlazeSwap => Requirement::and([
                 self.trick.blaze_swap.clone(),
                 Requirement::EnergySkill(Skill::Blaze, amount.take()? as f32),
+                Requirement::or(BLAZE_SWAP_SKILLS.map(Requirement::Skill)),
             ]),
             Trick::Wavedash => Requirement::and([
                 self.trick.wave_dash.clone(),
