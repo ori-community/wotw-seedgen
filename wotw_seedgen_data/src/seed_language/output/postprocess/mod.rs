@@ -275,7 +275,9 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
                 continue;
             }
 
-            let matches = self.find_metadata(events, world);
+            let Some(matches) = self.find_metadata(events, world) else {
+                continue;
+            };
 
             if let Some(uber_identifier) = shop_identifier {
                 self.generate_shop_defaults(
@@ -306,7 +308,7 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
         &self,
         events: &[&'output Event],
         origin_world: &WorldPostprocessor<'output, 'log>,
-    ) -> MetadataMatches<'output, 'log> {
+    ) -> Option<MetadataMatches<'output, 'log>> {
         let mut matches = vec![];
 
         let names = events.iter().filter_map(|event| {
@@ -347,9 +349,9 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
             Some(name)
         });
 
-        let name = multi_name(names);
+        let name = multi_name(names)?;
 
-        MetadataMatches { name, matches }
+        Some(MetadataMatches { name, matches })
     }
 
     fn generate_shop_defaults(
@@ -475,7 +477,7 @@ impl<'output, 'log> WorldPostprocessor<'output, 'log> {
                     .try_force_name()
             });
 
-        multi_name(names)
+        multi_name(names).unwrap_or_else(|| "Unknown".into())
     }
 }
 
@@ -1015,7 +1017,7 @@ impl Display for AreaOfMatch {
     }
 }
 
-fn multi_name<I>(names: I) -> CommandString
+fn multi_name<I>(names: I) -> Option<CommandString>
 where
     I: IntoIterator<Item = CommandString>,
 {
@@ -1055,16 +1057,18 @@ where
                 }
             });
 
-    match (acc, const_acc.is_empty()) {
+    let multi_name = match (acc, const_acc.is_empty()) {
         (None, false) => const_acc.into(),
-        (None, true) => "Unknown".into(),
+        (None, true) => return None,
         (Some(acc), false) => CommandString::from(Operation {
             left: acc,
             operator: Concatenator::Concat,
             right: format!(" {TRANSPARENT_AND} {const_acc}").into(),
         }),
         (Some(acc), true) => acc,
-    }
+    };
+
+    Some(multi_name)
 }
 
 fn multi_price<I>(prices: I) -> CommandInteger
