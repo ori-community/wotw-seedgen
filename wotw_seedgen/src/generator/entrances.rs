@@ -96,19 +96,19 @@ pub fn generate_entrances(
                 ArrayVec::from([1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29]),
                 ArrayVec::from_iter([2]),  // lupoShopInside
                 ArrayVec::from_iter([4]),  // lastHutInside
-                ArrayVec::from_iter([6]),
-                ArrayVec::from_iter([8]),
-                ArrayVec::from_iter([10]),
-                ArrayVec::from_iter([12]),
-                ArrayVec::from_iter([14]),
-                ArrayVec::from_iter([16, 18]),
-                ArrayVec::from_iter([20]),
-                ArrayVec::from_iter([22]),
-                ArrayVec::from_iter([24]),
-                ArrayVec::from_iter([26]),
-                ArrayVec::from_iter([28]),
-                ArrayVec::from_iter([30, 32]),
-                ArrayVec::from_iter([31]),
+                ArrayVec::from_iter([6]),  // hutAboveMotayInside
+                ArrayVec::from_iter([8]),  // treeHutInside
+                ArrayVec::from_iter([10]),  // mokiFatherHutInside
+                ArrayVec::from_iter([12]),  // storageHutInside
+                ArrayVec::from_iter([14]),  // caveInside
+                ArrayVec::from_iter([16, 18]),  // wellspring1stFloorBottomInside, wellspring1stFloorTopInside
+                ArrayVec::from_iter([20]),  // wellspring2ndFloorInside
+                ArrayVec::from_iter([22]),  // wellspring3rdFloorInside
+                ArrayVec::from_iter([24]),  // reachSeedInside
+                ArrayVec::from_iter([26]),  // teddyHutInside
+                ArrayVec::from_iter([28]),  // ruinsInside
+                ArrayVec::from_iter([30, 32]),  // willowBottomInside, willowTopInside
+                ArrayVec::from_iter([31]),  // willowTopOutside
             ];
 
             output.push_event(Event {
