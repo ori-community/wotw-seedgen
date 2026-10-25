@@ -6,7 +6,7 @@ use crate::{
     CommonUberIdentifier, Icon, MapIcon,
 };
 use derivative::Derivative;
-use log::warn;
+use log::{trace, warn};
 use rand::seq::IndexedRandom;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::{FxBuildHasher, FxHashMap};
@@ -59,16 +59,24 @@ pub struct ItemMetadataRef<'command, 'entry, 'log> {
 impl ItemMetadataRef<'_, '_, '_> {
     /// Generic name used when sending the item to another world and in the spoiler.
     pub fn name(&self) -> Option<StringOrPlaceholder> {
-        self.entry.and_then(|entry| entry.name.clone())
+        trace!(logger: self.log_capture, "searching name for {}", self.command);
+        let name = self.entry?.name.clone()?;
+        trace!(logger: self.log_capture, "found name from item data: {name}");
+        Some(name)
     }
 
     /// Try to force some kind of name for the item.
     ///
     /// If nothing is given by [`Self::name`], tries to scan the item for messages.
     pub fn try_force_name(&self) -> Option<CommandString> {
-        self.name()
-            .map(CommandString::from)
-            .or_else(|| single_item(self.command.contained_messages()).cloned())
+        match self.name() {
+            None => {
+                let message = single_item(self.command.contained_messages())?;
+                trace!(logger: self.log_capture, "found name from message: {message}");
+                Some(message.clone())
+            }
+            Some(name) => Some(name.into()),
+        }
     }
 
     /// Force some kind of name for the item.
@@ -96,16 +104,31 @@ impl ItemMetadataRef<'_, '_, '_> {
                     .contained_uber_state_writes(commands)
                     .common_items(),
             ) {
-                None => self.command.to_string(),
-                Some(common_item) => common_item.log_name().to_string(),
+                None => {
+                    let code = self.command.to_string();
+                    warn!(logger: self.log_capture, "unable to find readable log name for {code}\n{stack}", stack = std::backtrace::Backtrace::force_capture());
+                    code.into()
+                }
+                Some(common_item) => {
+                    let name = common_item.log_name().to_string();
+                    trace!(logger: self.log_capture, "found log name from common item: \"{name}\"");
+                    name
+                }
             },
-            Some(name) => strip_invisible_characters(&name),
+            Some(name) => {
+                let name = strip_invisible_characters(&name);
+                trace!(logger: self.log_capture, "found log name from upstream name: \"{name}\"");
+                name
+            }
         }
     }
 
     /// Base price used when placed in a shop
     pub fn shop_price(&self) -> Option<CommandInteger> {
-        self.entry.and_then(|entry| entry.shop_price.clone())
+        trace!(logger: self.log_capture, "searching shop price for {}", self.command);
+        let shop_price = self.entry?.shop_price.clone()?;
+        trace!(logger: self.log_capture, "found shop price from item data: {shop_price}");
+        Some(shop_price)
     }
 
     /// Try to force a shop price for the item.
@@ -121,7 +144,10 @@ impl ItemMetadataRef<'_, '_, '_> {
                 .map(CommonUberIdentifier::shop_price)
                 .sum::<i32>();
 
-            (price > 0).then(|| price.into())
+            (price > 0).then(|| {
+                trace!(logger: self.log_capture, "found shop price from contained writes: {price}");
+                price.into()
+            })
         })
     }
 
@@ -129,26 +155,37 @@ impl ItemMetadataRef<'_, '_, '_> {
     ///
     /// If nothing is given by [`Self::try_force_shop_price`], defaults to [`DEFAULT_SHOP_PRICE`].
     pub fn force_shop_price(&self) -> CommandInteger {
-        self.shop_price()
-            .unwrap_or_else(|| DEFAULT_SHOP_PRICE.into())
+        self.shop_price().unwrap_or_else(|| {
+            trace!(logger: self.log_capture, "unable to find shop price for {code}, using default {DEFAULT_SHOP_PRICE}", code = self.command);
+            DEFAULT_SHOP_PRICE.into()
+        })
     }
 
     /// Description used when placed in a shop
     pub fn description(&self) -> Option<CommandString> {
-        self.entry.and_then(|entry| entry.description.clone())
+        trace!(logger: self.log_capture, "searching description for {}", self.command);
+        let description = self.entry?.description.clone()?;
+        trace!(logger: self.log_capture, "found description from item data: {description}");
+        Some(description)
     }
 
     /// Force a description for the item.
     ///
     /// If nothing is given by [`Self::description`], returns a random description.
     pub fn force_description(&self, rng: &mut Pcg64Mcg) -> CommandString {
-        self.description()
-            .unwrap_or_else(|| random_shop_description(rng).into())
+        self.description().unwrap_or_else(|| {
+            let description = random_shop_description(rng);
+            trace!(logger: self.log_capture, "unable to find description for {code}, using random \"{description}\"", code = self.command);
+            description.into()
+        })
     }
 
     /// Icon used when placed in a shop
     pub fn icon(&self) -> Option<Icon> {
-        self.entry.and_then(|entry| entry.icon.clone())
+        trace!(logger: self.log_capture, "searching icon for {}", self.command);
+        let icon = self.entry?.icon.clone()?;
+        trace!(logger: self.log_capture, "found icon from item data: {icon}");
+        Some(icon)
     }
 
     /// Try to force an icon out of the item.
@@ -157,18 +194,24 @@ impl ItemMetadataRef<'_, '_, '_> {
     /// on the item's contents. May return `None` for unrecognized items.
     pub fn try_force_icon(&self, commands: &CommandsOutput) -> Option<Icon> {
         self.icon().or_else(|| {
-            single_item(
+            let icon = single_item(
                 self.command
                     .contained_uber_state_writes(commands)
                     .common_identifiers()
                     .filter_map(CommonUberIdentifier::icon),
-            )
+            )?;
+
+            trace!(logger: self.log_capture, "found icon from contained writes: {icon}");
+            Some(icon)
         })
     }
 
     /// Map Icon used in the spoiler map
     pub fn map_icon(&self) -> Option<MapIcon> {
-        self.entry.and_then(|entry| entry.map_icon)
+        trace!(logger: self.log_capture, "searching map icon for {}", self.command);
+        let map_icon = self.entry?.map_icon.clone()?;
+        trace!(logger: self.log_capture, "found map icon from item data: {map_icon}");
+        Some(map_icon)
     }
 
     /// Try to force a map icon out of the item.
@@ -177,12 +220,15 @@ impl ItemMetadataRef<'_, '_, '_> {
     /// on the item's contents.
     pub fn try_force_map_icon(&self, commands: &CommandsOutput) -> Option<MapIcon> {
         self.map_icon().or_else(|| {
-            single_item(
+            let map_icon = single_item(
                 self.command
                     .contained_uber_state_writes(commands)
                     .common_identifiers()
                     .map(CommonUberIdentifier::map_icon),
-            )
+            )?;
+
+            trace!(logger: self.log_capture, "found map icon from contained writes: {map_icon}");
+            Some(map_icon)
         })
     }
 }

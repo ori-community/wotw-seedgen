@@ -46,6 +46,7 @@ pub enum VerboseTarget {
     Weight,
     Spawn,
     Entrances,
+    ItemMetadata,
     OptimizeGraph,
     SeedCompile,
     Watcher,

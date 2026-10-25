@@ -27,6 +27,7 @@ pub struct LogConfig {
     trace_weight: LevelFilter,
     trace_spawn: LevelFilter,
     trace_entrances: LevelFilter,
+    trace_item_metadata: LevelFilter,
     trace_optimize_graph: LevelFilter,
     trace_seed_compile: LevelFilter,
     trace_watcher: LevelFilter,
@@ -42,6 +43,7 @@ const SOLUTIONS_MOD: &str = "wotw_seedgen::generator::solutions";
 const WEIGHT_MOD: &str = "wotw_seedgen::generator::solutions::weight";
 const SPAWN_MOD: &str = "wotw_seedgen::generator::spawn";
 const ENTRANCES_MOD: &str = "wotw_seedgen::generator::entrances";
+const ITEM_METADATA_MOD: &str = "wotw_seedgen_data::seed_language::output::item_metadata";
 const OPTIMIZE_GRAPH_MOD: &str = "wotw_seedgen_data::logic_language::optimize";
 const SEED_COMPILE_MOD: &str = "wotw_seedgen_seed::compile::command";
 
@@ -57,6 +59,7 @@ impl Default for LogConfig {
             trace_weight: LevelFilter::Info,
             trace_spawn: LevelFilter::Info,
             trace_entrances: LevelFilter::Info,
+            trace_item_metadata: LevelFilter::Info,
             trace_optimize_graph: LevelFilter::Info,
             trace_seed_compile: LevelFilter::Info,
             trace_watcher: LevelFilter::Info,
@@ -78,6 +81,7 @@ impl Index<VerboseTarget> for LogConfig {
             VerboseTarget::Weight => &self.trace_weight,
             VerboseTarget::Spawn => &self.trace_spawn,
             VerboseTarget::Entrances => &self.trace_entrances,
+            VerboseTarget::ItemMetadata => &self.trace_item_metadata,
             VerboseTarget::OptimizeGraph => &self.trace_optimize_graph,
             VerboseTarget::SeedCompile => &self.trace_seed_compile,
             VerboseTarget::Watcher => &self.trace_watcher,
@@ -96,6 +100,7 @@ impl IndexMut<VerboseTarget> for LogConfig {
             VerboseTarget::Weight => &mut self.trace_weight,
             VerboseTarget::Spawn => &mut self.trace_spawn,
             VerboseTarget::Entrances => &mut self.trace_entrances,
+            VerboseTarget::ItemMetadata => &mut self.trace_item_metadata,
             VerboseTarget::OptimizeGraph => &mut self.trace_optimize_graph,
             VerboseTarget::SeedCompile => &mut self.trace_seed_compile,
             VerboseTarget::Watcher => &mut self.trace_watcher,
@@ -152,6 +157,7 @@ impl LogConfig {
             trace_weight,
             trace_spawn,
             trace_entrances,
+            trace_item_metadata,
             trace_optimize_graph,
             trace_seed_compile,
             trace_watcher,
@@ -174,6 +180,7 @@ impl LogConfig {
                 .level_for(WEIGHT_MOD, trace_weight)
                 .level_for(SPAWN_MOD, trace_spawn)
                 .level_for(ENTRANCES_MOD, trace_entrances)
+                .level_for(ITEM_METADATA_MOD, trace_item_metadata)
                 .level_for(OPTIMIZE_GRAPH_MOD, trace_optimize_graph)
                 .level_for(SEED_COMPILE_MOD, trace_seed_compile)
                 .level_for("watcher", trace_watcher)
