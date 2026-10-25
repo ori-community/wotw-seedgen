@@ -1,4 +1,4 @@
-use crate::seed_language::output::TriggerCondition;
+use crate::seed_language::{compile::item_message_without_origin_world, output::TriggerCondition};
 
 use super::{
     intermediate::Literal, Command, CommandArea, CommandBoolean, CommandFloat, CommandInteger,
@@ -472,18 +472,14 @@ impl CommandVoid {
             CommandVoid::Multi { commands } => {
                 Box::new(commands.iter().flat_map(Self::contained_messages))
             }
-            CommandVoid::QueuedMessage { message, .. }
-            | CommandVoid::FreeMessage { message, .. } => Box::new(iter::once(message)),
-            _ => Box::new(iter::empty()),
-        }
-    }
-
-    // TODO: Doesn't look into function invocations yet
-    pub fn contained_messages_mut(&mut self) -> Box<dyn Iterator<Item = &mut CommandString> + '_> {
-        match self {
-            CommandVoid::Multi { commands } => {
-                Box::new(commands.iter_mut().flat_map(Self::contained_messages_mut))
-            }
+            CommandVoid::QueuedMessage {
+                id: None,
+                priority: false,
+                message,
+                ..
+            } => Box::new(iter::once(
+                item_message_without_origin_world(message).unwrap_or(message),
+            )),
             CommandVoid::QueuedMessage { message, .. }
             | CommandVoid::FreeMessage { message, .. } => Box::new(iter::once(message)),
             _ => Box::new(iter::empty()),

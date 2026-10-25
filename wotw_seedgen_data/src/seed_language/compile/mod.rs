@@ -12,9 +12,9 @@ mod preprocess;
 mod scope;
 
 pub use function::{
-    clean_water, empty, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot,
-    skill, spirit_light, teleporter, weapon_upgrade, FunctionArg, FunctionIdentifier,
-    FunctionSignature,
+    clean_water, empty, energy_fragment, gorlek_ore, health_fragment,
+    item_message_without_origin_world, keystone, shard, shard_slot, skill, spirit_light,
+    teleporter, weapon_upgrade, FunctionArg, FunctionIdentifier, FunctionSignature,
 };
 pub use helpers::{add_float, add_integer, store_boolean, store_float, store_integer};
 use wotw_seedgen_log_capture::LogCapture;

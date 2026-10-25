@@ -1596,6 +1596,7 @@ fn item_message(message: CommandString) -> CommandVoid {
     }
 }
 
+/// If this structure is changed, the destructuring counterpart has to be changed in [`item_message_without_origin_world`].
 fn message_with_origin_world(message: CommandString) -> CommandString {
     CommandString::Multi {
         commands: vec![
@@ -1720,6 +1721,23 @@ fn message_with_origin_world(message: CommandString) -> CommandString {
             id: RESERVED_STRING,
         }),
     }
+}
+
+/// Destructures [`message_with_origin_world`] used in [`item_message`].
+pub fn item_message_without_origin_world(item_message: &CommandString) -> Option<&CommandString> {
+    let CommandString::Multi { commands, .. } = item_message else {
+        return None;
+    };
+
+    let CommandVoid::If { command, .. } = commands.first()? else {
+        return None;
+    };
+
+    let CommandVoid::SetString { value, .. } = &**command else {
+        return None;
+    };
+
+    Some(value)
 }
 
 fn set_spirit_light_string(value: &str) -> Box<CommandVoid> {
