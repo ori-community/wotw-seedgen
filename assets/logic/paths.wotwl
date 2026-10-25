@@ -9606,7 +9606,6 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
     moki:
       Spear=1
       Launch, Hammer
-      LowerReach.ThawCentralFurnace, DoubleJump, Dash, Hammer
     gorlek:
       Hammer, Bash OR SentryJump=1
       Reach.AboveBaur.Lever, DoubleJump, TripleJump, Hammer
@@ -9616,31 +9615,23 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
       GlideJump, DoubleJump, Hammer
       AerialHammerJump
 
-  pickup Reach.LeverDoor.CeilingSL:  # check for redundancies with OutsideTPRoom
+  pickup Reach.LeverDoor.CeilingSL:  # check for redundancies with AboveLeverDoor
     moki:
       Launch
-      LowerReach.ThawCentralFurnace, DoubleJump, Dash, Reach.LeverDoor.Ceiling
+      Reach.LeverDoor.Ceiling, Bash, Grenade=1
     gorlek:
-      Bash, Grenade=1
+      Bash
       SentryJump=1
       Reach.AboveBaur.Lever, DoubleJump, TripleJump
     kii:
       Reach.AboveBaur.Lever, DoubleJump, Hammer OR Spear=1
-      LowerReach.ThawCentralFurnace:
-        DoubleJump, Glide, Hammer
-        DoubleJump, Glide, Spear=1, Shuriken=1 OR Sentry=1 OR Flash=1
-        DoubleJump, Glide, Spear=2
-        DoubleJump, Sentry=2, Hammer OR Spear=1
-        Dash, Hammer
-      Bash OR GrenadeJump=1
+      AerialHammerJump OR GrenadeJump=1
       DoubleJump, Sword
     unsafe:
+      AbilitySwap=1
       DoubleJump, TripleJump
       Sword, Hammer, Flash=1 OR Sentry=1 OR Spear=1
-      GrenadeJump
       Dash, DoubleJump, Sentry=1 OR Blaze=1 OR Spear=1 OR Flash=1 OR Shuriken=1  # Dash ramp from the ramp near the spikes otw to Lupo
-      LowerReach.ThawCentralFurnace, Sword, Dash, Spear=1
-      LowerReach.ThawCentralFurnace, Sword, Hammer, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # hammer upslash+sword full combo+energy weapon
   pickup Reach.LupoMap:
     moki, SpiritLight=150:
       Launch
@@ -9655,70 +9646,50 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
       DoubleJump, Sword OR Hammer
       DoubleJump, Glide, Shuriken=1 OR Flash=1 OR Sentry=1 OR Spear=1
       DoubleJump, Sentry=2
-      Dash, Hammer
       Reach.AboveBaur.Lever, DoubleJump, Glide, Hammer OR Spear=1  # from Reach.LeverDoor.CeilingSL
     unsafe, SpiritLight=150:
-      Dash, Sword
-      Grenade=1  # GrenadeJump=1
+      Dash, Sword OR Hammer
+      GrenadeJump
       DoubleJump, Shuriken=1
-  pickup Reach.BelowTPMortar.SL:  # Check for redundancies with OutsideTPRoom
-    moki: LowerReach.ThawCentralFurnace, DoubleJump, Dash
-    gorlek:
-      Bash, Grenade=2, Spear=1
-      Reach.AboveBaur.Lever, DoubleJump, TripleJump, Hammer OR Spear=1  # finish with an upswing
-      SwordSJump=2, Spear=1
-      HammerSJump=3
-    kii:
-      Reach.AboveBaur.Lever, Hammer, DoubleJump, Glide OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR Damage=20
-      Reach.AboveBaur.Lever, Spear=1, DoubleJump, Dash
-      LowerReach.ThawCentralFurnace, DoubleJump, Glide, Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1
-      LowerReach.ThawCentralFurnace, DoubleJump, Sentry=5
-      LowerReach.ThawCentralFurnace, DoubleJump, Sentry=2, Damage=20
-      LowerReach.ThawCentralFurnace, Reach.AboveBaur.Lever, DoubleJump, Spear=2, Damage=20  # from Reach.LeverDoor.CeilingSL
-    unsafe:
-      Reach.AboveBaur.Lever, DoubleJump, Sword, Spear=1  # Pogo the mortar projectile once it hit the snaptrap
-      Grenade=2, Hammer OR Spear=1  # GrenadeJump=2, Hammer OR Spear=1
-      LowerReach.ThawCentralFurnace, Dash, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
-      LowerReach.ThawCentralFurnace, Bash
-      LowerReach.ThawCentralFurnace, Reach.AboveBaur.Lever, DoubleJump, Glide
 
   conn LowerReach.SecondSoup: free
   conn LowerReach.BelowLupo:
     kii:
       DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Sentry=2 OR Blaze=3
       Damage=10, Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=2
-  conn LowerReach.OutsideTPRoom:
+  conn LowerReach.AboveLeverDoor:
     moki:
-      Reach.LeverDoor.Ceiling, Launch
-      LowerReach.ThawCentralFurnace, DoubleJump, Dash, Bash
-      LowerReach.ThawCentralFurnace, Bash, Grenade=1
+      Launch, Reach.LeverDoor.Ceiling OR LowerReach.ThawCentralFurnace
+      Reach.LeverDoor.Ceiling, Bash, Grenade=1, DoubleJump
+      LowerReach.ThawCentralFurnace, DoubleJump, Dash
     gorlek:
+      SentryJump=1, Reach.LeverDoor.Ceiling OR LowerReach.ThawCentralFurnace
       Reach.LeverDoor.Ceiling:  # go up through the breakable ceiling
-        SentryJump=3
-        Bash, Grenade=1, DoubleJump OR Dash OR Damage=20
-        Bash, Grenade=2
-        Reach.AboveBaur.Lever, DoubleJump, TripleJump, Bash
-      LowerReach.ThawCentralFurnace, DoubleJump, TripleJump OR Dash
+        Bash, Dash OR Grenade=1 OR Sword OR Hammer OR Damage=20  # land next to the spikes
+        Reach.AboveBaur.Lever, DoubleJump, TripleJump
+      LowerReach.ThawCentralFurnace, DoubleJump, TripleJump
     kii:
-      Sword, DoubleJump, TripleJump, Spear=1  # Spear might have been to break the ceiling? Keeping it for now but needs to be checked again
       Reach.LeverDoor.Ceiling:  # go up through the breakable ceiling
-        DoubleJump, TripleJump, Dash
+        Bash OR GrenadeJump=1
+        DoubleJump, Sword  # pogo the slime
+        DoubleJump, TripleJump, Dash  # dash from lupo's area
+        Reach.AboveBaur.Lever, DoubleJump, Hammer OR Spear=1
+      LowerReach.ThawCentralFurnace:
         Bash
-        Reach.AboveBaur.Lever:
-          DoubleJump, TripleJump
-          DoubleJump, Dash, Hammer
-      LowerReach.ThawCentralFurnace:
-        Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1
-        DoubleJump, Sword OR Hammer
-        DoubleJump, Glide, Shuriken=2
+        DoubleJump, Sword OR Hammer OR Sentry=2
+        DoubleJump, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:
-      Sword, DoubleJump, Hammer  # Hammer might have been to break the ceiling? Keeping it for now but needs to be checked again
-      GrenadeJump, Reach.LeverDoor.Ceiling OR LowerReach.ThawCentralFurnace  # gjump on top of the tongue plant, get on the wall above it then grenade cancel to get to the mortar
-      SentryJump=2, Reach.LeverDoor.Ceiling OR LowerReach.ThawCentralFurnace
-      Reach.LeverDoor.Ceiling, Reach.AboveBaur.Lever, DoubleJump, Dash
+      AbilitySwap=3  # 1 to go near Lupo + 2 at the tongue
+      GrenadeJump, Reach.LeverDoor.Ceiling OR LowerReach.ThawCentralFurnace
+      Reach.LeverDoor.Ceiling:
+        BlazeSwap=1 OR SentrySwap=1
+        DoubleJump, TripleJump OR Reach.AboveBaur.Lever
+        Sword, Hammer, Flash=1 OR Sentry=1 OR Spear=1
+        Dash, DoubleJump, Sentry=1 OR Blaze=1 OR Spear=1 OR Flash=1 OR Shuriken=1  # Dash ramp from the ramp near the spikes otw to Lupo
       LowerReach.ThawCentralFurnace:
-        Dash, Sword  # coyote dash->up slash->dash->weapon stall to grab the tongue. pass through the tongue ennemy from the right with downslashes
-        Dash, Hammer  # Stand on the tongue plant
+        BlazeSwap=1 OR SentrySwap=1
+        Dash, Sword OR Hammer
+        Sword, Hammer, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # hammer upslash+sword full combo+energy weapon
   conn LowerReach.Entry:
     moki, Reach.AboveBaur.Lever:
       DoubleJump, Dash OR Glide
@@ -9734,6 +9705,65 @@ anchor LowerReach.Central at -335, -4009:  # After the lever door
     gorlek: Reach.AboveBaur.Lever, DoubleJump, TripleJump, Dash, Sword
     kii: Reach.AboveBaur.Lever, DoubleJump, TripleJump, Dash OR Sword
 
+anchor LowerReach.AboveLeverDoor at -321, -3990:  # on the snaptrap above the lever door
+  state Reach.LeverDoor.Ceiling:
+    moki: Hammer OR Spear=1 OR Bash
+    unsafe: SentryRedirect=1 OR GrenadeRedirect=1
+
+  pickup Reach.LeverDoor.CeilingSL:
+    moki: Reach.LeverDoor.Ceiling
+  pickup Reach.LupoMap:
+    moki: SpiritLight=150, DoubleJump OR Dash OR Glide
+    gorlek: SpiritLight=150  # not too hard to do damageless, slide down the tongue plant and land on the little wall
+  pickup Reach.BelowTPMortar.SL:
+    moki:
+      Launch
+      Bash, DoubleJump OR Dash OR Glide
+      LowerReach.ThawCentralFurnace:
+        DoubleJump, Dash OR Glide
+        Dash, Glide
+    gorlek:
+      SentryJump=1
+      DoubleJump, TripleJump OR Dash
+      Bash, Sword OR Hammer OR Grenade=1
+      LowerReach.ThawCentralFurnace, Glide, Hammer
+    kii:
+      GrenadeJump=1
+      Bash, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Damage=20
+      LowerReach.ThawCentralFurnace:
+        DoubleJump, Flash=1 OR Sentry=1  # jump from the snaptrap when it's closed
+        Dash, Sword OR Hammer  # sword from the tongue / hammer from the snaptrap
+    unsafe:
+      Bash OR AbilitySwap=1 OR GlideJump
+      Dash  # dash ramp from the snaptrap. Really precise when it's open
+      LowerReach.ThawCentralFurnace, PauseFloat
+
+  conn LowerReach.SecondSoup: free
+  conn LowerReach.Central:
+    moki: DoubleJump OR Dash OR Launch OR Reach.LeverDoor.Ceiling
+    gorlek: free
+  conn LowerReach.OutsideTPRoom:
+    moki: Launch OR Bash
+    gorlek:
+      SentryJump=2
+      LowerReach.ThawCentralFurnace, DoubleJump, TripleJump
+    kii:
+      DoubleJump, TripleJump
+      DoubleJump, Dash, Hammer
+      LowerReach.ThawCentralFurnace:
+        DoubleJump, Dash OR Sword OR Hammer
+        DoubleJump, Glide, Shuriken=2
+    unsafe:
+      SentryJump=1 OR AbilitySwap=3
+      GrenadeJump  # gjump on top of the tongue plant, get on the wall above it then grenade cancel to get to the mortar
+      BlazeSwap=2 OR SentrySwap=2:  # Reach the wall at the tongue + dboost on the mortar projectile to get a walljump on the physic object
+        Damage=10
+      DoubleJump, Sword OR Dash  # Sword pogo the mortar projectile to reach the top-left side of the tongue
+      LowerReach.ThawCentralFurnace:
+        Sword  # Pass through the tongue ennemy from the right with downslashes
+        Hammer  # Stand on the tongue plant
+
 anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter room
   refill Checkpoint
   refill Full:  # use the teleporter
@@ -9743,31 +9773,16 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
   refill Energy=3:
     moki: BreakCrystal
 
-  state Reach.LeverDoor.Ceiling:
-    moki: Bash OR Hammer OR Spear=1
-    unsafe: SentryRedirect=1 OR GrenadeRedirect=1
-
-  pickup Reach.LeverDoor.CeilingSL:
-    moki: Reach.LeverDoor.Ceiling
-  pickup Reach.LupoMap:
-    moki: SpiritLight=150, DoubleJump OR Dash OR Glide OR Launch
-    gorlek: SpiritLight=150  # not too hard to do damageless, slide down the tongue plant and land on the little wall
-  pickup Reach.BelowTPMortar.SL:
-    moki:
-      Bash, DoubleJump OR Dash OR Glide
-      Launch
+  pickup Reach.BelowTPMortar.SL:  # Check redundancy with LowerReach.AboveLeverDoor
     gorlek:
-      Glide OR SentryJump=1
-      DoubleJump, TripleJump OR Dash OR Sword OR Hammer
+      Glide
+      DoubleJump, Sword OR Hammer
       Dash, Sword OR Hammer
-      Bash, Sword OR Hammer
     kii:
       DoubleJump OR Dash OR Sword OR Hammer
-      Bash, Grenade=1  # can be done from the ledge next to breakable floor
     unsafe:
-      PauseFloat
-      GrenadeJump
-      Bash OR Sentry=2
+      Sentry=2 OR PauseFloat
+      Shuriken=1  # Use shuriken as you get a corner boost on the branch
   pickup Reach.TPMortar.Ore:
     moki:
       Launch
@@ -9788,10 +9803,7 @@ anchor LowerReach.OutsideTPRoom at -311, -3970:  # To the left of the teleporter
       # LowerReach.ThawCentralFurnace, Bash, Blaze=1
       LowerReach.ThawCentralFurnace, Bash  # stand beside the spitter, bash off it once it shoots, then again off the projectile
 
-  conn LowerReach.SecondSoup: free
-  conn LowerReach.Central:
-    moki: DoubleJump OR Dash OR Glide OR Launch OR Reach.LeverDoor.Ceiling
-    gorlek: free
+  conn LowerReach.AboveLeverDoor: free
   conn LowerReach.Teleporter:
     moki: Grenade=1
     gorlek: SentryBurn=1
