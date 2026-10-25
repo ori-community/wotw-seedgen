@@ -18,10 +18,9 @@ use super::{
 use crate::{
     assets::{Pickups, PickupsEntry},
     seed_language::output::{
-        display::strip_invisible_characters,
         item_metadata::{random_shop_description, single_item, DEFAULT_SHOP_PRICE},
         postprocess::price_noise::PriceNoise,
-        AsConstant, ClientEvent, CommandsOutput, ContainedWrites, ContainedWritesExt, IntoConstant,
+        ClientEvent, CommandsOutput, ContainedWrites, ContainedWritesExt, IntoConstant,
         ItemMetadataRef, TriggerCondition,
     },
     Area, Position, ShopKind, UberIdentifier,
@@ -425,17 +424,12 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
         }))
         .unwrap_or_default();
 
-        let label = match name.as_constant() {
-            Some(name) => strip_invisible_characters(name).into(),
-            None => name.clone(),
-        };
-
         extra_events.push(Event::on_reload(CommandVoid::CreateSpoilerMapIcon {
             id: spoiler_icon_id,
             icon,
             x: map_position.x.into(),
             y: map_position.y.into(),
-            label,
+            label: name.clone(),
         }));
 
         extra_events.push(Event {
