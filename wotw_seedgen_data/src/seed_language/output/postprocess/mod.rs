@@ -17,16 +17,20 @@ use super::{
 
 use crate::{
     assets::{Pickups, PickupsEntry},
-    seed_language::output::{
-        item_metadata::{random_shop_description, single_item, DEFAULT_SHOP_PRICE},
-        postprocess::price_noise::PriceNoise,
-        ClientEvent, CommandsOutput, ContainedWrites, ContainedWritesExt, IntoConstant,
-        ItemMetadataRef, TriggerCondition,
+    seed_language::{
+        compile::ORIGIN_WORLD_STRING,
+        output::{
+            item_metadata::{random_shop_description, single_item, DEFAULT_SHOP_PRICE},
+            postprocess::price_noise::PriceNoise,
+            ClientEvent, CommandsOutput, ContainedWrites, ContainedWritesExt, IntoConstant,
+            ItemMetadataRef, TriggerCondition,
+        },
     },
     Area, Position, ShopKind, UberIdentifier,
 };
 use indexmap::IndexMap;
 use itertools::Itertools;
+use log::warn;
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::{FxBuildHasher, FxHashMap};
 
@@ -335,12 +339,23 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
                     .filter_map(|id| self.multiworld_lookup.get(&id))
                     .map(|multiworld_event| {
                         let output = self.worlds[multiworld_event.target_world_index].output;
+                        let mut target_command = multiworld_event.target_command;
+
+                        match destructure_target_command(target_command) {
+                            None => {
+                                warn!(
+                                    logger: self.worlds.first().unwrap().output.modifiers.item_metadata.log_capture,
+                                    "cannot destructure {target_command} to receive item metadata",
+                                );
+                            }
+                            Some(destructured) => target_command = destructured,
+                        }
 
                         MetadataMatch {
                             metadata: output
                                 .modifiers
                                 .item_metadata
-                                .get(multiworld_event.target_command),
+                                .get(target_command),
                             commands: &output.commands,
                         }
                     }),
@@ -1015,6 +1030,25 @@ impl Display for AreaOfMatch {
 
         write!(f, "{}", self.area)
     }
+}
+
+fn destructure_target_command(target_command: &CommandVoid) -> Option<&CommandVoid> {
+    let CommandVoid::Multi { commands } = target_command else {
+        return None;
+    };
+
+    let [CommandVoid::SetString {
+        id: ORIGIN_WORLD_STRING,
+        ..
+    }, target_command, CommandVoid::SetString {
+        id: ORIGIN_WORLD_STRING,
+        ..
+    }] = commands.as_slice()
+    else {
+        return None;
+    };
+
+    Some(target_command)
 }
 
 fn multi_name<I>(names: I) -> Option<CommandString>

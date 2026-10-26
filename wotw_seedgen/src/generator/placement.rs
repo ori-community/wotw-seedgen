@@ -828,7 +828,7 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
     fn push_command(
         &mut self,
         trigger: Trigger,
-        mut command: CommandVoid,
+        command: CommandVoid,
         origin_world_index: usize,
         target_world_index: usize,
     ) {
@@ -861,21 +861,11 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
                 value: "".into(),
             };
 
-            match &mut command {
-                CommandVoid::Multi { commands } => {
-                    commands.insert(0, set_command);
-                    commands.push(unset_command);
-                }
-                _ => {
-                    command = CommandVoid::Multi {
-                        commands: vec![set_command, command, unset_command],
-                    }
-                }
-            }
-
             self.worlds[target_world_index].push_command(
                 Trigger::Binding(uber_identifier), // this is server synced and can't change to false
-                command,
+                CommandVoid::Multi {
+                    commands: vec![set_command, command, unset_command],
+                },
             );
         }
     }
