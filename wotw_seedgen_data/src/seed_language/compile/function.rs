@@ -284,8 +284,8 @@ pub enum FunctionIdentifier {
     RemoveCleanWaterString,
     WeaponUpgradeString,
     RemoveWeaponUpgradeString,
-    CurrentArea,
-    CurrentMapArea,
+    PlayerArea,
+    MapFocusedArea,
     SpiritLight,
     RemoveSpiritLight,
     GorlekOre,
@@ -461,8 +461,8 @@ impl FunctionIdentifier {
             RemoveCleanWaterString() -> String,
             WeaponUpgradeString(weapon_upgrade: WeaponUpgrade) -> String,
             RemoveWeaponUpgradeString(weapon_upgrade: WeaponUpgrade) -> String,
-            CurrentArea() -> Area,
-            CurrentMapArea() -> Area,
+            PlayerArea() -> Area,
+            MapFocusedArea() -> Area,
             SpiritLight(amount: Integer),
             RemoveSpiritLight(amount: Integer),
             GorlekOre(),
@@ -881,8 +881,8 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveWeaponUpgradeString => {
                 Command::String(weapon_upgrade_string(arg(&mut context)?, true))
             }
-            FunctionIdentifier::CurrentArea => Command::Area(CommandArea::PlayerArea {}),
-            FunctionIdentifier::CurrentMapArea => Command::Area(CommandArea::MapFocusedArea {}),
+            FunctionIdentifier::PlayerArea => Command::Area(CommandArea::PlayerArea {}),
+            FunctionIdentifier::MapFocusedArea => Command::Area(CommandArea::MapFocusedArea {}),
             FunctionIdentifier::SpiritLight => {
                 Command::Void(spirit_light(arg(&mut context)?, &mut context.compiler.rng))
             }

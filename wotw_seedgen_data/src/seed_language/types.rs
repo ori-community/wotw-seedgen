@@ -196,7 +196,7 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
             | FunctionIdentifier::RemoveCleanWaterString
             | FunctionIdentifier::WeaponUpgradeString
             | FunctionIdentifier::RemoveWeaponUpgradeString => Type::String,
-            FunctionIdentifier::CurrentArea | FunctionIdentifier::CurrentMapArea => Type::Area,
+            FunctionIdentifier::PlayerArea | FunctionIdentifier::MapFocusedArea => Type::Area,
             FunctionIdentifier::SpiritLight
             | FunctionIdentifier::RemoveSpiritLight
             | FunctionIdentifier::GorlekOre

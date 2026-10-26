@@ -166,8 +166,8 @@ impl Display for CommandArea {
         match self {
             CommandArea::Constant { value } => value.fmt(f),
             CommandArea::Multi { commands, last } => multi(f, commands, last),
-            CommandArea::PlayerArea {} => write!(f, "current_area()"),
-            CommandArea::MapFocusedArea {} => write!(f, "current_map_area()"),
+            CommandArea::PlayerArea {} => write!(f, "player_area()"),
+            CommandArea::MapFocusedArea {} => write!(f, "map_focused_area()"),
         }
     }
 }

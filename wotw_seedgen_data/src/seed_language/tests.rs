@@ -221,7 +221,7 @@ fn coersions() {
                 test_variants::<Equipment>(|equipment| format!("unequip({equipment})"))
             }
             ConstantDiscriminants::Area => {
-                test_variants::<Area>(|area| format!("if current_area() == {area} {{}}"))
+                test_variants::<Area>(|area| format!("if player_area() == {area} {{}}"))
             }
             ConstantDiscriminants::GenericIcon => test_variants::<GenericIcon>(|generic_icon| {
                 format!("set_shop_item_icon(Shop.Opher.Slot9, {generic_icon})")

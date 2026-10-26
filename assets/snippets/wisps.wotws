@@ -51,11 +51,11 @@ on spawn store(tracker.wispsRequired, wisps_required)
 !augment_fun(write_missing_goals(), if tracker.wispsCollected < wisps_required write_missing_wisps())
 
 fun write_missing_wisps() { new_row("Missing Wisps (" + (wisps_required - tracker.wispsCollected) + "): ") }
-!if voice { !augment_fun(write_missing_wisps(), if Hollow.Wisp == false add_missing_goal_in_area("Voice", current_area() == Hollow)) }
-!if strength { !augment_fun(write_missing_wisps(), if Pools.Wisp == false add_missing_goal_in_area("Strength", current_area() == Pools)) }
-!if memory { !augment_fun(write_missing_wisps(), if Reach.Wisp == false add_missing_goal_in_area("Memory", current_area() == Reach)) }
-!if eyes { !augment_fun(write_missing_wisps(), if Depths.Wisp == false add_missing_goal_in_area("Eyes", current_area() == Depths)) }
-!if heart { !augment_fun(write_missing_wisps(), if Ruins.Wisp == false add_missing_goal_in_area("Heart", current_area() == Ruins)) }
+!if voice { !augment_fun(write_missing_wisps(), if Hollow.Wisp == false add_missing_goal_in_area("Voice", player_area() == Hollow)) }
+!if strength { !augment_fun(write_missing_wisps(), if Pools.Wisp == false add_missing_goal_in_area("Strength", player_area() == Pools)) }
+!if memory { !augment_fun(write_missing_wisps(), if Reach.Wisp == false add_missing_goal_in_area("Memory", player_area() == Reach)) }
+!if eyes { !augment_fun(write_missing_wisps(), if Depths.Wisp == false add_missing_goal_in_area("Eyes", player_area() == Depths)) }
+!if heart { !augment_fun(write_missing_wisps(), if Ruins.Wisp == false add_missing_goal_in_area("Heart", player_area() == Ruins)) }
 !augment_fun(write_missing_wisps(), add_current_row())
 
 on change tracker.wispsCollected update_goals()

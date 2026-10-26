@@ -78,20 +78,20 @@ on spawn store(tracker.treesRequired, trees_required)
 !augment_fun(write_missing_goals(), if tracker.treesCollected < trees_required write_missing_trees())
 
 fun write_missing_trees() { new_row("Missing Trees (" + (trees_required - tracker.treesCollected) + "): ") }
-!if sword_tree { !augment_fun(write_missing_trees(), if Marsh.SwordTree == false add_missing_goal_in_area("Sword", current_area() == Marsh)) }
-!if double_jump_tree { !augment_fun(write_missing_trees(), if Marsh.DoubleJumpTree == false add_missing_goal_in_area("Double Jump", current_area() == Marsh)) }
-!if regenerate_tree { !augment_fun(write_missing_trees(), if Marsh.RegenerateTree == false add_missing_goal_in_area("Regenerate", current_area() == Marsh)) }
-!if bow_tree { !augment_fun(write_missing_trees(), if Marsh.BowTree == false add_missing_goal_in_area("Bow", current_area() == Marsh)) }
-!if dash_tree { !augment_fun(write_missing_trees(), if Hollow.DashTree == false add_missing_goal_in_area("Dash", current_area() == Hollow)) }
-!if bash_tree { !augment_fun(write_missing_trees(), if Hollow.BashTree == false add_missing_goal_in_area("Bash", current_area() == Hollow)) }
-!if grapple_tree { !augment_fun(write_missing_trees(), if Wellspring.GrappleTree == false add_missing_goal_in_area("Grapple", current_area() == Wellspring)) }
-!if grenade_tree { !augment_fun(write_missing_trees(), if Reach.GrenadeTree == false add_missing_goal_in_area("Grenade", current_area() == Reach)) }
-!if flash_tree { !augment_fun(write_missing_trees(), if Depths.FlashTree == false add_missing_goal_in_area("Flash", current_area() == Depths)) }
-!if water_dash_tree { !augment_fun(write_missing_trees(), if Pools.WaterDashTree == false add_missing_goal_in_area("Water Dash", current_area() == Pools)) }
-!if burrow_tree { !augment_fun(write_missing_trees(), if Wastes.BurrowTree == false add_missing_goal_in_area("Burrow", current_area() == Wastes)) }
-!if launch_tree { !augment_fun(write_missing_trees(), if Woods.LaunchTree == false add_missing_goal_in_area("Launch", current_area() == Woods)) }
-!if marsh_ancestral_light_tree { !augment_fun(write_missing_trees(), if Marsh.AncestralLightTree == false add_missing_goal_in_area("Marsh Ancestral Light", current_area() == Marsh)) }
-!if glades_ancestral_light_tree { !augment_fun(write_missing_trees(), if Glades.AncestralLightTree == false add_missing_goal_in_area("Glades Ancestral Light", current_area() == Glades)) }
+!if sword_tree { !augment_fun(write_missing_trees(), if Marsh.SwordTree == false add_missing_goal_in_area("Sword", player_area() == Marsh)) }
+!if double_jump_tree { !augment_fun(write_missing_trees(), if Marsh.DoubleJumpTree == false add_missing_goal_in_area("Double Jump", player_area() == Marsh)) }
+!if regenerate_tree { !augment_fun(write_missing_trees(), if Marsh.RegenerateTree == false add_missing_goal_in_area("Regenerate", player_area() == Marsh)) }
+!if bow_tree { !augment_fun(write_missing_trees(), if Marsh.BowTree == false add_missing_goal_in_area("Bow", player_area() == Marsh)) }
+!if dash_tree { !augment_fun(write_missing_trees(), if Hollow.DashTree == false add_missing_goal_in_area("Dash", player_area() == Hollow)) }
+!if bash_tree { !augment_fun(write_missing_trees(), if Hollow.BashTree == false add_missing_goal_in_area("Bash", player_area() == Hollow)) }
+!if grapple_tree { !augment_fun(write_missing_trees(), if Wellspring.GrappleTree == false add_missing_goal_in_area("Grapple", player_area() == Wellspring)) }
+!if grenade_tree { !augment_fun(write_missing_trees(), if Reach.GrenadeTree == false add_missing_goal_in_area("Grenade", player_area() == Reach)) }
+!if flash_tree { !augment_fun(write_missing_trees(), if Depths.FlashTree == false add_missing_goal_in_area("Flash", player_area() == Depths)) }
+!if water_dash_tree { !augment_fun(write_missing_trees(), if Pools.WaterDashTree == false add_missing_goal_in_area("Water Dash", player_area() == Pools)) }
+!if burrow_tree { !augment_fun(write_missing_trees(), if Wastes.BurrowTree == false add_missing_goal_in_area("Burrow", player_area() == Wastes)) }
+!if launch_tree { !augment_fun(write_missing_trees(), if Woods.LaunchTree == false add_missing_goal_in_area("Launch", player_area() == Woods)) }
+!if marsh_ancestral_light_tree { !augment_fun(write_missing_trees(), if Marsh.AncestralLightTree == false add_missing_goal_in_area("Marsh Ancestral Light", player_area() == Marsh)) }
+!if glades_ancestral_light_tree { !augment_fun(write_missing_trees(), if Glades.AncestralLightTree == false add_missing_goal_in_area("Glades Ancestral Light", player_area() == Glades)) }
 !augment_fun(write_missing_trees(), add_current_row())
 
 on change tracker.treesCollected update_goals()

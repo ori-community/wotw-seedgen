@@ -80,66 +80,66 @@ on spawn store(tracker.questsRequired, quests_required)
 fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tracker.questsFinished) + "): ") }
 !if silent_teeth { !augment_fun(write_missing_quests(), if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 add_missing_goal_in_area(
     "Silent Teeth",
-    (kwolokGroupDescriptor.cleanseWellspringQuestUberState != 3 && current_area() == Wellspring)
-    || (kwolokGroupDescriptor.cleanseWellspringQuestUberState == 3 && current_area() == Hollow)
+    (kwolokGroupDescriptor.cleanseWellspringQuestUberState != 3 && player_area() == Wellspring)
+    || (kwolokGroupDescriptor.cleanseWellspringQuestUberState == 3 && player_area() == Hollow)
 )) }
 !if missing_key { !augment_fun(write_missing_quests(), if Marsh.MissingKey.Completed == false add_missing_goal_in_area(
     // TODO any other permanents Tokks? Or toggle this based on the conditions for the Tokks to appear? Also relevant in hand to hand
     "Missing Key",
-    (npcsStateGroup.marshKeystoneQuest != 2 && current_area() == Marsh)
-    || (npcsStateGroup.marshKeystoneQuest == 2 && (current_area() == Marsh || current_area() == Glades))
+    (npcsStateGroup.marshKeystoneQuest != 2 && player_area() == Marsh)
+    || (npcsStateGroup.marshKeystoneQuest == 2 && (player_area() == Marsh || player_area() == Glades))
 )) }
 !if into_burrows { !augment_fun(write_missing_quests(), if Marsh.IntoBurrows.Completed == false add_missing_goal_in_area(
     "Into Burrows",
-    (npcsStateGroup.inkwaterWellQuest != 3 && current_area() == Burrows)
-    || (npcsStateGroup.inkwaterWellQuest == 3 && current_area() == Marsh)
+    (npcsStateGroup.inkwaterWellQuest != 3 && player_area() == Burrows)
+    || (npcsStateGroup.inkwaterWellQuest == 3 && player_area() == Marsh)
 )) }
 !if lost_compass { !augment_fun(write_missing_quests(), if Wellspring.LostCompass.Completed == false add_missing_goal_in_area(
-    "Lost Compass", current_area() == Wellspring
+    "Lost Compass", player_area() == Wellspring
 )) }
 !if little_braver { !augment_fun(write_missing_quests(), if Marsh.LittleBraver.Completed == false add_missing_goal_in_area(
-    "Little Braver", current_area() == Marsh
+    "Little Braver", player_area() == Marsh
 )) }
 !if family_reunion { !augment_fun(write_missing_quests(), if Glades.FamilyReunion.Completed == false add_missing_goal_in_area(
     "Family Reunion",
-    (questUberStateGroup.familyReunionQuest != 2 && current_area() == Glades)
-    || (questUberStateGroup.familyReunionQuest == 2 && current_area() == Woods)
+    (questUberStateGroup.familyReunionQuest != 2 && player_area() == Glades)
+    || (questUberStateGroup.familyReunionQuest == 2 && player_area() == Woods)
 )) }
 !if tree_keeper { !augment_fun(write_missing_quests(), if Glades.Plants.LastTree == false add_missing_goal_in_area(
     "Tree Keeper",
-    (questUberStateGroup.treeKeeperQuest != 1 && current_area() == Woods)
-    || (questUberStateGroup.treeKeeperQuest == 1 && current_area() == Glades)
+    (questUberStateGroup.treeKeeperQuest != 1 && player_area() == Woods)
+    || (questUberStateGroup.treeKeeperQuest == 1 && player_area() == Glades)
 )) }
 !if rough_diamond { !augment_fun(write_missing_quests(), if questUberStateGroup.desertCogQuest < 5 add_missing_goal_in_area(
     "Rough Diamond",
-    (questUberStateGroup.desertCogQuest != 4 && current_area() == Wastes)
-    || (questUberStateGroup.desertCogQuest == 4 && (current_area() == Hollow || current_area() == Glades))
+    (questUberStateGroup.desertCogQuest != 4 && player_area() == Wastes)
+    || (questUberStateGroup.desertCogQuest == 4 && (player_area() == Hollow || player_area() == Glades))
 )) }
 !if hand_to_hand { !augment_fun(write_missing_quests(), if Ruins.HandToHand.Completed == false add_missing_goal_in_area(
     "Hand to Hand",
-    (questUberStateGroup.tradeSequenceQuest == 0 && current_area() == Hollow)
-    || (questUberStateGroup.tradeSequenceQuest == 1 && (current_area() == Marsh || current_area() == Glades))
-    || (questUberStateGroup.tradeSequenceQuest == 2 && current_area() == Wellspring)
-    || ((questUberStateGroup.tradeSequenceQuest == 3 || questUberStateGroup.tradeSequenceQuest == 5 || questUberStateGroup.tradeSequenceQuest == 8) && current_area() == Glades)
-    || (questUberStateGroup.tradeSequenceQuest == 4 && current_area() == Reach)
-    || (questUberStateGroup.tradeSequenceQuest == 6 && current_area() == Depths)
-    || (questUberStateGroup.tradeSequenceQuest == 7 && current_area() == Pools)
-    || (questUberStateGroup.tradeSequenceQuest == 9 && current_area() == Wastes)
-    || (questUberStateGroup.tradeSequenceQuest == 10 && current_area() == Ruins)
+    (questUberStateGroup.tradeSequenceQuest == 0 && player_area() == Hollow)
+    || (questUberStateGroup.tradeSequenceQuest == 1 && (player_area() == Marsh || player_area() == Glades))
+    || (questUberStateGroup.tradeSequenceQuest == 2 && player_area() == Wellspring)
+    || ((questUberStateGroup.tradeSequenceQuest == 3 || questUberStateGroup.tradeSequenceQuest == 5 || questUberStateGroup.tradeSequenceQuest == 8) && player_area() == Glades)
+    || (questUberStateGroup.tradeSequenceQuest == 4 && player_area() == Reach)
+    || (questUberStateGroup.tradeSequenceQuest == 6 && player_area() == Depths)
+    || (questUberStateGroup.tradeSequenceQuest == 7 && player_area() == Pools)
+    || (questUberStateGroup.tradeSequenceQuest == 9 && player_area() == Wastes)
+    || (questUberStateGroup.tradeSequenceQuest == 10 && player_area() == Ruins)
 )) }
 !if into_darkness { !augment_fun(write_missing_quests(), if Glades.IntoDarkness.Completed == false add_missing_goal_in_area(
-    "Into Darkness", current_area() == Glades
+    "Into Darkness", player_area() == Glades
 )) }
 !if kwoloks_wisdom { !augment_fun(write_missing_quests(), if Hollow.KwoloksWisdom.Completed == false add_missing_goal_in_area(
     "Kwolok's Wisdom",
-    (questUberStateGroup.kwoloksWisdomQuest != 3 && current_area() == Pools)
-    || (questUberStateGroup.kwoloksWisdomQuest == 3 && current_area() == Hollow)
+    (questUberStateGroup.kwoloksWisdomQuest != 3 && player_area() == Pools)
+    || (questUberStateGroup.kwoloksWisdomQuest == 3 && player_area() == Hollow)
 )) }
 !if rebuilding_the_glades { !augment_fun(write_missing_quests(), if Glades.RebuildGlades.Completed == false add_missing_goal_in_area(
-    "Rebuilding the Glades", current_area() == Glades
+    "Rebuilding the Glades", player_area() == Glades
 )) }
 !if regrowing_the_glades { !augment_fun(write_missing_quests(), if Glades.RegrowGlades.Completed == false add_missing_goal_in_area(
-    "Regrowing the Glades", current_area() == Glades
+    "Regrowing the Glades", player_area() == Glades
 )) }
 !augment_fun(write_missing_quests(), add_current_row())
 

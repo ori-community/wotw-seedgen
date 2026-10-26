@@ -34,13 +34,13 @@
     // TODO on change current area / regenerate?
     on tick if
     (
-        current_area() == Woods
-        || current_area() == Reach
-        || current_area() == Depths
-        || current_area() == Pools
-        || current_area() == Wastes
-        || current_area() == Ruins
-        || current_area() == Willow
+        player_area() == Woods
+        || player_area() == Reach
+        || player_area() == Depths
+        || player_area() == Pools
+        || player_area() == Wastes
+        || player_area() == Ruins
+        || player_area() == Willow
     )
     && is_in_rectangle(-486, -3773, -476, -3763) == false
     && skills.regenerate == false {
