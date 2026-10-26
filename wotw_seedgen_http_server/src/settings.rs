@@ -89,7 +89,7 @@ fn inline_snippet<'c>(
         return;
     };
 
-    let SchemaResult::Ok(snippet_info) = &cache.snippet_info[identifier] else {
+    let Some(SchemaResult::Ok(snippet_info)) = cache.snippet_info.get(identifier) else {
         return;
     };
 
