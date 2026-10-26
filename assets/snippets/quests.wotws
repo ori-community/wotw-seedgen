@@ -143,7 +143,20 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tra
 )) }
 !augment_fun(write_missing_quests(), add_current_row())
 
-on change tracker.questsFinished update_goals()
+// have to update on every quest step because of the area highlighting above
+!if silent_teeth { on change kwolokGroupDescriptor.cleanseWellspringQuestUberState update_goals() }
+!if missing_key { on change npcsStateGroup.marshKeystoneQuest update_goals() }
+!if into_burrows { on change npcsStateGroup.inkwaterWellQuest update_goals() }
+!if lost_compass { on change questUberStateGroup.braveMokiQuest update_goals() }
+!if little_braver { on change questUberStateGroup.familyReunionQuest update_goals() }
+!if family_reunion { on change questUberStateGroup.familyReunionQuest update_goals() }
+!if tree_keeper { on change questUberStateGroup.treeKeeperQuest update_goals() }
+!if rough_diamond { on change questUberStateGroup.desertCogQuest update_goals() }
+!if hand_to_hand { on change questUberStateGroup.tradeSequenceQuest update_goals() }
+!if into_darkness { on change questUberStateGroup.darkCaveQuest update_goals() }
+!if kwoloks_wisdom { on change questUberStateGroup.kwoloksWisdomQuest update_goals() }
+!if rebuilding_the_glades { on change questUberStateGroup.rebuildGladesQuest update_goals() }
+!if regrowing_the_glades { on change questUberStateGroup.regrowGladesQuest update_goals() }
 
 !if silent_teeth {
     on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 4 {
