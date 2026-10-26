@@ -199,7 +199,7 @@ fn select_presets(
             .unwrap_or_default()
             .into_iter()
             .map(|index| available_presets[index].identifier.clone())
-            .collect::<Vec<_>>();
+            .collect();
 
         multi_select_custom_report(&prompt, &selected);
 
@@ -493,7 +493,7 @@ fn select_snippets(
         .unwrap_or_default()
         .into_iter()
         .map(|index| available_snippets[index].identifier.clone())
-        .collect::<Vec<_>>();
+        .collect();
 
     multi_select_custom_report(&prompt, &selected);
 
@@ -730,7 +730,7 @@ where
         .collect()
 }
 
-fn multi_select_custom_report(prompt: &str, selected: &[String]) {
+fn multi_select_custom_report(prompt: &str, selected: &FxHashSet<String>) {
     eprintln!(
         "{prompt}: {}",
         selected

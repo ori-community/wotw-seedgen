@@ -162,7 +162,7 @@ fn generation(c: &mut Criterion) {
         .unwrap();
     universe_settings.world_settings[0]
         .snippets
-        .push("trees".to_owned());
+        .insert("trees".to_owned());
 
     for (identifier, preset) in TEST_ASSETS.world_base_presets() {
         let mut universe_settings = universe_settings.clone();

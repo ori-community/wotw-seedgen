@@ -202,7 +202,7 @@ pub struct WorldSettings {
     /// Randomize entrance connections with the given max loop size
     pub randomize_entrances: Option<GreaterOneU8>,
     /// Names of snippets to use
-    pub snippets: Vec<String>,
+    pub snippets: FxHashSet<String>,
     /// Configuration to pass to snippets
     pub snippet_config: FxHashMap<String, FxHashMap<String, String>>,
 }

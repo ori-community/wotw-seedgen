@@ -816,8 +816,8 @@ impl FromArgMatches for SeedSettings {
             |world_preset, snippet: &String| {
                 world_preset
                     .snippets
-                    .get_or_insert_with(Vec::new)
-                    .push(snippet.clone());
+                    .get_or_insert_with(FxHashSet::default)
+                    .insert(snippet.clone());
             },
         )?;
 

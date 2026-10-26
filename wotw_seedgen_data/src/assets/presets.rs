@@ -2,6 +2,7 @@ use crate::{
     assets::SnippetAccess, settings::GameDifficulties, Difficulty, GreaterOneU8, Spawn, Trick,
     UniverseSettings, WorldSettings, DEFAULT_SPAWN,
 };
+use itertools::Itertools;
 use rustc_hash::{FxHashMap, FxHashSet};
 use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
@@ -389,7 +390,7 @@ pub struct WorldPresetSettings {
     /// Randomize entrance connections with the given max loop size
     pub randomize_entrances: Option<GreaterOneU8>,
     /// Names of snippets to use
-    pub snippets: Option<Vec<String>>,
+    pub snippets: Option<FxHashSet<String>>,
     /// Configuration to pass to snippets
     pub snippet_config: Option<FxHashMap<String, FxHashMap<String, String>>>,
 }
@@ -512,25 +513,54 @@ impl WorldPresetSettings {
         }
 
         if let Some(snippets) = &mut self.snippets {
-            for index in 0..snippets.len() {
-                let snippet = &mut snippets[index];
+            let mut extra = Vec::new();
+            let mut removed = Vec::new();
 
+            snippets.retain(|snippet| {
                 match snippet.as_str() {
-                    "util_twillen"
-                    | "vanilla_opher_upgrades"
-                    | "bonus_opher_upgrades"
-                    | "open_mode" => return err_removed(snippet),
-                    "autoplants" => *snippet = "no_cutscenes".to_string(),
+                    "util_twillen" => removed.push("util_twillen"),
+                    "vanilla_opher_upgrades" => removed.push("vanilla_opher_upgrades"),
+                    "bonus_opher_upgrades" => removed.push("bonus_opher_upgrades"),
+                    "open_mode" => removed.push("open_mode"),
+                    "autoplants" => {
+                        extra.push("no_cutscenes");
+                        return false;
+                    }
                     "better_stomp"
                     | "fragment_overflow"
                     | "tp_refill"
-                    | "shriek_escape_health_bar" => *snippet = "better_mechanics".to_string(),
-                    "no_rain" => {
-                        *snippet = "no_storm".to_string();
-                        snippets.push("no_howl".to_string());
+                    | "shriek_escape_health_bar" => {
+                        extra.push("better_mechanics");
+                        return false;
                     }
-                    "zone_hints" => *snippet = "area_hints".to_string(),
+                    "no_rain" => {
+                        extra.push("no_storm");
+                        extra.push("no_howl");
+                        return false;
+                    }
+                    "zone_hints" => {
+                        extra.push("area_hints");
+                        return false;
+                    }
                     _ => {}
+                }
+
+                true
+            });
+
+            match removed.len() {
+                0 => snippets.extend(extra.into_iter().map(str::to_string)),
+                1 => {
+                    return Err(format!(
+                        "{} was removed from the settings available by default",
+                        snippets.iter().next().unwrap(),
+                    ));
+                }
+                _ => {
+                    return Err(format!(
+                        "{} were removed from the settings available by default",
+                        snippets.iter().format(", "),
+                    ));
                 }
             }
         }
@@ -594,12 +624,6 @@ impl Tricks {
             Tricks::Some(tricks) => tricks.contains(trick),
         }
     }
-}
-
-fn err_removed(identifier: &str) -> Result<(), String> {
-    Err(format!(
-        "{identifier} was removed from the settings available by default"
-    ))
 }
 
 /// Access to presets by identifier
@@ -667,15 +691,12 @@ mod tests {
             assets_version: 0,
             info: None,
             settings: WorldPresetSettings {
-                snippets: Some(vec!["util_twillen".to_string()]),
+                snippets: Some(FxHashSet::from_iter(["util_twillen".to_string()])),
                 ..Default::default()
             },
         };
 
-        assert_eq!(
-            preset.check_compability().map(|_| ()),
-            err_removed("util_twillen")
-        );
+        assert!(preset.check_compability().is_err());
     }
 
     #[test]
@@ -684,11 +705,11 @@ mod tests {
             assets_version: 0,
             info: None,
             settings: WorldPresetSettings {
-                snippets: Some(vec![
+                snippets: Some(FxHashSet::from_iter([
                     "bonus_items".to_string(),
                     "autoplants".to_string(),
                     "better_stomp".to_string(),
-                ]),
+                ])),
                 ..Default::default()
             },
         };
@@ -696,11 +717,11 @@ mod tests {
         assert_eq!(
             preset.check_compability(),
             Ok(WorldPresetSettings {
-                snippets: Some(vec![
+                snippets: Some(FxHashSet::from_iter([
                     "bonus_items".to_string(),
                     "no_cutscenes".to_string(),
                     "better_mechanics".to_string()
-                ]),
+                ])),
                 ..Default::default()
             })
         );
