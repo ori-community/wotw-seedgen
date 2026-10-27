@@ -21,13 +21,13 @@ on hubUberStateGroup.builderProjectOpenCave == 0 && gromShop.clearTheCaveEntranc
 on hubUberStateGroup.builderProjectBeautify > 0 || gromShop.theGorlekTouch show_the_gorlek_touch()
 on hubUberStateGroup.builderProjectBeautify == 0 && gromShop.theGorlekTouch == false hide_the_gorlek_touch()
 
-on gromShop.repairTheSpiritWell store(gladesProjects.repairTheSpiritWell, true)
+on gromShop.repairTheSpiritWell store(Glades.Buildings.RepairTheSpiritWell, true)
 on gromShop.dwellingRepairs store(Glades.Buildings.DwellingRepairs, true)
 on gromShop.roofsOverHeads store(Glades.Buildings.RoofsOverHeads, true)
 on gromShop.onwardsAndUpwards store(Glades.Buildings.OnwardsAndUpwards, true)
 on gromShop.thornySituation store(Glades.Buildings.ThornySituation, true)
 on gromShop.clearTheCaveEntrance store(Glades.Buildings.ClearTheCaveEntrance, true)
-on gromShop.theGorlekTouch store(gladesProjects.theGorlekTouch, true)
+on gromShop.theGorlekTouch store(Glades.Buildings.TheGorlekTouch, true)
 
 on spawn {
     set_shop_item_data(

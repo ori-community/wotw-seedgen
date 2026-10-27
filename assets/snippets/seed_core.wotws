@@ -77,13 +77,13 @@ on Pools.CentralTeleporter {
   store(Pools.CentralTPSwim.Drained, true)
 }
 
-on gladesProjects.repairTheSpiritWell
+on Glades.Buildings.RepairTheSpiritWell
 && Glades.Buildings.DwellingRepairs
 && Glades.Buildings.RoofsOverHeads
 && Glades.Buildings.OnwardsAndUpwards
 && Glades.Buildings.ThornySituation
 && Glades.Buildings.ClearTheCaveEntrance
-&& gladesProjects.theGorlekTouch
+&& Glades.Buildings.TheGorlekTouch
     store(questUberStateGroup.rebuildGladesQuest, 2)
 
 on Glades.Plants.Lightcatchers
