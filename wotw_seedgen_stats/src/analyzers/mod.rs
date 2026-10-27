@@ -9,14 +9,15 @@ mod item_location;
 mod item_unlock;
 mod location_item;
 mod location_unlock;
+// TODO progression_item?
 mod progression;
+mod progression_locations;
 mod spawn_item_count;
 mod spawn_items;
 mod spawn_location;
 mod spawn_region;
 mod step_size;
 mod total_spirit_light;
-// TODO idea: progression_location analyzer for which locations get chosen for progression
 
 // TODO use contained_writes for analysis instead of common_items?
 
@@ -32,6 +33,7 @@ pub use item_unlock::ItemUnlockStats;
 pub use location_item::LocationItemStats;
 pub use location_unlock::LocationUnlockStats;
 pub use progression::ProgressionStats;
+pub use progression_locations::ProgressionLocationsStats;
 pub use spawn_item_count::SpawnItemCountStats;
 pub use spawn_items::SpawnItemStats;
 pub use spawn_location::SpawnLocationStats;
