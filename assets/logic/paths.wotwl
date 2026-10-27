@@ -674,7 +674,8 @@ anchor MarshSpawn.BurrowsEntry at -937, -4494:  # At the bells puzzle
     kii: WaterDash, Damage=20
     unsafe: Water OR Damage=10  # TP to safety
 
-  conn Tokk: free
+  # despawns
+  # conn Tokk: free
   conn MidnightBurrows.Teleporter:
     moki: Marsh.Bells.BurrowsOpen
   conn MarshSpawn.BeforeBurrows:
@@ -10863,7 +10864,8 @@ anchor UpperReach.KeystoneRoom at -256, -3914:  # At the furnace in the four key
       Damage=20, WaterDash
       Damage=60
 
-  conn Tokk: free
+  # despawns
+  # conn Tokk: free
   conn UpperReach.UpperSoup:  # check for redundancies with OutsideTreeRoom and KeystoneSnapPlant
     moki:
       # these paths go through the hidden area below the soup
@@ -15601,12 +15603,13 @@ anchor LowerWastes.CentralTP at 1992, -3902:  # Location of the east teleporter
     moki: Burrow
 
   conn Teleporters: free
-  conn Tokk:
-    moki:
-      DoubleJump OR Burrow OR Launch
-      Bash, Grenade=1
-    gorlek: Sword OR Hammer
-    kii: Spear=1 OR Flash=1 OR Sentry=1
+  # despawns
+  # conn Tokk:
+  #   moki:
+  #     DoubleJump OR Burrow OR Launch
+  #     Bash, Grenade=1
+  #   gorlek: Sword OR Hammer
+  #   kii: Spear=1 OR Flash=1 OR Sentry=1
   conn LowerWastes.LeverArea:
     moki: Burrow
   conn LowerWastes.UpperPath:
