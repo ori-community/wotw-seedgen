@@ -75,6 +75,18 @@ pub enum Analyzer {
         reset = Reset.render(),
     ))]
     LocationItem { location: String },
+    #[command(about = format!(
+        "Analyzes how many locations are reachable before a location unlocks\n\
+        Use '{literal}location-unlock:<location>{reset}' to specify which location to analyze (Example: '{literal}location-item:Glades.RebuildGlades.Completed{reset}')\n\
+        Optionally use '{literal}item-unlock:<item-name>,<result-bucket-size>{reset}' to group results together in buckets",
+        literal = LITERAL.render(),
+        reset = Reset.render(),
+    ))]
+    LocationUnlock {
+        location: String,
+        #[arg(default_value = "1")]
+        result_bucket_size: NonZeroUsize,
+    },
     /// Analyzes which items get placed as forced progression
     Progression,
     /// Analyzes the amount of spawn items. Mostly makes sense with random spawn, since with the default spawn usually no spawn items are given
