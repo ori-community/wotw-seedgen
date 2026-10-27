@@ -581,7 +581,7 @@ impl Display for CommonItemLogName<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.inner {
             CommonItem::SpiritLight(amount) => write!(f, "{amount} Spirit Light"),
-            CommonItem::HealthFragment => f.write_str("Health Fragment"),
+            CommonItem::HealthFragment => f.write_str("Life Fragment"),
             CommonItem::EnergyFragment => f.write_str("Energy Fragment"),
             CommonItem::GorlekOre => f.write_str("Gorlek Ore"),
             CommonItem::Keystone => f.write_str("Keystone"),

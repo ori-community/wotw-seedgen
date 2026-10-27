@@ -3,7 +3,7 @@
 #description("Various adjustments to improve gameplay mechanics")
 
 !config_boolean(better_stomp, true, "Better Stomp", "Preserve velocity when stomping through portals and into water")
-!config_boolean(fragment_overflow, true, "Fragment Overflow", "When collecting a Health or Energy fragment with the Overflow shard equipped, refill both resources instead of just the matching one")
+!config_boolean(fragment_overflow, true, "Fragment Overflow", "When collecting a Life or Energy fragment with the Overflow shard equipped, refill both resources instead of just the matching one")
 !config_boolean(shriek_escape_health_bar, true, "Shriek Escape Health Bar", "Keeps the health bar visible during Shriek Escape")
 !config_boolean(teleport_refill, true, "Teleport Refill", "Heals you to full when warping to a spirit well")
 

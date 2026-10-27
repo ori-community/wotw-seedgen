@@ -61,17 +61,17 @@ fun energy_regeneration() {
 
 fun health_regeneration() {
     store(health_regenerations, health_regenerations + 1)
-    item_message("#Health Regeneration x" + health_regenerations + "#")
+    item_message("#Life Regeneration x" + health_regenerations + "#")
     store(health_per_second, health_per_second + 10. / 60.)
     update_upgrades()
 }
 !augment_fun(write_upgrades(relevant: Boolean), {
-    if relevant && health_regenerations != 0 add_upgrade("Health Regeneration x" + health_regenerations)
+    if relevant && health_regenerations != 0 add_upgrade("Life Regeneration x" + health_regenerations)
 })
 !item_data(health_regeneration(),
-    "#Health Regeneration#",
+    "#Life Regeneration#",
     200,
-    "Passively regenerate one health orb per minute",
+    "Passively regenerate one life orb per minute",
     health_regeneration_icon,
     BonusItem
 )

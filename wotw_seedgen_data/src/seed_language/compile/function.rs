@@ -1895,7 +1895,7 @@ fn shard_slot_string(remove: bool) -> CommandString {
 }
 
 fn health_fragment_string(remove: bool) -> CommandString {
-    resource_string("Health Fragment", remove)
+    resource_string("Life Fragment", remove)
 }
 
 fn energy_fragment_string(remove: bool) -> CommandString {

@@ -298,7 +298,7 @@ fun upgrade_effects_half(relevant: Boolean) {
     if relevant {
         new_colored_row("#Passive Regeneration#: ")
         if energy_per_second != 0 add_upgrade(energy_per_second + " Energy/s")
-        if health_per_second != 0 add_upgrade(health_per_second + " Health/s")
+        if health_per_second != 0 add_upgrade(health_per_second + " Life/s")
         add_current_colored_row()
     }
 }

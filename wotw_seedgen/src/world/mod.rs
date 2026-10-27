@@ -707,7 +707,7 @@ impl Display for InventoryDisplay<'_, '_, '_, '_, '_> {
 
         let mut first = true;
 
-        amount_item(f, &mut first, self.world.base_max_health(), "Health")?;
+        amount_item(f, &mut first, self.world.base_max_health(), "Life")?;
         amount_item(f, &mut first, self.world.base_max_energy(), "Energy")?;
         resource::<false>(f, &mut first, self.world.spirit_light(), "Spirit Light")?;
         resource::<false>(f, &mut first, self.world.gorlek_ore(), "Gorlek Ore")?;

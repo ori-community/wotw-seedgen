@@ -73,7 +73,7 @@ on reload {
     )
     set_wheel_item_action("root", Left, Ability1, {
         refill()
-        respond("Health and Energy restored")
+        respond("Life and Energy restored")
     })
     set_wheel_item_action("root", Left, Ability2, toggle_auto_refill())
     set_wheel_item_action("root", Left, Ability3, toggle_auto_refill())
@@ -361,7 +361,7 @@ on first_spawn {
 on binding1 if get_integer("bind_pointer") == 0 {
     save()
     refill()
-    controlled_priority_message("response", "Game Saved!\nHealth and Energy restored", 4)
+    controlled_priority_message("response", "Game Saved!\nLife and Energy restored", 4)
 }
 fun refill() {
     store(player.health, player.maxHealth)

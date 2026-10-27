@@ -1,6 +1,6 @@
 #hidden
 #name("Regeneration Core")
-#description("Implements passive energy and health regeneration")
+#description("Implements passive energy and life regeneration")
 
 !include("delta_time", tick)
 

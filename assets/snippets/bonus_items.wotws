@@ -3,7 +3,7 @@
 #description("Shuffles items unique to the randomizer into the world")
 
 !tags("Bonus Items")
-!config_integer(health_regenerations, 3, "Health Regeneration Count", "Gain Health over time")
+!config_integer(health_regenerations, 3, "Life Regeneration Count", "Gain Life over time")
 !config_integer(energy_regenerations, 3, "Energy Regeneration Count", "Gain Energy over time")
 !config_integer(extra_double_jumps, 1, "Extra Double Jump Count", "Add extra jumps when having Double Jump")
 !config_integer(extra_air_dashes, 1, "Extra Air Dash Count", "Allows dashing multiple times without a dash refresh")
