@@ -1,6 +1,7 @@
 pub mod dev;
 
 mod display;
+mod fix_args;
 mod http_server_args;
 mod interactive;
 mod open_args;
@@ -16,6 +17,7 @@ pub use display::{
     AvailablePreset, AvailableSnippet, AVAILABLE_SNIPPETS, AVAILABLE_UNIVERSE_PRESETS,
     AVAILABLE_WORLD_PRESETS,
 };
+pub use fix_args::FixArgs;
 pub use http_server_args::HttpServerArgs;
 pub use open_args::{OpenArgs, OpenDirectory};
 pub use plando_args::PlandoArgs;
@@ -59,6 +61,11 @@ pub enum Cli {
     Plando {
         #[command(flatten)]
         args: PlandoArgs,
+    },
+    /// Automatically apply lints
+    Fix {
+        #[command(flatten)]
+        args: FixArgs,
     },
     /// Generate seed statistics
     ///

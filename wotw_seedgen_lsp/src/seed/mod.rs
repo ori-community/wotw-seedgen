@@ -247,11 +247,12 @@ impl Backend<Cache> {
 
             let (source, errors) = result
                 .errors
+                .inner
                 .into_values()
                 .find(|(source, _)| source.id[..source.id.len() - 6].ends_with(identifier))
                 .unwrap();
 
-            Some((source.content, errors))
+            Some((source.content, errors.errors))
         })
         .await;
     }

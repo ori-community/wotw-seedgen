@@ -1,7 +1,9 @@
 use std::{collections::hash_map::Entry, mem, ops::Range};
 
 use rustc_hash::FxHashMap;
-use wotw_seedgen_parse::{Error, Source};
+use wotw_seedgen_parse::Error;
+
+use crate::seed_language::compile::CompileErrors;
 
 #[derive(Debug, Default)]
 pub struct IdUse {
@@ -35,7 +37,7 @@ impl IdUse {
         warp_icon.finish_snippet(identifier);
     }
 
-    pub fn finish(self, errors: &mut FxHashMap<String, (Source, Vec<Error>)>) {
+    pub fn finish(self, errors: &mut CompileErrors) {
         let Self {
             boolean,
             integer,
@@ -91,14 +93,14 @@ impl IdUseMap {
         }
     }
 
-    pub fn finish(self, errors: &mut FxHashMap<String, (Source, Vec<Error>)>) {
+    pub fn finish(self, errors: &mut CompileErrors) {
         for status in self.inner.into_values() {
             match status {
                 IdUseStatus::NeverWritten { read_spans } => {
                     debug_assert!(read_spans.current.is_empty());
 
                     for (snippet, spans) in read_spans.finished {
-                        errors.get_mut(&snippet).unwrap().1.extend(
+                        errors.inner.get_mut(&snippet).unwrap().1.errors.extend(
                             spans.into_iter().map(|span| {
                                 Error::warning("id never written to".to_string(), span)
                             }),

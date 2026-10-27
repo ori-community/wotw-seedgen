@@ -25,8 +25,12 @@ use crate::{
     seed_language::{
         ast::{self, Expression, Snippet, UberStateType},
         compile::{
-            self, error::operand_error, ids::IdResolver, lint::LintData,
-            preprocess::PreprocessedFunction, scope::Scopes,
+            self,
+            error::operand_error,
+            ids::IdResolver,
+            lint::{Fix, LintData},
+            preprocess::PreprocessedFunction,
+            scope::Scopes,
         },
         output::{CommandBoolean, IntermediateOutput, Literal, SnippetDebugOutput, VariableValue},
         types::{uber_state_type, InferType, Type},
@@ -54,10 +58,30 @@ pub struct Compiler<'snippets, 'uberstates, 'log> {
     rng: Pcg64Mcg,
     global: GlobalCompilerData<'snippets, 'uberstates, 'log>,
     compiled_snippets: FxHashMap<String, CompileState>,
-    errors: FxHashMap<String, (Source, Vec<Error>)>,
+    errors: CompileErrors,
+    collect_fixes: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
+pub struct CompileErrors {
+    pub inner: FxHashMap<String, (Source, SourceErrors)>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SourceErrors {
+    pub errors: Vec<Error>,
+    pub fixes: Vec<Fix>,
+}
+
+impl SourceErrors {
+    pub fn compilation_failed(&self) -> bool {
+        self.errors
+            .iter()
+            .any(|error| matches!(error.kind.severity(), Severity::Error))
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
 enum CompileState {
     Started,
     Finished,
@@ -269,10 +293,7 @@ impl<'snippets, 'uberstates, 'log> GlobalCompilerData<'snippets, 'uberstates, 'l
         self.lint_data = None;
     }
 
-    pub(crate) fn finish(
-        self,
-        errors: &mut FxHashMap<String, (Source, Vec<Error>)>,
-    ) -> IntermediateOutput<'log> {
+    pub(crate) fn finish(self, errors: &mut CompileErrors) -> IntermediateOutput<'log> {
         if let Some(lint_data) = self.lint_data {
             lint_data.finish(errors);
         }
@@ -506,7 +527,8 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
             rng: Pcg64Mcg::from_rng(rng),
             global: GlobalCompilerData::new(pickups, uber_state_data, snippet_access),
             compiled_snippets: FxHashMap::default(),
-            errors: FxHashMap::default(),
+            errors: CompileErrors::default(),
+            collect_fixes: false,
         }
     }
 
@@ -540,6 +562,15 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
         self
     }
 
+    pub fn with_fixes(mut self, fixes: bool) -> Self {
+        if fixes {
+            self.global.enable_lint();
+        }
+
+        self.collect_fixes = fixes;
+        self
+    }
+
     pub fn with_log_capture(mut self, log_capture: &'log LogCapture) -> Self {
         self.global.output.modifiers.item_metadata.log_capture = log_capture;
         self
@@ -560,24 +591,34 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
 
         let source = self.global.snippet_access.read_snippet(identifier)?;
         let errors = self.compile_source(identifier, &source.content);
-        self.errors.insert(identifier.to_string(), (source, errors));
+        self.errors
+            .inner
+            .insert(identifier.to_string(), (source, errors));
 
         *self.compiled_snippets.get_mut(identifier).unwrap() = CompileState::Finished;
 
         Ok(())
     }
 
-    fn compile_source(&mut self, identifier: &str, source: &str) -> Vec<Error> {
+    fn compile_source(&mut self, identifier: &str, source: &str) -> SourceErrors {
         let ast = Snippet::parse(source);
-        let mut errors = ast.errors;
+        let mut errors = SourceErrors {
+            errors: ast.errors,
+            fixes: Vec::new(),
+        };
 
         if let Some(ast) = ast.parsed {
             if self.global.lint_data.is_some() {
-                lint::lint_ast(&ast, &mut errors);
+                lint::lint_ast(
+                    &ast,
+                    self.global.uber_state_data,
+                    &mut errors,
+                    self.collect_fixes,
+                );
             }
 
             let preprocessor = Preprocessor::preprocess(&ast, &self.global.output);
-            errors.extend(preprocessor.errors);
+            errors.errors.extend(preprocessor.errors);
 
             self.global.output.commands.lookup.extend(
                 // Fill with placeholders for all the functions, this also ensures a sane result if some of the functions fail to compile
@@ -595,7 +636,7 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
 
             for include in &preprocessor.output.includes {
                 if let Err(err) = self.compile_snippet(&include.data) {
-                    errors.push(Error::error(
+                    errors.errors.push(Error::error(
                         format!("Failed to read snippet: {err}"),
                         include.span.clone(),
                     ));
@@ -614,7 +655,7 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
                 preprocessor.output,
             );
 
-            errors.extend(compiler.errors);
+            errors.errors.extend(compiler.errors);
         }
 
         errors
@@ -633,7 +674,7 @@ impl<'snippets, 'uberstates, 'log> Compiler<'snippets, 'uberstates, 'log> {
 #[derive(Debug, Clone)]
 pub struct CompileResult<'log> {
     pub output: IntermediateOutput<'log>,
-    pub errors: FxHashMap<String, (Source, Vec<Error>)>,
+    pub errors: CompileErrors,
 }
 
 impl<'log> CompileResult<'log> {
@@ -642,8 +683,8 @@ impl<'log> CompileResult<'log> {
 
         let mut error_count = 0;
 
-        for (source, errors) in self.errors.into_values() {
-            for error in errors {
+        for (source, errors) in self.errors.inner.into_values() {
+            for error in errors.errors {
                 if error.kind.severity() == Severity::Error {
                     error_count += 1;
                 }

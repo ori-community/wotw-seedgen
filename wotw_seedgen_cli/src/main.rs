@@ -1,5 +1,6 @@
 mod cli;
 mod dev;
+mod fix;
 mod helpers;
 mod http_server;
 mod log_config;
@@ -14,6 +15,7 @@ use bugsalot::debugger;
 use clap::Parser;
 use cli::Cli;
 use dev::dev;
+use fix::fix;
 use open::open;
 use plando::plando;
 use preset::{universe_preset, world_preset};
@@ -40,6 +42,7 @@ fn main() -> Result<(), Error> {
         Cli::UniversePreset { args } => universe_preset(args),
         Cli::WorldPreset { args } => world_preset(args),
         Cli::Plando { args } => plando(args),
+        Cli::Fix { args } => fix(args),
         Cli::Stats { args } => stats(args),
         Cli::Open { args } => open(args),
         Cli::ShellCompletions { shell } => shell_completions(shell),

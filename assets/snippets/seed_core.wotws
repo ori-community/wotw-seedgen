@@ -74,30 +74,30 @@ on spawn {
 
 // Lower water around pools TP when collecting it
 on Pools.CentralTeleporter {
-  store(lumaPoolsStateGroup.waterLowered, true)
+  store(Pools.CentralTPSwim.Drained, true)
 }
 
 on gladesProjects.repairTheSpiritWell
-&& gladesProjects.dwellingRepairs
-&& gladesProjects.roofsOverHeads
-&& gladesProjects.onwardsAndUpwards
-&& gladesProjects.thornySituation
-&& gladesProjects.clearTheCaveEntrance
+&& Glades.Buildings.DwellingRepairs
+&& Glades.Buildings.RoofsOverHeads
+&& Glades.Buildings.OnwardsAndUpwards
+&& Glades.Buildings.ThornySituation
+&& Glades.Buildings.ClearTheCaveEntrance
 && gladesProjects.theGorlekTouch
     store(questUberStateGroup.rebuildGladesQuest, 2)
 
-on gladesProjects.lightcatchersPlanted
-&& gladesProjects.selaFlowersPlanted
-&& gladesProjects.blueMoonPlanted
-&& gladesProjects.stickyGrassPlanted
-&& gladesProjects.springPlantsPlanted
-&& gladesProjects.lastTreePlanted
+on Glades.Plants.Lightcatchers
+&& Glades.Plants.SelaFlowers
+&& Glades.Plants.BlueMoon
+&& Glades.Plants.StickyGrass
+&& Glades.Plants.SpringPlants
+&& Glades.Plants.LastTree
     store(questUberStateGroup.regrowGladesQuest, 2)
 
 // In vanilla, the storm is lifted when getting the ability Sword.
 // In rando, we instead want the storm to be lifted when collecting the Sword tree location.
 on spawn store(modifications.stormLiftedInMarshStateActive, true)
-on Marsh.SwordTree store(modifications.stormLiftedInMarsh, true)
+on Marsh.SwordTree store(Marsh.StormLifted, true)
 // This progresses the Diamond in the Rough quest to 3 immediately after turning in the diamond at Twillen.
 // This prevents the black screen cutscene in Glades from ever playing. When you turn in the diamond in
 // Hollow, which is usually not possible in vanilla, and then walk into Glades, that cutscene would play otherwise.
@@ -116,7 +116,7 @@ on Wellspring.Escape.Reward if kwolokGroupDescriptor.cleanseWellspringQuestUberS
 // The behaviour described above can make the quest exceed its intended values, which causes Tuley to despawn again.
 // We may not be able to set the quest down in multiplayer synced games (or currently in general - client prevents it) so we manually reimplement Tuley.
 on spawn store(modifications.spawnTuleyStateActive, true)
-on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 4 store(modifications.spawnTuley, true)
+on Hollow.SilentTeeth.Completed store(Glades.TuleySpawned, true)
 // No one remembers what this does anymore.
 on _petrifiedForestGroup.chaseState == 7 store(_petrifiedForestGroup.chaseState, 8)
 // This is presumed to fix some multiplayer bug but no one really knows.
@@ -126,20 +126,20 @@ on Willow.MinibossHeart store(willowsEndGroup.laserShooterBossState, 4)
 on spawn store(modifications.canOpenMokiFatherHutStateActive, true)
 // When receiving the key, allow opening the hut
 on questUberStateGroup.familyReunionQuest == 2 {
-    store(modifications.canOpenMokiFatherHut, true)
+    store(Woods.MokiHut.CanOpen, true)
     // If DollQI is already collected and we have previously reverted this state, skip the DollQI quest step
     if Woods.FamilyReunion.Doll store(questUberStateGroup.familyReunionQuest, 3)
 }
 // If DollQI is collected without having opened the hut, revert the quest state to its previous value
-on questUberStateGroup.familyReunionQuest > 2 if modifications.canOpenMokiFatherHut == false {
-    if gladesProjects.dwellingRepairs == false store(questUberStateGroup.familyReunionQuest, 0)
-    if gladesProjects.dwellingRepairs store(questUberStateGroup.familyReunionQuest, 1)
+on questUberStateGroup.familyReunionQuest > 2 if Woods.MokiHut.CanOpen == false {
+    if Glades.Buildings.DwellingRepairs == false store(questUberStateGroup.familyReunionQuest, 0)
+    if Glades.Buildings.DwellingRepairs store(questUberStateGroup.familyReunionQuest, 1)
 }
 // Patience Skip can lock you out of the escape reward. This fix gives the expected rewards when teleporting away in the cutscene area.
 on windtornRuinsGroup.desertRuinsEscape == 3 if is_in_rectangle(2048, -3573, 2154, -3539) {
     position_trigger_rectangle("seir_walk", 2048, -3573, 2154, -3539)
-    position_trigger_leave_callback("seir_walk", if windtornRuinsGroup.wispRewardPickup == false {
-        store(windtornRuinsGroup.wispRewardPickup, true)
+    position_trigger_leave_callback("seir_walk", if Ruins.Wisp == false {
+        store(Ruins.Wisp, true)
         store(player.baseMaxHealth, player.baseMaxHealth + 10)
         store(player.health, player.maxHealth)
         store(player.baseMaxEnergy, player.baseMaxEnergy + 1)

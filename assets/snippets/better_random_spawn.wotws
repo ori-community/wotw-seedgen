@@ -15,6 +15,5 @@ on spawn {
     // For settings that can't use reverse breaks or the unintuitive Double Jump tree interaction
     store(Marsh.Den.BottomAreaWall, true)
     // For settings that can't wedge past the skull
-    // TODO write logic
-    store(_petrifiedForestGroup.skeletonState, true)
+    store(Woods.GiantSkull.Corruption, true)
 }

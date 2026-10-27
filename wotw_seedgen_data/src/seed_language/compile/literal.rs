@@ -1,6 +1,8 @@
 use super::{Compile, SnippetCompiler};
 use crate::{
-    assets::{RandoUberStateGroup, UberStateAlias, UberStateData, UberStateNameEntry},
+    assets::{
+        RandoUberStateGroup, UberStateAlias, UberStateData, UberStateDataEntry, UberStateNameEntry,
+    },
     seed_language::{ast, compile::helpers::suggestion, output::Literal},
     UberIdentifier,
 };
@@ -60,17 +62,41 @@ impl ast::UberIdentifier<'_> {
     pub(crate) fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
         match self {
             ast::UberIdentifier::Numeric(numeric) => {
-                numeric.member.value.as_option().map(|member| {
-                    UberStateAlias::identifier(UberIdentifier::new(numeric.group.data, member.data))
-                })
+                numeric.resolve().map(UberStateAlias::identifier)
             }
             ast::UberIdentifier::Name(name) => name.resolve(compiler),
         }
     }
+
+    pub(crate) fn inspect_resolve(
+        &self,
+        uber_state_data: &UberStateData,
+    ) -> Option<UberStateAlias> {
+        match self {
+            ast::UberIdentifier::Numeric(numeric) => {
+                numeric.resolve().map(UberStateAlias::identifier)
+            }
+            ast::UberIdentifier::Name(name) => name.inspect_resolve(uber_state_data),
+        }
+    }
+}
+
+impl ast::UberIdentifierNumeric {
+    pub(crate) fn resolve(&self) -> Option<UberIdentifier> {
+        let member = self.member.value.as_option()?.data;
+        Some(UberIdentifier::new(self.group.data, member))
+    }
+
+    pub(crate) fn inspect<'u>(
+        &self,
+        uber_state_data: &'u UberStateData,
+    ) -> Option<&'u UberStateDataEntry> {
+        uber_state_data.id_lookup.get(&self.resolve()?)
+    }
 }
 
 impl ast::UberIdentifierName<'_> {
-    fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
+    pub(crate) fn resolve(&self, compiler: &mut SnippetCompiler) -> Option<UberStateAlias> {
         let Some(group) = compiler
             .global
             .uber_state_data
@@ -174,6 +200,37 @@ impl ast::UberIdentifierName<'_> {
                     rando_group.root_member.clone()
                 }
             },
+        }
+    }
+
+    pub(crate) fn inspect<'u>(
+        &self,
+        uber_state_data: &'u UberStateData,
+    ) -> Option<&'u UberStateNameEntry> {
+        let group = self.group.data.0;
+        let member = self.member.value.as_option()?.data.0;
+        uber_state_data.name_lookup.get(group)?.get(member)
+    }
+
+    pub(crate) fn inspect_resolve(
+        &self,
+        uber_state_data: &UberStateData,
+    ) -> Option<UberStateAlias> {
+        match self.inspect(uber_state_data)? {
+            UberStateNameEntry::Vanilla(ids) => {
+                if ids.len() == 1 {
+                    ids.first().copied().map(UberStateAlias::identifier)
+                } else {
+                    None
+                }
+            }
+            UberStateNameEntry::Rando(group) => match &self.pickup {
+                SpannedOption::Some(pickup) => group
+                    .members
+                    .get(pickup.identifier.value.as_option()?.data.0),
+                SpannedOption::None(_) => group.root_member.as_ref(),
+            }
+            .cloned(),
         }
     }
 }

@@ -24,10 +24,10 @@ on spawn {
     store(questUberStateGroup.tradeSequenceQuest, 11)
     store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 4)
     store(hubUberStateGroup.gardenerProjectTree, 3)
-    store(_petrifiedForestGroup.hutDoorUnlocked, true)
+    store(Woods.MokiHut.Open, true)
     store(questUberStateGroup.desertCogQuest, 5)
 }
 on Glades.Buildings.DwellingRepairs {
-    store(hubUberStateGroup.fatherMokiGone, true)
+    store(Glades.FatherMokiGone, true)
     store(questUberStateGroup.familyReunionQuest, 4)
 }

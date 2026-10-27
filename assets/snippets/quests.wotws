@@ -159,7 +159,7 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tra
 !if regrowing_the_glades { on change questUberStateGroup.regrowGladesQuest update_goals() }
 
 !if silent_teeth {
-    on kwolokGroupDescriptor.cleanseWellspringQuestUberState >= 4 {
+    on Hollow.SilentTeeth.Completed {
         create_stats_entry(QuestEnd, "The Silent Teeth")
         store(tracker.questsFinished, tracker.questsFinished + 1)
     }
@@ -215,9 +215,8 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tra
     on Glades.Plants.LastTree == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
-// TODO we lack fully accurate simulation in cases where quests set multiple states.
 !if rough_diamond {
-    on questUberStateGroup.desertCogQuest >= 5 {
+    on Glades.RoughDiamond.Completed {
         create_stats_entry(QuestEnd, "A Diamond in the Rough")
         store(tracker.questsFinished, tracker.questsFinished + 1)
     }

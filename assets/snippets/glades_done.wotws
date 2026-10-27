@@ -11,12 +11,12 @@ on spawn {
     store(questUberStateGroup.regrowGladesQuest, 2)
     // TODO block tuley shop
     // Plant Seeds
-    store(gladesProjects.blueMoonPlanted, true)
-    store(gladesProjects.stickyGrassPlanted, true)
-    store(gladesProjects.springPlantsPlanted, true)
-    store(gladesProjects.lightcatchersPlanted, true)
-    store(gladesProjects.selaFlowersPlanted, true)
-    store(gladesProjects.lastTreePlanted, true)
+    store(Glades.Plants.BlueMoon, true)
+    store(Glades.Plants.StickyGrass, true)
+    store(Glades.Plants.SpringPlants, true)
+    store(Glades.Plants.Lightcatchers, true)
+    store(Glades.Plants.SelaFlowers, true)
+    store(Glades.Plants.LastTree, true)
     // Shop from Grom (should eventually become conditional if we have random items in Groms shop)
     store(gromShop.dwellingRepairs, true)
     store(gromShop.roofsOverHeads, true)

@@ -146,6 +146,8 @@ impl<H: Handler, T: Traverse<H>, R> Traverse<H> for Recoverable<T, R> {
 
 impl<H: Handler> Traverse<H> for Expression<'_> {
     fn traverse(&self, handler: &mut H) {
+        handler.expression(self);
+
         match self {
             Self::Value(value) => value.traverse(handler),
             Self::Operation(operation) => operation.traverse(handler),
@@ -940,6 +942,10 @@ pub trait Handler {
         let _ = uber_identifier;
     }
 
+    fn expression(&mut self, expression: &Expression) {
+        let _ = expression;
+    }
+
     fn identifier(&mut self, identifier: &Spanned<Identifier>) {
         let _ = identifier;
     }
@@ -1038,6 +1044,11 @@ impl<H1: Handler, H2: Handler> Handler for (H1, H2) {
     fn uber_identifier(&mut self, uber_identifier: &UberIdentifier) {
         self.0.uber_identifier(uber_identifier);
         self.1.uber_identifier(uber_identifier);
+    }
+
+    fn expression(&mut self, expression: &Expression) {
+        self.0.expression(expression);
+        self.1.expression(expression);
     }
 
     fn identifier(&mut self, identifier: &Spanned<Identifier>) {

@@ -11,12 +11,12 @@ on change Wellspring.ThirdFloor.Seed store(blue_moon, Wellspring.ThirdFloor.Seed
 on change Reach.Seed store(spring_plants, Reach.Seed)
 on change Woods.TreeKeeper.Seed store(last_tree, Woods.TreeKeeper.Seed)
 
-on tuleyShop.selaFlowers store(gladesProjects.selaFlowersPlanted, true)
-on tuleyShop.stickyGrass store(gladesProjects.stickyGrassPlanted, true)
-on tuleyShop.lightcatchers store(gladesProjects.lightcatchersPlanted, true)
-on tuleyShop.blueMoon store(gladesProjects.blueMoonPlanted, true)
-on tuleyShop.springPlants store(gladesProjects.springPlantsPlanted, true)
-on tuleyShop.lastTree store(gladesProjects.lastTreePlanted, true)
+on tuleyShop.selaFlowers store(Glades.Plants.SelaFlowers, true)
+on tuleyShop.stickyGrass store(Glades.Plants.StickyGrass, true)
+on tuleyShop.lightcatchers store(Glades.Plants.Lightcatchers, true)
+on tuleyShop.blueMoon store(Glades.Plants.BlueMoon, true)
+on tuleyShop.springPlants store(Glades.Plants.SpringPlants, true)
+on tuleyShop.lastTree store(Glades.Plants.LastTree, true)
 
 on spawn {
     set_shop_item_icon(tuleyShop.selaFlowers, SelaFlowers)

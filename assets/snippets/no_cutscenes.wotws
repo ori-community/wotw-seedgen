@@ -28,7 +28,7 @@ on spawn {
     store(windsweptWastesGroupDescriptor.wispSequencePlayedOut, true) // Voice dialogue at Wastes entrance
     store(howlsOriginGroup.interactedWithTokk, true) // Forced Tokk dialogue at bell puzzle
     store(waterMillStateGroupDescriptor.rescuedOpher, true) // TODO what this?
-    store(lumaPoolsStateGroup.talkedToKwolok, true) // Kwolok dialogue before going up to Water Dash
+    store(Pools.SeedRoom.KwolokMet, true) // Kwolok dialogue before going up to Water Dash
     if questUberStateGroup.findToadQuestUberState < 1 store(questUberStateGroup.findToadQuestUberState, 1) // TODO what this?
     if kwolokGroupDescriptor.cleanseWellspringQuestUberState < 2 store(kwolokGroupDescriptor.cleanseWellspringQuestUberState, 2) // Cutscene in front of Wellspring
     store(windtornRuinsGroup.ruinsVisited, true) // Cinematic when entering Ruins
@@ -90,7 +90,7 @@ on spawn {
 
 on Hollow.Wisp store(Hollow.Hornbug.VoiceDoor, true)
 on skills.glide store(Hollow.DepthsOpen, true)
-on gladesProjects.thornySituation if hubUberStateGroup.builderProjectOpenCave == 0 store(hubUberStateGroup.builderProjectOpenCave, 1)
+on Glades.Buildings.ThornySituation if hubUberStateGroup.builderProjectOpenCave == 0 store(hubUberStateGroup.builderProjectOpenCave, 1)
 on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3) // Skip talking to the moki again after completing the pools wisp quest
 on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)
 

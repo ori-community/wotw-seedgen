@@ -22,7 +22,6 @@ use wotw_seedgen_data::{
     assets::{ChainedSnippetAccess, Pickups, PickupsEntry, SnippetAccess, UberStateData},
     env_or,
     logic_language::output::Graph,
-    parse::Severity,
     seed_language::{compile::Compiler, output::IntermediateOutput, simulate::UberStates},
     UniverseSettings, WorldSettings,
 };
@@ -204,12 +203,9 @@ fn parse_snippets<'log>(
 
     let failed_snippets = result
         .errors
+        .inner
         .iter()
-        .filter(|(_, (_, errors))| {
-            errors
-                .iter()
-                .any(|error| error.kind.severity() == Severity::Error)
-        })
+        .filter(|(_, (_, errors))| errors.compilation_failed())
         .map(|(identifier, _)| identifier.clone())
         .collect::<Vec<_>>();
 

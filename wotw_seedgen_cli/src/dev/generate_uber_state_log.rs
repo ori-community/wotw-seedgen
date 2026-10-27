@@ -4,10 +4,11 @@ use wotw_seedgen::{
     data::{
         assets::{
             self, DefaultFileAccess, InlineSnippets, KnownAssetAccess, UberStateData,
-            SEEDGEN_USER_DATA_DIR,
+            UberStateNameEntry, SEEDGEN_USER_DATA_DIR,
         },
         parse::Source,
         seed_language::{compile::Compiler, output::PlaceholderMap},
+        UberIdentifier,
     },
     seed::{PlandoAttributes, Seed},
 };
@@ -26,12 +27,15 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
     )
     .to_string();
 
-    let uber_state_dump = DefaultFileAccess.uber_state_dump().unwrap();
+    let pickups = DefaultFileAccess.pickups()?;
+    let states = DefaultFileAccess.states()?;
+    let uber_state_dump = DefaultFileAccess.uber_state_dump()?;
+    let uber_state_data = DefaultFileAccess.uber_state_data(&pickups, &states)?;
 
-    for (group_id, group) in &uber_state_dump.groups {
-        for (state_id, state) in &group.states {
+    for (&group_id, group) in &uber_state_dump.groups {
+        for (&member_id, state) in &group.states {
             if matches!(
-                (group_id, state_id),
+                (group_id, member_id),
                 (8 | 9 | 10 | 12 | 14 | 8246 | 33399, _)
                     | (5, 40 | 41)
                     | (30, 1 | 2)
@@ -42,12 +46,33 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
                 continue;
             }
 
-            writeln!(
-                &mut source,
-                "on change {group_id}|{state_id} uber_state_log_message(\"#{group_name}.{state_name}# ({group_id}|{state_id}) -> \" + {group_id}|{state_id})",
-                group_name = group.name,
-                state_name = state.name
-            ).unwrap();
+            let entry = &uber_state_data.id_lookup[&UberIdentifier::new(group_id, member_id)];
+
+            match &entry.rando_name {
+                None => {
+                    let (group, member) = entry.name.split_once('.').unwrap();
+                    let UberStateNameEntry::Vanilla(ids) = &uber_state_data.name_lookup[group][member] else {continue};
+
+                    if ids.len() == 1 {
+                        writeln!(
+                            &mut source,
+                            "on change {name} uber_state_log_message(\"#{name}# ({group_id}|{member_id}) -> \" + {name})",
+                            name = entry.name,
+                        )?;
+                    } else {
+                        writeln!(
+                            &mut source,
+                            "on change {group_id}|{member_id} uber_state_log_message(\"#{name}# ({group_id}|{member_id}) -> \" + {group_id}|{member_id})",
+                            name = entry.name,
+                        )?;
+                    }
+                },
+                Some(rando_name) => writeln!(
+                    &mut source,
+                    "on change {rando_name} uber_state_log_message(\"#{rando_name}# / #{name}# ({group_id}|{member_id}) -> \" + {rando_name})",
+                    name = entry.name,
+                )?,
+            }
         }
     }
 

@@ -2,19 +2,19 @@
 #name("Vanilla Grom Shop")
 #description("Places the building projects in the Grom shop and unlocks them by the vanilla logic")
 
-on questUberStateGroup.familyReunionQuest >= 1 store(hubUberStateGroup.builderProjectHouses, 1)  // Softlock fix for vanilla never enabling the houses if a quest step is skipped
+on Glades.FamilyReunion.Started store(hubUberStateGroup.builderProjectHouses, 1)  // Softlock fix for vanilla never enabling the houses if a quest step is skipped
 on hubUberStateGroup.builderProjectHouses > 0 || gromShop.dwellingRepairs show_dwelling_repairs()
 on hubUberStateGroup.builderProjectHouses == 0 && gromShop.dwellingRepairs == false hide_dwelling_repairs()
 
-on gladesProjects.dwellingRepairs store(hubUberStateGroup.builderProjectHousesB, 1)
+on Glades.Buildings.DwellingRepairs store(hubUberStateGroup.builderProjectHousesB, 1)
 on hubUberStateGroup.builderProjectHousesB > 0 || gromShop.roofsOverHeads show_roofs_over_heads()
 on hubUberStateGroup.builderProjectHousesB == 0 && gromShop.roofsOverHeads == false hide_roofs_over_heads()
 
-on gladesProjects.roofsOverHeads store(hubUberStateGroup.builderProjectHousesC, 1)
+on Glades.Buildings.RoofsOverHeads store(hubUberStateGroup.builderProjectHousesC, 1)
 on hubUberStateGroup.builderProjectHousesC > 0 || gromShop.onwardsAndUpwards show_onwards_and_upwards()
 on hubUberStateGroup.builderProjectHousesC == 0 && gromShop.onwardsAndUpwards == false hide_onwards_and_upwards()
 
-on questUberStateGroup.darkCaveQuest >= 1 store(hubUberStateGroup.builderProjectOpenCave, 1)  // Softlock fix for vanilla never enabling the cave if a quest step is skipped
+on Glades.IntoDarkness.Started store(hubUberStateGroup.builderProjectOpenCave, 1)  // Softlock fix for vanilla never enabling the cave if a quest step is skipped
 on hubUberStateGroup.builderProjectOpenCave > 0 || gromShop.clearTheCaveEntrance show_clear_the_cave_entrance()
 on hubUberStateGroup.builderProjectOpenCave == 0 && gromShop.clearTheCaveEntrance == false hide_clear_the_cave_entrance()
 
@@ -22,11 +22,11 @@ on hubUberStateGroup.builderProjectBeautify > 0 || gromShop.theGorlekTouch show_
 on hubUberStateGroup.builderProjectBeautify == 0 && gromShop.theGorlekTouch == false hide_the_gorlek_touch()
 
 on gromShop.repairTheSpiritWell store(gladesProjects.repairTheSpiritWell, true)
-on gromShop.dwellingRepairs store(gladesProjects.dwellingRepairs, true)
-on gromShop.roofsOverHeads store(gladesProjects.roofsOverHeads, true)
-on gromShop.onwardsAndUpwards store(gladesProjects.onwardsAndUpwards, true)
-on gromShop.thornySituation store(gladesProjects.thornySituation, true)
-on gromShop.clearTheCaveEntrance store(gladesProjects.clearTheCaveEntrance, true)
+on gromShop.dwellingRepairs store(Glades.Buildings.DwellingRepairs, true)
+on gromShop.roofsOverHeads store(Glades.Buildings.RoofsOverHeads, true)
+on gromShop.onwardsAndUpwards store(Glades.Buildings.OnwardsAndUpwards, true)
+on gromShop.thornySituation store(Glades.Buildings.ThornySituation, true)
+on gromShop.clearTheCaveEntrance store(Glades.Buildings.ClearTheCaveEntrance, true)
 on gromShop.theGorlekTouch store(gladesProjects.theGorlekTouch, true)
 
 on spawn {
