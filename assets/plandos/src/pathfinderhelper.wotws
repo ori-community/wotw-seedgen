@@ -157,12 +157,12 @@ on reload {
 
     set_wheel_item_data(
         "glades_projects",
-        Left,
+        TopLeft,
         "Toggle Dwelling Repairs",
         "[Ability1]Toggle",
         DwellingRepairs,
     )
-    set_wheel_item_all_actions("glades_projects", Left, store(Glades.Buildings.DwellingRepairs, Glades.Buildings.DwellingRepairs == false))
+    set_wheel_item_all_actions("glades_projects", TopLeft, store(Glades.Buildings.DwellingRepairs, Glades.Buildings.DwellingRepairs == false))
 
     set_wheel_item_data(
         "glades_projects",
@@ -175,94 +175,85 @@ on reload {
 
     set_wheel_item_data(
         "glades_projects",
-        TopLeft,
+        Left,
         "Toggle Onwards and Upwards",
         "[Ability1]Toggle",
         OnwardsAndUpwards,
     )
-    set_wheel_item_all_actions("glades_projects", TopLeft, store(Glades.Buildings.OnwardsAndUpwards, Glades.Buildings.OnwardsAndUpwards == false))
-
-    set_wheel_item_data(
-        "glades_projects",
-        Top,
-        "Toggle Thorny Situation",
-        "[Ability1]Toggle",
-        ThornySituation,
-    )
-    set_wheel_item_all_actions("glades_projects", Top, store(Glades.Buildings.ThornySituation, Glades.Buildings.ThornySituation == false))
-
-    set_wheel_item_data(
-        "glades_projects",
-        TopRight,
-        "Toggle Clear the Cave Entrance",
-        "[Ability1]Toggle",
-        ClearTheCaveEntrance,
-    )
-    set_wheel_item_all_actions("glades_projects", TopRight, store(Glades.Buildings.ClearTheCaveEntrance, Glades.Buildings.ClearTheCaveEntrance == false))
-
-    set_wheel_item_data(
-        "glades_projects",
-        RightTop,
-        "Toggle The Gorlek Touch",
-        "[Ability1]Toggle",
-        TheGorlekTouch,
-    )
-    set_wheel_item_all_actions("glades_projects", RightTop, store(gladesProjects.theGorlekTouch, gladesProjects.theGorlekTouch == false))
-
-
-    set_wheel_item_data(
-        "glades_projects",
-        Right,
-        "Toggle Sela Flowers",
-        "[Ability1]Toggle",
-        SelaFlowers,
-    )
-    set_wheel_item_all_actions("glades_projects", Right, store(Glades.Plants.SelaFlowers, Glades.Plants.SelaFlowers == false))
-
-    set_wheel_item_data(
-        "glades_projects",
-        RightBottom,
-        "Toggle Sticky Grass",
-        "[Ability1]Toggle",
-        StickyGrass,
-    )
-    set_wheel_item_all_actions("glades_projects", RightBottom, store(Glades.Plants.StickyGrass, Glades.Plants.StickyGrass == false))
-
-    set_wheel_item_data(
-        "glades_projects",
-        BottomRight,
-        "Toggle Lightcatchers",
-        "[Ability1]Toggle",
-        Lightcatchers,
-    )
-    set_wheel_item_all_actions("glades_projects", BottomRight, store(Glades.Plants.Lightcatchers, Glades.Plants.Lightcatchers == false))
-
-    set_wheel_item_data(
-        "glades_projects",
-        Bottom,
-        "Toggle Blue Moon",
-        "[Ability1]Toggle",
-        BlueMoon,
-    )
-    set_wheel_item_all_actions("glades_projects", Bottom, store(Glades.Plants.BlueMoon, Glades.Plants.BlueMoon == false))
-
-    set_wheel_item_data(
-        "glades_projects",
-        BottomLeft,
-        "Toggle Spring Plants",
-        "[Ability1]Toggle",
-        SpringPlants,
-    )
-    set_wheel_item_all_actions("glades_projects", BottomLeft, store(Glades.Plants.SpringPlants, Glades.Plants.SpringPlants == false))
+    set_wheel_item_all_actions("glades_projects", Left, store(Glades.Buildings.OnwardsAndUpwards, Glades.Buildings.OnwardsAndUpwards == false))
 
     set_wheel_item_data(
         "glades_projects",
         LeftBottom,
+        "Toggle Thorny Situation",
+        "[Ability1]Toggle",
+        ThornySituation,
+    )
+    set_wheel_item_all_actions("glades_projects", LeftBottom, store(Glades.Buildings.ThornySituation, Glades.Buildings.ThornySituation == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        BottomLeft,
+        "Toggle Clear the Cave Entrance",
+        "[Ability1]Toggle",
+        ClearTheCaveEntrance,
+    )
+    set_wheel_item_all_actions("glades_projects", BottomLeft, store(Glades.Buildings.ClearTheCaveEntrance, Glades.Buildings.ClearTheCaveEntrance == false))
+
+
+    set_wheel_item_data(
+        "glades_projects",
+        Top,
+        "Toggle Sela Flowers",
+        "[Ability1]Toggle",
+        SelaFlowers,
+    )
+    set_wheel_item_all_actions("glades_projects", Top, store(Glades.Plants.SelaFlowers, Glades.Plants.SelaFlowers == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        TopRight,
+        "Toggle Sticky Grass",
+        "[Ability1]Toggle",
+        StickyGrass,
+    )
+    set_wheel_item_all_actions("glades_projects", TopRight, store(Glades.Plants.StickyGrass, Glades.Plants.StickyGrass == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        RightTop,
+        "Toggle Lightcatchers",
+        "[Ability1]Toggle",
+        Lightcatchers,
+    )
+    set_wheel_item_all_actions("glades_projects", RightTop, store(Glades.Plants.Lightcatchers, Glades.Plants.Lightcatchers == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        Right,
+        "Toggle Blue Moon",
+        "[Ability1]Toggle",
+        BlueMoon,
+    )
+    set_wheel_item_all_actions("glades_projects", Right, store(Glades.Plants.BlueMoon, Glades.Plants.BlueMoon == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        RightBottom,
+        "Toggle Spring Plants",
+        "[Ability1]Toggle",
+        SpringPlants,
+    )
+    set_wheel_item_all_actions("glades_projects", RightBottom, store(Glades.Plants.SpringPlants, Glades.Plants.SpringPlants == false))
+
+    set_wheel_item_data(
+        "glades_projects",
+        BottomRight,
         "Toggle Last Tree",
         "[Ability1]Toggle",
         TheLastSeed,
     )
-    set_wheel_item_all_actions("glades_projects", LeftBottom, store(Glades.Plants.LastTree, Glades.Plants.LastTree == false))
+    set_wheel_item_all_actions("glades_projects", BottomRight, store(Glades.Plants.LastTree, Glades.Plants.LastTree == false))
 }
 
 on first_spawn {
@@ -465,7 +456,6 @@ fun toggle_glades_projects() {
         && Glades.Buildings.OnwardsAndUpwards
         && Glades.Buildings.ThornySituation
         && Glades.Buildings.ClearTheCaveEntrance
-        && gladesProjects.theGorlekTouch
         && Glades.Plants.BlueMoon
         && Glades.Plants.StickyGrass
         && Glades.Plants.SpringPlants
@@ -479,7 +469,6 @@ fun toggle_glades_projects() {
         store(Glades.Buildings.OnwardsAndUpwards, false)
         store(Glades.Buildings.ThornySituation, false)
         store(Glades.Buildings.ClearTheCaveEntrance, false)
-        store(gladesProjects.theGorlekTouch, false)
         store(Glades.Plants.BlueMoon, false)
         store(Glades.Plants.StickyGrass, false)
         store(Glades.Plants.SpringPlants, false)
@@ -494,7 +483,6 @@ fun toggle_glades_projects() {
         store(Glades.Buildings.OnwardsAndUpwards, true)
         store(Glades.Buildings.ThornySituation, true)
         store(Glades.Buildings.ClearTheCaveEntrance, true)
-        store(gladesProjects.theGorlekTouch, true)
         store(Glades.Plants.BlueMoon, true)
         store(Glades.Plants.StickyGrass, true)
         store(Glades.Plants.SpringPlants, true)
