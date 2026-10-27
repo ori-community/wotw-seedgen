@@ -198,13 +198,23 @@
           "type": "VirtualIntUberState",
           "value": 0.0
         },
-        "12": {
+        "10": {
           "name": "inLogicFilterAvailable",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
-        "100": {
+        "11": {
           "name": "spoilerFilterAvailable",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "20": {
+          "name": "showSmallEntrances",
+          "type": "SerializedBooleanUberState",
+          "value": 0.0
+        },
+        "100": {
+          "name": "disableTeleporterMapActivation",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
@@ -593,11 +603,6 @@
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },
-        "1": {
-          "name": "disableTeleporterMapActivation",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
         "8": {
           "name": "disablePickupCollision",
           "type": "SerializedBooleanUberState",
@@ -715,11 +720,6 @@
         },
         "103": {
           "name": "disableDespawningNearbyEnemies",
-          "type": "SerializedBooleanUberState",
-          "value": 0.0
-        },
-        "200": {
-          "name": "showSmallEntrances",
           "type": "SerializedBooleanUberState",
           "value": 0.0
         },

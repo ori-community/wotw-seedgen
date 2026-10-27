@@ -221,8 +221,8 @@ impl UberIdentifier {
     pub const ENERGY: UberIdentifier = UberIdentifier::player(22);
     pub const PLAYER_AREA: UberIdentifier = UberIdentifier::player(50);
     pub const MAP_FOCUSED_AREA: UberIdentifier = UberIdentifier::map(1);
+    pub const SHOW_SMALL_ENTRANCES: UberIdentifier = UberIdentifier::map(20);
     pub const SHRIEK_BARRIER: UberIdentifier = UberIdentifier::modifications(0);
-    pub const SHOW_SMALL_ENTRANCES: UberIdentifier = UberIdentifier::modifications(200);
     pub const CLEAN_WATER: UberIdentifier = UberIdentifier::world_events(2000);
     pub const TRACKER_SHOW_VISITED_ENTRANCE_COUNT: UberIdentifier = UberIdentifier::tracker(200);
     pub const RANDOM_SPIRIT_LIGHT: UberIdentifier = UberIdentifier::settings(0);
