@@ -91,7 +91,7 @@ on spawn {
 on Hollow.Wisp store(Hollow.Hornbug.VoiceDoor, true)
 on skills.glide store(Hollow.DepthsOpen, true)
 on Glades.Buildings.ThornySituation if hubUberStateGroup.builderProjectOpenCave == 0 store(hubUberStateGroup.builderProjectOpenCave, 1)
-on questUberStateGroup.lagoonWispQuestUberState == 3 if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3) // Skip talking to the moki again after completing the pools wisp quest
+on Pools.LostParadise.Completed if questUberStateGroup.kwoloksWisdomQuest == 2 store(questUberStateGroup.kwoloksWisdomQuest, 3) // Skip talking to the moki again after completing the pools wisp quest
 on _petrifiedForestGroup.petrifiedOwlState == 5 store(_petrifiedForestGroup.petrifiedOwlState, 6)
 
 // The game actually checks for the quests, not the wisps.

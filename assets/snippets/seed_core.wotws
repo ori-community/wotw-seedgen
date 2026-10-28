@@ -131,12 +131,12 @@ on questUberStateGroup.familyReunionQuest == 2 {
     if Woods.FamilyReunion.Doll store(questUberStateGroup.familyReunionQuest, 3)
 }
 // If DollQI is collected without having opened the hut, revert the quest state to its previous value
-on questUberStateGroup.familyReunionQuest > 2 if Woods.MokiHut.CanOpen == false {
+on Woods.FamilyReunion.DollCollected if Woods.MokiHut.CanOpen == false {
     if Glades.Buildings.DwellingRepairs == false store(questUberStateGroup.familyReunionQuest, 0)
     if Glades.Buildings.DwellingRepairs store(questUberStateGroup.familyReunionQuest, 1)
 }
 // Patience Skip can lock you out of the escape reward. This fix gives the expected rewards when teleporting away in the cutscene area.
-on windtornRuinsGroup.desertRuinsEscape == 3 if is_in_rectangle(2048, -3573, 2154, -3539) {
+on Ruins.Escape.Completed if is_in_rectangle(2048, -3573, 2154, -3539) {
     position_trigger_rectangle("seir_walk", 2048, -3573, 2154, -3539)
     position_trigger_leave_callback("seir_walk", if Ruins.Wisp == false {
         store(Ruins.Wisp, true)

@@ -148,7 +148,7 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tra
         create_stats_entry(QuestEnd, "The Silent Teeth")
         store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on kwolokGroupDescriptor.cleanseWellspringQuestUberState < 4 store(tracker.questsFinished, tracker.questsFinished - 1)
+    on Hollow.SilentTeeth.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if missing_key {
@@ -205,7 +205,7 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tra
         create_stats_entry(QuestEnd, "A Diamond in the Rough")
         store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on questUberStateGroup.desertCogQuest < 5 store(tracker.questsFinished, tracker.questsFinished - 1)
+    on Glades.RoughDiamond.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if hand_to_hand {
