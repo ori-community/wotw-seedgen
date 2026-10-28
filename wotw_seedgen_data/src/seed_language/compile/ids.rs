@@ -2,7 +2,7 @@ use std::{
     fs::{self, File},
     marker::PhantomData,
     ops::{ControlFlow, Deref, DerefMut, Range},
-    path::PathBuf,
+    path::{Path, PathBuf},
 };
 
 use derivative::Derivative;
@@ -155,20 +155,7 @@ impl<'log> IdResolver<'log> {
 
     /// Reads ids from the lockfile, or uses default fallbacks
     pub fn from_lockfile(path: PathBuf, log_capture: &'log LogCapture) -> Self {
-        let ids = File::open(&path)
-            .ok()
-            .and_then(|lockfile| match serde_json::from_reader(&lockfile) {
-                Ok(ids) => Some(ids),
-                Err(err) => {
-                    warn!(
-                        logger: log_capture,
-                        "regenerating ids after failing to parse lockfile \"{path}\": {err}",
-                        path = path.display(),
-                    );
-                    None
-                }
-            })
-            .unwrap_or_default();
+        let ids = Ids::from_lockfile(&path, log_capture).unwrap_or_default();
 
         Self {
             lockfile: Some(path),
@@ -245,6 +232,55 @@ pub struct Ids {
 }
 
 impl Ids {
+    fn from_lockfile(path: &Path, log_capture: &LogCapture) -> Option<Self> {
+        let lockfile = File::open(path).ok()?;
+
+        let mut previous: Ids = match serde_json::from_reader(&lockfile) {
+            Ok(previous) => previous,
+            Err(err) => {
+                warn!(
+                    logger: log_capture,
+                    "regenerating ids after failing to parse lockfile \"{path}\": {err}",
+                    path = path.display(),
+                );
+
+                return None;
+            }
+        };
+
+        previous.validate(log_capture);
+
+        Some(previous)
+    }
+
+    fn validate(&mut self, log_capture: &LogCapture) {
+        let Self {
+            boolean,
+            integer,
+            float,
+            string,
+            boolean_state,
+            integer_state,
+            float_state,
+            message,
+            position_trigger,
+            wheel,
+            warp_icon,
+        } = self;
+
+        boolean.validate_offset(log_capture, "boolean");
+        integer.validate_offset(log_capture, "integer");
+        float.validate_offset(log_capture, "float");
+        string.validate_offset(log_capture, "string");
+        boolean_state.validate_limit(log_capture, "boolean state");
+        integer_state.validate_limit(log_capture, "integer state");
+        float_state.validate_limit(log_capture, "float state");
+        message.validate_offset(log_capture, "message");
+        position_trigger.validate_offset(log_capture, "position trigger");
+        wheel.validate_limit(log_capture, "wheel");
+        warp_icon.validate_offset(log_capture, "warp icon");
+    }
+
     fn purge_unused(&mut self) {
         let Self {
             boolean,
@@ -292,6 +328,19 @@ impl<const OFFSET: usize, S> IdMap<OFFSET, { usize::MAX }, S> {
     pub fn id(&mut self, id: String) -> usize {
         self.id_impl(id, |next| ControlFlow::Continue(next + OFFSET))
     }
+
+    fn validate_offset(&mut self, log_capture: &LogCapture, id_kind: &str) {
+        self.gaps.retain(|gap| *gap >= OFFSET);
+        self.ids.retain(|id, value| {
+            let retain = value.value >= OFFSET;
+
+            if !retain {
+                warn!(logger: log_capture, "reassigning {id_kind} id \"{id}\" since the previous value has been reserved");
+            }
+
+            retain
+        });
+    }
 }
 
 impl<const LIMIT: usize, SD> IdMap<0, LIMIT, SD> {
@@ -308,6 +357,19 @@ impl<const LIMIT: usize, SD> IdMap<0, LIMIT, SD> {
             } else {
                 ControlFlow::Continue(next)
             })
+    }
+
+    fn validate_limit(&mut self, log_capture: &LogCapture, id_kind: &str) {
+        self.gaps.retain(|gap| *gap < LIMIT);
+        self.ids.retain(|id, value| {
+            let retain = value.value < LIMIT;
+
+            if !retain {
+                warn!(logger: log_capture, "reassigning {id_kind} id \"{id}\" since the previous value falls out of the available limit");
+            }
+
+            retain
+        });
     }
 }
 
