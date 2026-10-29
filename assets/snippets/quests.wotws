@@ -105,7 +105,7 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tra
     (questUberStateGroup.familyReunionQuest != 2 && player_area() == Glades)
     || (questUberStateGroup.familyReunionQuest == 2 && player_area() == Woods)
 )) }
-!if tree_keeper { !augment_fun(write_missing_quests(), if Glades.Plants.LastTree == false add_missing_goal_in_area(
+!if tree_keeper { !augment_fun(write_missing_quests(), if Woods.TreeKeeper.Completed == false add_missing_goal_in_area(
     "Tree Keeper",
     (questUberStateGroup.treeKeeperQuest != 1 && player_area() == Woods)
     || (questUberStateGroup.treeKeeperQuest == 1 && player_area() == Glades)
