@@ -193,11 +193,11 @@ fun write_missing_quests() { new_row("Missing Quests (" + (quests_required - tra
 }
 
 !if tree_keeper {
-    on Glades.Plants.LastTree {
+    on Woods.TreeKeeper.Completed {
         create_stats_entry(QuestEnd, "The Tree Keeper")
         store(tracker.questsFinished, tracker.questsFinished + 1)
     }
-    on Glades.Plants.LastTree == false store(tracker.questsFinished, tracker.questsFinished - 1)
+    on Woods.TreeKeeper.Completed == false store(tracker.questsFinished, tracker.questsFinished - 1)
 }
 
 !if rough_diamond {

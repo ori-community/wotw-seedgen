@@ -7941,6 +7941,8 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
   refill Full
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
+  state Woods.TreeKeeper.Completed:
+    moki: Glades.TreeKeeper.BranchRejected
 
   pickup Woods.TreeKeeper.Branch: free
   pickup Woods.TreeKeeper.Seed:
