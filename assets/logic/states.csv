@@ -1,57 +1,56 @@
 Identifier, Condition
 Marsh.Spawn.Teleporter, 21786|10185
+Marsh.CollapsingLog.Collapsed, 21786|59922
+Marsh.CollapsingLog.OpherWall, 21786|23177
 Marsh.CollapsingLog.ShardWall, 21786|33430
+Marsh.Howl.KeystoneDoor, 21786|42309
+Marsh.TokkCave.EntranceWall, 21786|35166
+Marsh.TokkCave.LizardFight, 21786|35598
+Marsh.MissingKey.Started, 48248|51645 >= 1
+Marsh.MissingKey.KeystoneCollected, 48248|51645 >= 2
+Marsh.Sand.Fight, 9593|59418
+Marsh.Bells.BurrowsOpen, 24922|13349
+Marsh.Bells.TreeOpen, 24922|59146
 Marsh.HowlDefeated, 21786|40322
 Marsh.LittleBraver.Started, 14019|15983 >= 1
 Marsh.LittleBraver.FangCollected, 14019|15983 >= 2
-Marsh.Howl.KeystoneDoor, 21786|42309
-Marsh.CollapsingLog.Collapsed, 21786|59922
-Marsh.Bells.BurrowsOpen, 24922|13349
-Marsh.Bells.TreeOpen, 24922|59146
-Marsh.CollapsingLog.OpherWall, 21786|23177
-Marsh.TokkCave.EntranceWall, 21786|35166
-Marsh.MissingKey.Started, 48248|51645 >= 1
-Marsh.MissingKey.KeystoneCollected, 48248|51645 >= 2
-Marsh.TokkCave.LizardFight, 21786|35598
-Marsh.Sand.Fight, 9593|59418
+Marsh.Den.ExitLoopBottomWall, 21786|876
+Marsh.Den.ExitLoopTopWall, 21786|25291
+Marsh.Den.KeystoneDoor, 21786|47445
+Marsh.Den.DoorLoopSecretWall, 21786|11343
+Marsh.Den.DoorLoopTopBarrier, 21786|29636
+Marsh.StormLifted, 6|400
+Marsh.Den.BottomAreaWall, 21786|53932
+Marsh.Den.Teleporter, 11666|61594
+Marsh.Den.CombatShrineCompleted, 24922|45011
+Marsh.DoubleJumpTree.Fight, 9593|25130 >= 3
+Marsh.Trial.EntranceWall, 21786|44253
+Marsh.Trial.CombatShrineCompleted, 21786|2869
+Marsh.SpiritTrial.Active, 44964|45951 >= 1
 Marsh.UpperPoolsPath.Floor, 9593|17659
 Marsh.UpperPoolsPath.ShortcutWall, 9593|34704
 Marsh.UpperPoolsPath.PoolsWall, 945|43451
+Marsh.EyestoneDoor, 937|64003
 Burrows.Teleporter, 24922|42531
 Burrows.KeystoneDoor, 18793|3171
+Burrows.IntoBurrows.TabletCollected, 48248|18458 >= 3
 Burrows.Lever, 24922|16603
 Burrows.DenShortcutWall, 24922|2524
-Burrows.IntoBurrows.TabletCollected, 48248|18458 >= 3
-Marsh.Den.DoorLoopTopBarrier, 21786|29636
-Marsh.Den.ExitLoopBottomWall, 21786|876
-Marsh.Den.ExitLoopTopWall, 21786|25291
-Marsh.StormLifted, 6|400
-Marsh.Den.BottomAreaWall, 21786|53932
-Marsh.Den.KeystoneDoor, 21786|47445
-Marsh.Den.DoorLoopSecretWall, 21786|11343
-Marsh.Den.Teleporter, 11666|61594
-Marsh.DoubleJumpTree.Fight, 9593|25130 >= 3
-Marsh.Den.CombatShrineCompleted, 24922|45011
-Marsh.Trial.EntranceWall, 21786|44253
-Marsh.SpiritTrial.Active, 44964|45951 >= 1
-Marsh.EyestoneDoor, 937|64003
-Marsh.Trial.CombatShrineCompleted, 21786|2869
+Hollow.DrainWater.Halfway, 937|42245 >= 1
+Hollow.DrainWater.Gone, 937|42245 >= 2
+Hollow.Drain.RockPuzzleSolved, 937|22716
+Hollow.SpiritTrial.Active, 44964|25545 >= 1
+Hollow.Trial.DashTreeDoor, 937|59920
+Hollow.BashTreeApproach.Lever, 937|22419
+Hollow.TP.BowDoor, 937|59850
 Hollow.Teleporter, 937|26601
 Hollow.HornbugDefeated, 937|53122
 Hollow.Hornbug.VoiceDoor, 937|6778
-Hollow.BashTreeApproach.Lever, 937|22419
-Hollow.DepthsOpen, 18793|25789
 Hollow.Kwolok.Met, 937|10071 >= 1
 Hollow.SilentTeeth.Started, 937|34641 >= 1
 Hollow.WoodsSwim.Wall, 58674|11400
-Hollow.TP.BowDoor, 937|59850
-Hollow.DrainWater.Halfway, 937|42245 >= 1
-Hollow.Drain.RockPuzzleSolved, 937|22716
-Hollow.DrainWater.Gone, 937|42245 >= 2
-Hollow.Trial.DashTreeDoor, 937|59920
-Hollow.SpiritTrial.Active, 44964|25545 >= 1
+Hollow.DepthsOpen, 18793|25789
 Glades.GromsWall, 42178|5815
-Glades.Teleporter, 42178|42096
 Glades.Buildings.RepairTheSpiritWell, 21|16825
 Glades.Buildings.DwellingRepairs, 21|51230
 Glades.Buildings.ClearTheCaveEntrance, 21|16586
@@ -62,11 +61,12 @@ Glades.Buildings.TheGorlekTouch, 21|15068
 Glades.TuleySpawned, 6|300
 Glades.Plants.BlueMoon, 21|33011
 Glades.Plants.LastTree, 21|40006
-Glades.TreeKeeper.BranchRejected, 14019|59708 >= 2
 Glades.Plants.Lightcatchers, 21|47651
 Glades.Plants.SelaFlowers, 21|16254
 Glades.Plants.SpringPlants, 21|38393
 Glades.Plants.StickyGrass, 21|64583
+Glades.TreeKeeper.BranchRejected, 14019|59708 >= 2
+Glades.Teleporter, 42178|42096
 Glades.IntoDarkness.Started, 14019|33776 >= 1
 Glades.IntoDarkness.AcornCollected, 14019|33776 >= 2
 Glades.FamilyReunion.Started, 14019|27804 >= 1
@@ -74,101 +74,101 @@ Glades.FamilyReunion.Completed, 14019|27804 >= 4
 Glades.FatherMokiGone, 42178|36609
 Glades.RoughDiamond.Completed, 14019|61011 >= 5
 Glades.CombatShrineCompleted, 44310|58796
-Wellspring.DrainClimb.Lever, 37858|31187
+Wellspring.SpiritTrial.Active, 44964|11512 >= 1
+Wellspring.OutsideLeftDoor.BlueMoon, 53632|2522
+Wellspring.OutsideLeft.FallingWheel, 37858|16604
+Wellspring.OutsideLeft.ShardWall, 53632|62781
+Wellspring.OutsideLeft.ShardLever, 26019|23382
+Wellspring.BottomDoor, 37858|23644
+Wellspring.FirstFloor.ShortcutLever, 37858|34433
+Wellspring.FirstFloor.ThreeWheels, 37858|64055
 Wellspring.FirstFloor.SwimSwitch, 37858|6338
 Wellspring.DrainClimb.SubmergedWheel, 37858|50902
 Wellspring.DrainClimb.CentralWheel, 37858|60716
+Wellspring.DrainClimb.LeverWheel, 37858|31584
+Wellspring.DrainClimb.Lever, 37858|31187
 Wellspring.MiddleDoors, 37858|9487
-Wellspring.FirstFloor.ShortcutLever, 37858|34433
 Wellspring.SecondFloor.SpinArena, 37858|8487 >= 2
 Wellspring.RotatingRoom.Entrance, 37858|8487 >= 5
 Wellspring.RotatingRoom.Solved, 37858|36070 >= 3
-Wellspring.FirstFloor.ThreeWheels, 37858|64055
 Wellspring.TopDoor, 37858|31962
-Wellspring.DrainClimb.LeverWheel, 37858|31584
 Wellspring.Teleporter, 53632|18181
 Wellspring.Escape.Completed, 37858|10720 >= 2
-Wellspring.SilentTeeth.SoSoggy, 937|34641 >= 3
 Wellspring.SilentTeeth.EnterCutscene, 937|34641 >= 2
-Wellspring.BottomDoor, 37858|23644
-Wellspring.OutsideLeft.ShardLever, 26019|23382
-Wellspring.OutsideLeft.ShardWall, 53632|62781
-Wellspring.OutsideLeftDoor.BlueMoon, 53632|2522
-Wellspring.OutsideLeft.FallingWheel, 37858|16604
-Wellspring.SpiritTrial.Active, 44964|11512 >= 1
+Wellspring.SilentTeeth.SoSoggy, 937|34641 >= 3
 Woods.MokiHut.CanOpen, 6|500
 Woods.MokiHut.Open, 58674|14313
 Woods.FamilyReunion.DollCollected, 14019|27804 >= 3
 Woods.TreeKeeper.Completed, 14019|59708 >= 3
 Woods.EntranceTeleporter, 58674|7071
 Woods.FirstKeystoneDoor, 58674|21500
-Woods.KuKeystoneDoor, 18793|41544
 Woods.KuKSRoom.YellowWall, 58674|54686
+Woods.KuKeystoneDoor, 18793|41544
 Woods.GiantSkull.Corruption, 58674|61252
 Woods.BehindSkull.Corruption, 58674|902
 Woods.BehindSkull.YellowWall, 58674|29622
-Woods.ExitTP.Corruption, 58674|48394
 Woods.SpiritTrial.Active, 44964|22703 >= 1
+Woods.ExitTP.Corruption, 58674|48394
 Woods.ExitTeleporter, 58674|1965
 Woods.CombatShrineCompleted, 58674|56043
+Woods.FeedingGrounds.Teleporter, 58674|10029
 Woods.Ridge.ElevatorFight, 36153|23584
-Reach.WispClimb.Fight, 28895|42209
-Reach.BelowBaur.Floor, 28895|49329
 Reach.Baur.Sneezed, 28895|29098 >= 1
 Reach.Baur.Awake, 28895|29098 >= 3
+Reach.BelowBaur.Floor, 28895|49329
 Reach.AboveBaur.Lever, 28895|62198
 Reach.LeverDoor.Ceiling, 28895|8664
 Reach.TPWind.Lantern, 28895|59394
 Reach.TP.ShortcutLantern, 28895|48757
 Reach.Teleporter, 28895|54235
+Reach.TopKeystoneDoor, 28895|49900
 Reach.Snowball.Rolled, 28895|20731
 Reach.IceCave.Lantern, 28895|37287
 Reach.Trial.KeystoneDoor, 28895|4290
 Reach.SpiritTrial.Active, 44964|23661 >= 1
+Reach.WispClimb.Fight, 28895|42209
 Reach.HighestReach.Completed, 14019|8973 >= 3
-Reach.TopKeystoneDoor, 28895|49900
-Depths.SecondKeystoneDoor, 18793|10758
 Depths.FirstKeystoneDoor, 21786|59990
 Depths.IlluminableTunnel.Solved, 18793|21994
 Depths.Teleporter, 18793|38871
-Depths.BreakingMould.Completed, 14019|45931 >= 3
+Depths.SecondKeystoneDoor, 18793|10758
 Depths.MoraDefeated, 18793|26713 >= 7
-Depths.SpiritTrial.Active, 44964|28552 >= 1
+Depths.BreakingMould.Completed, 14019|45931 >= 3
 Depths.CombatShrineCompleted, 18793|12512
+Depths.SpiritTrial.Active, 44964|28552 >= 1
+Pools.WellspringPath.EFWall, 945|3487
+Pools.WellspringPath.UnderwaterWall, 945|55795
 Pools.BelowWheel.LeftWall, 945|28631
 Pools.Wheel, 945|12852
-Pools.WellspringPath.UnderwaterWall, 945|55795
-Pools.WellspringPath.EFWall, 945|3487
 Pools.KwoloksWisdom.Started, 14019|50597 >= 1
 Pools.KwoloksWisdom.KwolokFound, 14019|50597 >= 2
 Pools.KwoloksWisdom.AltarRequested, 14019|50597 >= 3
+Pools.EntranceLever, 5377|14488
+Pools.EntranceLeverRoom.BubbleFloor, 5377|64337
 Pools.CentralTeleporter, 945|58183
 Pools.CentralTPApproach.BubbleFree, 5377|35751
 Pools.CentralTPApproach.PurpleWall, 5377|26170
-Pools.EntranceLever, 5377|14488
-Pools.EntranceLeverRoom.BubbleFloor, 5377|64337
-Pools.WaterArena.PurpleFloor, 5377|22978
-Pools.CentralTPSwim.ShardWall, 5377|4463
-Pools.WaterArena.WaterDashFight, 5377|53480 >= 4
 Pools.CentralTPSwim.Drained, 5377|63173
+Pools.CentralTPSwim.ShardWall, 5377|4463
+Pools.WaterArena.PurpleFloor, 5377|22978
+Pools.WaterArena.WaterDashFight, 5377|53480 >= 4
 Pools.Lupo.PurpleFloor, 5377|8451
 Pools.SeedRoom.PurpleWall, 5377|10782
-Pools.SeedRoom.BubbleFree, 5377|57453
 Pools.SeedRoom.KwolokMet, 5377|21700
-Pools.SpiritTrial.Active, 44964|54686 >= 1
-Pools.KeystoneDoor, 5377|47621
+Pools.SeedRoom.BubbleFree, 5377|57453
 Pools.KSRoom.BubbleFree, 5377|15754
-Pools.WaterDashTree.LeftBubbleFree, 5377|24765
-Pools.WaterDashTree.RightBubbleFree, 5377|58278
-Pools.WaterDashDrain.Solved, 5377|29911
-Pools.WaterDashTree.WaterDashButton, 5377|15402
-Pools.WaterDashDrain.PurpleWall, 20120|43231
+Pools.KeystoneDoor, 5377|47621
+Pools.SpiritTrial.Active, 44964|54686 >= 1
 Pools.BubbleSpam.Lever, 5377|6398
 Pools.BubbleSpam.Wall, 5377|65413
+Pools.WaterDashTree.LeftBubbleFree, 5377|24765
+Pools.WaterDashTree.RightBubbleFree, 5377|58278
+Pools.WaterDashTree.WaterDashButton, 5377|15402
+Pools.WaterDashDrain.Solved, 5377|29911
+Pools.WaterDashDrain.PurpleWall, 20120|43231
 Pools.BossTeleporter, 945|1370
-Pools.LostParadise.Completed, 14019|35087 >= 3
 Pools.Escape.Completed, 945|58403 >= 7
-Woods.FeedingGrounds.Teleporter, 58674|10029
+Pools.LostParadise.Completed, 14019|35087 >= 3
 Wastes.RoughDiamond.GemCollected, 14019|61011 >= 4
 Wastes.DoubleBridge.Lever, 20120|48009
 Wastes.SpiritTrial.Active, 44964|30767 >= 1
@@ -177,12 +177,12 @@ Wastes.KeystoneDoor, 20120|28786
 Wastes.MissilePuzzles.LeverDoor, 20120|12902
 Wastes.UpperTeleporter, 20120|41398
 Ruins.Entrance, 10289|3804
-Ruins.PillarCorruption, 10289|43103
 Ruins.Lever, 10289|41277
 Ruins.Teleporter, 10289|4928
-World.SeirSkill, 24|108
+Ruins.PillarCorruption, 10289|43103
 Ruins.Escape.Completed, 10289|19890 >= 3
 Ruins.SiftingSands.Completed, 14019|35399 >= 3
+Willow.Entrance.TPShortcut, 16155|3096
 Willow.GrappleWheelsHeart, 16155|60752
 Willow.BoulderHeart, 16155|41488
 Willow.Teleporter, 16155|41465
@@ -192,5 +192,5 @@ Willow.MinibossHeart, 16155|28478
 Willow.SpinLasersHeart, 16155|54940
 Willow.GlideHeart, 16155|42976
 Willow.SpinPortalsHeart, 16155|24290
-Willow.Entrance.TPShortcut, 16155|3096
 Willow.Shriek.Teleporter, 16155|50867
+World.SeirSkill, 24|108
