@@ -540,13 +540,20 @@ impl<'graph> World<'graph, '_, '_, '_> {
                 connection_index.display(self.graph)
             ),
             Some(best_orbs) => {
+                let orb_variants = match connection_index.connection {
+                    // refill connections start, as you may expect, before the refills
+                    ConnectionOrRefill::Refill(_) => &best_orbs.pre_refills,
+                    // anchor connections originate from the post-refill orbs of the origin anchor
+                    ConnectionOrRefill::Connection(_) => &best_orbs.post_refills,
+                };
+
                 debug_assert!(
-                    !best_orbs.post_refills.is_empty(),
-                    "encountered empty post-refill orbs in connection {}",
+                    !orb_variants.is_empty(),
+                    "encountered empty orbs in connection {}",
                     connection_index.display(self.graph)
                 );
 
-                &best_orbs.post_refills
+                &orb_variants
             }
         }
     }
@@ -733,13 +740,28 @@ impl<'graph> World<'graph, '_, '_, '_> {
 
         match &connection_index.connection {
             ConnectionOrRefill::Refill(_) => {
-                let node_index = connection_index.node_index(self.graph);
-                self.traverse(node_index, orb_variants, output);
+                self.progress_refill(orb_variants, connection_index, output);
             }
             ConnectionOrRefill::Connection(connection) => {
                 self.traverse_connection(connection.0, orb_variants, connection_index, output);
             }
         }
+    }
+
+    fn progress_refill(
+        &mut self,
+        orb_variants: OrbVariants,
+        connection_index: ConnectionIndex<'graph>,
+        output: &CommandsOutput,
+    ) {
+        trace!(
+            logger: self.log_capture,
+            "revisiting for refill {connection}",
+            connection = connection_index.display(self.graph)
+        );
+
+        let node_index = connection_index.node_index(self.graph);
+        self.traverse(node_index, orb_variants, output);
     }
 
     fn traverse(&mut self, node_index: usize, orb_variants: OrbVariants, output: &CommandsOutput) {
