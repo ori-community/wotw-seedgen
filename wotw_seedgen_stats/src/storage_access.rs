@@ -17,7 +17,7 @@ pub trait SeedStorageAccess {
     /// check that the cache for `settings` is up to date
     fn check_cache<F>(&self, settings: &UniverseSettings, f: F) -> Result<()>
     where
-        F: FnMut(&UniverseSettings) -> Option<SeedSpoiler>;
+        F: FnMut(&UniverseSettings) -> Result<SeedSpoiler>;
 
     /// fetch seeds that have been previously generated with these settings
     fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter>;
@@ -52,11 +52,11 @@ impl SeedStorageAccess for FileAccess {
 
     fn check_cache<F>(&self, settings: &UniverseSettings, f: F) -> Result<()>
     where
-        F: FnOnce(&UniverseSettings) -> Option<SeedSpoiler>,
+        F: FnOnce(&UniverseSettings) -> Result<SeedSpoiler>,
     {
         let base_path = path_from_settings(settings);
 
-        let valid = fs::read_dir(&base_path)
+        let Some((seed, previous)) = fs::read_dir(&base_path)
             .into_iter()
             .flatten()
             .flatten()
@@ -68,19 +68,19 @@ impl SeedStorageAccess for FileAccess {
 
                 Some((seed, previous))
             })
-            .is_none_or(|(seed, previous)| {
-                let settings = UniverseSettings {
-                    seed,
-                    world_settings: settings.world_settings.clone(),
-                    inline_snippets: InlineSnippets::default(),
-                };
+        else {
+            return Ok(());
+        };
 
-                let current = f(&settings);
+        let settings = UniverseSettings {
+            seed,
+            world_settings: settings.world_settings.clone(),
+            inline_snippets: InlineSnippets::default(),
+        };
 
-                current == Some(previous)
-            });
+        let current = f(&settings)?;
 
-        if !valid {
+        if previous != current {
             eprintln!("failed to validate cache for these settings, removing previous seeds");
             fs::remove_dir_all(&base_path).map_err(|err| format_read_dir_err(err, &base_path))?;
         }

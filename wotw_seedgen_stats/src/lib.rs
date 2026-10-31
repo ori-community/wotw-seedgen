@@ -163,9 +163,7 @@ impl<
             eprintln!("Cleaned seed storage for these settings");
         } else {
             self.storage_access.check_cache(self.settings, |settings| {
-                self.generate_one_seed(settings)
-                    .ok()
-                    .map(|seed| seed.spoiler)
+                self.generate_one_seed(settings).map(|seed| seed.spoiler)
             })?;
         }
 
