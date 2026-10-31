@@ -1,6 +1,6 @@
-use super::Analyzer;
-use std::cmp::Ordering;
-use wotw_seedgen::spoiler::SeedSpoiler;
+use std::{ cmp::Ordering};
+
+use crate::analyzers::{Analyzer, SeedAnalyzer};
 
 /// Analyzes what location an item get placed on
 pub struct ItemLocationStats {
@@ -12,12 +12,10 @@ impl Analyzer for ItemLocationStats {
         format!("Location of {}", self.item)
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.groups
-            .iter()
-            .flat_map(|group| group.placements.iter())
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.placements()
             .filter(|placement| placement.item.name == self.item)
-            .map(|placement| placement.location.identifier.clone())
+            .map(|placement| placement.location.identifier.to_string())
             .collect()
     }
 

@@ -571,6 +571,34 @@ impl CommonItem {
     pub fn log_name(&self) -> CommonItemLogName<'_> {
         CommonItemLogName { inner: self }
     }
+
+    pub fn is_skill_hinted(&self) -> bool {
+        matches!(
+            self,
+            Self::Skill(
+                Skill::Bash
+                    | Skill::DoubleJump
+                    | Skill::Launch
+                    | Skill::Glide
+                    | Skill::WaterBreath
+                    | Skill::Grenade
+                    | Skill::Grapple
+                    | Skill::Flash
+                    | Skill::Spear
+                    | Skill::Regenerate
+                    | Skill::Bow
+                    | Skill::Hammer
+                    | Skill::Sword
+                    | Skill::Burrow
+                    | Skill::Dash
+                    | Skill::WaterDash
+                    | Skill::Shuriken
+                    | Skill::Blaze
+                    | Skill::Sentry
+                    | Skill::Flap
+            ) | Self::CleanWater
+        )
+    }
 }
 
 pub struct CommonItemLogName<'a> {

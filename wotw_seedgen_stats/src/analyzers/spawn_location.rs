@@ -1,6 +1,6 @@
-use super::Analyzer;
 use std::cmp::Ordering;
-use wotw_seedgen::spoiler::SeedSpoiler;
+
+use crate::analyzers::{Analyzer, SeedAnalyzer};
 
 /// Analyzes the spawn location
 pub struct SpawnLocationStats;
@@ -9,8 +9,8 @@ impl Analyzer for SpawnLocationStats {
         "Spawn Location".to_string()
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.spawns.clone()
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.spoiler.spawns.iter().map(String::clone).collect()
     }
 
     fn compare_keys(&self) -> fn(&str, &str) -> Ordering {

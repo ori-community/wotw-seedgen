@@ -1,11 +1,8 @@
-use super::Analyzer;
-use wotw_seedgen::{
-    data::{
-        seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
-        Area,
-    },
-    spoiler::SeedSpoiler,
-};
+use std::ops::ControlFlow;
+
+use wotw_seedgen::data::Area;
+
+use crate::analyzers::{placement_items, Analyzer, Keys, SeedAnalyzer};
 
 /// Analyzes how many skills are in an area
 pub struct AreaSkillsStats {
@@ -17,22 +14,18 @@ impl Analyzer for AreaSkillsStats {
         format!("Skills in {}", self.area)
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        let skills = seed
-            .groups
-            .iter()
-            .flat_map(|group| group.placements.iter())
-            .filter(|placement| placement.location.area == self.area)
-            .flat_map(|placement| {
-                placement
-                    .item
-                    .command
-                    .direct_contained_uber_state_writes(&[])
-                    .common_items()
-            })
-            .filter(|item| matches!(item, CommonItem::Skill(_)))
-            .count();
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.world_analyzer::<usize>()
+            .analyze_placements(|skills, placement| {
+                if placement.location.area == self.area {
+                    *skills += placement_items(placement)
+                        .filter(|item| item.is_skill_hinted())
+                        .count();
+                }
 
-        vec![skills.to_string()]
+                ControlFlow::Continue(())
+            })
+            .finish()
+            .keys()
     }
 }

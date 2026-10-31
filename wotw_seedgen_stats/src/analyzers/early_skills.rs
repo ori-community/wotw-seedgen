@@ -1,12 +1,8 @@
-use super::Analyzer;
-use rustc_hash::FxHashSet;
-use wotw_seedgen::{
-    data::{
-        seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
-        Skill,
-    },
-    spoiler::SeedSpoiler,
-};
+use std::ops::ControlFlow;
+
+use rustc_hash::{FxBuildHasher, FxHashSet};
+
+use crate::analyzers::{placement_items, Analyzer, Keys, SeedAnalyzer};
 
 /// Analyzes how many skills were placed early on
 pub struct EarlySkillsStats {
@@ -18,37 +14,33 @@ impl Analyzer for EarlySkillsStats {
         format!("Skills within {} reachables", self.reachable_limit)
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        let first_reachables = seed
-            .groups
-            .iter()
-            .flat_map(|group| group.reachable.iter().flatten())
-            .take(self.reachable_limit)
-            .map(|node| &node.identifier)
-            .collect::<FxHashSet<_>>();
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.world_analyzer_with((
+            FxHashSet::with_capacity_and_hasher(self.reachable_limit, FxBuildHasher),
+            0,
+        ))
+        .analyze_reachables(|(early_locations, _), reachable| {
+            for node in reachable {
+                early_locations.insert(&node.identifier);
 
-        let early_skills = seed
-            .groups
-            .iter()
-            .flat_map(|group| group.placements.iter())
-            .filter(|placement| first_reachables.contains(&&placement.location.identifier))
-            .flat_map(|placement| {
-                placement
-                    .item
-                    .command
-                    .direct_contained_uber_state_writes(&[])
-                    .common_items()
-            })
-            .filter(|item| match item {
-                CommonItem::Skill(Skill::GladesAncestralLight | Skill::MarshAncestralLight) => {
-                    false
+                if early_locations.len() == self.reachable_limit {
+                    return ControlFlow::Break(());
                 }
-                CommonItem::Skill(_) => true,
-                CommonItem::CleanWater => true,
-                _ => false,
-            })
-            .count();
+            }
 
-        vec![early_skills.to_string()]
+            ControlFlow::Continue(())
+        })
+        .analyze_placements(|(early_locations, early_skills), placement| {
+            if early_locations.contains(&placement.location.identifier) {
+                *early_skills += placement_items(placement)
+                    .filter(|item| item.is_skill_hinted())
+                    .count()
+            }
+
+            ControlFlow::Continue(())
+        })
+        .finish()
+        .map(|(_, early_skills)| early_skills)
+        .keys()
     }
 }

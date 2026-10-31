@@ -15,9 +15,11 @@ use std::{
     thread,
 };
 
-use analyzers::Analyzer;
+use analyzers::{Analyzer, SeedAnalyzer};
 use handle_errors::HandleErrors;
 use itertools::Itertools;
+use rand::seq::SliceRandom;
+use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
 use storage_access::SeedStorageAccess;
 use wotw_seedgen::{
@@ -27,7 +29,7 @@ use wotw_seedgen::{
         UniverseSettings,
     },
     spoiler::SeedSpoiler,
-    Generator, SeedUniverse,
+    Generator,
 };
 
 // TODO use the assets fs helpers here for better errors
@@ -162,13 +164,8 @@ impl<
             self.storage_access.clean_all_seeds()?;
             eprintln!("Cleaned seed storage for these settings");
         } else {
-            self.storage_access.check_cache(self.settings, |settings| {
-                self.generate_one_seed(settings).map(|seed| seed.spoiler)
-            })?;
-        }
-
-        if self.settings.world_count() > 1 {
-            return Err("Multiworld seeds aren't supported yet".to_string());
+            self.storage_access
+                .check_cache(self.settings, |settings| self.generate_one_seed(settings))?;
         }
 
         let mut data = vec![SeedData::default(); self.analyzers.len()];
@@ -195,18 +192,20 @@ impl<
 
         for seed in &mut existing {
             existing_amount += 1;
-            self.analyze_seed(&seed, data);
+            self.analyze_seed(seed, data);
         }
         print_feedback_for_unusable_seeds(existing.errors);
 
         Ok(existing_amount)
     }
 
-    fn analyze_seed(&self, seed: &SeedSpoiler, data: &mut [SeedData]) {
+    fn analyze_seed(&self, seed: SeedSpoiler, data: &mut [SeedData]) {
+        let seed = SeedAnalyzer::new(&seed);
+
         for (data, chained_analyzers) in data.iter_mut().zip(self.analyzers.iter()) {
             chained_analyzers
                 .iter()
-                .map(|analyzer| analyzer.analyze(seed).into_iter().map(Arc::new))
+                .map(|analyzer| analyzer.analyze(&seed).into_iter().map(Arc::new))
                 .multi_cartesian_product()
                 .for_each(|key| *data.entry(key).or_default() += 1);
         }
@@ -246,7 +245,7 @@ impl<
                             let seed = self.generate_seed(&settings, errors, error_messages)?;
 
                             self.analyze_seed(
-                                &seed,
+                                seed,
                                 &mut data.lock().expect("Another thread panicked"),
                             );
                         }
@@ -275,7 +274,7 @@ impl<
     ) -> Result<SeedSpoiler> {
         let seed = loop {
             match self.generate_one_seed(settings) {
-                Ok(seed) => break seed.spoiler,
+                Ok(seed) => break seed,
                 Err(err) => {
                     let mut error_messages_lock =
                         error_messages.lock().expect("Another thread panicked");
@@ -306,15 +305,20 @@ impl<
         Ok(seed)
     }
 
-    fn generate_one_seed(&self, settings: &UniverseSettings) -> Result<SeedUniverse> {
-        Generator::new(
+    fn generate_one_seed(&self, settings: &UniverseSettings) -> Result<SeedSpoiler> {
+        let mut seed = Generator::new(
             self.graph,
             self.pickups,
             self.uber_state_data,
             self.snippet_access,
             settings,
         )
-        .generate()
+        .generate()?
+        .spoiler;
+
+        shuffle_seed(&mut seed);
+
+        Ok(seed)
     }
 }
 
@@ -349,6 +353,22 @@ fn print_feedback_for_generated_seeds(generated: usize, total: usize) {
     let length_of_line_to_clear =
         (17 + generated.to_string().len() * 2).saturating_sub(message.len());
     eprintln!("{}{}", message, " ".repeat(length_of_line_to_clear));
+}
+
+/// shuffle the sorted parts of a seed spoiler to avoid unintentional bias
+fn shuffle_seed(seed: &mut SeedSpoiler) {
+    let mut rng = Pcg64Mcg::new(0xcafef00dd15ea5e5);
+
+    seed.preplacements.shuffle(&mut rng);
+
+    for group in &mut seed.groups {
+        group.forced_items.shuffle(&mut rng);
+        group.placements.shuffle(&mut rng);
+
+        for reachable in &mut group.reachable {
+            reachable.shuffle(&mut rng);
+        }
+    }
 }
 
 pub struct Stats {

@@ -1,9 +1,8 @@
-use super::Analyzer;
-use std::{cmp::Ordering, num::NonZeroUsize};
-use wotw_seedgen::{
-    data::seed_language::output::{CommonItem, ContainedWrites, ContainedWritesExt},
-    spoiler::SeedSpoiler,
-};
+use std::{num::NonZeroUsize, ops::ControlFlow};
+
+use wotw_seedgen::data::seed_language::output::CommonItem;
+
+use crate::analyzers::{placement_items, Analyzer, GroupKeys, SeedAnalyzer};
 
 /// Analyzes the total spirit light
 pub struct TotalSpiritLightStats {
@@ -16,32 +15,19 @@ impl Analyzer for TotalSpiritLightStats {
         "Total Spirit Light".to_string()
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        // TODO preplacements seem to be ignored elsewhere? maybe we want a helper function for contained placements?
-        let total_spirit_light = seed
-            .preplacements
-            .iter()
-            .chain(seed.groups.iter().flat_map(|group| group.placements.iter()))
-            .flat_map(|placement| {
-                placement
-                    .item
-                    .command
-                    .direct_contained_uber_state_writes(&[])
-                    .common_items()
-            })
-            .filter_map(|common_item| match common_item {
-                CommonItem::SpiritLight(amount) => Some(amount),
-                _ => None,
-            })
-            .sum::<i32>();
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.world_analyzer()
+            .analyze_placements(|spirit_light, placement| {
+                *spirit_light += placement_items(placement)
+                    .map(|item| match item {
+                        CommonItem::SpiritLight(amount) => amount,
+                        _ => 0,
+                    })
+                    .sum::<i32>();
 
-        vec![super::group_result(
-            total_spirit_light as usize,
-            self.result_bucket_size,
-        )]
-    }
-
-    fn compare_keys(&self) -> fn(&str, &str) -> Ordering {
-        super::compare_location
+                ControlFlow::Continue(())
+            })
+            .finish()
+            .group_keys(self.result_bucket_size.get() as i32)
     }
 }

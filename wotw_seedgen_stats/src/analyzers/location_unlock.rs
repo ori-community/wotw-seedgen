@@ -1,6 +1,6 @@
-use super::Analyzer;
-use std::num::NonZeroUsize;
-use wotw_seedgen::spoiler::SeedSpoiler;
+use std::{ num::NonZeroUsize, ops::ControlFlow};
+
+use crate::analyzers::{Analyzer, GroupKeys, SeedAnalyzer};
 
 /// Analyzes how late a location is unlocked
 pub struct LocationUnlockStats {
@@ -14,22 +14,20 @@ impl Analyzer for LocationUnlockStats {
         format!("Reachables on {} unlock", self.location)
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        let reachable_until_unlocked = seed
-            .groups
-            .iter()
-            .take_while(|group| {
-                !group
-                    .placements
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.world_analyzer()
+            .analyze_reachables(|reachable_count, reachable| {
+                if reachable
                     .iter()
-                    .any(|placement| placement.location.identifier == self.location)
+                    .any(|node| node.identifier == self.location)
+                {
+                    ControlFlow::Break(())
+                } else {
+                    *reachable_count += reachable.len();
+                    ControlFlow::Continue(())
+                }
             })
-            .flat_map(|group| group.reachable.iter().map(Vec::len))
-            .sum::<usize>();
-
-        vec![super::group_result(
-            reachable_until_unlocked,
-            self.result_bucket_size,
-        )]
+            .finish()
+            .group_keys(self.result_bucket_size.get())
     }
 }

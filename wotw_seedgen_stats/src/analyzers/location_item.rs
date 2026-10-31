@@ -1,5 +1,4 @@
-use super::Analyzer;
-use wotw_seedgen::spoiler::SeedSpoiler;
+use crate::analyzers::{Analyzer, SeedAnalyzer};
 
 /// Analyzes what item gets placed on a location
 pub struct LocationItemStats {
@@ -11,13 +10,10 @@ impl Analyzer for LocationItemStats {
         format!("Item placed at {}", self.location)
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.groups
-            .iter()
-            .flat_map(|group| group.placements.iter())
-            .find(|placement| placement.location.identifier == self.location)
-            .map(|placement| placement.item.name.clone())
-            .into_iter()
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.placements()
+            .filter(|placement| placement.location.identifier == self.location)
+            .map(|placement| placement.item.name.to_string())
             .collect()
     }
 }

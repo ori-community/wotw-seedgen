@@ -1,6 +1,8 @@
-use super::Analyzer;
-use std::num::NonZeroUsize;
-use wotw_seedgen::{data::Area, spoiler::SeedSpoiler};
+use std::{num::NonZeroUsize, ops::ControlFlow};
+
+use wotw_seedgen::data::Area;
+
+use crate::analyzers::{Analyzer, GroupKeys, SeedAnalyzer};
 
 /// Analyzes when areas unlock
 ///
@@ -16,21 +18,17 @@ impl Analyzer for AreaUnlockStats {
         format!("Reachables on {} unlock", self.area)
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        let groups_until_unlocked = seed.groups.iter().take_while(|group| {
-            !group
-                .reachable
-                .iter()
-                .flatten()
-                .any(|node| node.area == self.area)
-        });
-        let reachable_count = groups_until_unlocked
-            .flat_map(|group| group.reachable.iter().map(Vec::len))
-            .sum();
-
-        vec![super::group_result(
-            reachable_count,
-            self.result_bucket_size,
-        )]
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.world_analyzer()
+            .analyze_reachables(|reachable_count, reachable| {
+                if reachable.iter().any(|node| node.area == self.area) {
+                    ControlFlow::Break(())
+                } else {
+                    *reachable_count += reachable.len();
+                    ControlFlow::Continue(())
+                }
+            })
+            .finish()
+            .group_keys(self.result_bucket_size.get())
     }
 }

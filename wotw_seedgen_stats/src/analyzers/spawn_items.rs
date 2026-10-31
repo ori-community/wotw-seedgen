@@ -1,5 +1,4 @@
-use super::Analyzer;
-use wotw_seedgen::spoiler::SeedSpoiler;
+use crate::analyzers::{Analyzer, SeedAnalyzer};
 
 /// Analyzes the spawn items
 pub struct SpawnItemStats;
@@ -8,12 +7,10 @@ impl Analyzer for SpawnItemStats {
         "Spawn Items".to_string()
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.groups
-            .iter()
-            .flat_map(|group| group.placements.iter())
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.placements()
             .filter(|placement| placement.location.identifier == "Spawn")
-            .map(|placement| placement.item.name.clone())
+            .map(|placement| placement.item.name.to_string())
             .collect()
     }
 }

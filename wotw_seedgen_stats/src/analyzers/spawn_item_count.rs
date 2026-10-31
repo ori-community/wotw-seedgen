@@ -1,5 +1,6 @@
-use super::Analyzer;
-use wotw_seedgen::spoiler::SeedSpoiler;
+use std::{ ops::ControlFlow};
+
+use crate::analyzers::{Analyzer, Keys, SeedAnalyzer};
 
 /// Analyzes the spawn items
 pub struct SpawnItemCountStats;
@@ -8,14 +9,16 @@ impl Analyzer for SpawnItemCountStats {
         "Spawn Item Count".to_string()
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        let count = seed
-            .groups
-            .iter()
-            .flat_map(|group| group.placements.iter())
-            .filter(|placement| placement.location.identifier == "Spawn")
-            .count();
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.world_analyzer::<usize>()
+            .analyze_placements(|spawn_item_count, placement| {
+                if placement.location.identifier == "Spawn" {
+                    *spawn_item_count += 1;
+                }
 
-        vec![count.to_string()]
+                ControlFlow::Continue(())
+            })
+            .finish()
+            .keys()
     }
 }

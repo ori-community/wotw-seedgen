@@ -1,15 +1,16 @@
-use super::Analyzer;
-use wotw_seedgen::spoiler::SeedSpoiler;
+use crate::analyzers::{Analyzer, SeedAnalyzer};
 
 pub struct ProgressionLocationsStats;
+
 /// Analyzes what locations progression gets placed on
 impl Analyzer for ProgressionLocationsStats {
     fn title(&self) -> String {
         "Progression locations".to_string()
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.groups
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.spoiler
+            .groups
             .iter()
             .flat_map(|group| {
                 let mut forced_items = group
@@ -24,7 +25,7 @@ impl Analyzer for ProgressionLocationsStats {
                         .position(|item| *item == &placement.item.name)?;
                     forced_items.swap_remove(index);
 
-                    Some(placement.location.identifier.clone())
+                    Some(placement.location.identifier.to_string())
                 })
             })
             .collect()

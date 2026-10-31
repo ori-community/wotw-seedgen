@@ -1,6 +1,6 @@
-use super::Analyzer;
 use std::num::NonZeroUsize;
-use wotw_seedgen::spoiler::SeedSpoiler;
+
+use crate::analyzers::{Analyzer, Keys, SeedAnalyzer};
 
 /// Analyzes how big the steps of progression are
 pub struct StepSizeStats {
@@ -13,15 +13,12 @@ impl Analyzer for StepSizeStats {
         "Size of progression steps".to_string()
     }
 
-    fn analyze(&self, seed: &SeedSpoiler) -> Vec<String> {
-        seed.groups
+    fn analyze(&self, seed: &SeedAnalyzer) -> Vec<String> {
+        seed.spoiler
+            .groups
             .iter()
-            .map(|group| {
-                super::group_result(
-                    group.reachable.iter().map(Vec::len).sum(),
-                    self.result_bucket_size,
-                )
-            })
-            .collect()
+            .flat_map(|group| group.reachable.iter().map(Vec::len))
+            .filter(|step_size| *step_size > 0)
+            .keys()
     }
 }
