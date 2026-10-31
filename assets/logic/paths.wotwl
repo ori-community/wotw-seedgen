@@ -11362,10 +11362,18 @@ anchor UpperDepths.FirstFirefly at 211, -4391:  # Where the Voice dialogue plays
     kii:
       Bash, Sword OR Hammer OR Shuriken=1
       Bash, Damage=30, Sentry=1 OR Flash=1
-      DoubleJump, TripleJump
+      DoubleJump, TripleJump OR Hammer OR GlideJump OR GrenadeJump=1
+      SwordSJump=1, Damage=30
+      GlideJump:
+        Sentry=1, Sentry=1 OR Damage=30
+        Flash=1, Flash=1 OR Damage=30
+        Hammer, Damage=30
     unsafe:
-      Bash
-      SentryJump=1, Combat=Bat, Glide, Damage=30
+      # Sword, DoubleJump  # Reset doublejumps with the bat. Too precise for kii
+      Glide, DoubleJump  # Use the updraft
+      # GlideJump, Sword, Damage=30  # GlideJump + upslash to reach the wall
+      Bash OR Sword OR GlideJump OR SentryJump=1 OR GroundedHammerJump OR AbilitySwap=2 OR GrenadeCancel  # Two safe spots in the overhead spikes to avoid damage
+      SpearJump=1, DoubleJump
   pickup Depths.BehindWind.CeilingOre:
     moki:
       Combat=Bat, Grapple, DoubleJump
@@ -11374,12 +11382,22 @@ anchor UpperDepths.FirstFirefly at 211, -4391:  # Where the Voice dialogue plays
     gorlek:
       Grapple, DoubleJump
       Bash OR SentryJump=1
+    kii:
+      Grapple:  # Use the left plant to gain height
+        Sword OR Hammer  # Weapon takes care of combat. Hover to reach right plant
+        Combat=Bat, Dash OR Glide OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      AerialHammerJump
+      GrenadeJump=1, DoubleJump OR Glide
+      SwordJump, DoubleJump, TripleJump
     unsafe:
-      DoubleJump, TripleJump
-      Hammer, DoubleJump
-      Grenade=1
-      DoubleJump, Shuriken, Sword, Deflector
-  pickup Depths.FirstKSRoom.LeftKS:  # paths breaking the firefly egg; others can go from the anchor below
+      DoubleJump:
+        Hammer OR Dash OR TripleJump OR SpearJump=1  # Wall at the grapple plant
+        Shuriken, Sword, Deflector
+      GlideJump OR GrenadeCancel OR AbilitySwap=1 OR GroundedHammerJump
+      Grapple  # Grapple both plants
+      # Grapple, UltraGrapple  # oriCool
+      # Grapple, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Too unreliable for kii with the plant physics
+  pickup Depths.FirstKSRoom.LeftKS:  # Only paths breaking the firefly egg. Other paths start on UpperDepths.FirstKSRoom
     moki:
       BreakWall=1, Combat=Spiderling, Grapple, DoubleJump OR Dash OR Glide
       BreakWall=1, Bash, Grapple, DoubleJump OR Dash OR Glide
@@ -11389,14 +11407,27 @@ anchor UpperDepths.FirstFirefly at 211, -4391:  # Where the Voice dialogue plays
     gorlek:
       BreakWall=1, Grapple
       BreakWall=1, DoubleJump, TripleJump OR Dash OR Glide  # Glide happens to automatically line up with the safe spot, Sword doesn't
-      Bow=1 OR Spear=1  # break the firefly egg from a distance
-      SwordSJump=1, DoubleJump OR Dash OR Glide  # Go as close to spikes as possible, do SentryJup and the Sword hower + the skill you have
+      Bow=1 OR Spear=1  # Break the firefly egg from a distance
+      SwordSJump=1, DoubleJump OR Dash OR Glide  # Go as close to spikes as possible, do SentryJump and the Sword hover + the skill you have
     kii:
-      Sword, DoubleJump, Flash=1 OR Shuriken=1 OR Sentry=1
+      Sword, DoubleJump, Shuriken=1 OR Flash=1 OR Sentry=1
+      SwordJump  # +upslash
+      Hammer, DoubleJump
+      Grenade=1, Dash OR Glide
+      BreakWall=1, Dash  # Coyote dash lands perfectly on the safe spot. Alternatively:
+      # BreakWall=1, Dash, Flash=1 OR Sentry=1
+      # BreakWall=1, Dash, Damage=30, Shuriken=1 OR Blaze=1
     unsafe:
-      Bash  # make friends with the spiderling
-      Sword, DoubleJump, Damage=30
-  # a higher difficulty can put paths directly to swimec using the firefly egg here
+      # Bash  # Bash a projectile towards the firefly egg. Redundant with going down and using the spiderling as light
+      Sword  # Pogo a projectile then hover
+      # Sword, DoubleJump
+      DoubleJump, Shuriken=1  # Use the shuriken to reach the safe spot and break the egg at the same time
+      AbilitySwap=1, BreakWall=1
+      # BreakWall=1, DoubleJump, Flash=1 OR Sentry=1  # Redundant with AbilitySwap
+      PauseFloat, Damage=30, BreakWall=1  # I hope you enjoy enabling this trick
+      GrenadeJump=1  # Dropping down too early will despawn the firefly so you need to land back on the upper platform
+      ChargeBlaze=1
+  # a higher difficulty can put paths directly to SwimEF using the firefly egg here
 
   conn UpperDepths.Entry:
     moki:
@@ -11407,7 +11438,15 @@ anchor UpperDepths.FirstFirefly at 211, -4391:  # Where the Voice dialogue plays
       Glide, Combat=BombSlug+Bat
       Glide, Combat=Bat, Damage=10
       Launch, DoubleJump, TripleJump, Dash, Bash, Damage=30
-    kii: Glide
+    kii:
+      Glide
+      Launch, Damage=70  # 2 Spikes + Bat or Bombslug
+      AerialHammerJump, Damage=130  # 3 Spikes + Bombslug
+      AerialHammerJump, TripleJump, Damage=40  # 1 Spikes + Bombslug
+    unsafe:
+      Launch  # https://youtu.be/WvNGlURMIFM
+      Unpopular, Bash, Spear=1  # Double fake bash https://youtu.be/sb2HNuEZUGw
+
   conn UpperDepths.FirstKSRoom: free
 
 anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
@@ -11420,6 +11459,8 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
     moki: DepthsLight, Combat=Spiderling OR DoubleJump OR Bash OR Launch
     gorlek: DepthsLight
     kii: Bash, Glide, DoubleJump OR Dash  # Kite spider to left with bash and then bashglide
+    unsafe:
+      Bash  # make friends with the spiderling
   pickup Depths.FirstKSRoom.SwimEF:
     moki:
       Flash=1, Water, Combat=Spiderling OR DoubleJump OR Bash OR Launch
