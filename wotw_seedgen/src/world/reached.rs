@@ -927,6 +927,10 @@ impl<'graph> World<'graph, '_, '_, '_> {
                     return ControlFlow::Break(());
                 }
 
+                if *previous.post_refills.first().unwrap() == self.max_orbs() {
+                    return ControlFlow::Break(());
+                }
+
                 let pre_refills = &previous.pre_refills;
                 orb_variants.retain(|orbs| {
                     !pre_refills
