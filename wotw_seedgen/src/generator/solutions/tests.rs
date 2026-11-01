@@ -1673,8 +1673,12 @@ fn feeding_grounds_spawn_solutions() {
             [skill(Bash), skill(Grenade), skill(DoubleJump)],
             [skill(Bash), skill(Grenade), skill(Dash)],
             [skill(Bash), skill(Grenade), health_fragment()],
+            [skill(Bash), skill(Grenade), skill(Glide), skill(Sword)],
+            [skill(Bash), skill(Grenade), skill(Glide), skill(Hammer)],
             [skill(Grapple), skill(Dash)],
             [skill(Grapple), skill(Sword), health_fragment()],
+            [skill(Grapple), skill(Glide), skill(Sword)],
+            [skill(Grapple), skill(Glide), skill(Hammer)],
             [skill(Launch)],
         ]),
     );

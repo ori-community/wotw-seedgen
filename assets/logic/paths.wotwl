@@ -14973,40 +14973,27 @@ anchor LowerWastes.FeedingGroundsTP at 1456, -3997:  # At the Western Wastes TP
     gorlek: Burrow
 
   conn Teleporters: free
-  conn LowerWastes.SunsetView:
+  conn LowerWastes.AboveFeedingGroundsTP:
     moki:
-      DoubleJump, Grapple
-      Bash, Grenade=1, DoubleJump OR Dash
-      DoubleJump, Burrow
       Launch
+      DoubleJump, Grapple OR Burrow
+      Bash, Grenade=1
     gorlek:
-      Bash, Grenade=1, Damage=30
       DoubleJump, TripleJump
-      Grapple, Dash  # done by jumping off the muncher
-      Grapple, Sword, Damage=30
-      SentryJump=1, Damage=30 OR DoubleJump OR Dash
-      SwordSJump=2
-      HammerSJump=2, Glide
+      Burrow, Hammer
+      Grapple, Dash OR Sword  # done by jumping off the muncher
+      Grapple, Glide, Hammer
+      SentryJump=1
     kii:
       DoubleJump, Hammer OR Sword  # djump+upslash to climb the wall
-      Burrow, Dash OR Hammer OR Shuriken=2
-      Burrow, Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
-        Damage=30
-      Burrow, Glide, Sword OR Flash=2 OR Sentry=2
-      Burrow, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # upslash then energy weapon to pass over the spikes
-      Grapple, Hammer
-      Grapple, Sentry=2, Shuriken=1 OR Damage=30
-      Grapple, Glide, Sword OR Shuriken=2 OR Flash=2 OR Sentry=2
-      Grapple, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1:
-        Damage=30
-      Grapple, Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=30  # upslash then energy weapon to pass over the spikes
+      Burrow, Dash OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
+      Grapple, Hammer OR Sentry=2
+      Grapple, Glide, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
     unsafe:
-      DoubleJump  # precise....? This is another rough path. Can turn it to triple jump to make it freeTM, or can add weapons
-      Burrow, Damage=30  # This is a pretty rough path. Might be too tricky. Sticky makes it a bit easier though?
-      Burrow, Sword OR Sentry=3 OR Shuriken=1
-      Grapple, Glide, Spear=2 OR Blaze=2
-      Grapple, Shuriken=3 OR Sentry=4
-      Burrow, GlideJump  # Burrow-Glidejump to get up the ledge, GlideJump over the spikes
+      DoubleJump OR Burrow OR GrenadeJump OR SpearJump=1 OR AbilitySwap=1  # Get on the wall then wrap around the semi solid
+      Grapple, Shuriken=2 OR PauseFloat
+      GlideJump, Hammer OR Spear=1
+      Wavedash, Spear=1  # wavedash on the teleporter then jump+spear to reach the wall
   conn WoodsMain.FeedingGrounds:
     moki: World.SeirSkill, Burrow  # Seir to make it a safe path
     gorlek: Burrow
@@ -15040,7 +15027,23 @@ anchor LowerWastes.FeedingGroundsTP at 1456, -3997:  # At the Western Wastes TP
       Burrow, SentryJump=2, DoubleJump, TripleJump OR Dash OR Glide  # moving SentryJump
       Burrow, SentryJump=2, Dash OR Glide  # moving SentryJump
 
-# checkpoint at 1509, -3987
+anchor LowerWastes.AboveFeedingGroundsTP at 1509, -3987:  # On the ledge up-right of the teleporter
+  refill Checkpoint
+
+  conn LowerWastes.FeedingGroundsTP: free
+  conn LowerWastes.SunsetView:
+    moki: DoubleJump OR Dash OR Launch
+    gorlek:
+      SwordSJump=1 OR Damage=30
+      Glide, Sword OR Hammer
+    kii:
+      Hammer OR Shuriken=1 OR GlideJump
+      Glide, Flash=1 OR Sentry=1
+      Sword, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # upslash then energy weapon to pass over the spikes
+    unsafe:
+      Sword OR Sentry=2 OR AbilitySwap=1 OR SpearJump=1 OR PauseFloat
+      Glide, GrenadeCancel
+      GrenadeJump, Spear=1 OR Blaze=1 OR Flash=1 OR Sentry=1
 
 anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
   refill Checkpoint
@@ -15053,7 +15056,7 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
     moki: Wastes.SpiritTrial.Active, Burrow, DoubleJump, Dash, Grapple
     gorlek: Wastes.SpiritTrial.Active, Burrow, Dash, Grapple
 
-  conn LowerWastes.FeedingGroundsTP:
+  conn LowerWastes.AboveFeedingGroundsTP:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Damage=30 OR Sword OR Hammer  # Multiple side slashes, not difficult
     kii:
