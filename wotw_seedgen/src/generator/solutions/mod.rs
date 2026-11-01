@@ -396,13 +396,15 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
         spirit_light_slots: usize,
     ) -> Vec<Solution<'graph>> {
         solution.inner.search_radius = u8::MAX;
+        // TODO do we want to cover the edge case that has to retry this path without capping?
+        let capped_slots = usize::min(slots, *SOLUTION_MAX_ITEMS);
 
         let mut context = SolutionContext::new(
             self,
             output,
             item_pool,
             available_spirit_light,
-            slots,
+            capped_slots,
             spirit_light_slots,
         );
 
@@ -627,6 +629,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             self.world.inventory_display(),
             self.world
                 .reached_nodes()
+                .filter(|node| {
+                    node.uber_identifier().is_none_or(|uber_identifier| {
+                        !uber_identifier.is_entrance() && !uber_identifier.is_entrance_known()
+                    })
+                })
                 .map(Node::identifier)
                 .format(", "),
         );

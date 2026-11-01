@@ -206,7 +206,12 @@ impl UberIdentifier {
 
     /// Returns `true` if this `UberIdentifier` corresponds to an entrance connection state
     pub const fn is_entrance(self) -> bool {
-        self.group == 27
+        self.group == ENTRANCES_GROUP
+    }
+
+    /// Returns `true` if this `UberIdentifier` corresponds to an entrance connection known state
+    pub const fn is_entrance_known(self) -> bool {
+        self.group == ENTRANCES_KNOWN_GROUP
     }
 
     pub const SPIRIT_LIGHT: UberIdentifier = UberIdentifier::player(0);
