@@ -15055,15 +15055,19 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
   pickup Wastes.SpiritTrial.Completed:
     moki: Wastes.SpiritTrial.Active, Burrow, DoubleJump, Dash, Grapple
     gorlek: Wastes.SpiritTrial.Active, Burrow, Dash, Grapple
+    unsafe, Wastes.SpiritTrial.Active, Burrow:
+      DoubleJump, Damage=60
+      GlideJump, DoubleJump, Damage=30
+      Dash, Damage=90  # https://youtu.be/QSSUSt_YcQI
 
   conn LowerWastes.AboveFeedingGroundsTP:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Damage=30 OR Sword OR Hammer  # Multiple side slashes, not difficult
-    kii:
-      Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
+    kii: Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
       Bash, Grenade=1  # deemed too obscure
       Blaze=1  # This is a little tight
+      GrenadeCancel OR PauseFloat
   conn LowerWastes.Shovel:
     moki:  # I think this is fine without Combat?
       Grapple, DoubleJump OR Dash OR Glide
@@ -15081,7 +15085,9 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
       SentryJump=1  # sentry jumps are OP
       Bash  # bash the gorlek then its projectile
       GrenadeJump, DoubleJump
-      DoubleJump, Damage=30, SpearJump=1
+      DoubleJump, Damage=30, GlideJump OR SpearJump=1  # GlideJump from Wastes.TornBridge.HiddenSL
+      DoubleJump, Damage=60
+      Dash, Damage=90  # https://youtu.be/QSSUSt_YcQI
 
 anchor LowerWastes.Shovel at 1635, -3981:  # On the ground to the left of the Sand Bridge
   refill Energy=3:
