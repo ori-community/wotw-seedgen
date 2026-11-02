@@ -223,6 +223,7 @@ fun icons_message() {
         "\n" +
         "[Binding1]Close"
     )
+    set_message_background("icons", false)
 }
 
 fun xbox_icons_message() {
@@ -236,6 +237,7 @@ fun xbox_icons_message() {
         "\n" +
         "[Binding1]Close"
     )
+    set_message_background("icons", false)
 }
 
 on binding1 destroy_message("icons")
