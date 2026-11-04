@@ -1008,7 +1008,7 @@ pub struct Preplace;
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct PreplaceArgs<'source> {
     pub item: Action<'source>,
-    pub area: CommandArg<Expression<'source>>,
+    pub area: SpannedOption<(Symbol<','>, Expression<'source>)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

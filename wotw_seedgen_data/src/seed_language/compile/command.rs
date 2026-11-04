@@ -1260,15 +1260,27 @@ impl<'source> Compile<'source> for ast::PreplaceArgs<'source> {
             .compile(compiler)
             .and_then(|command| command.expect_void(compiler, span));
 
-        let area = get_command_arg(self.area).and_then(|area| area.evaluate(compiler));
+        let area = self
+            .area
+            .into_option()
+            .map(|(_, area)| area.evaluate(compiler));
 
-        if let (Some(item), Some(area)) = (item, area) {
-            compiler
+        let Some(item) = item else { return };
+
+        match area {
+            None => compiler
                 .global
                 .output
                 .modifiers
-                .preplacements
-                .push((item, area));
+                .world_preplacements
+                .push(item),
+            Some(None) => return,
+            Some(Some(area)) => compiler
+                .global
+                .output
+                .modifiers
+                .area_preplacements
+                .push((item, area)),
         }
     }
 }

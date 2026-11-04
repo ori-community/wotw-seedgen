@@ -162,7 +162,8 @@ pub struct GenerationModifiers<'log> {
     pub random_placement_slots: FxHashMap<CommandBoolean, u32>,
     pub logical_state_sets: FxHashSet<String>,
     pub only_simulation_events: Vec<Range<usize>>,
-    pub preplacements: Vec<(CommandVoid, Area)>,
+    pub area_preplacements: Vec<(CommandVoid, Area)>,
+    pub world_preplacements: Vec<CommandVoid>,
 }
 
 impl GenerationModifiers<'_> {

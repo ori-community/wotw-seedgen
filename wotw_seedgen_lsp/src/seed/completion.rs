@@ -1413,7 +1413,7 @@ impl CompletionInSpan for PreplaceArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
             .completion(index, cache)
-            .or_else(|| self.area.completion(index, cache))
+            .or_else(|| self.area.as_option()?.1.completion(index, cache))
     }
 }
 

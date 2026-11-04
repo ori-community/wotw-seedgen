@@ -20,7 +20,7 @@ use rand::{
 };
 use rand_pcg::Pcg64Mcg;
 use rustc_hash::FxHashMap;
-use std::{cmp::Ordering, iter, mem, ops::RangeFrom, sync::LazyLock};
+use std::{cmp::Ordering, fmt::Display, iter, mem, ops::RangeFrom, sync::LazyLock};
 use wotw_seedgen_data::{
     assets::{Pickups, PickupsEntry},
     env_or, env_or_else,
@@ -130,8 +130,10 @@ impl<'graph, 'settings, 'perf, 'log> Context<'graph, 'settings, 'perf, 'log> {
 
         for world in &worlds {
             universe_placements += world.needs_placement.len();
-            universe_item_count +=
-                world.item_pool.len() + world.output.modifiers.preplacements.len() + 1;
+            universe_item_count += world.item_pool.len()
+                + world.output.modifiers.area_preplacements.len()
+                + world.output.modifiers.world_preplacements.len()
+                + 1;
         }
 
         if universe_item_count >= universe_placements {
@@ -1023,8 +1025,8 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         let mut area_reachable = FxHashMap::default();
         let mut area_unreachable = FxHashMap::default();
 
-        for (command, area) in mem::take(&mut self.output.modifiers.preplacements) {
-            let pickup = self.choose_preplacement_location(
+        for (command, area) in mem::take(&mut self.output.modifiers.area_preplacements) {
+            let pickup = self.choose_area_preplacement_location(
                 &command,
                 &mut area_reachable,
                 &mut area_unreachable,
@@ -1034,10 +1036,16 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             self.preplace(pickup, command, preplacement_spoiler);
         }
 
+        for command in mem::take(&mut self.output.modifiers.world_preplacements) {
+            let pickup = self.choose_world_preplacement_location(&command)?;
+
+            self.preplace(pickup, command, preplacement_spoiler);
+        }
+
         Ok(())
     }
 
-    fn choose_preplacement_location(
+    fn choose_area_preplacement_location(
         &mut self,
         command: &CommandVoid,
         area_reachable: &mut FxHashMap<Area, Vec<usize>>,
@@ -1059,20 +1067,52 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
             })
         }
 
-        let area_reachable = area_pickups(area_reachable, area, &self.needs_placement);
+        self.choose_preplacement_location(
+            command,
+            format_args!("in {area}"),
+            |reachable| {
+                area_pickups(area_reachable, area, reachable)
+                    .pop()
+                    .map(|index| reachable.swap_remove(index))
+            },
+            |unreachable| {
+                area_pickups(area_unreachable, area, unreachable)
+                    .pop()
+                    .map(|index| unreachable.swap_remove(index))
+            },
+            |pickup| pickup.area == area,
+        )
+    }
 
-        if let Some(index) = area_reachable.pop() {
-            return Ok(self.needs_placement.swap_remove(index));
+    fn choose_world_preplacement_location(
+        &mut self,
+        command: &CommandVoid,
+    ) -> Result<&'graph PickupsEntry, String> {
+        self.choose_preplacement_location(
+            command,
+            "",
+            |reachable| reachable.pop(),
+            |unreachable| unreachable.pop(),
+            |_| true,
+        )
+    }
+
+    fn choose_preplacement_location(
+        &mut self,
+        command: &CommandVoid,
+        restriction_display: impl Display,
+        find_reachable: impl FnOnce(&mut Vec<&'graph PickupsEntry>) -> Option<&'graph PickupsEntry>,
+        find_unreachable: impl FnOnce(&mut Vec<&'graph PickupsEntry>) -> Option<&'graph PickupsEntry>,
+        disabled_filter: impl Fn(&PickupsEntry) -> bool,
+    ) -> Result<&'graph PickupsEntry, String> {
+        if let Some(pickup) = find_reachable(&mut self.needs_placement) {
+            return Ok(pickup);
         }
 
-        let area_unreachable = area_pickups(area_unreachable, area, &self.unreachable);
-
-        if let Some(index) = area_unreachable.pop() {
-            let pickup = self.unreachable.swap_remove(index);
-
+        if let Some(pickup) = find_unreachable(&mut self.unreachable) {
             warn!(
                 logger: self.item_pool.log_capture,
-                "{log_index}No reachable locations to preplace {command} in {area}. Forcing into unreachable location {pickup}",
+                "{log_index}No reachable locations to preplace {command}{restriction_display}. Forcing into unreachable location {pickup}",
                 log_index = self.log_index,
                 command = self.log_name(command),
                 pickup = pickup.identifier,
@@ -1086,7 +1126,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 .graph
                 .nodes
                 .choose_weighted(&mut self.rng, |node| match node {
-                    Node::Pickup(pickup) if pickup.area == area => 1,
+                    Node::Pickup(pickup) => disabled_filter(pickup) as u8,
                     _ => 0,
                 });
 
@@ -1096,7 +1136,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
 
                 warn!(
                     logger: self.item_pool.log_capture,
-                    "{log_index}No locations to preplace {command} in {area}. Forcing into disabled location {pickup}",
+                    "{log_index}No locations to preplace {command}{restriction_display}. Forcing into disabled location {pickup}",
                     log_index = self.log_index,
                     command = self.log_name(command),
                     pickup = pickup.identifier,
@@ -1105,7 +1145,7 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
                 Ok(pickup)
             }
             Err(_) => Err(format!(
-                "{log_index}No locations exist to preplace {command} in {area}",
+                "{log_index}No locations exist to preplace {command}{restriction_display}",
                 log_index = self.log_index,
                 command = self.log_name(command),
             )),

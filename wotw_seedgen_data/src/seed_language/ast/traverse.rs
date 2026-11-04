@@ -787,7 +787,9 @@ impl<H: Handler> Traverse<H> for EventContent<'_> {
 impl<H: Handler> Traverse<H> for PreplaceArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.item.traverse(handler);
-        inspect_command_arg(&self.area, |area| area.traverse(handler));
+        if let SpannedOption::Some((_, area)) = &self.area {
+            area.traverse(handler);
+        }
     }
 }
 
