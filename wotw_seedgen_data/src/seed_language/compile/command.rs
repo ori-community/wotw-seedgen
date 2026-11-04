@@ -930,9 +930,15 @@ fn compile_item_pool_change<'source, const FACTOR: i32>(
         .compile(compiler)
         .and_then(|command| command.expect_void(compiler, span));
 
-    let amount = get_command_arg(args.amount).and_then(|amount| amount.evaluate::<i32>(compiler));
+    let amount = match args.amount {
+        SpannedOption::Some((_, amount)) => match amount.evaluate(compiler) {
+            None => return,
+            Some(amount) => amount,
+        },
+        SpannedOption::None(_) => 1,
+    };
 
-    if let (Some(item), Some(amount)) = (item, amount) {
+    if let Some(item) = item {
         *compiler
             .global
             .output

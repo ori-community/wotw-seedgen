@@ -4,4 +4,4 @@
 
 !tags("No Launch")
 
-!remove_item(skill(Launch), 1)
+!remove_item(skill(Launch))

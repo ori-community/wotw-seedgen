@@ -884,7 +884,7 @@ pub struct RemoveItemArgs<'source>(pub ChangeItemPoolArgs<'source>);
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]
 pub struct ChangeItemPoolArgs<'source> {
     pub item: Action<'source>,
-    pub amount: CommandArg<Expression<'source>>,
+    pub amount: SpannedOption<(Symbol<','>, Expression<'source>)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast)]

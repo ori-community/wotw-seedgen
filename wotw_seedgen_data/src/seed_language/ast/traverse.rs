@@ -695,7 +695,9 @@ impl<H: Handler> Traverse<H> for RemoveSpiritLightArgs<'_> {
 impl<H: Handler> Traverse<H> for ChangeItemPoolArgs<'_> {
     fn traverse(&self, handler: &mut H) {
         self.item.traverse(handler);
-        inspect_command_arg(&self.amount, |amount| amount.traverse(handler));
+        if let SpannedOption::Some((_, amount)) = &self.amount {
+            amount.traverse(handler);
+        }
     }
 }
 

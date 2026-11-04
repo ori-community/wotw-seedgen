@@ -1239,7 +1239,7 @@ impl CompletionInSpan for ChangeItemPoolArgs<'_> {
     fn completion_in_span(&self, index: usize, cache: &CacheValues) -> Option<Vec<CompletionItem>> {
         self.item
             .completion(index, cache)
-            .or_else(|| self.amount.completion(index, cache))
+            .or_else(|| self.amount.as_option()?.1.completion(index, cache))
     }
 }
 
