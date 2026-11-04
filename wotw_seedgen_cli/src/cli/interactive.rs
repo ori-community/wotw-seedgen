@@ -527,10 +527,8 @@ fn select_snippet_config(
 
     let items = sanitize_items(configurable_snippets.iter().map(|snippet| {
         format!(
-            "{literal}{identifier}{reset}: {values}",
-            literal = LITERAL.render(),
+            "{LITERAL}{identifier}{Reset}: {values}",
             identifier = snippet.identifier,
-            reset = Reset.render(),
             values = snippet.metadata.config.keys().format(", ")
         )
     }));
@@ -598,9 +596,7 @@ fn select_snippet_config_value(
             .zip(&current_values)
             .map(|((identifier, value), current)| {
                 format!(
-                    "{literal}{identifier}{reset} [{current}]: {name}{description}",
-                    literal = LITERAL.render(),
-                    reset = Reset.render(),
+                    "{LITERAL}{identifier}{Reset} [{current}]: {name}{description}",
                     name = value.name,
                     description = match &value.description {
                         None => String::new(),
@@ -653,17 +649,13 @@ fn choose_snippet_config_value(
         ConfigValue::IntegerRange { min, max, .. } => {
             let _ = write!(
                 &mut prompt,
-                " between {literal}{min}{reset} and {literal}{max}{reset}",
-                literal = LITERAL.render(),
-                reset = Reset.render(),
+                " between {LITERAL}{min}{Reset} and {LITERAL}{max}{Reset}",
             );
         }
         ConfigValue::FloatRange { min, max, .. } => {
             let _ = write!(
                 &mut prompt,
-                " between {literal}{min}{reset} and {literal}{max}{reset}",
-                literal = LITERAL.render(),
-                reset = Reset.render(),
+                " between {LITERAL}{min}{Reset} and {LITERAL}{max}{Reset}",
             );
         }
         _ => {}
@@ -736,9 +728,7 @@ fn multi_select_custom_report(prompt: &str, selected: &FxHashSet<String>) {
         selected
             .iter()
             .format_with(", ", |identifier, f| f(&format_args!(
-                "{literal}{identifier}{reset}",
-                literal = LITERAL.render(),
-                reset = Reset.render(),
+                "{LITERAL}{identifier}{Reset}",
             )))
     );
 }
@@ -757,10 +747,8 @@ where
                 eprintln!("Finish");
             } else {
                 eprintln!(
-                    "{literal}{identifier}{reset}",
-                    literal = LITERAL.render(),
+                    "{LITERAL}{identifier}{Reset}",
                     identifier = get_identifier(index),
-                    reset = Reset.render(),
                 );
             }
         }

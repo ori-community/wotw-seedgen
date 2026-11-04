@@ -131,12 +131,10 @@ fn worlds_arg() -> Arg {
         .help("Number of worlds for multiworld")
         .long_help(format!(
             "By specifying a number greater than 0, you can generate seeds for the multiworld game mode\n\
-            You can define different settings for all the worlds using the scoping syntax '{literal}<INDEX>: <ARGS>...{reset}'\n\
-            For example, the following options define a three world seed where all worlds include the '{literal}rspawn{reset}'\n\
-            preset, the first two worlds ('{literal}0{reset}' and '{literal}1{reset}') include the '{literal}moki{reset}' preset and the last world ('{literal}2{reset}') includes\n\
-            the '{literal}gorlek{reset}' preset: '{literal}--worlds 3 --world-presets rspawn 0: moki 1: moki 2: gorlek{reset}'",
-            literal = LITERAL.render(),
-            reset = Reset.render(),
+            You can define different settings for all the worlds using the scoping syntax '{LITERAL}<INDEX>: <ARGS>...{Reset}'\n\
+            For example, the following options define a three world seed where all worlds include the '{LITERAL}rspawn{Reset}'\n\
+            preset, the first two worlds ('{LITERAL}0{Reset}' and '{LITERAL}1{Reset}') include the '{LITERAL}moki{Reset}' preset and the last world ('{LITERAL}2{Reset}') includes\n\
+            the '{LITERAL}gorlek{Reset}' preset: '{LITERAL}--worlds 3 --world-presets rspawn 0: moki 1: moki 2: gorlek{Reset}'",
         ))
 }
 
@@ -206,9 +204,7 @@ fn spawn_arg(world_scoped: bool) -> Arg {
         .help("Spawn location")
         .long_help(format!(
             "Use any anchor identifier from paths.wotwl to spawn on a specific location\n\
-            Use '{literal}r{reset}' / '{literal}random{reset}' for a random teleporter or '{literal}f{reset}' / '{literal}fullyrandom{reset}' for a random anchor",
-            literal = LITERAL.render(),
-            reset = Reset.render(),
+            Use '{LITERAL}r{Reset}' / '{LITERAL}random{Reset}' for a random teleporter or '{LITERAL}f{Reset}' / '{LITERAL}fullyrandom{Reset}' for a random anchor",
         ));
 
     if world_scoped {
@@ -228,11 +224,8 @@ fn difficulty_arg(world_scoped: bool) -> Arg {
         .long_help(format!(
             "The logical difficulty to expect in a seed\n\
             This represents how demanding the required core movement should be\n\
-            Difficulties don't include glitches by default, these are handled separately with '{literal}--tricks{reset}'\n\
-            See the paths wiki page for more information: {link}https://wiki.orirando.com/seedgen/paths{reset}",
-            literal = LITERAL.render(),
-            link = LINK.render(),
-            reset = Reset.render(),
+            Difficulties don't include glitches by default, these are handled separately with '{LITERAL}--tricks{Reset}'\n\
+            See the paths wiki page for more information: {LINK}https://wiki.orirando.com/seedgen/paths{Reset}",
         ));
 
     if world_scoped {
@@ -253,9 +246,7 @@ fn tricks_arg(world_scoped: bool) -> Arg {
         .long_help(format!(
             "Tricks that can be logically required\n\
             This includes mostly Glitches but also other techniques that can be toggled for logic, such as damage boosting\n\
-            See the paths wiki page for more information: {link}https://wiki.orirando.com/seedgen/paths{reset}",
-            link = LINK.render(),
-            reset = Reset.render(),
+            See the paths wiki page for more information: {LINK}https://wiki.orirando.com/seedgen/paths{Reset}",
         )); // TODO don't think damage boost toggling is actually implemented yet
 
     choose_strum_enum_parser!(arg, world_scoped, Trick)
@@ -280,11 +271,9 @@ fn game_difficulties_arg(world_scoped: bool) -> Arg {
         .help("Logically supported in-game difficulties")
         .long_help(format!(
             "This refers to the vanilla difficulties when starting a savefile.\n\
-            By default seeds support {literal}easy{reset} and {literal}normal{reset}. If you want to play on {literal}hard{reset},\n\
-            you should use '{literal}--game-difficulties hard{reset}' (short: '{literal}-g h{reset}') to ensure damage requirements are scaled and such.\n\
-            You can combine your difficulties with '{literal}o{reset}' or '{literal}only-show-selected{reset}' (example: '{literal}-g o n{reset}') to hide all other difficulties from the main menu.",
-            literal = LITERAL.render(), // TODO .render() is optional now, shorten these
-            reset = Reset.render(),
+            By default seeds support '{LITERAL}easy{Reset}' and '{LITERAL}normal{Reset}'. If you want to play on '{LITERAL}hard{Reset}',\n\
+            you should use '{LITERAL}--game-difficulties hard{Reset}' (short: '{LITERAL}-g h{Reset}') to ensure damage requirements are scaled and such.\n\
+            You can combine your difficulties with '{LITERAL}o{Reset}' or '{LITERAL}only-show-selected{Reset}' (example: '{LITERAL}-g o n{Reset}') to hide all other difficulties from the main menu.",
         ));
 
     choose_strum_enum_parser!(arg, world_scoped, GameDifficulty)
@@ -352,11 +341,9 @@ fn preset_help(available_presets: &[AvailablePreset], kind: &str) -> String {
     let kind_lower = kind.to_ascii_lowercase();
     let mut help = format!(
         "{kind} presets define reusable settings to be applied to a {kind_lower}.\n\
-        For details on how to create them, try '{literal}seedgen help {kind_lower}-preset{reset}'\n\
+        For details on how to create them, try '{LITERAL}seedgen help {kind_lower}-preset{Reset}'\n\
         All json files in the '{kind_lower}_presets' directory in the current working directory are available\n\n\
         Currently {count} {kind_lower} preset{plural} available",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
         count = available_presets.len(),
         plural = if available_presets.len() == 1 { " is" } else { "s are" }
     );
@@ -423,9 +410,7 @@ fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
     let mut help = format!(
         "Many snippets offer additional settings to customize their behaviour.\n\
         These will only have an effect if you use the respective snippet.\n\
-        For instance, you can remove black market keystones, but keep black market ore by setting {literal}black_market.keystones=false{reset}",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        For instance, you can remove black market keystones, but keep black market ore by setting '{LITERAL}black_market.keystones=false{Reset}'",
     );
 
     if !available_snippets.is_empty() {
@@ -435,10 +420,8 @@ fn snippet_config_help(available_snippets: &[AvailableSnippet]) -> String {
             for (config_identifier, config_value) in &available_snippet.metadata.config {
                 let _ = write!(
                     help,
-                    "\n    {literal}{snippet_identifier}.{config_identifier}{reset}: {name}{description} [default: {default}]",
-                    literal = LITERAL.render(),
+                    "\n    {LITERAL}{snippet_identifier}.{config_identifier}{Reset}: {name}{description} [default: {default}]",
                     snippet_identifier = available_snippet.identifier,
-                    reset = Reset.render(),
                     name = config_value.name,
                     description = match &config_value.description {
                         None => String::new(),
@@ -515,13 +498,11 @@ impl FromStr for GameDifficulty {
             "h" | "hard" => Ok(Self::Hard),
             "o" | "only-show-selected" => Ok(Self::OnlyShowSelected),
             other => Err(format!(
-                "invalid game difficulty \"{other}\": possible values are \
-                \"{literal}e{reset}asy\", \
-                \"{literal}n{reset}ormal\", \
-                \"{literal}h{reset}ard\" or \
-                \"{literal}o{reset}nly-show-selected\"",
-                literal = LITERAL.render(),
-                reset = Reset.render(),
+                "invalid game difficulty '{other}': possible values are \
+                '{LITERAL}e{Reset}asy', \
+                '{LITERAL}n{Reset}ormal', \
+                '{LITERAL}h{Reset}ard' or \
+                '{LITERAL}o{Reset}nly-show-selected'",
             )),
         }
     }
@@ -711,11 +692,8 @@ impl FromArgMatches for SeedSettings {
                                     clap::Error::raw(
                                         ErrorKind::ValueValidation,
                                         format!(
-                                            "world index '{invalid}{index}{reset}' exceeds number of worlds. Try '{literal}--worlds {worlds}{reset}' to generate multiple worlds",
+                                            "world index '{INVALID}{index}{Reset}' exceeds number of worlds. Try '{LITERAL}--worlds {worlds}{Reset}' to generate multiple worlds",
                                             worlds = *index + 1,
-                                            invalid = INVALID.render(),
-                                            literal = LITERAL.render(),
-                                            reset = Reset.render()
                                         ),
                                     )
                                 })?;

@@ -109,10 +109,8 @@ fn identifier_arg<const UNIVERSE: bool>() -> Arg {
         .required_unless_present("interactive")
         .help("The preset's identifier")
         .long_help(format!(
-            "The preset's identifier which you can later pass like '{literal}seedgen seed -{flag} <identifier>{reset}'",
-            literal = LITERAL.render(),
+            "The preset's identifier which you can later pass like '{LITERAL}seedgen seed -{flag} <identifier>{Reset}'",
             flag = if UNIVERSE { 'P' } else { 'p' },
-            reset = Reset.render(),
         ))
 }
 

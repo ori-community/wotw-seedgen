@@ -15,9 +15,7 @@ pub struct VerboseArgs {
         num_args = 0..,
         help = VERBOSE_HELP,
         long_help = format!(
-            "{VERBOSE_HELP}.\nOne or more targets can be provided for additional logging.\n'{literal}-v{reset}' without any arguments defaults to '{literal}-v placement spawn{reset}'",
-            literal = LITERAL.render(),
-            reset = Reset.render()
+            "{VERBOSE_HELP}.\nOne or more targets can be provided for additional logging.\n'{LITERAL}-v{Reset}' without any arguments defaults to '{LITERAL}-v placement spawn{Reset}'",
         )
     )]
     pub verbose: Option<Vec<VerboseTarget>>,
@@ -28,9 +26,7 @@ pub struct VerboseArgs {
         num_args = 0..,
         help = TRACE_UBER_STATES_HELP,
         long_help = format!(
-            "{TRACE_UBER_STATES_HELP}.\nOne or more UberStates can be provided in {literal}<group>|<member>{reset} format for filtering.\nWithout filters, all changes will be traced",
-            literal = LITERAL.render(),
-            reset = Reset.render()
+            "{TRACE_UBER_STATES_HELP}.\nOne or more UberStates can be provided in '{LITERAL}<group>|<member>{Reset}' format for filtering.\nWithout filters, all changes will be traced",
         )
     )]
     pub trace_uber_states: Option<Vec<UberIdentifier>>,

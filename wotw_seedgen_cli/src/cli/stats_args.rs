@@ -13,14 +13,12 @@ pub struct StatsArgs {
     #[arg(short, long, value_hint = ValueHint::Other, required = true, num_args = 1.., long_help = format!(
         "Any amount of analyzers that will provide statistics\n\n\
         Some analyzers take additional arguments. You can provide those like <ANALYZER>:<ARG>[,<ARG>]...\n\
-        For instance, '{literal}--analyzers item-unlock:Launch{reset}' will create a 'Reachables on launch unlock.csv'\n\n\
+        For instance, '{LITERAL}--analyzers item-unlock:Launch{Reset}' will create a 'Reachables on launch unlock.csv'\n\n\
         Multiple analyzers separated with spaces will create separate stats files analyzing their individual criteria\n\
-        For instance, '{literal}--spawn random --analyzers spawn-location spawn-items{reset}' will create one set of stats 'Spawn Location.csv' and another 'Spawn Items.csv'\n\n\
+        For instance, '{LITERAL}--spawn random --analyzers spawn-location spawn-items{Reset}' will create one set of stats 'Spawn Location.csv' and another 'Spawn Items.csv'\n\n\
         However, you can also chain analyzers together by separating them with plus signs (no spaces)\n\
-        For instance, '{literal}--spawn random --analyzers spawn-location+spawn-items{reset}' will create a 'Spawn Location and Spawn Items.csv' that contains stats on spawn items for each individual spawn location\n\n\
-        To learn more about the available analyzers, try '{literal}--analyzers help{reset}'",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        For instance, '{LITERAL}--spawn random --analyzers spawn-location+spawn-items{Reset}' will create a 'Spawn Location and Spawn Items.csv' that contains stats on spawn items for each individual spawn location\n\n\
+        To learn more about the available analyzers, try '{LITERAL}--analyzers help{Reset}'",
     ))]
     pub analyzers: Vec<ChainedAnalyzers>,
     // TODO dir_name, tolerated_errors, error_message_limit, overwrite_cache
@@ -32,9 +30,7 @@ pub struct ChainedAnalyzers(pub Vec<Analyzer>);
 pub enum Analyzer {
     #[command(about = format!(
         "Analyzes the skills placed early on. By default this means placed in the first 50 reachable locations\n\
-        Optionally use '{literal}early-skills:<reachable-limit>{reset}' to override the default value",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Optionally use '{LITERAL}early-skills:<reachable-limit>{Reset}' to override the default value",
     ))]
     EarlySkills {
         #[arg(default_value = "50")]
@@ -44,17 +40,13 @@ pub enum Analyzer {
     FirstWeapon,
     #[command(about = format!(
         "Analyzes what location an item get placed on\n\
-        Use '{literal}item-location:<item-name>{reset}' to specify which item to analyze (Example: '{literal}item-location:Launch{reset}')",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}item-location:<item-name>{Reset}' to specify which item to analyze (Example: '{LITERAL}item-location:Launch{Reset}')",
     ))]
     ItemLocation { item: String },
     #[command(about = format!(
         "Analyzes how many locations are reachable when an item unlocks\n\
-        Use '{literal}item-unlock:<item-name>{reset}' to specify which item to analyze (Example: '{literal}item-name:Launch{reset}')\n\
-        Optionally use '{literal}item-unlock:<item-name>,<result-bucket-size>{reset}' to group results together in buckets",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}item-unlock:<item-name>{Reset}' to specify which item to analyze (Example: '{LITERAL}item-unlock:Launch{Reset}')\n\
+        Optionally use '{LITERAL}item-unlock:<item-name>,<result-bucket-size>{Reset}' to group results together in buckets",
     ))]
     ItemUnlock {
         item: String,
@@ -63,24 +55,18 @@ pub enum Analyzer {
     },
     #[command(about = format!(
         "Analyzes what area an item is placed in\n\
-        Use '{literal}item-area:<item-name>{reset}' to specify which item to analyze (Example: '{literal}item-area:Launch{reset}')",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}item-area:<item-name>{Reset}' to specify which item to analyze (Example: '{LITERAL}item-area:Launch{Reset}')",
     ))]
     ItemArea { item: String },
     #[command(about = format!(
         "Analyzes what item gets placed on a location\n\
-        Use '{literal}location-item:<location>{reset}' to specify which location to analyze (Example: '{literal}location-item:Glades.RebuildGlades.Completed{reset}')",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}location-item:<location>{Reset}' to specify which location to analyze (Example: '{LITERAL}location-item:Glades.RebuildGlades.Completed{Reset}')",
     ))]
     LocationItem { location: String },
     #[command(about = format!(
         "Analyzes how many locations are reachable before a location unlocks\n\
-        Use '{literal}location-unlock:<location>{reset}' to specify which location to analyze (Example: '{literal}location-item:Glades.RebuildGlades.Completed{reset}')\n\
-        Optionally use '{literal}item-unlock:<item-name>,<result-bucket-size>{reset}' to group results together in buckets",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}location-unlock:<location>{Reset}' to specify which location to analyze (Example: '{LITERAL}location-item:Glades.RebuildGlades.Completed{Reset}')\n\
+        Optionally use '{LITERAL}item-unlock:<item-name>,<result-bucket-size>{Reset}' to group results together in buckets",
     ))]
     LocationUnlock {
         location: String,
@@ -101,9 +87,7 @@ pub enum Analyzer {
     SpawnRegion,
     #[command(about = format!(
         "Analyzes how big the steps of progression are\n\
-        Optionally use '{literal}step-size:<result-bucket-size>{reset}' to group results together in buckets",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Optionally use '{LITERAL}step-size:<result-bucket-size>{Reset}' to group results together in buckets",
     ))]
     StepSize {
         #[arg(default_value = "1")]
@@ -111,9 +95,7 @@ pub enum Analyzer {
     },
     #[command(about = format!(
         "Analyzes how much Spirit Light is in a seed\n\
-        Optionally use '{literal}total-spirit-light:<result-bucket-size>{reset}' to group results together in buckets",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Optionally use '{LITERAL}total-spirit-light:<result-bucket-size>{Reset}' to group results together in buckets",
     ))]
     TotalSpiritLight {
         #[arg(default_value = "1")]
@@ -123,10 +105,8 @@ pub enum Analyzer {
     // TODO available values
     #[command(about = format!(
         "Analyzes how much Spirit Light is in an area\n\
-        Use '{literal}area-spirit-light:<area>{reset}' to specify which area to analyze (Example: '{literal}area-spirit-light:wellspring{reset}')\n\
-        Optionally use '{literal}area-spirit-light:<area>,<result-bucket-size>{reset}' to group results together in buckets",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}area-spirit-light:<area>{Reset}' to specify which area to analyze (Example: '{LITERAL}area-spirit-light:wellspring{Reset}')\n\
+        Optionally use '{LITERAL}area-spirit-light:<area>,<result-bucket-size>{Reset}' to group results together in buckets",
     ))]
     AreaSpiritLight {
         area: Area,
@@ -135,17 +115,13 @@ pub enum Analyzer {
     },
     #[command(about = format!(
         "Analyzes how many skills are in an area\n\
-        Use '{literal}area-skills:<area>{reset}' to specify which area to analyze (Example: '{literal}area-skills:marsh{reset}'",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}area-skills:<area>{Reset}' to specify which area to analyze (Example: '{LITERAL}area-skills:marsh{Reset}'",
     ))]
     AreaSkills { area: Area },
     #[command(about = format!(
         "Analyzes how many locations are reachable when an area unlocks\n\
-        Use '{literal}area-unlock:<area>{reset}' to specify which area to analyze (Example: '{literal}area-unlock:wellspring{reset}')\n\
-        Optionally use '{literal}area-unlock:<area>,<result-bucket-size>{reset}' to group results together in buckets",
-        literal = LITERAL.render(),
-        reset = Reset.render(),
+        Use '{LITERAL}area-unlock:<area>{Reset}' to specify which area to analyze (Example: '{LITERAL}area-unlock:wellspring{Reset}')\n\
+        Optionally use '{LITERAL}area-unlock:<area>,<result-bucket-size>{Reset}' to group results together in buckets",
     ))]
     AreaUnlock {
         area: Area,
