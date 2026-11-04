@@ -200,6 +200,13 @@ impl<'s, T> WorldAnalyzer<'s, T> {
     pub fn finish(self) -> impl Iterator<Item = T> {
         self.stats.into_iter().map(|(stat, _)| stat)
     }
+
+    pub fn finish_filter_break(self) -> impl Iterator<Item = T> {
+        self.stats
+            .into_iter()
+            .filter(|(_, flow)| flow.is_break())
+            .map(|(stat, _)| stat)
+    }
 }
 
 pub fn placement_items(placement: &SpoilerPlacement) -> impl Iterator<Item = CommonItem> + use<'_> {

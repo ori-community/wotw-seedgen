@@ -28,7 +28,7 @@ impl Analyzer for AreaUnlockStats {
                     ControlFlow::Continue(())
                 }
             })
-            .finish()
+            .finish_filter_break()
             .group_keys(self.result_bucket_size.get())
     }
 }

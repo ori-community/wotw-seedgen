@@ -1,4 +1,4 @@
-use std::{ num::NonZeroUsize, ops::ControlFlow};
+use std::{num::NonZeroUsize, ops::ControlFlow};
 
 use crate::analyzers::{Analyzer, GroupKeys, SeedAnalyzer};
 
@@ -34,7 +34,7 @@ impl Analyzer for ItemUnlockStats {
                     ControlFlow::Continue(())
                 }
             })
-            .finish()
+            .finish_filter_break()
             .map(|(_, reachable_count)| reachable_count)
             .group_keys(self.result_bucket_size.get())
     }
