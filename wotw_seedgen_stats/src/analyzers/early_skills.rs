@@ -1,6 +1,7 @@
 use std::ops::ControlFlow;
 
 use rustc_hash::{FxBuildHasher, FxHashSet};
+use wotw_seedgen::data::Area;
 
 use crate::analyzers::{placement_items, Analyzer, Keys, SeedAnalyzer};
 
@@ -30,8 +31,11 @@ impl Analyzer for EarlySkillsStats {
 
             ControlFlow::Continue(())
         })
+        .reset_flow()
         .analyze_placements(|(early_locations, early_skills), placement| {
-            if early_locations.contains(&placement.location.identifier) {
+            if matches!(placement.location.area, Area::Spawn)
+                || early_locations.contains(&placement.location.identifier)
+            {
                 *early_skills += placement_items(placement)
                     .filter(|item| item.is_skill_hinted())
                     .count()

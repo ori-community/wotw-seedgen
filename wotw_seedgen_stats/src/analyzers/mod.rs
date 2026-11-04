@@ -166,8 +166,6 @@ impl<'s, T> WorldAnalyzer<'s, T> {
         FI: FnOnce(&'s SeedAnalyzer) -> I,
         I: IntoIterator<Item = (usize, S)>,
     {
-        self.reset_flow();
-
         let mut running = self.stats.len();
 
         for (world_index, s) in inspect(self.inner) {
@@ -190,10 +188,12 @@ impl<'s, T> WorldAnalyzer<'s, T> {
         self
     }
 
-    fn reset_flow(&mut self) {
+    pub fn reset_flow(mut self) -> Self {
         for (_, flow) in &mut self.stats {
             *flow = ControlFlow::Continue(());
         }
+
+        self
     }
 
     pub fn finish(self) -> impl Iterator<Item = T> {
