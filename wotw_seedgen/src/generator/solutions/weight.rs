@@ -191,16 +191,16 @@ impl Cost for CommonUberIdentifier {
             CommonUberIdentifier::Skill(Skill::Dash | Skill::Flap) => 600., // Counteracting bias because these unlock rather little
             CommonUberIdentifier::Skill(Skill::Glide | Skill::Grapple) => 700., // Feel-Good Finds
             CommonUberIdentifier::Skill(
-                Skill::Sword | Skill::Hammer | Skill::Bow | Skill::Shuriken,
-            ) => 800., // Basic Weapons
+                Skill::Bow | Skill::Shuriken | Skill::Blaze | Skill::Sentry,
+            ) => 800., // Basic Energy Weapons
             CommonUberIdentifier::Skill(
                 Skill::Burrow | Skill::WaterDash | Skill::Grenade | Skill::Flash,
             )
             | CommonUberIdentifier::CleanWater => 900., // Key Skills
             CommonUberIdentifier::Skill(Skill::DoubleJump) => 1000., // Good to find, but this is already biased for by being powerful
-            CommonUberIdentifier::Skill(Skill::Blaze | Skill::Sentry) => 1400., // Tedious Weapons
+            CommonUberIdentifier::Skill(Skill::Sword | Skill::Hammer) => 1200., // Non-Energy Weapons that unlock a lot
             CommonUberIdentifier::Skill(Skill::Bash) => 1500., // Counteracting bias because Bash unlocks a lot
-            CommonUberIdentifier::Skill(Skill::Spear) => 2000., // Lowering the frequency of slow Spear starts
+            CommonUberIdentifier::Skill(Skill::Spear) => 1800., // Lowering the frequency of slow Spear starts
             CommonUberIdentifier::Teleporter(
                 Teleporter::Den
                 | Teleporter::Hollow
