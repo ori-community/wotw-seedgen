@@ -19,7 +19,8 @@ use wotw_seedgen_stats::{
         SpawnItemCountStats, SpawnItemStats, SpawnLocationStats, StepSizeStats,
         TotalSpiritLightStats,
     },
-    storage_access, ChainedAnalyzers, Stats, StatsGenerator,
+    storage_access::SeedStorageFileAccess,
+    ChainedAnalyzers, Stats, StatsGenerator,
 };
 
 pub fn stats(args: StatsArgs) -> Result<(), Error> {
@@ -27,6 +28,7 @@ pub fn stats(args: StatsArgs) -> Result<(), Error> {
         settings_args,
         sample_size,
         analyzers,
+        no_cache,
     } = args;
 
     let settings = settings_args.into_universe_settings()?;
@@ -37,7 +39,7 @@ pub fn stats(args: StatsArgs) -> Result<(), Error> {
         &settings,
         &graph,
         &DefaultFileAccess,
-        &storage_access::FileAccess,
+        (!no_cache).then_some(&SeedStorageFileAccess),
         &pickups,
         &uber_state_data,
     )

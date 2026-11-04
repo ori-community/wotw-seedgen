@@ -75,10 +75,10 @@ pub struct StatsGenerator<
     ///
     /// TODO how can you obtain this
     pub snippet_access: &'snippet_access A1,
-    /// A [`SeedStorageAccess`] implementation
+    /// An optional [`SeedStorageAccess`] implementation which can cache generated seeds
     ///
     /// TODO how can you obtain this
-    pub storage_access: &'storage_access A2,
+    pub storage_access: Option<&'storage_access A2>,
     /// How many errors during seed generation should be tolerated before aborting
     pub tolerated_errors: usize,
     /// How many error messages should be displayed after aborting due to `tolerated_errors` being exceeded
@@ -115,7 +115,7 @@ impl<
         settings: &'settings UniverseSettings,
         graph: &'graph Graph,
         snippet_access: &'snippet_access A1,
-        storage_access: &'storage_access A2,
+        storage_access: Option<&'storage_access A2>,
         pickups: &'pickups Pickups,
         uber_state_data: &'uberstates UberStateData,
     ) -> Self {
@@ -160,12 +160,23 @@ impl<
     }
 
     pub fn generate(self) -> Result<Vec<Stats>> {
-        if self.overwrite_seed_storage {
-            self.storage_access.clean_all_seeds()?;
-            eprintln!("Cleaned seed storage for these settings");
-        } else {
-            self.storage_access
-                .check_cache(self.settings, |settings| self.generate_one_seed(settings))?;
+        if let Some(storage_access) = self.storage_access {
+            if self.overwrite_seed_storage {
+                storage_access.clean_all_seeds()?;
+                eprintln!("Cleaned seed storage for these settings");
+            } else if let Some((seed, previous)) = storage_access.seed_for_check(self.settings) {
+                let current = self.generate_one_seed(&UniverseSettings {
+                    seed,
+                    ..self.settings.clone()
+                })?;
+
+                if previous != current {
+                    eprintln!(
+                        "failed to validate cache for these settings, removing previous seeds"
+                    );
+                    storage_access.clean_seeds(self.settings)?;
+                }
+            }
         }
 
         let mut data = vec![SeedData::default(); self.analyzers.len()];
@@ -184,9 +195,12 @@ impl<
     }
 
     fn analyze_existing_seeds(&self, data: &mut [SeedData]) -> Result<usize> {
+        let Some(storage_access) = self.storage_access else {
+            return Ok(0);
+        };
+
         let mut existing = HandleErrors::new_print_errors(
-            self.storage_access
-                .read_seeds(self.settings, self.sample_size)?,
+            storage_access.read_seeds(self.settings, self.sample_size)?,
         );
         let mut existing_amount = 0;
 
@@ -298,8 +312,10 @@ impl<
             }
         };
 
-        if let Err(err) = self.storage_access.write_seed(&seed, settings) {
-            eprintln!("{err}");
+        if let Some(storage_access) = self.storage_access {
+            if let Err(err) = storage_access.write_seed(&seed, settings) {
+                eprintln!("{err}");
+            }
         }
 
         Ok(seed)

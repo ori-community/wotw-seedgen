@@ -1,36 +1,3 @@
-use crate::Result;
-use wotw_seedgen::{
-    data::{
-        assets::{self, InlineSnippets, SEEDGEN_USER_DATA_DIR},
-        UniverseSettings,
-    },
-    spoiler::SeedSpoiler,
-};
-
-/// Access seed files across stats runs
-///
-/// When generating stats multiple times with the same settings, seeds generated for previous runs can be reused
-/// These trait methods will be used to store and reuse seeds across stats runs
-pub trait SeedStorageAccess {
-    type Iter: Iterator<Item = Result<SeedSpoiler>>;
-
-    /// check that the cache for `settings` is up to date
-    fn check_cache<F>(&self, settings: &UniverseSettings, f: F) -> Result<()>
-    where
-        F: FnMut(&UniverseSettings) -> Result<SeedSpoiler>;
-
-    /// fetch seeds that have been previously generated with these settings
-    fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter>;
-
-    /// write a seed generated from these settings for later use
-    fn write_seed(&self, seed: &SeedSpoiler, settings: &UniverseSettings) -> Result<()>;
-
-    /// clean all seeds that have previously been generated
-    fn clean_all_seeds(&self) -> Result<()>;
-}
-
-use crate::handle_errors::HandleErrors;
-
 use std::{
     fs::{self, DirEntry, File, ReadDir},
     hash::{Hash, Hasher},
@@ -41,22 +8,54 @@ use std::{
 };
 
 use rustc_hash::FxHasher;
+use wotw_seedgen::{
+    data::{
+        assets::{self, SEEDGEN_USER_DATA_DIR},
+        UniverseSettings,
+    },
+    spoiler::SeedSpoiler,
+};
+
+use crate::{handle_errors::HandleErrors, Result};
+
+/// Access seed files across stats runs
+///
+/// When generating stats multiple times with the same settings, seeds generated for previous runs can be reused
+/// These trait methods will be used to store and reuse seeds across stats runs
+pub trait SeedStorageAccess {
+    type Iter: Iterator<Item = Result<SeedSpoiler>>;
+
+    /// read one seed for `settings` and return the rng seed it was generated with
+    fn seed_for_check(&self, settings: &UniverseSettings) -> Option<(String, SeedSpoiler)> {
+        let _ = settings;
+        None
+    }
+
+    /// fetch seeds that have been previously generated with these settings
+    fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter>;
+
+    /// write a seed generated from these settings for later use
+    fn write_seed(&self, seed: &SeedSpoiler, settings: &UniverseSettings) -> Result<()>;
+
+    /// clean all seeds that have previously been generated for `settings`
+    fn clean_seeds(&self, settings: &UniverseSettings) -> Result<()>;
+
+    /// clean all seeds that have previously been generated
+    fn clean_all_seeds(&self) -> Result<()>;
+}
 
 static SEED_STORAGE_DIR: LazyLock<PathBuf> =
     LazyLock::new(|| SEEDGEN_USER_DATA_DIR.join("seed_storage"));
 
 /// A [`SeedStorageAccess`] implementation storing and fetching seeds using the local filesystem
-pub struct FileAccess;
-impl SeedStorageAccess for FileAccess {
+pub struct SeedStorageFileAccess;
+impl SeedStorageAccess for SeedStorageFileAccess {
     type Iter = ReadSeeds;
 
-    fn check_cache<F>(&self, settings: &UniverseSettings, f: F) -> Result<()>
-    where
-        F: FnOnce(&UniverseSettings) -> Result<SeedSpoiler>,
-    {
+    fn seed_for_check(&self, settings: &UniverseSettings) -> Option<(String, SeedSpoiler)> {
         let base_path = path_from_settings(settings);
 
-        let Some((seed, previous)) = fs::read_dir(&base_path)
+        fs::read_dir(&base_path)
             .into_iter()
             .flatten()
             .flatten()
@@ -68,24 +67,6 @@ impl SeedStorageAccess for FileAccess {
 
                 Some((seed, previous))
             })
-        else {
-            return Ok(());
-        };
-
-        let settings = UniverseSettings {
-            seed,
-            world_settings: settings.world_settings.clone(),
-            inline_snippets: InlineSnippets::default(),
-        };
-
-        let current = f(&settings)?;
-
-        if previous != current {
-            eprintln!("failed to validate cache for these settings, removing previous seeds");
-            fs::remove_dir_all(&base_path).map_err(|err| format_read_dir_err(err, &base_path))?;
-        }
-
-        Ok(())
     }
 
     fn read_seeds(&self, settings: &UniverseSettings, limit: usize) -> Result<Self::Iter> {
@@ -108,6 +89,12 @@ impl SeedStorageAccess for FileAccess {
             .map_err(|err| format!("Failed to write seed to storage: {err}"))?;
 
         Ok(())
+    }
+
+    fn clean_seeds(&self, settings: &UniverseSettings) -> Result<()> {
+        let base_path = path_from_settings(settings);
+
+        fs::remove_dir_all(&base_path).map_err(|err| format_read_dir_err(err, &base_path))
     }
 
     fn clean_all_seeds(&self) -> Result<()> {

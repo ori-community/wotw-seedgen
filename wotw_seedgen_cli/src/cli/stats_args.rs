@@ -21,6 +21,9 @@ pub struct StatsArgs {
         To learn more about the available analyzers, try '{LITERAL}--analyzers help{Reset}'",
     ))]
     pub analyzers: Vec<ChainedAnalyzers>,
+    /// Don't read or write from the seed_storage cache
+    #[arg(long)]
+    pub no_cache: bool,
     // TODO dir_name, tolerated_errors, error_message_limit, overwrite_cache
 }
 
