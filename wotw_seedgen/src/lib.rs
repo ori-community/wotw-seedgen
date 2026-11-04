@@ -2,11 +2,11 @@
 //!
 //! This library can generate seeds for the [Ori and the Will of the Wisps Randomizer](https://wotw.orirando.com/).
 //!
-//! The main entry point is [`generate_seed`], which holds further documentation.
+//! The main entry point is [`Generator`], which holds further documentation.
 //!
 //! # Re-exports
 //!
-//! Relevant crates are re-exported here, e.g. you can access the [`wotw_seedgen_settings`] crate as `wotw_seedgen::settings`
+//! Relevant crates are re-exported here, e.g. you can access the [`wotw_seedgen_data`] crate as `wotw_seedgen::data`
 
 pub use wotw_seedgen_data as data;
 pub use wotw_seedgen_log_capture as log_capture;

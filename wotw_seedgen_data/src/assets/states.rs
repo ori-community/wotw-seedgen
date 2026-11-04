@@ -31,7 +31,7 @@ use utoipa::ToSchema;
 ///
 /// Does not contain information about world states already present in [`Pickups`]
 ///
-/// [`Pickups`]: crate::Pickups
+/// [`Pickups`]: crate::assets::Pickups
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct States {
     /// List of individual world states

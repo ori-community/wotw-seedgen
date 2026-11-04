@@ -13,7 +13,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 /// An Error returned from an [`Ast`] implementation, including the span the error originated from.
 ///
-/// If you wish, you can reuse this Error type directly as your compilation Error by utilizing [`Error::custom`].
+/// If you wish, you can reuse this Error type directly as your compilation Error by utilizing [`Error::error`] and [`Error::warning`].
 ///
 /// The [`Display`] implementation of [`Error`] may not provide the best error messages since it will not reference the source file.
 /// You may provide the [`Source`] file to [`Error::with_source`] or (with the ariadne feature) [`Error::write_pretty`] for better error displays.

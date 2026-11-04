@@ -1724,7 +1724,9 @@ fn message_with_origin_world(message: CommandString) -> CommandString {
 }
 
 /// Destructures [`message_with_origin_world`] used in [`item_message`].
-pub fn item_message_without_origin_world(item_message: &CommandString) -> Option<&CommandString> {
+pub(crate) fn item_message_without_origin_world(
+    item_message: &CommandString,
+) -> Option<&CommandString> {
     let CommandString::Multi { commands, .. } = item_message else {
         return None;
     };

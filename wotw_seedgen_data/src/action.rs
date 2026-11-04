@@ -3,7 +3,7 @@ use wotw_seedgen_derive::FromStr;
 
 /// An input action
 ///
-/// Mirrors https://github.com/ori-community/wotw-rando-client/blob/v5/src/Core/enums/actions.h
+/// Mirrors <https://github.com/ori-community/wotw-rando-client/blob/v5/src/Core/enums/actions.h>
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Display, FromStr, VariantNames, VariantArray)]
 pub enum InputAction {
     MainMenuSaveCopy,

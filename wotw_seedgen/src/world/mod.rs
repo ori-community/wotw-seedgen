@@ -139,7 +139,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
         debug_assert!(orbs.energy <= max_energy);
     }
 
-    /// Reduces the [`Orbs`] to the maximum health and energy of this [`Player`] if they exceed it
+    /// Reduces the [`Orbs`] to the maximum health and energy of this `World` if they exceed it
     ///
     /// This follows the in-game rules when adding health or energy to the in-game player
     ///

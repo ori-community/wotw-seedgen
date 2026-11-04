@@ -78,7 +78,7 @@ impl PresetInfo {
 /// assert_eq!(universe_settings.world_settings[0].spawn, Spawn::Random);
 /// ```
 ///
-/// [`UniverseSettings`]: wotw_seedgen_settings::UniverseSettings
+/// [`UniverseSettings`]: crate::settings::UniverseSettings
 #[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]
@@ -158,7 +158,7 @@ pub struct UniversePresetSettings {
     ///
     /// A [`PresetAccess::universe_preset`] implementation may be used to resolve the identifiers
     ///
-    /// [`PresetAccess::universe_preset`]: crate::PresetAccess::universe_preset
+    /// [`PresetAccess::universe_preset`]: PresetAccess::universe_preset
     pub includes: Option<FxHashSet<String>>,
     /// The seed that determines all randomness
     pub seed: Option<String>,
@@ -306,7 +306,7 @@ fn include_universe_preset<A: PresetAccess + SnippetAccess>(
 /// assert_eq!(world_settings.spawn, Spawn::Random);
 /// ```
 ///
-/// [`WorldSettings`]: wotw_seedgen_settings::WorldSettings
+/// [`WorldSettings`]: crate::settings::WorldSettings
 #[skip_serializing_none]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "camelCase")]

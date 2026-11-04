@@ -46,7 +46,7 @@ const SETTINGS_GROUP: i32 = 29;
 impl UberIdentifier {
     /// Creates a new `UberIdentifier` from its parts
     ///
-    /// See the [`uber_identifier`] module for constants on major `UberIdentifier`s that might make your code more readable
+    /// See also the associated constants on major `UberIdentifier`s
     pub const fn new(group: i32, member: i32) -> Self {
         Self { group, member }
     }

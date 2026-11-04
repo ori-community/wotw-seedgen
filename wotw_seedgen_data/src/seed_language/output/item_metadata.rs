@@ -153,7 +153,7 @@ impl ItemMetadataRef<'_, '_, '_> {
 
     /// Force a shop price for the item.
     ///
-    /// If nothing is given by [`Self::try_force_shop_price`], defaults to [`DEFAULT_SHOP_PRICE`].
+    /// If nothing is given by [`Self::try_force_shop_price`], returns a default value.
     pub fn force_shop_price(&self) -> CommandInteger {
         self.shop_price().unwrap_or_else(|| {
             trace!(logger: self.log_capture, "unable to find shop price for {code}, using default {DEFAULT_SHOP_PRICE}", code = self.command);

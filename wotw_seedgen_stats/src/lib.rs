@@ -52,7 +52,7 @@ pub struct StatsGenerator<
     pub sample_size: usize,
     /// Any number of [`Analyzer`]s that will analyze the seeds
     ///
-    /// Each instance of [`ChainedAnalyzers`] will be treated separately (as though you would call [`stats`] multiple times with each of them),
+    /// Each instance of [`ChainedAnalyzers`] will be treated separately (as though you would call generate multiple times with each of them),
     /// but the [`Analyzer`]s within one [`ChainedAnalyzers`] will be chained together, e.g. chaining [`SpawnLocationStats`] with [`AreaUnlockStats`]
     /// would analyze the area unlocks for each spawn
     ///
@@ -61,7 +61,7 @@ pub struct StatsGenerator<
     pub analyzers: Vec<ChainedAnalyzers>,
     /// The logical [`Graph`] passed to seedgen
     ///
-    /// You can obtain this from the logic language crate using [`Graph::compile`]
+    /// You can obtain this from the logic language crate using [`Graph::compiler`]
     pub graph: &'graph Graph,
     /// The [`Pickups`] passed to seedgen
     ///
