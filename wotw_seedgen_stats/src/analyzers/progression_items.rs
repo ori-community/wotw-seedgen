@@ -1,9 +1,9 @@
 use crate::analyzers::{Analyzer, SeedAnalyzer};
 
-pub struct ProgressionStats;
+pub struct ProgressionItemsStats;
 
-/// Analyzes which progressions get placed
-impl Analyzer for ProgressionStats {
+/// Analyzes which items get placed as progression
+impl Analyzer for ProgressionItemsStats {
     fn title(&self) -> String {
         "Progression items".to_string()
     }

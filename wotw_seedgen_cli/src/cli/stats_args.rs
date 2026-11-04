@@ -74,7 +74,7 @@ pub enum Analyzer {
         result_bucket_size: NonZeroUsize,
     },
     /// Analyzes which items get placed as forced progression
-    Progression,
+    ProgressionItems,
     /// Analyzes what locations forced progression gets placed on
     ProgressionLocations,
     /// Analyzes the amount of spawn items. Mostly makes sense with random spawn, since with the default spawn usually no spawn items are given

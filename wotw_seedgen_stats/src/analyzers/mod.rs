@@ -8,8 +8,7 @@ mod item_location;
 mod item_unlock;
 mod location_item;
 mod location_unlock;
-// TODO progression_item?
-mod progression;
+mod progression_items;
 mod progression_locations;
 mod spawn_area;
 mod spawn_item_count;
@@ -30,7 +29,7 @@ pub use item_location::ItemLocationStats;
 pub use item_unlock::ItemUnlockStats;
 pub use location_item::LocationItemStats;
 pub use location_unlock::LocationUnlockStats;
-pub use progression::ProgressionStats;
+pub use progression_items::ProgressionItemsStats;
 pub use progression_locations::ProgressionLocationsStats;
 pub use spawn_area::SpawnAreaStats;
 pub use spawn_item_count::SpawnItemCountStats;

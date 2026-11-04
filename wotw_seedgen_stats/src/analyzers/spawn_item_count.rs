@@ -1,8 +1,8 @@
-use std::{ ops::ControlFlow};
+use std::ops::ControlFlow;
 
 use crate::analyzers::{Analyzer, Keys, SeedAnalyzer};
 
-/// Analyzes the spawn items
+/// Analyzes the amount of spawn items
 pub struct SpawnItemCountStats;
 impl Analyzer for SpawnItemCountStats {
     fn title(&self) -> String {

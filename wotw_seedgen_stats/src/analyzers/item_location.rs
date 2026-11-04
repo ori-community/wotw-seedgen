@@ -1,4 +1,4 @@
-use std::{ cmp::Ordering};
+use std::cmp::Ordering;
 
 use crate::analyzers::{Analyzer, SeedAnalyzer};
 
