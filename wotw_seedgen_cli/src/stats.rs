@@ -15,8 +15,9 @@ use wotw_seedgen_stats::{
     analyzers::{
         Analyzer, AreaSkillsStats, AreaSpiritLightStats, AreaUnlockStats, EarlySkillsStats,
         FirstWeaponStats, ItemAreaStats, ItemLocationStats, ItemUnlockStats, LocationItemStats,
-        LocationUnlockStats, ProgressionLocationsStats, ProgressionStats, SpawnItemCountStats,
-        SpawnItemStats, SpawnLocationStats, SpawnAreaStats, StepSizeStats, TotalSpiritLightStats,
+        LocationUnlockStats, ProgressionLocationsStats, ProgressionStats, SpawnAreaStats,
+        SpawnItemCountStats, SpawnItemStats, SpawnLocationStats, StepSizeStats,
+        TotalSpiritLightStats,
     },
     storage_access, ChainedAnalyzers, Stats, StatsGenerator,
 };
@@ -81,7 +82,7 @@ fn write_stats(stats: Vec<Stats>, settings: &UniverseSettings) -> Result<(), Err
     for stats in stats {
         let csv = stats.csv();
         let mut path = path.clone();
-        path.push(format!("{}.csv", sanitize(stats.title())));
+        path.push(format!("{}.csv", sanitize(stats.titles().join(" and "))));
         assets::write(&path, csv)?;
         eprintln!("Wrote statistics to \"{}\"", path.display());
     }

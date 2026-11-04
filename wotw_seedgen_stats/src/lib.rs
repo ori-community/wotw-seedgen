@@ -377,17 +377,11 @@ pub struct Stats {
 }
 
 impl Stats {
-    pub fn title(&self) -> String {
-        self.analyzers
-            .iter()
-            .map(|analyzer| analyzer.title())
-            .join(" and ")
+    pub fn titles(&self) -> impl Iterator<Item = String> + use<'_> {
+        self.analyzers.iter().map(|analyzer| analyzer.title())
     }
 
     pub fn csv(&self) -> String {
-        let mut csv = self.title();
-        csv.push_str(", Count\n");
-
         let mut data = self.data.iter().collect::<Vec<_>>();
         data.sort_unstable_by(|(a, _), (b, _)| {
             for ((x, y), analyzer) in a.iter().zip(b.iter()).zip(self.analyzers.iter()) {
@@ -400,15 +394,15 @@ impl Stats {
             cmp::Ordering::Equal
         });
 
-        csv.extend(Itertools::intersperse_with(
-            data.into_iter().map(|(keys, value)| {
-                let mut data_line = keys.iter().join(", ");
-                write!(data_line, ", {value}").unwrap();
-                data_line
-            }),
-            || "\n".to_string(),
-        ));
-
-        csv
+        format!(
+            "{titles}, Count\n{data}\n",
+            titles = self.titles().format(", "),
+            data = data
+                .into_iter()
+                .format_with("\n", |(keys, value), f| f(&format_args!(
+                    "{keys}, {value}",
+                    keys = keys.iter().format(", ")
+                ))),
+        )
     }
 }
