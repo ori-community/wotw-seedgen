@@ -11421,15 +11421,25 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
   pickup Depths.FirstKSRoom.LeftKS:
     moki: DepthsLight, Combat=Spiderling OR DoubleJump OR Bash OR Launch
     gorlek: DepthsLight
-    kii: Bash, Glide, DoubleJump OR Dash  # Kite spider to left with bash and then bashglide
-  pickup Depths.FirstKSRoom.SwimEF:
+    kii:
+      Bash, Glide, DoubleJump OR Dash  # Kite spider to left with bash and then bashglide
+      LaunchSwap
+      # Combat=Spiderling, Wavedash, DoubleJump
+      # GrenadeZoom
+    unsafe:
+      Bash OR Dash OR Launch  # Lure the spiderling to the energy crystal, then use abilities
+      BreakCrystal  # Lure an energy drop to the edge
+      # Wavedash, RegenJump
+  pickup Depths.FirstKSRoom.SwimEF:  # Paths going above the water cannot rely on the keystone for light
     moki:
       Flash=1, Water, Combat=Spiderling OR DoubleJump OR Bash OR Launch
-      Depths.Wisp, Water, Combat=Spiderling OR DoubleJump OR Bash OR Launch
+      Depths.MoraDefeated, Water, Combat=Spiderling OR DoubleJump OR Bash OR Launch  # Not DepthsLight because higher difficulties cannot use light skills underwater
     gorlek:
-      Water, Depths.Wisp OR Flash=1
+      Water, Depths.MoraDefeated OR Flash=1  # Not DepthsLight because higher difficulties cannot use light skills underwater
       DepthsLight, ShurikenBreak=20, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=30
     kii: DepthsLight, SentryBreak=20, DoubleJump OR Dash OR Bash OR Glide OR Sword OR Hammer OR Damage=30
+    unsafe:
+      Bash, ShurikenBreak=20 OR SentryBreak=20  # Spiderling is friend
 
   conn UpperDepths.FirstFirefly:
     moki:
@@ -11441,6 +11451,12 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
       SentryJump=1, DoubleJump, Damage=30, Combat=2xSpiderling OR Bash
       Bash, Grenade=1, DoubleJump, Damage=30  # Possible without dmg if you go and jump from the left wall for additional height
       Launch
+    kii:
+      Bash OR SentryJump=1
+      AerialHammerJump, TripleJump OR Dash OR Glide
+    unsafe:  # Safe ledge at the left grapple plant
+      Grapple OR AbilitySwap=1 OR AerialHammerJump OR GroundedHammerJump OR WallHammerJump OR GlideHammerJump
+      GrenadeCancel, DoubleJump
   conn UpperDepths.KeydoorLedge:
     moki:
       DoubleJump, Grapple
@@ -11454,10 +11470,25 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
       HammerSJump=1, DoubleJump OR Dash OR Glide OR Grapple
     kii:
       Grapple, Sentry=1 OR Flash=1 OR Blaze=1 OR Spear=1 OR Shuriken=1 OR Hammer
-      DoubleJump, TripleJump OR Dash
+      DoubleJump, TripleJump OR Dash OR GlideJump
+      DoubleJump, Sword  # Pogo the spiderling
+      Bash
+      GrenadeJump=1, Grapple OR DoubleJump OR Dash OR Glide OR Sword
+      GlideJump, Sentry=1 OR Flash=1 OR Shuriken=1
+      AerialHammerJump
+    unsafe:
+      Sword, Shuriken=1
+      GrenadeJump=1, Hammer  # Too tight for kii
+      DoubleJump, Hammer
+      GlideJump OR AbilitySwap=1 OR PauseFloat OR HammerSJump=1
+      Wavedash  # The wobbly ground will let you wavedash sometimes
   conn UpperDepths.RightKeystonePath:  # check for redundancies with KeydoorLedge
     gorlek: Glide, DoubleJump OR Dash
-    kii: Bash, Grenade=1, DoubleJump OR Dash
+    kii:
+      Bash, Grenade=1, DoubleJump
+      GlideJump
+      Dash, Sword, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Bash  # Spiderling before Depths.BreakingMould.Completed or SneezeSlug after
 
 # checkpoint at 136, -4425
 # checkpoint at 297, -4376
