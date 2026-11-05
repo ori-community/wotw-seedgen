@@ -11520,7 +11520,7 @@ anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone
 anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the entry keydoor, going towards the keystone
   refill Checkpoint
 
-  pickup Depths.FirstKSRoom.RightKS:
+  pickup Depths.FirstKSRoom.RightKS:  # Lightless paths rely on the WeakSlugs, which disappear with Depths.BreakingMould.Completed
     moki:
       Grapple, DoubleJump
       Launch
@@ -11531,10 +11531,15 @@ anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the en
       DepthsLight, Bash, Grenade=1
       DepthsLight, SentryJump=1
     kii:
-      Bash
-      DepthsLight, Hammer OR Shuriken=2 OR Sentry=2 OR Sword
+      Bash OR DoubleJump
+      DepthsLight, Hammer OR Shuriken=2 OR Sentry=2 OR Sword OR GrenadeJump=1 OR GlideJump
     unsafe:
       DepthsLight, Flash=2
+      GrenadeCancel OR AbilitySwap=1 OR GlideJump
+      Sword, Shuriken=1
+      PauseFloat:
+        BowCancel, Bow=1  # As fun as it sounds
+        Depths.MoraDefeated
 
   conn UpperDepths.FirstKSRoom:
     moki:
@@ -11542,11 +11547,26 @@ anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the en
       Launch, DoubleJump OR Dash OR Glide
     gorlek:
       Grapple, Dash OR Damage=30
-      Grapple, SentryJump=1
       Launch
     kii:
       Dash, Damage=30, DoubleJump OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Sword OR Hammer
-      Dash, DoubleJump, TripleJump
+      DoubleJump, TripleJump, Dash OR GlideJump
+      Grapple, Shuriken=1 OR Flash=1 OR Sentry=1 OR GlideJump
+      # Wavedash, DoubleJump
+    unsafe:
+      Wavedash
+      GlideHammerJump
+      Grapple, PauseFloat OR GroundedHammerJump
+      Bash, Grenade=1, Dash
+  conn UpperDepths.KeydoorLedge:  # Paths that save energy or cannot reach FirstKSRoom. Check for redundancies with ->FirstKSRoom->KeydoorLedge
+    gorlek:
+      Grapple, SentryJump=1
+    kii:
+      Grapple, GrenadeJump=1
+    unsafe:
+      SwordSJump=1
+      AerialHammerJump  # Upswing first
+      Grapple, GrenadeCancel
 
 anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tunnel leading downwards
   refill Checkpoint
