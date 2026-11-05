@@ -343,7 +343,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
             logical_state: _,
             shop_item_hidden,
             shop_item_locked,
-            health,
+            life,
             energy,
         } = self.fails();
 
@@ -352,7 +352,7 @@ impl<'graph, 'log> World<'graph, '_, '_, 'log> {
             .flatten()
             .chain(shop_item_hidden.values())
             .chain(shop_item_locked.values())
-            .chain(health)
+            .chain(life)
             .chain(energy)
             .collect::<FxHashSet<_>>()
             .into_iter()
@@ -850,7 +850,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             logical_state: _,
             shop_item_hidden,
             shop_item_locked,
-            health,
+            life,
             energy,
         } = self.world.fails();
 
@@ -950,9 +950,9 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
 
         new_orb_fails(
             &mut new_fails,
-            health,
-            &self.initial_fails.health,
-            &mut solution.new_fails.health,
+            life,
+            &self.initial_fails.life,
+            &mut solution.new_fails.life,
         );
 
         new_orb_fails(
@@ -1002,7 +1002,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
             Missing::ShopItemLocked(shop_identifier) => {
                 self.solve_shop_item_locked(solution, shop_identifier, simulate)
             }
-            Missing::Health(amount) => self.solve_health(solution, *amount.ceil() as i32, simulate),
+            Missing::Life(amount) => self.solve_life(solution, *amount.ceil() as i32, simulate),
             Missing::Energy(amount) => self.solve_energy::<true>(solution, amount, simulate),
             Missing::WallWeapon => self.solve_weapon::<true>(solution, simulate),
             Missing::EnemyWeapon => self.solve_weapon::<false>(solution, simulate),
@@ -1025,7 +1025,7 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
         }
     }
 
-    fn solve_health(
+    fn solve_life(
         &mut self,
         mut solution: PartialSolution<'graph>,
         amount: i32,
@@ -1045,17 +1045,17 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
                     simulate,
                     Shard::Resilience,
                     // TODO we could optimize some branches if we do the other branch first and use information
-                    // from that somehow. For example, if solve_max_health only needs one health-boosting item,
+                    // from that somehow. For example, if solve_max_life only needs one life-boosting item,
                     // then we know a resilience branch will always be redundant.
                     Commitments::commit_resilience,
                     Difficulty::resilience,
-                    |this, solution, simulate| this.solve_max_health(solution, amount, simulate),
+                    |this, solution, simulate| this.solve_max_life(solution, amount, simulate),
                 )
             },
         )
     }
 
-    fn solve_max_health(
+    fn solve_max_life(
         &mut self,
         solution: PartialSolution<'graph>,
         amount: i32,
@@ -1063,9 +1063,9 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
     ) -> ControlFlow<(), PartialSolution<'graph>> {
         self.solve_amount(
             solution,
-            UberIdentifier::BASE_MAX_HEALTH,
+            UberIdentifier::BASE_MAX_LIFE,
             amount,
-            // health cannot drop to zero
+            // life cannot drop to zero
             |amount| amount < 0,
             convert_integer_write,
             simulate,
@@ -1097,11 +1097,11 @@ impl<'world, 'graph, 'settings, 'perf, 'output, 'pool, 'log>
                         if !LIFE_PACT || !this.world.settings.difficulty.life_pact() {
                             this.solve_max_energy(solution, amount, simulate)
                         } else if this.world.shard(Shard::LifePact) {
-                            // is_met communicates if health is missing due to life pact, so we're already branching into those variants.
+                            // is_met communicates if life is missing due to life pact, so we're already branching into those variants.
                             // But the amount returned is the full missing amount, for a complete set of solutions we need to include
-                            // mixes of health and energy. We can solev this in a non-overlapping way by letting the health branch
+                            // mixes of life and energy. We can solev this in a non-overlapping way by letting the life branch
                             // solve its communicated max amount and doing one step of energy here in the energy branch.
-                            // This will iteratively create a tree where energy is solved stepwise and health directly jumps to the leaves,
+                            // This will iteratively create a tree where energy is solved stepwise and life directly jumps to the leaves,
                             // which is ideal. We can use solve_boolean for a single step since the UberState type doesn't actually matter.
                             this.solve_boolean(solution, UberIdentifier::BASE_MAX_ENERGY, simulate)
                         } else if solution.commitments.commit_life_pact() {

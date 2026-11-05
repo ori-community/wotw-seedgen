@@ -170,7 +170,7 @@ impl Cost for CommonUberIdentifier {
     fn cost(&self) -> f32 {
         match self {
             CommonUberIdentifier::SpiritLight => 1.,
-            CommonUberIdentifier::BaseMaxHealth => 10.,
+            CommonUberIdentifier::BaseMaxLife => 10.,
             CommonUberIdentifier::GorlekOre => 80.,
             CommonUberIdentifier::BaseMaxEnergy
             | CommonUberIdentifier::Skill(Skill::Regenerate | Skill::WaterBreath) => 100., // Quality-of-Life Skills

@@ -13,7 +13,7 @@ mod scope;
 
 pub(crate) use function::item_message_without_origin_world;
 pub use function::{
-    clean_water, empty, energy_fragment, gorlek_ore, health_fragment, keystone, shard, shard_slot,
+    clean_water, empty, energy_fragment, gorlek_ore, keystone, life_fragment, shard, shard_slot,
     skill, spirit_light, teleporter, weapon_upgrade, FunctionArg, FunctionIdentifier,
     FunctionSignature,
 };

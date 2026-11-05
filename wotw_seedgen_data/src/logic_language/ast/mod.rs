@@ -274,18 +274,18 @@ impl SpanEnd for Refill<'_> {
 pub enum RefillValue {
     Full,
     Checkpoint,
-    Health(RefillHealth),
+    Life(RefillLife),
     Energy(RefillEnergy),
 }
 
 #[derive(Debug, Clone, PartialEq, Ast)]
-pub struct RefillHealth {
-    pub identifier: Health,
+pub struct RefillLife {
+    pub identifier: Life,
     pub amount: Option<Amount>,
 }
 
 #[derive(Debug, Clone, PartialEq, Ast)]
-pub struct Health;
+pub struct Life;
 
 #[derive(Debug, Clone, PartialEq, Ast)]
 pub struct RefillEnergy {

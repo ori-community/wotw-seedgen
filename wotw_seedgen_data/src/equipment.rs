@@ -3,7 +3,7 @@ use strum::{Display, VariantArray};
 use utoipa::ToSchema;
 use wotw_seedgen_derive::FromStr;
 
-/// Available slots for [`Equipment`] (the stuff displayed at the bottom between your energy and health)
+/// Available slots for [`Equipment`] (the stuff displayed at the bottom between your energy and life)
 #[derive(
     Debug,
     Clone,

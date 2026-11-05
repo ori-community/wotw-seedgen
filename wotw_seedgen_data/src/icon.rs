@@ -116,7 +116,7 @@ pub enum OpherIcon {
 #[repr(u8)]
 pub enum LupoIcon {
     EnergyFragmentsMap = 0,
-    HealthFragmentsMap = 1,
+    LifeFragmentsMap = 1,
     ShardsMap = 2,
 }
 
@@ -210,7 +210,7 @@ pub enum MapIcon {
     /// AbilityPedestal
     Skill = 10,
     /// HealthUpgrade
-    HealthCell = 11,
+    LifeCell = 11,
     /// EnergyUpgrade
     EnergyCell = 12,
     /// SavePedestal
@@ -241,7 +241,7 @@ pub enum MapIcon {
     QuestStart = 30,
     QuestEnd = 31,
     RaceStart = 32,
-    HealthFragment = 33,
+    LifeFragment = 33,
     EnergyFragment = 34,
     Seed = 35,
     RaceEnd = 36,

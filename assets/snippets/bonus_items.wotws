@@ -3,7 +3,7 @@
 #description("Shuffles items unique to the randomizer into the world")
 
 !tags("Bonus Items")
-!config_integer(health_regenerations, 3, "Life Regeneration Count", "Gain Life over time")
+!config_integer(life_regenerations, 3, "Life Regeneration Count", "Gain Life over time")
 !config_integer(energy_regenerations, 3, "Energy Regeneration Count", "Gain Energy over time")
 !config_integer(extra_double_jumps, 1, "Extra Double Jump Count", "Add extra jumps when having Double Jump")
 !config_integer(extra_air_dashes, 1, "Extra Air Dash Count", "Allows dashing multiple times without a dash refresh")
@@ -17,7 +17,7 @@
 !config_integer(grenade_efficiencies, 1, "Grenade Efficiency Count", "Make Grenade cost less energy")
 
 !include("bonus_item_core",
-    health_regeneration,
+    life_regeneration,
     energy_regeneration,
     extra_double_jump,
     extra_air_dash,
@@ -31,7 +31,7 @@
     grenade_efficiency
 )
 
-!add_item(health_regeneration(), health_regenerations)
+!add_item(life_regeneration(), life_regenerations)
 !add_item(energy_regeneration(), energy_regenerations)
 !add_item(extra_double_jump(), extra_double_jumps)
 !add_item(extra_air_dash(), extra_air_dashes)

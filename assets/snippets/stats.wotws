@@ -99,7 +99,7 @@ on Marsh.LeftPoolsPath.SL {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Spawn.LeftHF {
+on Marsh.Spawn.LeftLF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -111,7 +111,7 @@ on Marsh.Spawn.FirstSL {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Spawn.GrappleHF {
+on Marsh.Spawn.GrappleLF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -211,11 +211,11 @@ on Marsh.LittleBraver.Completed {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Den.ExitLoopHF {
+on Marsh.Den.ExitLoopLF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Den.SecretHF {
+on Marsh.Den.SecretLF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -271,7 +271,7 @@ on Marsh.Trial.EF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Trial.MantisLureHF {
+on Marsh.Trial.MantisLureLF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -347,7 +347,7 @@ on Burrows.IntoBurrows.Tablet {
     store(stats.pickupsCollectedBurrows, stats.pickupsCollectedBurrows + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Hollow.TwillenRoom.HF {
+on Hollow.TwillenRoom.LF {
     store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -379,7 +379,7 @@ on Hollow.SpiritTrial.Completed {
     store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Hollow.Trial.HF {
+on Hollow.Trial.LF {
     store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -431,7 +431,7 @@ on Hollow.BashTree.SL {
     store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Hollow.OutsideDepths.MortarHF {
+on Hollow.OutsideDepths.MortarLF {
     store(stats.pickupsCollectedHollow, stats.pickupsCollectedHollow + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -511,7 +511,7 @@ on Glades.LupoSwim.CeilingSL {
     store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Glades.LupoSwim.HF {
+on Glades.LupoSwim.LF {
     store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -591,7 +591,7 @@ on Glades.AboveGrom.SL {
     store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Glades.AboveGrom.HF {
+on Glades.AboveGrom.LF {
     store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -639,7 +639,7 @@ on Glades.CombatShrine {
     store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Glades.Shrine.HF {
+on Glades.Shrine.LF {
     store(stats.pickupsCollectedGlades, stats.pickupsCollectedGlades + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -675,7 +675,7 @@ on Wellspring.OutsideTopDoor.Shard {
     store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.OutsideLeftDoor.HF {
+on Wellspring.OutsideLeftDoor.LF {
     store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -715,7 +715,7 @@ on Wellspring.FirstFloor.WaterDashSL {
     store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.DrainSecret.HF {
+on Wellspring.DrainSecret.LF {
     store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -803,7 +803,7 @@ on Pools.WellspringPath.BreakWallEF {
     store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Pools.WellspringPath.MunchersHF {
+on Pools.WellspringPath.MunchersLF {
     store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -843,7 +843,7 @@ on Pools.HandToHand.Spyglass {
     store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Pools.AboveCentralTP.PurpleWallHF {
+on Pools.AboveCentralTP.PurpleWallLF {
     store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -859,7 +859,7 @@ on Pools.CentralTPSwim.Shard {
     store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Pools.WaterArena.HF {
+on Pools.WaterArena.LF {
     store(stats.pickupsCollectedPools, stats.pickupsCollectedPools + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1191,7 +1191,7 @@ on Reach.Seed {
     store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Reach.Snowball.SnowHF {
+on Reach.Snowball.SnowLF {
     store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1287,7 +1287,7 @@ on Depths.SecondKSRoom.RightKS {
     store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Depths.SecondKSRoom.HF {
+on Depths.SecondKSRoom.LF {
     store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1323,7 +1323,7 @@ on Depths.CombatShrine {
     store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Depths.TrialStart.HF {
+on Depths.TrialStart.LF {
     store(stats.pickupsCollectedDepths, stats.pickupsCollectedDepths + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1375,7 +1375,7 @@ on Wastes.SandMuncherTunnel.EF {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wastes.SandPot.HF {
+on Wastes.SandPot.LF {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1387,7 +1387,7 @@ on Wastes.DoubleBridge.SL {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wastes.RuinsShortcut.HF {
+on Wastes.RuinsShortcut.LF {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1439,7 +1439,7 @@ on Wastes.TreeToCentralTPArc.HiddenSL {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wastes.TreeToCentralTPArc.SandHF {
+on Wastes.TreeToCentralTPArc.SandLF {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1475,7 +1475,7 @@ on Wastes.MissilePuzzles.PurpleWallSL {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wastes.MissilePuzzles.PurpleWallHF {
+on Wastes.MissilePuzzles.PurpleWallLF {
     store(stats.pickupsCollectedWastes, stats.pickupsCollectedWastes + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1535,7 +1535,7 @@ on Willow.Entrance.SL {
     store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Willow.MossWheelsHeart.HF {
+on Willow.MossWheelsHeart.LF {
     store(stats.pickupsCollectedWillow, stats.pickupsCollectedWillow + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }

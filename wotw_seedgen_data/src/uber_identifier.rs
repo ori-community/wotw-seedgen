@@ -218,9 +218,9 @@ impl UberIdentifier {
     pub const GORLEK_ORE: UberIdentifier = UberIdentifier::player(1);
     pub const KEYSTONES: UberIdentifier = UberIdentifier::player(2);
     pub const SHARD_SLOTS: UberIdentifier = UberIdentifier::player(3);
-    pub const BASE_MAX_HEALTH: UberIdentifier = UberIdentifier::player(10);
-    pub const MAX_HEALTH: UberIdentifier = UberIdentifier::player(11);
-    pub const HEALTH: UberIdentifier = UberIdentifier::player(12);
+    pub const BASE_MAX_LIFE: UberIdentifier = UberIdentifier::player(10);
+    pub const MAX_LIFE: UberIdentifier = UberIdentifier::player(11);
+    pub const LIFE: UberIdentifier = UberIdentifier::player(12);
     pub const BASE_MAX_ENERGY: UberIdentifier = UberIdentifier::player(20);
     pub const MAX_ENERGY: UberIdentifier = UberIdentifier::player(21);
     pub const ENERGY: UberIdentifier = UberIdentifier::player(22);
@@ -329,7 +329,7 @@ pub enum CommonUberIdentifier {
     Keystones,
     ShardSlots,
     CleanWater,
-    BaseMaxHealth,
+    BaseMaxLife,
     BaseMaxEnergy,
     Skill(Skill),
     Shard(Shard),
@@ -345,7 +345,7 @@ impl CommonUberIdentifier {
             Self::Keystones => MapIcon::Keystone,
             Self::ShardSlots => MapIcon::ShardSlot,
             Self::CleanWater => MapIcon::CleanWater,
-            Self::BaseMaxHealth => MapIcon::HealthFragment,
+            Self::BaseMaxLife => MapIcon::LifeFragment,
             Self::BaseMaxEnergy => MapIcon::EnergyFragment,
             Self::WeaponUpgrade(_) => MapIcon::BonusItem, // TODO is this good?
             Self::Shard(_) => MapIcon::Shard,
@@ -360,7 +360,7 @@ impl CommonUberIdentifier {
             Self::GorlekOre | Self::Keystones => 100,
             Self::ShardSlots => 250,
             Self::CleanWater => 500,
-            Self::BaseMaxHealth => 200,
+            Self::BaseMaxLife => 200,
             Self::BaseMaxEnergy => 150,
             Self::Skill(skill) => match skill {
                 Skill::WaterBreath | Skill::Regenerate | Skill::Seir => 200,
@@ -381,7 +381,7 @@ impl CommonUberIdentifier {
             Self::Keystones => Icon::File(Cow::Borrowed("icons/game/keystone.png")),
             Self::ShardSlots => Icon::File(Cow::Borrowed("icons/game/shard_slot.png")),
             Self::CleanWater => Icon::File(Cow::Borrowed("icons/game/clean_water.monochrome.png")),
-            Self::BaseMaxHealth => Icon::File(Cow::Borrowed("icons/game/health_fragment.png")),
+            Self::BaseMaxLife => Icon::File(Cow::Borrowed("icons/game/life_fragment.png")),
             Self::BaseMaxEnergy => Icon::File(Cow::Borrowed("icons/game/energy_fragment.png")),
             Self::WeaponUpgrade(weapon_upgrade) => match weapon_upgrade {
                 WeaponUpgrade::ExplodingSpear => Icon::Opher(OpherIcon::ExplodingSpear),
@@ -424,7 +424,7 @@ impl CommonUberIdentifier {
             Self::Keystones => UberIdentifier::KEYSTONES,
             Self::ShardSlots => UberIdentifier::SHARD_SLOTS,
             Self::CleanWater => UberIdentifier::CLEAN_WATER,
-            Self::BaseMaxHealth => UberIdentifier::BASE_MAX_HEALTH,
+            Self::BaseMaxLife => UberIdentifier::BASE_MAX_LIFE,
             Self::BaseMaxEnergy => UberIdentifier::BASE_MAX_ENERGY,
             Self::Skill(skill) => skill.uber_identifier(),
             Self::Shard(shard) => shard.uber_identifier(),
@@ -441,7 +441,7 @@ impl CommonUberIdentifier {
             UberIdentifier::KEYSTONES => Some(Self::Keystones),
             UberIdentifier::SHARD_SLOTS => Some(Self::ShardSlots),
             UberIdentifier::CLEAN_WATER => Some(Self::CleanWater),
-            UberIdentifier::BASE_MAX_HEALTH => Some(Self::BaseMaxHealth),
+            UberIdentifier::BASE_MAX_LIFE => Some(Self::BaseMaxLife),
             UberIdentifier::BASE_MAX_ENERGY => Some(Self::BaseMaxEnergy),
             uber_identifier => {
                 if let Some(skill) = Skill::from_uber_identifier(uber_identifier) {

@@ -6,7 +6,7 @@
 
 !include("color_core", transparent)
 !include("list_core", default_color, new_column, add_row, add_current_colored_row, next_item_first, next_item_colored, next_item_uncolored, new_colored_row, add_colored_row_item_with, auto_negative_margin)
-!include("regeneration_core", energy_per_second, health_per_second)
+!include("regeneration_core", energy_per_second, life_per_second)
 
 !export(write_upgrades)
 fun write_upgrades(relevant: Boolean) {
@@ -121,7 +121,7 @@ on change bonusUpgrades.swimSpeedMultiplier update_upgrade_effects()
 on change bonusUpgrades.waterDashSpeedMultiplier update_upgrade_effects()
 on change bonusUpgrades.splinterLongerRange update_upgrade_effects()
 on change energy_per_second update_upgrade_effects()
-on change health_per_second update_upgrade_effects()
+on change life_per_second update_upgrade_effects()
 fun update_upgrade_effects() {
     write_upgrade_effects()
     set_message_text("upgrade_effects", get_string("column"))
@@ -298,7 +298,7 @@ fun upgrade_effects_half(relevant: Boolean) {
     if relevant {
         new_colored_row("#Passive Regeneration#: ")
         if energy_per_second != 0 add_upgrade(energy_per_second + " Energy/s")
-        if health_per_second != 0 add_upgrade(health_per_second + " Life/s")
+        if life_per_second != 0 add_upgrade(life_per_second + " Life/s")
         add_current_colored_row()
     }
 }

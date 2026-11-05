@@ -16,7 +16,7 @@ impl RelevantUberStates {
             UberIdentifier::KEYSTONES,
             UberIdentifier::SHARD_SLOTS,
             UberIdentifier::CLEAN_WATER,
-            UberIdentifier::BASE_MAX_HEALTH,
+            UberIdentifier::BASE_MAX_LIFE,
             UberIdentifier::BASE_MAX_ENERGY,
             Skill::BASH_ID,
             Skill::DOUBLE_JUMP_ID,

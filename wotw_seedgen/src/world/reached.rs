@@ -103,11 +103,11 @@ pub(crate) struct ReachStateFails<'graph> {
     pub shop_item_hidden: FxHashMap<UberIdentifier, ConnectionIndex<'graph>>,
     /// All [`ConnectionIndex`] which failed to solve and might be solved by unlocking the shop [`UberIdentifier`]
     pub shop_item_locked: FxHashMap<UberIdentifier, ConnectionIndex<'graph>>,
-    /// Some connections failed to solve and might require more health.
+    /// Some connections failed to solve and might require more life.
     /// Resuming progress along those connections would be very hard because of refill logic,
     /// So we just reset the entire Reach when progressing orbs.
-    pub health: FxHashSet<ConnectionIndex<'graph>>,
-    /// Same as `health_fail`, but for energy.
+    pub life: FxHashSet<ConnectionIndex<'graph>>,
+    /// Same as `life`, but for energy.
     pub energy: FxHashSet<ConnectionIndex<'graph>>,
 }
 
@@ -126,7 +126,7 @@ impl<'graph> ReachStateFails<'graph> {
             logical_state,
             shop_item_hidden,
             shop_item_locked,
-            health,
+            life,
             energy,
         } = self;
 
@@ -134,7 +134,7 @@ impl<'graph> ReachStateFails<'graph> {
             && logical_state.is_empty()
             && shop_item_hidden.is_empty()
             && shop_item_locked.is_empty()
-            && health.is_empty()
+            && life.is_empty()
             && energy.is_empty()
     }
 
@@ -144,7 +144,7 @@ impl<'graph> ReachStateFails<'graph> {
             logical_state,
             shop_item_hidden,
             shop_item_locked,
-            health,
+            life,
             energy,
         } = self;
 
@@ -152,7 +152,7 @@ impl<'graph> ReachStateFails<'graph> {
         logical_state.clear();
         shop_item_hidden.clear();
         shop_item_locked.clear();
-        health.clear();
+        life.clear();
         energy.clear();
     }
 
@@ -189,7 +189,7 @@ impl Display for ReachStateFailsDisplay<'_, '_> {
             logical_state,
             shop_item_hidden,
             shop_item_locked,
-            health,
+            life,
             energy,
         } = self.fails;
 
@@ -256,7 +256,7 @@ impl Display for ReachStateFailsDisplay<'_, '_> {
                 .fmt(f)?;
         }
 
-        if !health.is_empty() {
+        if !life.is_empty() {
             if comma {
                 f.write_str(", ")?;
             }
@@ -264,8 +264,8 @@ impl Display for ReachStateFailsDisplay<'_, '_> {
 
             write!(
                 f,
-                "Health for [{connections}]",
-                connections = format_connections(health, self.graph),
+                "Life for [{connections}]",
+                connections = format_connections(life, self.graph),
             )?;
         }
 
@@ -1012,8 +1012,8 @@ impl<'graph> World<'graph, '_, '_, '_> {
                     .shop_item_locked
                     .insert(shop_identifier, connection);
             }
-            Missing::Health(_) => {
-                self.reach.state.fails.health.insert(connection);
+            Missing::Life(_) => {
+                self.reach.state.fails.life.insert(connection);
             }
             Missing::Energy(_) => {
                 self.reach.state.fails.energy.insert(connection);

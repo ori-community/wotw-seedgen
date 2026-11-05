@@ -92,34 +92,34 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     // TODO it seems like we are returning progressions to nodes that are already reached. Maybe we have to filter that in post since they
     // may have been reached after initially encountering the unmet requirement? This is common for teleporters
 
-    /// Returns the maximum health and energy
+    /// Returns the maximum life and energy
     pub fn max_orbs(&self) -> Orbs {
         Orbs {
-            health: self.max_health(),
+            life: self.max_life(),
             energy: self.max_energy(),
         }
     }
 
-    pub fn cap_health<const CHECKPOINT: bool>(&self, orbs: &mut Orbs) {
-        // checkpoints don't refill health given by the Vitality shard
-        let max_health = if CHECKPOINT {
-            self.base_max_health()
+    pub fn cap_life<const CHECKPOINT: bool>(&self, orbs: &mut Orbs) {
+        // checkpoints don't refill life given by the Vitality shard
+        let max_life = if CHECKPOINT {
+            self.base_max_life()
         } else {
-            self.max_health()
+            self.max_life()
         };
 
         // TODO helpers for combined setting and inventory checks?
         if !CHECKPOINT && self.settings.difficulty.overflow() && self.shard(Shard::Overflow) {
-            if orbs.health > max_health {
-                let overflow_energy = (orbs.health - max_health) / 10.;
+            if orbs.life > max_life {
+                let overflow_energy = (orbs.life - max_life) / 10.;
                 orbs.energy = f32::min(orbs.energy + overflow_energy, self.max_energy());
-                orbs.health = max_health;
+                orbs.life = max_life;
             }
         } else {
-            orbs.health = f32::min(orbs.health, max_health);
+            orbs.life = f32::min(orbs.life, max_life);
         }
 
-        debug_assert!(orbs.health <= max_health);
+        debug_assert!(orbs.life <= max_life);
     }
 
     pub fn cap_energy<const CHECKPOINT: bool>(&self, orbs: &mut Orbs) {
@@ -128,8 +128,8 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
 
         if !CHECKPOINT && self.settings.difficulty.overflow() && self.shard(Shard::Overflow) {
             if orbs.energy > max_energy {
-                let overflow_health = (orbs.energy - max_energy) * 10.;
-                orbs.health = f32::min(orbs.health + overflow_health, self.max_health());
+                let overflow_life = (orbs.energy - max_energy) * 10.;
+                orbs.life = f32::min(orbs.life + overflow_life, self.max_life());
                 orbs.energy = max_energy;
             }
         } else {
@@ -139,9 +139,9 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
         debug_assert!(orbs.energy <= max_energy);
     }
 
-    /// Reduces the [`Orbs`] to the maximum health and energy of this `World` if they exceed it
+    /// Reduces the [`Orbs`] to the maximum life and energy of this `World` if they exceed it
     ///
-    /// This follows the in-game rules when adding health or energy to the in-game player
+    /// This follows the in-game rules when adding life or energy to the in-game player
     ///
     /// # Examples
     ///
@@ -160,7 +160,7 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// let world_settings = WorldSettings::default();
     /// let world = World::new(&graph, spawn, &world_settings, uber_states, &mut events);
     ///
-    /// let mut orbs = Orbs { health: 90.0, energy: 5.0 };
+    /// let mut orbs = Orbs { life: 90.0, energy: 5.0 };
     /// world.cap_orbs::<false>(&mut orbs);
     /// assert_eq!(orbs, world.max_orbs());
     /// ```
@@ -184,16 +184,16 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, output.events_mut());
     /// world.store_shard(Shard::Vitality, true, &output);
     ///
-    /// let mut orbs = Orbs { health: 90.0, energy: 1.0 };
+    /// let mut orbs = Orbs { life: 90.0, energy: 1.0 };
     /// world.cap_orbs::<false>(&mut orbs);
-    /// assert_eq!(orbs, Orbs { health: 40.0, energy: 1.0 });
+    /// assert_eq!(orbs, Orbs { life: 40.0, energy: 1.0 });
     ///
     /// world.cap_orbs::<true>(&mut orbs);
-    /// assert_eq!(orbs, Orbs { health: 30.0, energy: 1.0 });
+    /// assert_eq!(orbs, Orbs { life: 30.0, energy: 1.0 });
     /// ```
     // TODO this didn't end up being used much, maybe it should be used more to have the overflow check?
     pub fn cap_orbs<const CHECKPOINT: bool>(&self, orbs: &mut Orbs) {
-        self.cap_health::<CHECKPOINT>(orbs);
+        self.cap_life::<CHECKPOINT>(orbs);
         self.cap_energy::<CHECKPOINT>(orbs);
     }
 
@@ -217,17 +217,17 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, output.events_mut());
-    /// assert_eq!(world.max_orbs(), Orbs { health: 30.0, energy: 3.0 });
-    /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 30.0, energy: 1.0 });
+    /// assert_eq!(world.max_orbs(), Orbs { life: 30.0, energy: 3.0 });
+    /// assert_eq!(world.checkpoint_orbs(), Orbs { life: 30.0, energy: 1.0 });
     ///
-    /// world.add_base_max_health(110, &output);
+    /// world.add_base_max_life(110, &output);
     /// world.add_base_max_energy((12.).into(), &output);
-    /// assert_eq!(world.max_orbs(), Orbs { health: 140.0, energy: 15.0 });
-    /// assert_eq!(world.checkpoint_orbs(), Orbs { health: 42.0, energy: 3.0 });
+    /// assert_eq!(world.max_orbs(), Orbs { life: 140.0, energy: 15.0 });
+    /// assert_eq!(world.checkpoint_orbs(), Orbs { life: 42.0, energy: 3.0 });
     /// ```
     pub fn checkpoint_orbs(&self) -> Orbs {
         let mut orbs = Orbs {
-            health: f32::max((self.max_health() * 0.3).ceil(), 40.0),
+            life: f32::max((self.max_life() * 0.3).ceil(), 40.0),
             energy: f32::max((self.max_energy() * 0.2).ceil(), 1.0),
         };
 
@@ -236,9 +236,9 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
         orbs
     }
 
-    /// Returns how many health orbs plants will drop
+    /// Returns how many life orbs plants will drop
     ///
-    /// This follows the in-game rules when opening a health plant
+    /// This follows the in-game rules when opening a life plant
     ///
     /// # Examples
     ///
@@ -255,16 +255,16 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
     /// # let mut output = CommandsOutput::NONE;
     /// let world_settings = WorldSettings::default();
     /// let mut world = World::new(&graph, spawn, &world_settings, uber_states, output.events_mut());
-    /// assert_eq!(world.health_plant_drops(), 1.0);
+    /// assert_eq!(world.life_plant_drops(), 1.0);
     ///
-    /// world.add_base_max_health(40, &output);
-    /// assert_eq!(world.health_plant_drops(), 2.0);
+    /// world.add_base_max_life(40, &output);
+    /// assert_eq!(world.life_plant_drops(), 2.0);
     ///
-    /// world.add_base_max_health(90, &output);
-    /// assert_eq!(world.health_plant_drops(), 5.0);
+    /// world.add_base_max_life(90, &output);
+    /// assert_eq!(world.life_plant_drops(), 5.0);
     /// ```
-    pub fn health_plant_drops(&self) -> f32 {
-        let value = self.max_health() / 30.0;
+    pub fn life_plant_drops(&self) -> f32 {
+        let value = self.max_life() / 30.0;
         // the game rounds to even
         #[allow(
             clippy::cast_sign_loss,
@@ -278,10 +278,10 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
         }
     }
 
-    /// Replenish health, but don't exceed the player's maximum health
+    /// Replenish life, but don't exceed the player's maximum life
     pub fn heal(&self, orbs: &mut Orbs, amount: f32) {
-        orbs.health += amount;
-        self.cap_health::<false>(orbs);
+        orbs.life += amount;
+        self.cap_life::<false>(orbs);
     }
 
     /// Replenish energy, but don't exceed the player's maximum energy
@@ -300,12 +300,12 @@ impl<'graph, 'settings, 'perf, 'log> World<'graph, 'settings, 'perf, 'log> {
                 let checkpoint_orbs = self.checkpoint_orbs();
 
                 for orbs in orb_variants {
-                    orbs.health = f32::max(orbs.health, checkpoint_orbs.health);
+                    orbs.life = f32::max(orbs.life, checkpoint_orbs.life);
                     orbs.energy = f32::max(orbs.energy, checkpoint_orbs.energy);
                 }
             }
-            RefillValue::Health(amount) => {
-                let amount = amount * self.health_plant_drops();
+            RefillValue::Life(amount) => {
+                let amount = amount * self.life_plant_drops();
 
                 for orbs in orb_variants {
                     self.heal(orbs, amount);
@@ -556,18 +556,18 @@ impl Simulation for World<'_, '_, '_, '_> {
         self.state.shard_slots()
     }
 
-    fn base_max_health(&self) -> f32 {
-        self.state.base_max_health()
+    fn base_max_life(&self) -> f32 {
+        self.state.base_max_life()
     }
 
-    fn max_health(&self) -> f32 {
+    fn max_life(&self) -> f32 {
         // TODO does this get optimized into the branchless variant? Maybe just write it branchless...
         // Also I guess this could be cached since settings are immutable?
         // Could store the function pointer for which to invoke...
         if self.settings.difficulty.vitality() {
-            self.state.max_health()
+            self.state.max_life()
         } else {
-            self.base_max_health()
+            self.base_max_life()
         }
     }
 
@@ -707,7 +707,7 @@ impl Display for InventoryDisplay<'_, '_, '_, '_, '_> {
 
         let mut first = true;
 
-        amount_item(f, &mut first, self.world.base_max_health(), "Life")?;
+        amount_item(f, &mut first, self.world.base_max_life(), "Life")?;
         amount_item(f, &mut first, self.world.base_max_energy(), "Energy")?;
         resource::<false>(f, &mut first, self.world.spirit_light(), "Spirit Light")?;
         resource::<false>(f, &mut first, self.world.gorlek_ore(), "Gorlek Ore")?;

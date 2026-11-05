@@ -749,7 +749,7 @@ impl Requirement {
 
     fn factor_priority(&self) -> Option<OrbChangingFactorPriority> {
         match self {
-            Self::Danger(_) | Self::Damage(_) => Some(OrbChangingFactorPriority::Health),
+            Self::Danger(_) | Self::Damage(_) => Some(OrbChangingFactorPriority::Life),
             Self::NonConsumingEnergySkill(_)
             | Self::EnergySkill(_, _)
             | Self::ShurikenBreak(_)
@@ -1424,7 +1424,7 @@ enum OrbChangingFactorPriority {
     // TODO there seems to be a curious effect where kii is slightly faster if we don't factor out energy at all! What's that about?
     #[default]
     Energy,
-    Health,
+    Life,
     WeaponChoice,
 }
 

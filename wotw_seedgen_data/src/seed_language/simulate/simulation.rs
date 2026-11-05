@@ -206,14 +206,14 @@ pub trait Simulation: Sized {
     }
 
     #[inline]
-    fn store_base_max_health(&mut self, value: i32, output: &CommandsOutput) {
-        self.store_integer(UberIdentifier::BASE_MAX_HEALTH, value, output);
+    fn store_base_max_life(&mut self, value: i32, output: &CommandsOutput) {
+        self.store_integer(UberIdentifier::BASE_MAX_LIFE, value, output);
     }
 
     // TODO check that uses scaled correctly since they might have used the number of fragments before
     #[inline]
-    fn add_base_max_health(&mut self, add: i32, output: &CommandsOutput) {
-        self.add_integer(UberIdentifier::BASE_MAX_HEALTH, add, output);
+    fn add_base_max_life(&mut self, add: i32, output: &CommandsOutput) {
+        self.add_integer(UberIdentifier::BASE_MAX_LIFE, add, output);
     }
 
     #[inline]
@@ -278,13 +278,13 @@ pub trait Simulation: Sized {
     }
 
     #[inline]
-    fn base_max_health(&self) -> f32 {
-        self.fetch(UberIdentifier::BASE_MAX_HEALTH).expect_integer() as f32
+    fn base_max_life(&self) -> f32 {
+        self.fetch(UberIdentifier::BASE_MAX_LIFE).expect_integer() as f32
     }
 
-    /// Returns the maximum health
+    /// Returns the maximum life
     ///
-    /// One visual orb in the game represents 10 health
+    /// One visual orb in the game represents 10 life
     ///
     /// # Examples
     ///
@@ -296,11 +296,11 @@ pub trait Simulation: Sized {
     /// # let uber_states = TEST_ASSETS.uber_states.clone();
     /// # let mut events = [];
     /// let world_state = WorldState::new(uber_states, &mut events);
-    /// assert_eq!(world_state.max_health(), 30.0);
+    /// assert_eq!(world_state.max_life(), 30.0);
     /// ```
     #[inline]
-    fn max_health(&self) -> f32 {
-        self.base_max_health() + f32::from(u8::from(self.shard(Shard::Vitality))) * 10.
+    fn max_life(&self) -> f32 {
+        self.base_max_life() + f32::from(u8::from(self.shard(Shard::Vitality))) * 10.
     }
 
     #[inline]

@@ -60,16 +60,16 @@ pub fn shard_slot() -> CommandVoid {
     resource(shard_slot_string, UberIdentifier::SHARD_SLOTS)
 }
 
-pub fn health_fragment() -> CommandVoid {
+pub fn life_fragment() -> CommandVoid {
     CommandVoid::Multi {
         commands: vec![
-            item_message(health_fragment_string(false)),
-            add_integer(UberIdentifier::BASE_MAX_HEALTH, 5),
+            item_message(life_fragment_string(false)),
+            add_integer(UberIdentifier::BASE_MAX_LIFE, 5),
             // TODO reimplement fragment overflow bug?
             store_integer(
-                UberIdentifier::HEALTH,
+                UberIdentifier::LIFE,
                 CommandInteger::FetchInteger {
-                    uber_identifier: UberIdentifier::MAX_HEALTH,
+                    uber_identifier: UberIdentifier::MAX_LIFE,
                 },
             ),
         ],
@@ -270,8 +270,8 @@ pub enum FunctionIdentifier {
     RemoveKeystoneString,
     ShardSlotString,
     RemoveShardSlotString,
-    HealthFragmentString,
-    RemoveHealthFragmentString,
+    LifeFragmentString,
+    RemoveLifeFragmentString,
     EnergyFragmentString,
     RemoveEnergyFragmentString,
     SkillString,
@@ -294,8 +294,8 @@ pub enum FunctionIdentifier {
     RemoveKeystone,
     ShardSlot,
     RemoveShardSlot,
-    HealthFragment,
-    RemoveHealthFragment,
+    LifeFragment,
+    RemoveLifeFragment,
     EnergyFragment,
     RemoveEnergyFragment,
     Skill,
@@ -447,8 +447,8 @@ impl FunctionIdentifier {
             RemoveKeystoneString() -> String,
             ShardSlotString() -> String,
             RemoveShardSlotString() -> String,
-            HealthFragmentString() -> String,
-            RemoveHealthFragmentString() -> String,
+            LifeFragmentString() -> String,
+            RemoveLifeFragmentString() -> String,
             EnergyFragmentString() -> String,
             RemoveEnergyFragmentString() -> String,
             SkillString(skill: Skill) -> String,
@@ -471,8 +471,8 @@ impl FunctionIdentifier {
             RemoveKeystone(),
             ShardSlot(),
             RemoveShardSlot(),
-            HealthFragment(),
-            RemoveHealthFragment(),
+            LifeFragment(),
+            RemoveLifeFragment(),
             EnergyFragment(),
             RemoveEnergyFragment(),
             Skill(skill: Skill),
@@ -843,11 +843,9 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveKeystoneString => Command::String(keystone_string(true)),
             FunctionIdentifier::ShardSlotString => Command::String(shard_slot_string(false)),
             FunctionIdentifier::RemoveShardSlotString => Command::String(shard_slot_string(true)),
-            FunctionIdentifier::HealthFragmentString => {
-                Command::String(health_fragment_string(false))
-            }
-            FunctionIdentifier::RemoveHealthFragmentString => {
-                Command::String(health_fragment_string(true))
+            FunctionIdentifier::LifeFragmentString => Command::String(life_fragment_string(false)),
+            FunctionIdentifier::RemoveLifeFragmentString => {
+                Command::String(life_fragment_string(true))
             }
             FunctionIdentifier::EnergyFragmentString => {
                 Command::String(energy_fragment_string(false))
@@ -921,11 +919,11 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::RemoveShardSlot => {
                 remove_resource(shard_slot_string, UberIdentifier::SHARD_SLOTS)
             }
-            FunctionIdentifier::HealthFragment => Command::Void(health_fragment()),
-            FunctionIdentifier::RemoveHealthFragment => Command::Void(CommandVoid::Multi {
+            FunctionIdentifier::LifeFragment => Command::Void(life_fragment()),
+            FunctionIdentifier::RemoveLifeFragment => Command::Void(CommandVoid::Multi {
                 commands: vec![
-                    item_message(health_fragment_string(true)),
-                    add_integer(UberIdentifier::BASE_MAX_HEALTH, -5),
+                    item_message(life_fragment_string(true)),
+                    add_integer(UberIdentifier::BASE_MAX_LIFE, -5),
                 ],
             }),
             FunctionIdentifier::EnergyFragment => Command::Void(energy_fragment()),
@@ -1896,7 +1894,7 @@ fn shard_slot_string(remove: bool) -> CommandString {
     resource_string("Shard Slot", remove)
 }
 
-fn health_fragment_string(remove: bool) -> CommandString {
+fn life_fragment_string(remove: bool) -> CommandString {
     resource_string("Life Fragment", remove)
 }
 

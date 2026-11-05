@@ -33,7 +33,7 @@ impl<'log> ItemPoolBuilder<'log> {
         const GORLEK_ORE_AMOUNT: usize = 40;
         const KEYSTONE_AMOUNT: usize = 34;
         const SHARD_SLOT_AMOUNT: usize = 5;
-        const HEALTH_FRAGMENT_AMOUNT: usize = 24;
+        const LIFE_FRAGMENT_AMOUNT: usize = 24;
         const ENERGY_FRAGMENT_AMOUNT: usize = 24;
         const SKILLS: [Skill; 22] = [
             Skill::Bash,
@@ -96,7 +96,7 @@ impl<'log> ItemPoolBuilder<'log> {
         const TOTAL_AMOUNT: usize = GORLEK_ORE_AMOUNT
             + KEYSTONE_AMOUNT
             + SHARD_SLOT_AMOUNT
-            + HEALTH_FRAGMENT_AMOUNT
+            + LIFE_FRAGMENT_AMOUNT
             + ENERGY_FRAGMENT_AMOUNT
             + SKILLS.len()
             + 1
@@ -111,7 +111,7 @@ impl<'log> ItemPoolBuilder<'log> {
         builder.add_amount(compile::gorlek_ore(), GORLEK_ORE_AMOUNT, commands);
         builder.add_amount(compile::keystone(), KEYSTONE_AMOUNT, commands);
         builder.add_amount(compile::shard_slot(), SHARD_SLOT_AMOUNT, commands);
-        builder.add_amount(compile::health_fragment(), HEALTH_FRAGMENT_AMOUNT, commands);
+        builder.add_amount(compile::life_fragment(), LIFE_FRAGMENT_AMOUNT, commands);
         builder.add_amount(compile::energy_fragment(), ENERGY_FRAGMENT_AMOUNT, commands);
         for skill in SKILLS {
             builder.add(compile::skill(skill), commands);

@@ -26,7 +26,7 @@ fn is_met(c: &mut Criterion) {
     let req_c = Requirement::EnergySkill(Skill::Blaze, 1.0);
     let req_d = Requirement::Damage(10.0);
     world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
-    world.add_base_max_health(20, &CommandsOutput::NONE);
+    world.add_base_max_life(20, &CommandsOutput::NONE);
     world.add_base_max_energy(2., &CommandsOutput::NONE);
     let requirement = Requirement::And(vec![
         Requirement::Or(vec![req_a.clone(), req_d.clone()]),
@@ -99,7 +99,7 @@ fn reach_check(c: &mut Criterion) {
             world.snapshot();
             world.traverse_spawn(&CommandsOutput::NONE);
             world.store_spirit_light(10000, &CommandsOutput::NONE);
-            world.store_base_max_health(200, &CommandsOutput::NONE);
+            world.store_base_max_life(200, &CommandsOutput::NONE);
             world.store_base_max_energy(20., &CommandsOutput::NONE);
             world.store_keystones(34, &CommandsOutput::NONE);
             world.store_gorlek_ore(40, &CommandsOutput::NONE);

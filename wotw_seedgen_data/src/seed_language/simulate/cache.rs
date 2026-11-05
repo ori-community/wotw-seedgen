@@ -35,7 +35,7 @@ impl<S: Simulation> SimulationCache<S> {
         self.cache.gorlek_ore = self.simulation.gorlek_ore();
         self.cache.keystones = self.simulation.keystones();
         self.cache.shard_slots = self.simulation.shard_slots();
-        self.cache.base_max_health = self.simulation.base_max_health();
+        self.cache.base_max_life = self.simulation.base_max_life();
         self.cache.base_max_energy = self.simulation.base_max_energy();
         self.cache.skills = self.simulation.skills().collect();
         self.cache.shards = self.simulation.shards().collect();
@@ -57,7 +57,7 @@ struct Cache {
     gorlek_ore: i32,
     keystones: i32,
     shard_slots: i32,
-    base_max_health: f32,
+    base_max_life: f32,
     base_max_energy: f32,
     // TODO try out arrays with ids as indices?
     skills: FxHashSet<Skill>,
@@ -75,7 +75,7 @@ impl Default for Cache {
             gorlek_ore: 0,
             keystones: 0,
             shard_slots: 0,
-            base_max_health: 0.,
+            base_max_life: 0.,
             base_max_energy: 0.,
             skills: FxHashSet::with_capacity_and_hasher(Skill::VARIANTS.len(), FxBuildHasher),
             shards: FxHashSet::with_capacity_and_hasher(Shard::VARIANTS.len(), FxBuildHasher),
@@ -106,8 +106,8 @@ impl Cache {
             CommonUberIdentifier::Keystones => self.keystones = value.expect_integer(),
             CommonUberIdentifier::ShardSlots => self.shard_slots = value.expect_integer(),
             CommonUberIdentifier::CleanWater => self.clean_water = value.expect_boolean(),
-            CommonUberIdentifier::BaseMaxHealth => {
-                self.base_max_health = value.expect_integer() as f32;
+            CommonUberIdentifier::BaseMaxLife => {
+                self.base_max_life = value.expect_integer() as f32;
             }
             CommonUberIdentifier::BaseMaxEnergy => self.base_max_energy = value.expect_float(),
             CommonUberIdentifier::Skill(skill) => {
@@ -202,16 +202,16 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
             .add_integer(UberIdentifier::SHARD_SLOTS, add, output);
     }
 
-    fn store_base_max_health(&mut self, value: i32, output: &CommandsOutput) {
-        self.cache.base_max_health = value as f32;
+    fn store_base_max_life(&mut self, value: i32, output: &CommandsOutput) {
+        self.cache.base_max_life = value as f32;
         self.simulation
-            .store_integer(UberIdentifier::BASE_MAX_HEALTH, value, output);
+            .store_integer(UberIdentifier::BASE_MAX_LIFE, value, output);
     }
 
-    fn add_base_max_health(&mut self, add: i32, output: &CommandsOutput) {
-        self.cache.base_max_health += add as f32;
+    fn add_base_max_life(&mut self, add: i32, output: &CommandsOutput) {
+        self.cache.base_max_life += add as f32;
         self.simulation
-            .add_integer(UberIdentifier::BASE_MAX_HEALTH, add, output);
+            .add_integer(UberIdentifier::BASE_MAX_LIFE, add, output);
     }
 
     fn store_base_max_energy(&mut self, value: f32, output: &CommandsOutput) {
@@ -277,8 +277,8 @@ impl<S: Simulation> Simulation for SimulationCache<S> {
         self.cache.shard_slots
     }
 
-    fn base_max_health(&self) -> f32 {
-        self.cache.base_max_health
+    fn base_max_life(&self) -> f32 {
+        self.cache.base_max_life
     }
 
     fn base_max_energy(&self) -> f32 {

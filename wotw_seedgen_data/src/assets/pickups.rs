@@ -6,15 +6,15 @@
 //! use wotw_seedgen_data::{assets::{Pickups, PickupsEntry}, MapIcon, Position, UberIdentifier, Area};
 //!
 //! let input = "Identifier, Condition, Area, PickupType, PickupDetails, X, Y, MapX, MapY
-//! Marsh.Spawn.LeftHF, 21786|60210, Marsh, HealthFragment, , -958.6, -4313.2, -958.6199, -4312.245
+//! Marsh.Spawn.LeftLF, 21786|60210, Marsh, LifeFragment, , -958.6, -4313.2, -958.6199, -4312.245
 //! Glades.MotayHut.SL, 42178|57455, Glades, SpiritLight, 100, -172.7, -4583.2, -392.8, -4130.6";
 //! let pickups = Pickups::from_reader(input.as_bytes()).unwrap();
 //!
 //! assert_eq!(pickups.entries, vec![
 //!     PickupsEntry {
-//!         identifier: "Marsh.Spawn.LeftHF".to_string(),
+//!         identifier: "Marsh.Spawn.LeftLF".to_string(),
 //!         area: Area::Marsh,
-//!         map_icon: MapIcon::HealthFragment,
+//!         map_icon: MapIcon::LifeFragment,
 //!         uber_identifier: UberIdentifier::new(21786, 60210),
 //!         value: None,
 //!         position: Some(Position::new(-958., -4313.)),

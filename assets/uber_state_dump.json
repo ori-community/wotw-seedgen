@@ -524,17 +524,17 @@
           "value": 3.0
         },
         "10": {
-          "name": "baseMaxHealth",
+          "name": "baseMaxLife",
           "type": "VirtualIntUberState",
           "value": 30.0
         },
         "11": {
-          "name": "maxHealth",
+          "name": "maxLife",
           "type": "ReadOnlyVirtualIntUberState",
           "value": 30.0
         },
         "12": {
-          "name": "health",
+          "name": "life",
           "type": "VirtualFloatUberState",
           "value": 30.0
         },
@@ -18384,7 +18384,7 @@
           "value": 0.0
         },
         "32": {
-          "name": "healthEfficiency",
+          "name": "lifeEfficiency",
           "type": "VirtualBooleanUberState",
           "value": 0.0
         },

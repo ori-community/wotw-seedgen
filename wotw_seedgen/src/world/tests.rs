@@ -22,7 +22,7 @@ pub fn empty_test_world<'graph, 'settings>(
 ) -> World<'graph, 'settings, 'graph, 'static> {
     let mut world = test_world(graph, settings, spawn);
 
-    world.store_base_max_health(0, &CommandsOutput::NONE);
+    world.store_base_max_life(0, &CommandsOutput::NONE);
     world.store_base_max_energy(0., &CommandsOutput::NONE);
     world.store_shard_slots(0, &CommandsOutput::NONE);
 
@@ -101,7 +101,7 @@ fn small_reach_check() {
 
     world.store_skill(Skill::DoubleJump, true, &CommandsOutput::NONE);
     world.store_shard(Shard::TripleJump, true, &CommandsOutput::NONE);
-    world.store_base_max_health(5, &CommandsOutput::NONE);
+    world.store_base_max_life(5, &CommandsOutput::NONE);
 
     world.traverse_spawn(&CommandsOutput::NONE);
 
@@ -146,9 +146,9 @@ fn refill_orbs() {
         40., 40., 40., 40., 40., 40., 40., 40., 40., 41., 42., 44., 45., 47., 48., 50., 52., 53.,
         55., 56., 58., 59., 61., 62., 64., 65., 66., 68., 69.,
     ];
-    for health in expected {
-        assert_eq!(world.checkpoint_orbs().health, health);
-        world.add_base_max_health(5, &CommandsOutput::NONE);
+    for life in expected {
+        assert_eq!(world.checkpoint_orbs().life, life);
+        world.add_base_max_life(5, &CommandsOutput::NONE);
     }
 
     world.restore_snapshot();
@@ -160,8 +160,8 @@ fn refill_orbs() {
         8.,
     ];
     for drops in expected {
-        assert_eq!(world.health_plant_drops(), drops);
-        world.add_base_max_health(5, &CommandsOutput::NONE);
+        assert_eq!(world.life_plant_drops(), drops);
+        world.add_base_max_life(5, &CommandsOutput::NONE);
     }
 
     world.restore_snapshot();
@@ -170,10 +170,10 @@ fn refill_orbs() {
     world.store_shard(Shard::Vitality, true, &CommandsOutput::NONE);
     assert_eq!(world.checkpoint_orbs(), Orbs::new(0.0, 1.0));
 
-    world.store_base_max_health(35, &CommandsOutput::NONE);
+    world.store_base_max_life(35, &CommandsOutput::NONE);
     assert_eq!(world.checkpoint_orbs(), Orbs::new(35.0, 1.0));
 
-    world.store_base_max_health(140, &CommandsOutput::NONE);
+    world.store_base_max_life(140, &CommandsOutput::NONE);
     assert_eq!(world.checkpoint_orbs(), Orbs::new(45.0, 1.0));
 
     let world = test_world(&TEST_ASSETS.graphs.moki, &settings, DEFAULT_SPAWN);
@@ -251,9 +251,9 @@ fn is_met() {
                 let req = $req;
                 let mut left = orb_variants![$world_orbs];
                 let _ = world.is_met(&req, &mut left);
-                left.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));
+                left.sort_unstable_by(|a, b| a.life.total_cmp(&b.life));
                 let mut right = orb_variants![$($world_orbs + $orbs),*];
-                right.sort_unstable_by(|a, b| a.health.total_cmp(&b.health));
+                right.sort_unstable_by(|a, b| a.life.total_cmp(&b.life));
                 assert_eq!(left, right);
             }
         };
@@ -301,7 +301,7 @@ fn is_met() {
 
     world.store_shard(Shard::LifePact, true, &CommandsOutput::NONE);
     world.store_base_max_energy(0.5, &CommandsOutput::NONE);
-    world.store_base_max_health(15, &CommandsOutput::NONE);
+    world.store_base_max_life(15, &CommandsOutput::NONE);
     test!(
         Requirement::EnergySkill(Skill::Blaze, 1.0),
         [Orbs::new(-5.0, -0.5)]
@@ -312,7 +312,7 @@ fn is_met() {
     );
     test!(
         Requirement::NonConsumingEnergySkill(Skill::Blaze),
-        [Orbs::new(world.max_health(), 0.0)],
+        [Orbs::new(world.max_life(), 0.0)],
         [Orbs::new(-10.0, 0.5)]
     );
 
@@ -322,13 +322,13 @@ fn is_met() {
 
     eprintln!("testing Damage");
 
-    world.store_base_max_health(30, &CommandsOutput::NONE);
+    world.store_base_max_life(30, &CommandsOutput::NONE);
     test!(Requirement::Damage(30.0), "❌");
-    world.store_base_max_health(35, &CommandsOutput::NONE);
+    world.store_base_max_life(35, &CommandsOutput::NONE);
     test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
 
     set_difficulty!(Difficulty::Gorlek);
-    world.store_base_max_health(30, &CommandsOutput::NONE);
+    world.store_base_max_life(30, &CommandsOutput::NONE);
     world.store_shard(Shard::Vitality, true, &CommandsOutput::NONE);
     test!(Requirement::Damage(30.0), [Orbs::new(-30.0, 0.)]);
     world.store_shard(Shard::Vitality, false, &CommandsOutput::NONE);
@@ -340,7 +340,7 @@ fn is_met() {
     world.store_base_max_energy(3., &CommandsOutput::NONE);
     world.store_skill(Skill::Regenerate, true, &CommandsOutput::NONE);
     test!(Requirement::Damage(60.0), "❌");
-    world.store_base_max_health(65, &CommandsOutput::NONE);
+    world.store_base_max_life(65, &CommandsOutput::NONE);
     test!(
         Requirement::Damage(60.0),
         [Orbs::new(30.0, world.max_energy())],
@@ -487,7 +487,7 @@ fn is_met() {
 
     world.store_skill(Skill::Blaze, true, &CommandsOutput::NONE);
     world.store_base_max_energy(2., &CommandsOutput::NONE);
-    world.store_base_max_health(25, &CommandsOutput::NONE);
+    world.store_base_max_life(25, &CommandsOutput::NONE);
 
     test!(
         Requirement::And(vec![c.clone(), d.clone()]),
@@ -518,7 +518,7 @@ fn is_met() {
         [Orbs::new(-10.0, -1.0)]
     );
     world.store_base_max_energy(6., &CommandsOutput::NONE);
-    world.store_base_max_health(65, &CommandsOutput::NONE);
+    world.store_base_max_life(65, &CommandsOutput::NONE);
     test!(
         Requirement::And(vec![
             Requirement::Or(vec![a.clone(), d.clone()]),
@@ -546,7 +546,7 @@ fn is_met() {
     world.restore_snapshot();
     world.snapshot();
 
-    world.store_base_max_health(35, &CommandsOutput::NONE);
+    world.store_base_max_life(35, &CommandsOutput::NONE);
     world.store_base_max_energy(1., &CommandsOutput::NONE);
     test!(
         Requirement::And(vec![Requirement::Damage(30.0), Requirement::Damage(30.0)]),

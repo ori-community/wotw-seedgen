@@ -16,7 +16,7 @@ use wotw_seedgen_data::{
     },
     parse::SpannedOption,
     seed_language::{
-        compile::{clean_water, energy_fragment, health_fragment, keystone, shard, skill},
+        compile::{clean_water, energy_fragment, keystone, life_fragment, shard, skill},
         output::{
             CommandVoid, CommandsOutput, CommonItem, ContainedWrites, ContainedWritesExt,
             IntermediateOutput, ItemMetadata,
@@ -41,7 +41,7 @@ fn mock_world<'graph, 'settings>(
     uber_states: UberStates,
 ) -> World<'graph, 'settings, 'graph, 'static> {
     let mut world = World::new(graph, 0, settings, uber_states, &mut []);
-    world.store_base_max_health(0, &CommandsOutput::NONE);
+    world.store_base_max_life(0, &CommandsOutput::NONE);
     world.store_base_max_energy(0., &CommandsOutput::NONE);
     world.store_shard_slots(0, &CommandsOutput::NONE);
     world.traverse_spawn(&CommandsOutput::NONE);
@@ -194,7 +194,7 @@ fn mock_solutions() {
         &mut Pcg64Mcg::new(0xcafef00dd15ea5e5),
         &CommandsOutput::NONE,
     );
-    item_pool.add_amount(health_fragment(), 99, &CommandsOutput::NONE);
+    item_pool.add_amount(life_fragment(), 99, &CommandsOutput::NONE);
     item_pool.add_amount(energy_fragment(), 99, &CommandsOutput::NONE);
     item_pool.remove(&shard(Energy), &IntermediateOutput::default());
     item_pool.remove(&shard(Vitality), &IntermediateOutput::default());
@@ -258,14 +258,14 @@ fn mock_solutions() {
         [[skill(Grenade), (energy_fragment(), 8)]]
     );
 
-    test!(Requirement::Damage(36.), [[(health_fragment(), 8)]]);
+    test!(Requirement::Damage(36.), [[(life_fragment(), 8)]]);
 
     test!(
         Requirement::And(vec![Requirement::Damage(18.), Requirement::Damage(18.)]),
         [
-            [(health_fragment(), 8)],
+            [(life_fragment(), 8)],
             [
-                (health_fragment(), 4),
+                (life_fragment(), 4),
                 (energy_fragment(), 4),
                 skill(Regenerate)
             ]
@@ -274,7 +274,7 @@ fn mock_solutions() {
 
     test!(
         Requirement::Or(vec![Requirement::Damage(36.), Requirement::Damage(18.)]),
-        [[(health_fragment(), 4)]]
+        [[(life_fragment(), 4)]]
     );
 
     test!(
@@ -336,28 +336,28 @@ fn mock_solutions() {
             Requirement::Damage(18.),
         ]),
         [
-            [(health_fragment(), 11)],
-            [shard(Resilience), (health_fragment(), 10)],
+            [(life_fragment(), 11)],
+            [shard(Resilience), (life_fragment(), 10)],
             [
                 skill(Regenerate),
-                (health_fragment(), 8),
+                (life_fragment(), 8),
                 (energy_fragment(), 2)
             ],
             [
                 skill(Regenerate),
-                (health_fragment(), 4),
+                (life_fragment(), 4),
                 (energy_fragment(), 4)
             ],
             [
                 skill(Regenerate),
                 shard(Resilience),
-                (health_fragment(), 7),
+                (life_fragment(), 7),
                 (energy_fragment(), 2)
             ],
             [
                 skill(Regenerate),
                 shard(Overcharge),
-                (health_fragment(), 4),
+                (life_fragment(), 4),
                 (energy_fragment(), 3)
             ],
         ]
@@ -377,16 +377,16 @@ fn mock_solutions() {
             [
                 shard(LifePact),
                 (energy_fragment(), 1),
-                (health_fragment(), 1)
+                (life_fragment(), 1)
             ],
             [
                 shard(LifePact),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 1)
+                (life_fragment(), 1)
             ],
         ]
     );
@@ -402,14 +402,14 @@ fn mock_solutions() {
                 skill(Bow),
                 shard(LifePact),
                 energy_fragment(),
-                health_fragment()
+                life_fragment()
             ],
-            [skill(Bow), shard(LifePact), (health_fragment(), 2)],
+            [skill(Bow), shard(LifePact), (life_fragment(), 2)],
             [
                 skill(Bow),
                 shard(LifePact),
                 shard(Overcharge),
-                health_fragment()
+                life_fragment()
             ],
             [skill(Grenade), (energy_fragment(), 2)],
             [skill(Grenade), shard(Overcharge), energy_fragment()],
@@ -417,14 +417,14 @@ fn mock_solutions() {
                 skill(Grenade),
                 shard(LifePact),
                 energy_fragment(),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
-            [skill(Grenade), shard(LifePact), (health_fragment(), 3)],
+            [skill(Grenade), shard(LifePact), (life_fragment(), 3)],
             [
                 skill(Grenade),
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [skill(Shuriken), (energy_fragment(), 2)],
             [skill(Shuriken), shard(Overcharge), energy_fragment()],
@@ -432,14 +432,14 @@ fn mock_solutions() {
                 skill(Shuriken),
                 shard(LifePact),
                 energy_fragment(),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
-            [skill(Shuriken), shard(LifePact), (health_fragment(), 3)],
+            [skill(Shuriken), shard(LifePact), (life_fragment(), 3)],
             [
                 skill(Shuriken),
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [skill(Blaze), (energy_fragment(), 2)],
             [skill(Blaze), shard(Overcharge), energy_fragment()],
@@ -447,14 +447,14 @@ fn mock_solutions() {
                 skill(Blaze),
                 shard(LifePact),
                 energy_fragment(),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
-            [skill(Blaze), shard(LifePact), (health_fragment(), 3)],
+            [skill(Blaze), shard(LifePact), (life_fragment(), 3)],
             [
                 skill(Blaze),
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [skill(Spear), (energy_fragment(), 4)],
             [skill(Spear), shard(Overcharge), (energy_fragment(), 2)],
@@ -462,33 +462,33 @@ fn mock_solutions() {
                 skill(Spear),
                 shard(LifePact),
                 (energy_fragment(), 3),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Spear),
                 shard(LifePact),
                 (energy_fragment(), 2),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 skill(Spear),
                 shard(LifePact),
                 energy_fragment(),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
-            [skill(Spear), shard(LifePact), (health_fragment(), 5)],
+            [skill(Spear), shard(LifePact), (life_fragment(), 5)],
             [
                 skill(Spear),
                 shard(LifePact),
                 shard(Overcharge),
                 energy_fragment(),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Spear),
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [skill(Sentry), (energy_fragment(), 4)],
             [skill(Sentry), shard(Overcharge), (energy_fragment(), 2)],
@@ -496,33 +496,33 @@ fn mock_solutions() {
                 skill(Sentry),
                 shard(LifePact),
                 (energy_fragment(), 3),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Sentry),
                 shard(LifePact),
                 (energy_fragment(), 2),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 skill(Sentry),
                 shard(LifePact),
                 energy_fragment(),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
-            [skill(Sentry), shard(LifePact), (health_fragment(), 5)],
+            [skill(Sentry), shard(LifePact), (life_fragment(), 5)],
             [
                 skill(Sentry),
                 shard(LifePact),
                 shard(Overcharge),
                 energy_fragment(),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Sentry),
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
         ]
     );
@@ -540,53 +540,53 @@ fn mock_solutions() {
                 skill(Grenade),
                 shard(LifePact),
                 (energy_fragment(), 3),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Grenade),
                 shard(LifePact),
                 (energy_fragment(), 2),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 skill(Grenade),
                 shard(LifePact),
                 energy_fragment(),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
-            [skill(Grenade), shard(LifePact), (health_fragment(), 5)],
+            [skill(Grenade), shard(LifePact), (life_fragment(), 5)],
             [
                 skill(Grenade),
                 shard(LifePact),
                 shard(Overcharge),
                 energy_fragment(),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Grenade),
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 skill(Grenade),
                 shard(LifePact),
                 shard(Resilience),
                 energy_fragment(),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 skill(Grenade),
                 shard(LifePact),
                 shard(Resilience),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
             [
                 skill(Grenade),
                 shard(LifePact),
                 shard(Overcharge),
                 shard(Resilience),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
         ]
     );
@@ -612,256 +612,256 @@ fn mock_solutions() {
             [
                 shard(LifePact),
                 (energy_fragment(), 31),
-                (health_fragment(), 1)
+                (life_fragment(), 1)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 30),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 29),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 28),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 27),
-                (health_fragment(), 5)
+                (life_fragment(), 5)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 26),
-                (health_fragment(), 6)
+                (life_fragment(), 6)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 25),
-                (health_fragment(), 7)
+                (life_fragment(), 7)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 24),
-                (health_fragment(), 8)
+                (life_fragment(), 8)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 23),
-                (health_fragment(), 9)
+                (life_fragment(), 9)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 22),
-                (health_fragment(), 10)
+                (life_fragment(), 10)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 21),
-                (health_fragment(), 11)
+                (life_fragment(), 11)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 20),
-                (health_fragment(), 12)
+                (life_fragment(), 12)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 19),
-                (health_fragment(), 13)
+                (life_fragment(), 13)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 18),
-                (health_fragment(), 14)
+                (life_fragment(), 14)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 17),
-                (health_fragment(), 15)
+                (life_fragment(), 15)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 16),
-                (health_fragment(), 16)
+                (life_fragment(), 16)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 15),
-                (health_fragment(), 17)
+                (life_fragment(), 17)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 14),
-                (health_fragment(), 18)
+                (life_fragment(), 18)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 13),
-                (health_fragment(), 19)
+                (life_fragment(), 19)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 12),
-                (health_fragment(), 20)
+                (life_fragment(), 20)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 11),
-                (health_fragment(), 21)
+                (life_fragment(), 21)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 10),
-                (health_fragment(), 22)
+                (life_fragment(), 22)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 9),
-                (health_fragment(), 23)
+                (life_fragment(), 23)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 8),
-                (health_fragment(), 24)
+                (life_fragment(), 24)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 7),
-                (health_fragment(), 25)
+                (life_fragment(), 25)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 6),
-                (health_fragment(), 26)
+                (life_fragment(), 26)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 5),
-                (health_fragment(), 27)
+                (life_fragment(), 27)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 4),
-                (health_fragment(), 28)
+                (life_fragment(), 28)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 3),
-                (health_fragment(), 29)
+                (life_fragment(), 29)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 2),
-                (health_fragment(), 30)
+                (life_fragment(), 30)
             ],
             [
                 shard(LifePact),
                 (energy_fragment(), 1),
-                (health_fragment(), 31)
+                (life_fragment(), 31)
             ],
             [
                 shard(LifePact),
-                (health_fragment(), 32)
+                (life_fragment(), 32)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 15),
-                (health_fragment(), 1)
+                (life_fragment(), 1)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 14),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 13),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 12),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 11),
-                (health_fragment(), 5)
+                (life_fragment(), 5)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 10),
-                (health_fragment(), 6)
+                (life_fragment(), 6)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 9),
-                (health_fragment(), 7)
+                (life_fragment(), 7)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 8),
-                (health_fragment(), 8)
+                (life_fragment(), 8)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 7),
-                (health_fragment(), 9)
+                (life_fragment(), 9)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 6),
-                (health_fragment(), 10)
+                (life_fragment(), 10)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 5),
-                (health_fragment(), 11)
+                (life_fragment(), 11)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 4),
-                (health_fragment(), 12)
+                (life_fragment(), 12)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 3),
-                (health_fragment(), 13)
+                (life_fragment(), 13)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 2),
-                (health_fragment(), 14)
+                (life_fragment(), 14)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 1),
-                (health_fragment(), 15)
+                (life_fragment(), 15)
             ],
             [
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 16)
+                (life_fragment(), 16)
             ],
             [
                 skill(Burrow),
@@ -876,259 +876,259 @@ fn mock_solutions() {
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 26),
-                (health_fragment(), 1)
+                (life_fragment(), 1)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 25),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 24),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 23),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 22),
-                (health_fragment(), 5)
+                (life_fragment(), 5)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 21),
-                (health_fragment(), 6)
+                (life_fragment(), 6)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 20),
-                (health_fragment(), 7)
+                (life_fragment(), 7)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 19),
-                (health_fragment(), 8)
+                (life_fragment(), 8)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 18),
-                (health_fragment(), 9)
+                (life_fragment(), 9)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 17),
-                (health_fragment(), 10)
+                (life_fragment(), 10)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 16),
-                (health_fragment(), 11)
+                (life_fragment(), 11)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 15),
-                (health_fragment(), 12)
+                (life_fragment(), 12)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 14),
-                (health_fragment(), 13)
+                (life_fragment(), 13)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 13),
-                (health_fragment(), 14)
+                (life_fragment(), 14)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 12),
-                (health_fragment(), 15)
+                (life_fragment(), 15)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 11),
-                (health_fragment(), 16)
+                (life_fragment(), 16)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 10),
-                (health_fragment(), 17)
+                (life_fragment(), 17)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 9),
-                (health_fragment(), 18)
+                (life_fragment(), 18)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 8),
-                (health_fragment(), 19)
+                (life_fragment(), 19)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 7),
-                (health_fragment(), 20)
+                (life_fragment(), 20)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 6),
-                (health_fragment(), 21)
+                (life_fragment(), 21)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 5),
-                (health_fragment(), 22)
+                (life_fragment(), 22)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 4),
-                (health_fragment(), 23)
+                (life_fragment(), 23)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 3),
-                (health_fragment(), 24)
+                (life_fragment(), 24)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 2),
-                (health_fragment(), 25)
+                (life_fragment(), 25)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 (energy_fragment(), 1),
-                (health_fragment(), 26)
+                (life_fragment(), 26)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
-                (health_fragment(), 27)
+                (life_fragment(), 27)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 13),
-                (health_fragment(), 1)
+                (life_fragment(), 1)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 12),
-                (health_fragment(), 2)
+                (life_fragment(), 2)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 11),
-                (health_fragment(), 3)
+                (life_fragment(), 3)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 10),
-                (health_fragment(), 4)
+                (life_fragment(), 4)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 9),
-                (health_fragment(), 5)
+                (life_fragment(), 5)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 8),
-                (health_fragment(), 6)
+                (life_fragment(), 6)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 7),
-                (health_fragment(), 7)
+                (life_fragment(), 7)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 6),
-                (health_fragment(), 8)
+                (life_fragment(), 8)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 5),
-                (health_fragment(), 9)
+                (life_fragment(), 9)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 4),
-                (health_fragment(), 10)
+                (life_fragment(), 10)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 3),
-                (health_fragment(), 11)
+                (life_fragment(), 11)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 2),
-                (health_fragment(), 12)
+                (life_fragment(), 12)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
                 (energy_fragment(), 1),
-                (health_fragment(), 13)
+                (life_fragment(), 13)
             ],
             [
                 skill(Burrow),
                 shard(LifePact),
                 shard(Overcharge),
-                (health_fragment(), 14)
+                (life_fragment(), 14)
             ],
         ]
     );
@@ -1146,24 +1146,24 @@ fn mock_solutions() {
 //     (Sentry, Sentry.damage_per_energy(false)),
 // ];
 
-// const fn cost_to_destroy(skill: Skill, health: f32) -> f32 {
-//     (health / skill.total_damage(false)).ceil() * 2. * skill.energy_cost()
+// const fn cost_to_destroy(skill: Skill, life: f32) -> f32 {
+//     (life / skill.total_damage(false)).ceil() * 2. * skill.energy_cost()
 // }
 
-// const fn costs_to_destroy(health: f32) -> [(Skill, f32); 7] {
+// const fn costs_to_destroy(life: f32) -> [(Skill, f32); 7] {
 //     [
-//         (Bow, cost_to_destroy(Bow, health)),
-//         (Shuriken, cost_to_destroy(Shuriken, health)),
-//         (Blaze, cost_to_destroy(Blaze, health)),
-//         (Grenade, cost_to_destroy(Grenade, health)),
-//         (Flash, cost_to_destroy(Flash, health)),
-//         (Spear, cost_to_destroy(Spear, health)),
-//         (Sentry, cost_to_destroy(Sentry, health)),
+//         (Bow, cost_to_destroy(Bow, life)),
+//         (Shuriken, cost_to_destroy(Shuriken, life)),
+//         (Blaze, cost_to_destroy(Blaze, life)),
+//         (Grenade, cost_to_destroy(Grenade, life)),
+//         (Flash, cost_to_destroy(Flash, life)),
+//         (Spear, cost_to_destroy(Spear, life)),
+//         (Sentry, cost_to_destroy(Sentry, life)),
 //     ]
 // }
 
 // const fn costs_to_defeat(enemy: Enemy) -> [(Skill, f32); 7] {
-//     costs_to_destroy(enemy.health())
+//     costs_to_destroy(enemy.life())
 // }
 
 static GORLEK_SETTINGS: LazyLock<WorldSettings> =
@@ -1280,25 +1280,25 @@ fn hollow_spawn_solutions() {
             // Hollow.BashTree via EastHollow.BeetleFight
             [
                 skill(Regenerate),
-                (health_fragment(), 2),
+                (life_fragment(), 2),
                 skill(Sword),
                 skill(DoubleJump)
             ],
             [
                 skill(Regenerate),
-                (health_fragment(), 2),
+                (life_fragment(), 2),
                 skill(Sword),
                 skill(Dash)
             ],
             [
                 skill(Regenerate),
-                (health_fragment(), 2),
+                (life_fragment(), 2),
                 skill(Hammer),
                 skill(DoubleJump)
             ],
             [
                 skill(Regenerate),
-                (health_fragment(), 2),
+                (life_fragment(), 2),
                 skill(Hammer),
                 skill(Dash)
             ],
@@ -1598,7 +1598,7 @@ fn depths_spawn_solutions() {
             [skill(Flash), (energy_fragment(), 2)],
             [skill(Flash), skill(DoubleJump), skill(Sword)],
             [skill(Flash), skill(DoubleJump), skill(Hammer)],
-            [skill(Flash), skill(Dash), health_fragment()],
+            [skill(Flash), skill(Dash), life_fragment()],
             [skill(Launch), skill(Sword)],
             [skill(Launch), skill(Hammer)],
             [skill(Launch), skill(Blaze)],
@@ -1606,24 +1606,24 @@ fn depths_spawn_solutions() {
             [skill(Flash), skill(Bash)],
             [skill(Flash), skill(Launch)],
             [skill(Launch), skill(Dash)],
-            [skill(Dash), health_fragment(), skill(Bash)],
+            [skill(Dash), life_fragment(), skill(Bash)],
             [
                 skill(Dash),
-                health_fragment(),
+                life_fragment(),
                 skill(Grapple),
                 skill(DoubleJump),
                 skill(Sword)
             ],
             [
                 skill(Dash),
-                health_fragment(),
+                life_fragment(),
                 skill(Grapple),
                 skill(DoubleJump),
                 skill(Hammer)
             ],
             [
                 skill(Dash),
-                health_fragment(),
+                life_fragment(),
                 skill(Grapple),
                 skill(DoubleJump),
                 skill(Blaze),
@@ -1672,11 +1672,11 @@ fn feeding_grounds_spawn_solutions() {
             [skill(DoubleJump), skill(Grapple)],
             [skill(Bash), skill(Grenade), skill(DoubleJump)],
             [skill(Bash), skill(Grenade), skill(Dash)],
-            [skill(Bash), skill(Grenade), health_fragment()],
+            [skill(Bash), skill(Grenade), life_fragment()],
             [skill(Bash), skill(Grenade), skill(Glide), skill(Sword)],
             [skill(Bash), skill(Grenade), skill(Glide), skill(Hammer)],
             [skill(Grapple), skill(Dash)],
-            [skill(Grapple), skill(Sword), health_fragment()],
+            [skill(Grapple), skill(Sword), life_fragment()],
             [skill(Grapple), skill(Glide), skill(Sword)],
             [skill(Grapple), skill(Glide), skill(Hammer)],
             [skill(Launch)],
@@ -1691,7 +1691,7 @@ fn central_wastes_spawn_solutions() {
     assert_eq_solutions!(
         find_test_solutions(&mut world, &ITEM_POOL, 7),
         make_test_solutions!([
-            // Wastes.TreeToCentralTPArc.SandHF
+            // Wastes.TreeToCentralTPArc.SandLF
             [skill(Burrow)],
             // Wastes.CentralTP.BreakWallOre
             [skill(DoubleJump), skill(Sword)],
@@ -1750,7 +1750,7 @@ fn upper_wastes_spawn_solutions() {
                 skill(Grenade),
                 skill(DoubleJump),
                 shard(TripleJump),
-                health_fragment()
+                life_fragment()
             ],
             [
                 skill(Bash),
@@ -1789,10 +1789,10 @@ fn upper_wastes_spawn_solutions() {
 //             // [skill(Grenade), (energy_fragment(), 2)],
 //             // [skill(Spear), (energy_fragment(), 2)],
 //             // [skill(DoubleJump), skill(Dash)],
-//             // [skill(DoubleJump), shard(TripleJump), (health_fragment(), 3)],
+//             // [skill(DoubleJump), shard(TripleJump), (life_fragment(), 3)],
 //             // [skill(Glide)],
-//             // [skill(Bash), (health_fragment(), 3), skill(DoubleJump)],
-//             // [skill(Bash), (health_fragment(), 3), skill(Dash)],
+//             // [skill(Bash), (life_fragment(), 3), skill(DoubleJump)],
+//             // [skill(Bash), (life_fragment(), 3), skill(Dash)],
 //             // [skill(Launch)],
 //             // Willow.Entrance.SL
 //             [
@@ -1866,7 +1866,7 @@ fn upper_wastes_spawn_solutions() {
 //                 skill(Grenade),
 //                 skill(DoubleJump),
 //                 shard(TripleJump),
-//                 (health_fragment(), 3)
+//                 (life_fragment(), 3)
 //             ],
 //             [skill(Launch)],
 //             // Willow.SecretPortal.Ore
@@ -1897,7 +1897,7 @@ fn burrows_spawn_solutions() {
             // to a connection which has already been solved...
             // [skill(Bash)],
             [skill(Launch)],
-            [health_fragment()],
+            [life_fragment()],
             [skill(Regenerate)],
         ]),
     );

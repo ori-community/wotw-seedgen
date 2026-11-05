@@ -182,8 +182,8 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
             | FunctionIdentifier::RemoveKeystoneString
             | FunctionIdentifier::ShardSlotString
             | FunctionIdentifier::RemoveShardSlotString
-            | FunctionIdentifier::HealthFragmentString
-            | FunctionIdentifier::RemoveHealthFragmentString
+            | FunctionIdentifier::LifeFragmentString
+            | FunctionIdentifier::RemoveLifeFragmentString
             | FunctionIdentifier::EnergyFragmentString
             | FunctionIdentifier::RemoveEnergyFragmentString
             | FunctionIdentifier::SkillString
@@ -205,8 +205,8 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
             | FunctionIdentifier::RemoveKeystone
             | FunctionIdentifier::ShardSlot
             | FunctionIdentifier::RemoveShardSlot
-            | FunctionIdentifier::HealthFragment
-            | FunctionIdentifier::RemoveHealthFragment
+            | FunctionIdentifier::LifeFragment
+            | FunctionIdentifier::RemoveLifeFragment
             | FunctionIdentifier::EnergyFragment
             | FunctionIdentifier::RemoveEnergyFragment
             | FunctionIdentifier::Skill

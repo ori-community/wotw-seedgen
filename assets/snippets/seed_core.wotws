@@ -140,8 +140,8 @@ on Ruins.Escape.Completed if is_in_rectangle(2048, -3573, 2154, -3539) {
     position_trigger_rectangle("seir_walk", 2048, -3573, 2154, -3539)
     position_trigger_leave_callback("seir_walk", if Ruins.Wisp == false {
         store(Ruins.Wisp, true)
-        store(player.baseMaxHealth, player.baseMaxHealth + 10)
-        store(player.health, player.maxHealth)
+        store(player.baseMaxLife, player.baseMaxLife + 10)
+        store(player.life, player.maxLife)
         store(player.baseMaxEnergy, player.baseMaxEnergy + 1)
         store(player.energy, player.maxEnergy)
         position_trigger_destroy("seir_walk")

@@ -9,7 +9,7 @@ use crate::{
 };
 
 // TODO search for `Box::new(Operation` and similar, these helpers are often ignored
-// TODO move modify_health etc. helpers into here?
+// TODO move modify_life etc. helpers into here?
 pub fn store_boolean<T>(uber_identifier: UberIdentifier, value: T) -> CommandVoid
 where
     T: Into<CommandBoolean>,

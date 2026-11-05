@@ -1033,7 +1033,7 @@ impl Compile for ast::RefillValue {
         match self {
             ast::RefillValue::Full => RefillValue::Full,
             ast::RefillValue::Checkpoint => RefillValue::Checkpoint,
-            ast::RefillValue::Health(amount) => RefillValue::Health(
+            ast::RefillValue::Life(amount) => RefillValue::Life(
                 amount
                     .amount
                     .and_then(|amount| amount.value.value.into_option())

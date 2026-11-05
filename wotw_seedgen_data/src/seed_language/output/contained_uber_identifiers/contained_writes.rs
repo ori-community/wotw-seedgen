@@ -459,7 +459,7 @@ pub enum CommonWriteCommand {
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CommonItem {
     SpiritLight(i32),
-    HealthFragment,
+    LifeFragment,
     EnergyFragment,
     GorlekOre,
     Keystone,
@@ -541,9 +541,9 @@ impl CommonItem {
                 command: CommonWriteCommand::SetBooleanTrue,
             } => Some(Self::CleanWater),
             CommonUberStateWrite {
-                uber_identifier: CommonUberIdentifier::BaseMaxHealth,
+                uber_identifier: CommonUberIdentifier::BaseMaxLife,
                 command: CommonWriteCommand::AddInteger(5),
-            } => Some(Self::HealthFragment),
+            } => Some(Self::LifeFragment),
             CommonUberStateWrite {
                 uber_identifier: CommonUberIdentifier::BaseMaxEnergy,
                 command: CommonWriteCommand::AddFloat(OrderedFloat(0.5)),
@@ -609,7 +609,7 @@ impl Display for CommonItemLogName<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.inner {
             CommonItem::SpiritLight(amount) => write!(f, "{amount} Spirit Light"),
-            CommonItem::HealthFragment => f.write_str("Life Fragment"),
+            CommonItem::LifeFragment => f.write_str("Life Fragment"),
             CommonItem::EnergyFragment => f.write_str("Energy Fragment"),
             CommonItem::GorlekOre => f.write_str("Gorlek Ore"),
             CommonItem::Keystone => f.write_str("Keystone"),

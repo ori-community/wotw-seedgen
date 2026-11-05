@@ -2,11 +2,11 @@
 #name("Bonus Item Core")
 #description("Convenience functions for simple bonus items")
 
-!include("regeneration_core", energy_per_second, health_per_second)
+!include("regeneration_core", energy_per_second, life_per_second)
 !include("upgrade_progress_helper", write_upgrades, add_upgrade, update_upgrades)
 
 !builtin_icon(energy_regeneration_icon, "icons/bonus/energy_regeneration.png")
-!builtin_icon(health_regeneration_icon, "icons/bonus/health_regeneration.png")
+!builtin_icon(life_regeneration_icon, "icons/bonus/life_regeneration.png")
 !builtin_icon(extra_double_jump_icon, "icons/bonus/extra_double_jump.png")
 !builtin_icon(extra_air_dash_icon, "icons/bonus/extra_air_dash.png")
 !builtin_icon(extra_launch_icon, "icons/bonus/extra_launch.png")
@@ -56,26 +56,26 @@ fun energy_regeneration() {
 )
 !export(energy_regeneration)
 
-!state(health_regenerations, Integer)
-!export(health_regenerations)
+!state(life_regenerations, Integer)
+!export(life_regenerations)
 
-fun health_regeneration() {
-    store(health_regenerations, health_regenerations + 1)
-    item_message("#Life Regeneration x" + health_regenerations + "#")
-    store(health_per_second, health_per_second + 10. / 60.)
+fun life_regeneration() {
+    store(life_regenerations, life_regenerations + 1)
+    item_message("#Life Regeneration x" + life_regenerations + "#")
+    store(life_per_second, life_per_second + 10. / 60.)
     update_upgrades()
 }
 !augment_fun(write_upgrades(relevant: Boolean), {
-    if relevant && health_regenerations != 0 add_upgrade("Life Regeneration x" + health_regenerations)
+    if relevant && life_regenerations != 0 add_upgrade("Life Regeneration x" + life_regenerations)
 })
-!item_data(health_regeneration(),
+!item_data(life_regeneration(),
     "#Life Regeneration#",
     200,
     "Passively regenerate one life orb per minute",
-    health_regeneration_icon,
+    life_regeneration_icon,
     BonusItem
 )
-!export(health_regeneration)
+!export(life_regeneration)
 
 fun extra_double_jump() {
     item_message("#Extra Double Jump x" + bonusUpgrades.maxDoubleJumps + "#")

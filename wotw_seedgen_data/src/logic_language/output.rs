@@ -191,8 +191,8 @@ pub struct Refill {
 pub enum RefillValue {
     Full,
     Checkpoint,
-    #[strum(to_string = "Health={0}")]
-    Health(f32),
+    #[strum(to_string = "Life={0}")]
+    Life(f32),
     #[strum(to_string = "Energy={0}")]
     Energy(f32),
 }

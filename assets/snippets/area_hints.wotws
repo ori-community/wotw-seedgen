@@ -217,7 +217,7 @@ on spawn {
         200,
         "Glades Items Hint",
         "Reveals " + description + " in Glades",
-        HealthFragmentsMap,
+        LifeFragmentsMap,
     )
 
     set_shop_item_data(
