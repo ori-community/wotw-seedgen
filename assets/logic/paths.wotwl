@@ -1643,7 +1643,7 @@ anchor MarshPastOpher.TrialArea at -427, -4342:  # Next to the combat shrine
       Grapple, Launch OR Hammer OR Shuriken=1 OR Sentry=2
       Launch, DoubleJump OR Hammer OR Damage=10
       DoubleJump, TripleJump, Damage=30
-    unsafe:  # freindly spikes at the very right of the first spikes, left of the branch then very right of the last spike chunks
+    unsafe:  # friendly spikes at the very right of the first spikes, left of the branch then very right of the last spike chunks
       Grapple OR Launch OR AbilitySwap=6
       BlazeSwap=2 OR SentrySwap=2:
         Damage=10, BlazeSwap=2 OR SentrySwap=2
@@ -6517,41 +6517,72 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
     enter:
       moki: Wellspring.TopDoor
 
-  state Wellspring.SpiritTrial.Active:
-    moki: Grapple, DoubleJump, Dash OR Glide
-    gorlek: Grapple, Dash, Glide
-    kii: Grapple, Glide
-
-  pickup Wellspring.OutsideTopDoor.Shard:
+  conn OuterWellspring.TopShard:
     moki:
-      Grapple, DoubleJump, Dash OR Glide
       Bash, Grenade=1
       Launch
+    gorlek: SentryJump=1, DoubleJump OR Dash OR Glide  # generous extra abilities
+    kii:
+      SentryJump=1 OR AerialHammerJump
+      GlideJump, DoubleJump, TripleJump
+      # GrenadeJump=1, DoubleJump OR Dash OR Hammer
+    unsafe:
+      GrenadeJump, DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseFloat
+      CoyoteHammerJump OR WallHammerJump OR GlideHammerJump OR AbilitySwap=2
+      BlazeSwap=1 OR SentrySwap=1:
+        DoubleJump OR GlideJump OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
+      GlideJump, DoubleJump, Hammer
+      DoubleJump, TripleJump, Sword, Shuriken=1 OR Grenade=1  # pogo
+      DoubleJump, Sword, Deflector, Shuriken=1 OR Grenade=1
+      GlideJump, Sword, Shuriken=1 OR Grenade=1
+  conn OuterWellspring.SpritTrialEnd:  # paths which follow the Trial route
+    moki: Grapple, DoubleJump, Dash OR Glide
     gorlek:
-      SentryJump=1, DoubleJump OR Dash OR Glide  # generous extra abilities
+      Grapple, Dash, Glide OR Sword
       Grapple, DoubleJump, TripleJump OR Sword
-      Grapple, Dash, Sword
     kii:
       Grapple, Glide
       Grapple, Dash, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
       Grapple, DoubleJump, Hammer OR Sentry=2
       Grapple, Sword, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # With spear: hover, spear, upslash
       Grapple, Hammer, Sentry=2  # upslash, two swings, sentries
-      SentryJump=1 OR AerialHammerJump
-      GlideJump, DoubleJump, TripleJump
-      # GrenadeJump=1, DoubleJump OR Dash OR Hammer
     unsafe:
       Grapple, DoubleJump, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Not kii because it's hard to exit the spikes
       Grapple, Blaze=1, Dash OR Sword
       Grapple, DoubleJump, Shuriken=2  # at the end, shuriken then djump then shuriken again
-      GrenadeJump, DoubleJump OR Dash OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1 OR PauseFloat
-      CoyoteHammerJump OR WallHammerJump OR GlideHammerJump OR AbilitySwap=2
-      GlideJump, DoubleJump, Hammer
-      DoubleJump, TripleJump, Sword, Shuriken=1 OR Grenade=1  # pogo
-      DoubleJump, Sword, Deflector, Shuriken=1 OR Grenade=1
-      GlideJump, Sword, Deflector, Shuriken=1 OR Grenade=1
   conn OuterWellspring.EastDoor: free
   conn OuterWellspring.AboveWestDoor: free
+
+anchor OuterWellspring.TopShard at -803, -3914:  # At the Ultra Grapple shard
+  pickup Wellspring.OutsideTopDoor.Shard: free
+
+  conn OuterWellspring.SpritTrialEnd:
+    moki:
+      Launch
+      Bash, Grenade=1, DoubleJump
+    gorlek:
+      SentryJump=1  # Use sword for movement as well
+      Bash, Grenade=1
+    kii:
+      DoubleJump, TripleJump, Damage=15
+      AerialHammerJump
+    unsafe:  # some part of the spikes only deals 10 damage
+      GlideHammerJump OR AbilitySwap=2
+      DoubleJump, TripleJump, Damage=10
+      Damage=10, GlideJump OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR SpearJump=1
+ 
+  conn OuterWellspring.TrialApproach:
+    unsafe:
+      RegenJump, Damage=10
+  conn OuterWellspring.TopDoor: free
+
+anchor OuterWellspring.SpritTrialEnd at -839, -3893:  # At the end of the spirit trial
+  refill Checkpoint
+
+  state Wellspring.SpiritTrial.Active:
+    moki: free
+
+  conn OuterWellspring.TopShard: free
 
 # checkpoint at -973, -3949
 # checkpoint at -969, -3910
@@ -14681,6 +14712,8 @@ anchor UpperPools.RightBubbleSpamRoom at -1586, -4052:  # To the right of where 
     unsafe:
       Grenade=1 OR Bow=2  # https://youtu.be/oKRdNFQxYTQ
       WaterDash, Damage=40
+  state Pools.SpiritTrial.Active:
+    unsafe: PauseFloat
 
   pickup Pools.BubbleSpam.FishSL:
     moki: Water, Bash OR WaterDash OR Damage=10  # just in case someone's troubled by the fish
