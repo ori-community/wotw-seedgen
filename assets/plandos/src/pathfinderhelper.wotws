@@ -132,11 +132,13 @@ on reload {
     set_wheel_item_data(
         "root",
         Right,
-        "Toggle Marsh Weather",
-        "[Ability1]Toggle\nShortcut: [Binding3]",
+        "Toggle Area States",
+        "[Ability1]Toggle All\n[Ability2]Open Menu\nShortcut: [Binding3]",
         gears_icon,
     )
-    set_wheel_item_all_actions("root", Right, toggle_marsh_weather())
+    set_wheel_item_action("root", Right, Ability1, toggle_area_states())
+    set_wheel_item_action("root", Right, Ability2, switch_wheel("area_states"))
+    set_wheel_item_action("root", Right, Ability3, switch_wheel("area_states"))
 
     set_wheel_item_data(
         "root",
@@ -154,16 +156,6 @@ on reload {
         "[Ability1]Toggle All\n[Ability2]Open Menu",
         wall_icon,
     )
-
-    set_wheel_item_data(
-        "root",
-        BottomRight,
-        "Toggle Depths Settings",
-        "[Ability1]Toggle All\n[Ability2]Open Menu",
-        gears_icon,
-    )
-    set_wheel_item_action("root", BottomRight, Ability1, toggle_depths_settings())
-    set_wheel_item_action("root", BottomRight, Ability2, switch_wheel("depths_settings"))
 
     set_wheel_item_data(
         "glades_projects",
@@ -266,23 +258,31 @@ on reload {
     set_wheel_item_all_actions("glades_projects", BottomRight, store(Glades.Plants.LastTree, Glades.Plants.LastTree == false))
 
     set_wheel_item_data(
-        "depths_settings",
+        "area_states",
+        TopLeft,
+        "Toggle Marsh Weather",
+        "[Ability1]Toggle",
+        gears_icon,
+    )
+    set_wheel_item_all_actions("area_states", TopLeft, toggle_marsh_weather())
+
+    set_wheel_item_data(
+        "area_states",
         Top,
-        "Toggle Darkness\n(Mora defeated)",
+        "Toggle Depths Light\n(Mora defeated)",
         "[Ability1]Toggle",
         Flash,
     )
-    set_wheel_item_all_actions("depths_settings", Top, toggle_depths_light(Depths.MoraDefeated))
+    set_wheel_item_all_actions("area_states", Top, toggle_depths_light())
 
     set_wheel_item_data(
-        "depths_settings",
+        "area_states",
         TopRight,
-        "Toggle Enemies\n(Wisp quest completed)",
+        "Toggle Depths Enemies\n(Wisp quest completed)",
         "[Ability1]Toggle",
         Bounty,
     )
-    set_wheel_item_all_actions("depths_settings", TopRight, toggle_depths_enemies(Depths.BreakingMould.Completed))
-
+    set_wheel_item_all_actions("area_states", TopRight, toggle_depths_enemies())
 }
 
 on first_spawn {
@@ -448,13 +448,21 @@ on binding3 if get_integer("bind_pointer") == 0 {
     store(bind_pointer, select_major_state)
 
     open_dialogue()
-    set_message_text("dialogue", "Select toggle\n[Binding1]Difficulty\n[Binding2]Clean Water\n[Binding3]Glades Projects\n[Binding4]Marsh Weather\n[Binding5]Cancel")
+    set_message_text(
+        "dialogue",
+        "Select toggle\n" +
+        "[Binding1]Difficulty\n" +
+        "[Binding2]Clean Water\n" +
+        "[Binding3]Glades Projects\n" +
+        "[Binding4]Area States\n" +
+        "[Binding5]Cancel"
+    )
 }
 
 on binding1 if get_integer("bind_pointer") == select_major_state toggle_difficulty()
 on binding2 if get_integer("bind_pointer") == select_major_state toggle_clean_water()
 on binding3 if get_integer("bind_pointer") == select_major_state toggle_glades_projects()
-on binding4 if get_integer("bind_pointer") == select_major_state toggle_marsh_weather()
+on binding4 if get_integer("bind_pointer") == select_major_state select_area_state()
 on binding5 if get_integer("bind_pointer") == select_major_state close_dialogue()
 
 fun toggle_difficulty() {
@@ -472,14 +480,8 @@ fun toggle_clean_water() {
     if worldEvents.cleanWater == false respond(remove_clean_water_string())
 }
 
-fun toggle_marsh_weather() {
-    store(Marsh.StormLifted, Marsh.StormLifted == false)
-    if Marsh.StormLifted respond("#Storm Lifted#")
-    if Marsh.StormLifted == false respond("@Storm Reset@")
-}
-
 fun toggle_glades_projects() {
-    set_boolean("all_built",
+    set_boolean("all_completed",
         Glades.Buildings.DwellingRepairs
         && Glades.Buildings.RoofsOverHeads
         && Glades.Buildings.OnwardsAndUpwards
@@ -492,7 +494,7 @@ fun toggle_glades_projects() {
         && Glades.Plants.SelaFlowers
         && Glades.Plants.LastTree
     )
-    if get_boolean("all_built") {
+    if get_boolean("all_completed") {
         store(Glades.Buildings.DwellingRepairs, false)
         store(Glades.Buildings.RoofsOverHeads, false)
         store(Glades.Buildings.OnwardsAndUpwards, false)
@@ -506,7 +508,7 @@ fun toggle_glades_projects() {
         store(Glades.Plants.LastTree, false)
         respond("@Glades Projects Reset@")
     }
-    if get_boolean("all_built") == false {
+    if get_boolean("all_completed") == false {
         store(Glades.Buildings.DwellingRepairs, true)
         store(Glades.Buildings.RoofsOverHeads, true)
         store(Glades.Buildings.OnwardsAndUpwards, true)
@@ -522,19 +524,75 @@ fun toggle_glades_projects() {
     }
 }
 
-fun toggle_depths_settings(){
-    toggle_depths_light(Depths.MoraDefeated)
-    toggle_depths_enemies(Depths.BreakingMould.Completed)
+!let(bind_counter, bind_counter + 1)
+!let(select_area_state, bind_counter)
+
+fun select_area_state() {
+    store(bind_pointer, select_area_state)
+
+    set_message_text(
+        "dialogue",
+        "Select toggle\n" +
+        "[Binding1]Marsh Weather\n" +
+        "[Binding2]Depths Light (Mora defeated)\n" +
+        "[Binding3]Depths Enemies (Breaking Mould completed)\n" +
+        "[Binding5]Cancel"
+    )
 }
 
-fun toggle_depths_light(current_light: Boolean){
-    if current_light store(mouldwoodDepthsGroup.spiderBossState, 0)
-    if current_light == false store(mouldwoodDepthsGroup.spiderBossState, 7)
+on binding1 if get_integer("bind_pointer") == select_area_state toggle_marsh_weather()
+on binding2 if get_integer("bind_pointer") == select_area_state toggle_depths_light()
+on binding3 if get_integer("bind_pointer") == select_area_state toggle_depths_enemies()
+on binding5 if get_integer("bind_pointer") == select_area_state close_dialogue()
+
+fun toggle_marsh_weather() {
+    store(Marsh.StormLifted, Marsh.StormLifted == false)
+    if Marsh.StormLifted respond("#Storm Lifted#")
+    if Marsh.StormLifted == false respond("@Storm Reset@")
 }
 
-fun toggle_depths_enemies(current_enemies_updated: Boolean){
-    if current_enemies_updated store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 1)
-    if current_enemies_updated == false store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 3)
+fun toggle_area_states() {
+    set_boolean("all_completed",
+        Marsh.StormLifted
+        && Depths.MoraDefeated
+        && Depths.BreakingMould.Completed
+    )
+    if get_boolean("all_completed") {
+        store(Marsh.StormLifted, false)
+        store(mouldwoodDepthsGroup.spiderBossState, 0)
+        store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 0)
+        respond("@Area States Reset@")
+    }
+    if get_boolean("all_completed") == false {
+        store(Marsh.StormLifted, true)
+        store(mouldwoodDepthsGroup.spiderBossState, 7)
+        store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 3)
+        respond("#Area States Completed#")
+    }
+}
+
+fun toggle_depths_light() {
+    set_boolean("Depths.MoraDefeated", Depths.MoraDefeated)
+    if get_boolean("Depths.MoraDefeated") {
+        store(mouldwoodDepthsGroup.spiderBossState, 0)
+        respond("@Mora Reset@")
+    }
+    if get_boolean("Depths.MoraDefeated") == false {
+        store(mouldwoodDepthsGroup.spiderBossState, 7)
+        respond("#Mora Defeated#")
+    }
+}
+
+fun toggle_depths_enemies() {
+    set_boolean("Depths.BreakingMould.Completed", Depths.BreakingMould.Completed)
+    if get_boolean("Depths.BreakingMould.Completed") {
+        store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 0)
+        respond("@Breaking the Mould Reset@")
+    }
+    if get_boolean("Depths.BreakingMould.Completed") == false {
+        store(questUberStateGroup.mouldwoodDepthsWispQuestUberState, 3)
+        respond("#Breaking the Mould Completed#")
+    }
 }
 
 on binding4 if get_integer("bind_pointer") == 0 world_reset()
