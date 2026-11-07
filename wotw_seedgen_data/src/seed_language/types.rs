@@ -167,7 +167,8 @@ impl<'source> InferType<'source> for FunctionCall<'source> {
             FunctionIdentifier::GetBoolean
             | FunctionIdentifier::IsInCircle
             | FunctionIdentifier::IsInPositionTrigger
-            | FunctionIdentifier::IsInRectangle => Type::Boolean,
+            | FunctionIdentifier::IsInRectangle
+            | FunctionIdentifier::StringContains => Type::Boolean,
             FunctionIdentifier::GetInteger
             | FunctionIdentifier::ToInteger
             | FunctionIdentifier::StringLength => Type::Integer,

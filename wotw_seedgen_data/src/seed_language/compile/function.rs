@@ -258,6 +258,7 @@ pub enum FunctionIdentifier {
     GetInteger,
     ToInteger,
     StringLength,
+    StringContains,
     GetFloat,
     ToFloat,
     GetString,
@@ -435,6 +436,7 @@ impl FunctionIdentifier {
             GetInteger(id: String) -> Integer,
             ToInteger(float: Float) -> Integer,
             StringLength(string: String) -> Integer,
+            StringContains(haystack: String, needle: String) -> Boolean,
             GetFloat(id: String) -> Float,
             ToFloat(integer: Integer) -> Float,
             GetString(id: String) -> String,
@@ -774,6 +776,12 @@ impl<'source> Compile<'source> for ast::FunctionCall<'source> {
             FunctionIdentifier::StringLength => Command::Integer(CommandInteger::StringLength {
                 string: boxed_arg(&mut context)?,
             }),
+            FunctionIdentifier::StringContains => {
+                Command::Boolean(CommandBoolean::StringContains {
+                    haystack: boxed_arg(&mut context)?,
+                    needle: boxed_arg(&mut context)?,
+                })
+            }
             FunctionIdentifier::GetFloat => Command::Float(CommandFloat::GetFloat {
                 id: read_float_id(&mut context)?,
             }),
