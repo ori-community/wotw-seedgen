@@ -387,6 +387,10 @@ on first_spawn {
     store(Willow.Shriek.Teleporter, true)
 }
 
+// these can be enabled accidentally with debug
+on skills.weaponCharge store(skills.weaponCharge, false)
+on skills.bowCharge store(skills.bowCharge, false)
+
 on binding1 if get_integer("bind_pointer") == 0 {
     save()
     refill()
