@@ -6419,7 +6419,7 @@ anchor OuterWellspring.EastDoor at -814, -3972:  # Outside the door leading to t
       Sword OR Hammer
       Bash, Grenade=1
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
-    unsafe: Damage=15 OR GrenadeCancel OR PauseFloat
+    unsafe: Damage=15 OR RegenJump OR GrenadeCancel OR PauseFloat
   conn OuterWellspring.AboveEntranceDoor: free
   conn OuterWellspring.CutsceneIsland:
     gorlek: free
@@ -6550,11 +6550,16 @@ anchor OuterWellspring.TopDoor at -836, -3927:  # Outside the door leading to th
       Grapple, DoubleJump, Damage=15, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1  # Not kii because it's hard to exit the spikes
       Grapple, Blaze=1, Dash OR Sword
       Grapple, DoubleJump, Shuriken=2  # at the end, shuriken then djump then shuriken again
+  conn OuterWellspring.TrialApproach:
+    moki: Glide
+    unsafe: PauseFloat
   conn OuterWellspring.EastDoor: free
   conn OuterWellspring.AboveWestDoor: free
 
 anchor OuterWellspring.TopShard at -803, -3914:  # At the Ultra Grapple shard
   pickup Wellspring.OutsideTopDoor.Shard: free
+  pickup Wellspring.OutsideRight.EF:  # Make sure it's not redundant with paths originating from OuterWellspring.EastDoor. Haven't been actually pathfinded.
+    gorlek: Sword OR Hammer
 
   conn OuterWellspring.SpritTrialEnd:
     moki:
@@ -6570,7 +6575,7 @@ anchor OuterWellspring.TopShard at -803, -3914:  # At the Ultra Grapple shard
       GlideHammerJump OR AbilitySwap=2
       DoubleJump, TripleJump, Damage=10
       Damage=10, GlideJump OR GrenadeJump OR BlazeSwap=1 OR SentrySwap=1 OR SpearJump=1
- 
+
   conn OuterWellspring.TrialApproach:
     unsafe:
       RegenJump, Damage=10
