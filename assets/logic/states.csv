@@ -14,11 +14,11 @@ Marsh.Bells.TreeOpen, 24922|59146
 Marsh.HowlDefeated, 21786|40322
 Marsh.LittleBraver.Started, 14019|15983 >= 1
 Marsh.LittleBraver.FangCollected, 14019|15983 >= 2
-Marsh.Den.ExitLoopBottomWall, 21786|876
-Marsh.Den.ExitLoopTopWall, 21786|25291
+Marsh.DenExitLoop.BottomWall, 21786|876
+Marsh.DenExitLoop.TopWall, 21786|25291
 Marsh.Den.KeystoneDoor, 21786|47445
-Marsh.Den.DoorLoopSecretWall, 21786|11343
-Marsh.Den.DoorLoopTopBarrier, 21786|29636
+Marsh.DenDoorLoop.SecretWall, 21786|11343
+Marsh.DenDoorLoop.TopWall, 21786|29636
 Marsh.StormLifted, 6|400
 Marsh.Den.BottomAreaWall, 21786|53932
 Marsh.Den.Teleporter, 11666|61594
@@ -183,14 +183,14 @@ Ruins.PillarCorruption, 10289|43103
 Ruins.Escape.Completed, 10289|19890 >= 3
 Ruins.SiftingSands.Completed, 14019|35399 >= 3
 Willow.Entrance.TPShortcut, 16155|3096
-Willow.GrappleWheelsHeart, 16155|60752
+Willow.MossWheelsHeart, 16155|60752
 Willow.BoulderHeart, 16155|41488
 Willow.Teleporter, 16155|41465
 Willow.RedirectHeart, 16155|65277
 Willow.BurrowHeart, 16155|3588
 Willow.MinibossHeart, 16155|28478
 Willow.SpinLasersHeart, 16155|54940
-Willow.GlideHeart, 16155|42976
-Willow.SpinPortalsHeart, 16155|24290
+Willow.WindHeart, 16155|42976
+Willow.TopHeart, 16155|24290
 Willow.Shriek.Teleporter, 16155|50867
 World.SeirSkill, 24|108

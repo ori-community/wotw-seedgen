@@ -211,11 +211,11 @@ on Marsh.LittleBraver.Completed {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Den.ExitLoopLF {
+on Marsh.DenExitLoop.LF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Den.SecretLF {
+on Marsh.DenDoorLoop.SecretLF {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -259,7 +259,7 @@ on Marsh.DoubleJumpTree.Shard {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Marsh.Trial.LeftLS {
+on Marsh.Trial.LeftSL {
     store(stats.pickupsCollectedMarsh, stats.pickupsCollectedMarsh + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -783,7 +783,7 @@ on Wellspring.ThirdFloor.TPSL {
     store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Wellspring.ThirdFloor.Seed {
+on Wellspring.Seed {
     store(stats.pickupsCollectedWellspring, stats.pickupsCollectedWellspring + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -979,7 +979,7 @@ on Woods.TreeKeeper.Branch {
     store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Woods.TreeKeeper.Seed {
+on Woods.Seed {
     store(stats.pickupsCollectedWoods, stats.pickupsCollectedWoods + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
@@ -1139,7 +1139,7 @@ on Reach.BurrowRoom.Shard {
     store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }
-on Reach.BurrowRoom.ShardSL {
+on Reach.BurrowRoom.SL {
     store(stats.pickupsCollectedReach, stats.pickupsCollectedReach + 1)
     store(stats.pickupsCollected, stats.pickupsCollected + 1)
 }

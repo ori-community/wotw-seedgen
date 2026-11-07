@@ -1057,7 +1057,7 @@ anchor MarshSpawn.FangSuspendedPLatform at -247, -4394:
 anchor MarshSpawn.HowlsDenEntrance at -429, -4420:  # Next to Marsh.Howl.DenEntranceSL
   pickup Marsh.Howl.DenEntranceSL: free
 
-  # There isn't any point to go to HowlsDen.UpperLoopExit from this anchor because it only leads to Marsh.Den.ExitLoopLF, which is more restricitive than going from UpperLoopEntrance
+  # There isn't any point to go to HowlsDen.UpperLoopExit from this anchor because it only leads to Marsh.DenExitLoop.LF, which is more restricitive than going from UpperLoopEntrance
   conn HowlsDen.AboveBoneBridge: free
   conn MarshSpawn.MokkTheBrave:
     moki, Marsh.HowlDefeated: DoubleJump OR Dash OR Launch OR Glide
@@ -1069,27 +1069,27 @@ anchor HowlsDen.UpperLoopExit at -401, -4433:  # Right of the bone door where yo
   refill Checkpoint  # use the checkpoint at -372, -4435 instead of the one in the wall
   refill Life=1
 
-  state Marsh.Den.ExitLoopTopWall:
+  state Marsh.DenExitLoop.TopWall:
     moki: BreakWall=16
 
-  pickup Marsh.Den.ExitLoopLF:
+  pickup Marsh.DenExitLoop.LF:
     moki: BreakWall=20, Combat=Slug OR Bash OR Launch
     gorlek: BreakWall=20
 
   conn MarshSpawn.HowlsDenEntrance:  # Make sure it's not redundant with paths doing HowlsDen.UpperLoopExit->HowlsDen.AboveBoneBridge->MarshSpawn.HowlsDenEntrance
-    moki: Marsh.Den.ExitLoopTopWall, DoubleJump OR Dash
-    gorlek: Marsh.Den.ExitLoopTopWall, Glide OR Sword
-    kii: Marsh.Den.ExitLoopTopWall, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1
-    unsafe: Marsh.Den.ExitLoopTopWall  # tight jump
+    moki: Marsh.DenExitLoop.TopWall, DoubleJump OR Dash
+    gorlek: Marsh.DenExitLoop.TopWall, Glide OR Sword
+    kii: Marsh.DenExitLoop.TopWall, Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1 OR GrenadeJump=1
+    unsafe: Marsh.DenExitLoop.TopWall  # tight jump
   conn HowlsDen.AboveBoneBridge:
-    moki, Marsh.Den.ExitLoopTopWall: Launch OR Glide OR DoubleJump OR Dash
-    gorlek, Marsh.Den.ExitLoopTopWall: Sword OR Hammer
-    kii: Marsh.Den.ExitLoopTopWall
+    moki, Marsh.DenExitLoop.TopWall: Launch OR Glide OR DoubleJump OR Dash
+    gorlek, Marsh.DenExitLoop.TopWall: Sword OR Hammer
+    kii: Marsh.DenExitLoop.TopWall
 
 anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through the keydoor
   refill Checkpoint
 
-  state Marsh.Den.DoorLoopTopBarrier:
+  state Marsh.DenDoorLoop.TopWall:
     gorlek: ShurikenBreak=16
     kii: HammerBreak OR SpearBreak OR SentryBreak=16
 
@@ -1111,19 +1111,19 @@ anchor HowlsDen.AboveBoneBridge at -446, -4436:  # After the climb up through th
       AbilitySwap=1 OR GrenadeJump
       Wavedash, Damage=10  # In you don't aggro the slug, it goes far enough to let you get the right ramp. Jump in the spikes and dash again to get a walljump. Not sure why but sometimes dash doesn't reset the iframes here.
   conn HowlsDen.MidwayBottomLoop:
-    moki: Marsh.Den.DoorLoopTopBarrier
+    moki: Marsh.DenDoorLoop.TopWall
 
 anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door blocking the loop with the right hc
   refill Checkpoint:
-    moki: Marsh.Den.ExitLoopBottomWall
+    moki: Marsh.DenExitLoop.BottomWall
     unsafe: BreakWall=12  # checkpoint accessible by damaging the wall without fully breaking it. Then reload and walk out of the wall. Can't use the state because it goes back to full health after respawning.
 
-  state Marsh.Den.ExitLoopBottomWall:
+  state Marsh.DenExitLoop.BottomWall:
     moki: BreakWall=16
 
-  pickup Marsh.Den.ExitLoopLF:
-    moki: Marsh.Den.ExitLoopBottomWall, BreakWall=20, Combat=Slug OR Bash OR Launch
-    gorlek: Marsh.Den.ExitLoopBottomWall, BreakWall=20
+  pickup Marsh.DenExitLoop.LF:
+    moki: Marsh.DenExitLoop.BottomWall, BreakWall=20, Combat=Slug OR Bash OR Launch
+    gorlek: Marsh.DenExitLoop.BottomWall, BreakWall=20
 
   conn HowlsDen.BoneBridge: free
   conn HowlsDen.AboveBoneBridge:  # If you use sword/hammer, you can take the normal path
@@ -1141,17 +1141,17 @@ anchor HowlsDen.UpperLoopEntrance at -407, -4451:  # In front of the bone door b
       GlideJump, Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
   conn HowlsDen.UpperLoopExit:
     moki:
-      Marsh.Den.ExitLoopBottomWall, Combat=Slug, DoubleJump OR Dash
-      Marsh.Den.ExitLoopBottomWall, Bash, DoubleJump OR Dash
+      Marsh.DenExitLoop.BottomWall, Combat=Slug, DoubleJump OR Dash
+      Marsh.DenExitLoop.BottomWall, Bash, DoubleJump OR Dash
     gorlek:
-      Marsh.Den.ExitLoopBottomWall, DoubleJump OR Dash
-      Marsh.Den.ExitLoopBottomWall, Glide, Combat=Slug OR Bash
-      Marsh.Den.ExitLoopBottomWall, Sword OR HammerSJump=1
+      Marsh.DenExitLoop.BottomWall, DoubleJump OR Dash
+      Marsh.DenExitLoop.BottomWall, Glide, Combat=Slug OR Bash
+      Marsh.DenExitLoop.BottomWall, Sword OR HammerSJump=1
     kii:
-      Marsh.Den.ExitLoopBottomWall, Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1
-      Marsh.Den.ExitLoopBottomWall, WaterDash, Water OR Damage=10
+      Marsh.DenExitLoop.BottomWall, Hammer OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1
+      Marsh.DenExitLoop.BottomWall, WaterDash, Water OR Damage=10
     unsafe:
-      Marsh.Den.ExitLoopBottomWall, Spear=1 OR BlazeSwap=1 OR PauseFloat
+      Marsh.DenExitLoop.BottomWall, Spear=1 OR BlazeSwap=1 OR PauseFloat
       # You technically get a refill after BreakWall=12 but it can't be represented without adding another anchor
       BreakWall=12, DoubleJump OR Dash OR Glide OR Bash OR Shuriken=1 OR Sentry=1 OR Flash=1 OR Spear=1 OR BlazeSwap=1 OR Damage=10
       BreakWall=12, WaterDash, Water OR Damage=10
@@ -1246,11 +1246,11 @@ anchor HowlsDen.BoneBridgeDoor at -466, -4490:  # checkpoint once you opened the
     unsafe: free  # you don't take water damage if you land on the very left of the pound
 
 anchor HowlsDen.OutsideSecretRoom at -495, -4481:  # in front of the breakable wall behind the keystone door
-  state Marsh.Den.DoorLoopSecretWall:
+  state Marsh.DenDoorLoop.SecretWall:
     moki: BreakWall=20
 
   conn HowlsDen.SecretRoom:
-    moki: Marsh.Den.DoorLoopSecretWall
+    moki: Marsh.DenDoorLoop.SecretWall
   conn HowlsDen.BoneBridgeDoor:
     moki: Water OR Launch OR DoubleJump OR Dash OR Glide
     gorlek: Sword OR Hammer OR Damage=10
@@ -1320,17 +1320,17 @@ anchor HowlsDen.MidwayBottomLoop at -492, -4459:  # At the Life refill behind th
 anchor HowlsDen.LowerLoopExit at -475, -4441:  # Checkpoint left of the slimes
   refill Checkpoint
 
-  state Marsh.Den.DoorLoopTopBarrier:
+  state Marsh.DenDoorLoop.TopWall:
     moki: BreakWall=16
 
   conn HowlsDen.AboveBoneBridge:
-    moki: Marsh.Den.DoorLoopTopBarrier
+    moki: Marsh.DenDoorLoop.TopWall
   conn HowlsDen.MidwayBottomLoop: free
 
 anchor HowlsDen.SecretRoom at -510, -4479:  # The hidden room holding left hc
   refill Checkpoint
 
-  state Marsh.Den.DoorLoopSecretWall:  # No paths outside of unsafe because of how weird breaking that wall is
+  state Marsh.DenDoorLoop.SecretWall:  # No paths outside of unsafe because of how weird breaking that wall is
     unsafe: BreakWall=20, Sword OR Hammer OR Bow OR Spear OR Shuriken OR Sentry  # also works with fractured grenade, but not regular grenade
 
   conn HowlsDen.LeftSecretRoom:
@@ -1347,10 +1347,10 @@ anchor HowlsDen.SecretRoom at -510, -4479:  # The hidden room holding left hc
         Damage=10
     unsafe: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=10 OR PauseFloat OR GrenadeCancel OR FlashSwap
   conn HowlsDen.OutsideSecretRoom:
-    moki: Marsh.Den.DoorLoopSecretWall
+    moki: Marsh.DenDoorLoop.SecretWall
 
-anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the moss in the hidden room holding Marsh.Den.SecretLF
-  pickup Marsh.Den.SecretLF:
+anchor HowlsDen.LeftSecretRoom at -565, -4470:  # Top of the elbow after the moss in the hidden room holding Marsh.DenDoorLoop.SecretLF
+  pickup Marsh.DenDoorLoop.SecretLF:
     moki:
       Combat=SneezeSlug, DoubleJump OR Dash OR Glide
       Bash, DoubleJump OR Dash OR Glide
@@ -1616,7 +1616,7 @@ anchor MarshPastOpher.UnderTrunk at -573, -4339:  # After breaking the tree trun
       BreakWall=20, Sword OR Hammer OR Blaze OR Sentry OR Grenade  # Not hard to do but too obscure for others difficulties
       ShurikenBreak=20
 
-  pickup Marsh.Trial.LeftLS:
+  pickup Marsh.Trial.LeftSL:
     moki: DoubleJump OR Dash OR Glide OR Launch
     gorlek: Sword OR Hammer OR Damage=10  # Horizontal slash combo
     kii: Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -7699,7 +7699,7 @@ anchor InnerWellspring.Teleporter at -1308, -3674:  # At the teleporter
 
   # state NonGladesTeleporter: free  # the associated path got fixed in rando
 
-  pickup Wellspring.ThirdFloor.Seed:
+  pickup Wellspring.Seed:
     moki:
       DoubleJump, Dash
       Bash, Grenade=1
@@ -7994,7 +7994,7 @@ anchor WoodsEntry.Teleporter at 611, -4162:  # At the West Woods Teleporter
     moki: Glades.TreeKeeper.BranchRejected
 
   pickup Woods.TreeKeeper.Branch: free
-  pickup Woods.TreeKeeper.Seed:
+  pickup Woods.Seed:
     moki: Glades.TreeKeeper.BranchRejected
   pickup Woods.EntranceTP.SL: free
   pickup Woods.Entrance.LeafPileSL:
@@ -10808,7 +10808,7 @@ anchor UpperReach.MantisCairn at -315, -3934:  # inbetween Tokk and the burrow a
 anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
   refill Checkpoint
 
-  pickup Reach.BurrowRoom.ShardSL:
+  pickup Reach.BurrowRoom.SL:
     moki:
       Burrow, Launch, Bash
     gorlek:
@@ -10819,10 +10819,10 @@ anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
       Burrow, Bash, DoubleJump OR Dash OR Glide
       Burrow, Bash, Sword
       Burrow, Bash, Sentry=5  # One sentry in order to reach the second crumbling platfom then 2 to reach the lantern and another 2 to get to the SL platform
-      Burrow, Sword, Dash, DoubleJump  # "Precise" burrow angle bellow Reach.BurrowRoom.ShardSL then full sword combo + movement options
-      Burrow, DoubleJump, TripleJump OR Hammer  # precise angle underneath Reach.BurrowRoom.ShardSL then land next to the pickup
+      Burrow, Sword, Dash, DoubleJump  # "Precise" burrow angle bellow Reach.BurrowRoom.SL then full sword combo + movement options
+      Burrow, DoubleJump, TripleJump OR Hammer  # precise angle underneath Reach.BurrowRoom.SL then land next to the pickup
       Burrow, DoubleJump, Damage=20  # dboost in the spikes under the pickup
-      Burrow, DoubleJump, Sentry=1 OR Flash=1  # precise angle underneath Reach.BurrowRoom.ShardSL then land next to the pickup
+      Burrow, DoubleJump, Sentry=1 OR Flash=1  # precise angle underneath Reach.BurrowRoom.SL then land next to the pickup
       Burrow, Bash, Grenade=1, Damage=20  # grenade from under the pickup, burrow to reach it then land near the pickup. Damage because of the 2nd sand platform
       Burrow, Dash, Glide  # go to Reach.BurrowRoom.Shard first
     unsafe:
@@ -10846,10 +10846,10 @@ anchor UpperReach.BurrowArea at -369, -3917:  # left of the entrance sand wall
     kii:
       Burrow, Bash, DoubleJump OR Dash OR Glide OR Sword OR Hammer
       Burrow, Bash, Sentry=3  # One sentry in order to reach the second crumbling platfom then 2 to reach the lantern
-      Burrow, Sword, Dash, DoubleJump  # "Precise" burrow angle bellow Reach.BurrowRoom.ShardSL then full sword combo + movement option
-      Burrow, DoubleJump, TripleJump OR Hammer  # precise angle underneath Reach.BurrowRoom.ShardSL then land next to the pickup, then go to shard
+      Burrow, Sword, Dash, DoubleJump  # "Precise" burrow angle bellow Reach.BurrowRoom.SL then full sword combo + movement option
+      Burrow, DoubleJump, TripleJump OR Hammer  # precise angle underneath Reach.BurrowRoom.SL then land next to the pickup, then go to shard
       Burrow, DoubleJump, Damage=20  # dboost in the spikes under the SL pickup, then jump to the Shard
-      Burrow, DoubleJump, Sentry=1 OR Flash=1  # precise angle underneath Reach.BurrowRoom.ShardSL then land next to the SL pickup, then go to shard
+      Burrow, DoubleJump, Sentry=1 OR Flash=1  # precise angle underneath Reach.BurrowRoom.SL then land next to the SL pickup, then go to shard
       Burrow, Dash, Glide
     unsafe:
       Burrow, Dash OR Glide OR Sword OR PauseFloat OR Damage=20  # dboost require a precise upward burrow from the big pile of sand to walljump on the physic object under the bashable lantern and then landing in the spikes
@@ -16357,9 +16357,9 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       GrenadeJump OR AbilitySwap=1 OR GroundedHammerJump OR CoyoteHammerJump OR GlideHammerJump  # CoyoteHammerJump is scary...
       Sword, DoubleJump  # Djump, pogo the mine, djump+upslash to reach the floating platform
   conn WillowsEnd.GrappleHeart:  # Paths skipping WillowsEnd.EntryFloatingPlatform to save energy
-    kii, Willow.GrappleWheelsHeart:
+    kii, Willow.MossWheelsHeart:
       Bash, Grenade=2, DoubleJump OR Dash OR Sword OR Hammer OR Sentry=2  # Go to the floating platform below the heart with bashnade + condition
-    unsafe, Willow.GrappleWheelsHeart:
+    unsafe, Willow.MossWheelsHeart:
       SwordSJump=2  # Over the platform and hover to the left platform
   conn WillowsEnd.InnerTP:  # Paths skipping WillowsEnd.EntryFloatingPlatform to save energy. Be careful with redundancies Entry->EntryFloatingPlatform->InnerTP
     kii:
@@ -16402,7 +16402,7 @@ anchor WillowsEnd.Entry at 495, -3950:  # At the lower door
       AerialHammerJump
 
 anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platform above the entrance
-  state Willow.GrappleWheelsHeart:
+  state Willow.MossWheelsHeart:
     unsafe:
       ShurikenBreak=30 OR SentryBreak=30:  # Wedge Ori in the gap to the right of the falling rock
         Launch OR SentryJump=2 OR AerialHammerJump
@@ -16476,24 +16476,24 @@ anchor WillowsEnd.EntryFloatingPlatform at 477, -3937:  # At the floating platfo
       # SentryJump=4, Glide
       SentryJump=3, GlideJump  # GlideJump off the wheel into the 2nd portal
   conn WillowsEnd.GrappleHeart:
-    moki, Willow.GrappleWheelsHeart:
+    moki, Willow.MossWheelsHeart:
       Bash, Grenade=1, DoubleJump, Glide
       Launch
-    gorlek, Willow.GrappleWheelsHeart:
+    gorlek, Willow.MossWheelsHeart:
       SwordSJump=1, DoubleJump  # sword air stall (Hammer too hard for gorlek). Hard require djump because low sword skump aren't quite high enough
       HammerSJump=1, Dash OR Glide  # hammer sjump goes higher so they don't need to hard require djump
       HammerSJump=1, DoubleJump, TripleJump
       Bash, Grenade=1, Sword, DoubleJump OR Dash
       Bash, Grenade=1, DoubleJump, Dash OR TripleJump
       Bash, Grenade=2, DoubleJump OR Dash OR Glide
-    kii, Willow.GrappleWheelsHeart:
+    kii, Willow.MossWheelsHeart:
       Bash, Grenade=1, Glide  # bashnade to reach the heart from the floating platform
       Bash, Grenade=1, Sword, Hammer OR Shuriken=1 OR Flash=1
       SwordSJump=1, Dash OR Glide OR Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1  # sword hover
       HammerSJump=1, DoubleJump OR Sword OR Sentry=2 OR Shuriken=1  # hammer hover
       AerialHammerJump
       # DoubleJump, TripleJump, GrenadeJump=1
-    unsafe, Willow.GrappleWheelsHeart:
+    unsafe, Willow.MossWheelsHeart:
       Bash, Grenade=1:
         Grenade=1  # Bashglide too precise for kii
         Sword, Blaze=1  # Upswing, blaze, sword hover to cross the gap
@@ -16592,45 +16592,45 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
       GroundedHammerJump OR WallHammerJump OR CoyoteHammerJump  # You can do these on the side of the life plant
   refill Life=1
 
-  state Willow.GrappleWheelsHeart:
+  state Willow.MossWheelsHeart:
     moki: BreakWall=30
 
   pickup Willow.MossWheelsHeart.LF:
     moki:
       Launch
-      Willow.GrappleWheelsHeart, DoubleJump, Dash
+      Willow.MossWheelsHeart, DoubleJump, Dash
     gorlek:
       DoubleJump, TripleJump
       DoubleJump, Dash, Damage=4
-      Willow.GrappleWheelsHeart:
+      Willow.MossWheelsHeart:
         DoubleJump OR Dash OR Sword
         Bash, Grenade=1
         Glide, Hammer
     kii:
       DoubleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=4
       Bash, Grenade=1, DoubleJump OR Dash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1  # Bash grenade above the heart to avoid a dboost
-      Willow.GrappleWheelsHeart:
+      Willow.MossWheelsHeart:
         Sword OR Spear=2 OR Shuriken=2 OR Flash=2 OR Sentry=2
         Hammer, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       GlideJump, DoubleJump OR Dash OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe:  # You can ceilingjump across the ceiling portal. Left wall is climbable
       DoubleJump OR GrenadeJump OR AbilitySwap=1 OR Sword  # Skills that can solve with and without the heart
       Bash, Grenade=1  # You need to throw the grenade from the anchor position
-      Willow.GrappleWheelsHeart, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseFloat
+      Willow.MossWheelsHeart, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR PauseFloat
 
   conn WillowsEnd.EntryFloatingPlatform: # Paths that can reach the floating platform from here, but not from Entry
-    unsafe, Willow.GrappleWheelsHeart:
+    unsafe, Willow.MossWheelsHeart:
       GlideJump, DoubleJump, TripleJump  # Prepare GlideJump on the heart ledge and glide right
       Bash, Grenade=1, DoubleJump OR Dash OR Sword OR GlideJump  # saves on energy
   conn WillowsEnd.Entry:
-    moki, Willow.GrappleWheelsHeart:
+    moki, Willow.MossWheelsHeart:
       Glide, DoubleJump OR Dash
       Launch, DoubleJump OR Dash OR Glide
-    gorlek, Willow.GrappleWheelsHeart:
+    gorlek, Willow.MossWheelsHeart:
       DoubleJump, TripleJump, Dash OR Sword OR Hammer
       Bash, Grenade=1, DoubleJump OR Dash OR Glide
       Launch, Sword OR Hammer
-    kii, Willow.GrappleWheelsHeart:
+    kii, Willow.MossWheelsHeart:
       Launch
       DoubleJump, TripleJump, Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       Bash, Grenade=1, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
@@ -16638,7 +16638,7 @@ anchor WillowsEnd.GrappleHeart at 399, -3928:  # right next to the grapple wheel
       GlideJump  # Can help delay on a wrong cycle
       AerialHammerJump, Dash OR Glide OR Sword OR Shuriken=1 OR Blaze=2 OR Sentry=2
       # GrenadeJump=1, Glide
-    unsafe, Willow.GrappleWheelsHeart:
+    unsafe, Willow.MossWheelsHeart:
       Glide  # Not hard but need to jump on the right lava thingy cycle without seeing them
       Bash, Grenade=1
       Damage=40, Sword OR Hammer OR DoubleJump OR Dash  # Jump to the lava blob and use it as an elevator
@@ -17063,7 +17063,7 @@ anchor WillowsEnd.Upper at 499, -3748:  # At the upper door
     id: 32
     target: WillowsEnd.ShriekArena
     enter:
-      moki: Willow.GrappleWheelsHeart, Willow.BoulderHeart, Willow.RedirectHeart, Willow.BurrowHeart, Willow.MinibossHeart, Willow.SpinLasersHeart, Willow.GlideHeart, Willow.SpinPortalsHeart
+      moki: Willow.MossWheelsHeart, Willow.BoulderHeart, Willow.RedirectHeart, Willow.BurrowHeart, Willow.MinibossHeart, Willow.SpinLasersHeart, Willow.WindHeart, Willow.TopHeart
 
   refill Checkpoint
   refill Energy=4:  # on the way to burrow heart
@@ -17350,7 +17350,7 @@ anchor WillowsEnd.GlideRooms at 360, -3861:  # At the first wind
       GroundedHammerJump OR CoyoteHammerJump OR WallHammerJump
       BreakCrystal, AbilitySwap=1
 
-  state Willow.GlideHeart:
+  state Willow.WindHeart:
     moki: BreakWall=30, Glide
     kii: BreakWall=30, Launch, DoubleJump, Damage=40
     unsafe:
@@ -17393,12 +17393,12 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
     gorlek:
       Launch, Grapple
       Launch, DoubleJump, TripleJump
-      Willow.SpinPortalsHeart, Launch, DoubleJump, Glide, Bash
+      Willow.TopHeart, Launch, DoubleJump, Glide, Bash
     kii:
       Launch, Damage=80
       Launch, Damage=40, Bash OR Sword  # bash/pogo the elemental, dboost in the spike below UpperLeftSL
       DoubleJump, TripleJump, Grapple, Damage=60  # dboost on the laser at the second room then dboost on the wheel next to the pickup
-      Willow.SpinPortalsHeart, Launch, Bash  # bash the first elemental then bash one of its projectile in order to reach the 2nd elemental
+      Willow.TopHeart, Launch, Bash  # bash the first elemental then bash one of its projectile in order to reach the 2nd elemental
       AerialHammerJump, Grapple, Damage=40, TripleJump OR Dash  # damage for last wheel
     unsafe:
       Launch
@@ -17416,7 +17416,7 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
     gorlek:
       Launch, Grapple, Bash
       Launch, DoubleJump, TripleJump, Damage=40, Grapple OR Bash OR Glide
-      Willow.SpinPortalsHeart, Launch:
+      Willow.TopHeart, Launch:
         Bash, DoubleJump
         Bash, Grenade=1, Dash OR Glide OR Sword OR Hammer
         DoubleJump, TripleJump
@@ -17432,7 +17432,7 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       Launch, Grapple, Sword  # reset your launch by hitting elemental with your sword
       Launch, DoubleJump, TripleJump OR Sword
       DoubleJump, TripleJump, Grapple, Bash, Damage=100  # dboost on the laser before the 2nd wheel (20) then on spikes before the last portal (40). Since it's hard to avoid taking a dboost on the wheel when entering the portal under UpperLeftSL, adding an extra dboost (40)
-      Willow.SpinPortalsHeart:
+      Willow.TopHeart:
         Launch, DoubleJump OR Dash OR Sword OR Hammer
         Bash, Grenade=1, DoubleJump
         SentryJump=1, Bash  # Max height then use the elemental
@@ -17443,7 +17443,7 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
       # Launch, DoubleJump OR Damage=40
       DoubleJump, TripleJump, Grapple, Bash  # using the last portal without taking damage is hard
       DoubleJump, TripleJump, Dash, SpearJump=2, Damage=40, Damage=20, SpearJump=1
-      Willow.SpinPortalsHeart:
+      Willow.TopHeart:
         Bash, Grenade=1, SpearJump=1  # Grenade, then spear jump to bash it from higher
         AerialHammerJump, TripleJump
         SentryJump=2  # Into the portal
@@ -17451,7 +17451,7 @@ anchor WillowsEnd.UpperHeartPath at 506, -3711:  # Right above the exit blocked 
 anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the upper heart
   refill Checkpoint
 
-  state Willow.SpinPortalsHeart:
+  state Willow.TopHeart:
     moki: BreakWall=30
 
   pickup Willow.TopHeart.RightSL:
@@ -17463,13 +17463,13 @@ anchor WillowsEnd.UpperHeartCheckpoint at 514, -3638:  # Checkpoint next to the 
       AerialHammerJump
       # GrenadeJump=1, Damage=40  # Gives extra height when exiting the portal
     unsafe: DoubleJump OR GrenadeJump
-  pickup Willow.TopHeart.LeftSL:  # So far, paths using Willow.SpinPortalsHeart are the same as going to UpperHeartPath first
+  pickup Willow.TopHeart.LeftSL:  # So far, paths using Willow.TopHeart are the same as going to UpperHeartPath first
     gorlek: Launch, DoubleJump, Glide, Bash
     kii: Launch, Bash
     unsafe: Unpopular, Launch, Glide  # Guess the wheel rotation and take 40+ damage if you fail, then use the portal twice
 
   conn WillowsEnd.UpperHeartPath:
-    moki: Willow.SpinPortalsHeart
+    moki: Willow.TopHeart
     unsafe:  # Backward connections without solving the state have some weird spots
       Unpopular, Launch, Bash OR Glide  # I hate this path
 
@@ -17564,11 +17564,11 @@ anchor TuleyShop at -173, -4139:
   state Glades.Plants.Lightcatchers:
     moki: Depths.Seed
   state Glades.Plants.BlueMoon:
-    moki: Wellspring.ThirdFloor.Seed
+    moki: Wellspring.Seed
   state Glades.Plants.SpringPlants:
     moki: Reach.Seed
   state Glades.Plants.LastTree:
-    moki: Woods.TreeKeeper.Seed
+    moki: Woods.Seed
 
   pickup Glades.RegrowGlades.Completed:
     moki: Glades.Plants.SelaFlowers, Glades.Plants.StickyGrass, Glades.Plants.Lightcatchers, Glades.Plants.BlueMoon, Glades.Plants.SpringPlants, Glades.Plants.LastTree

@@ -13,7 +13,7 @@ on spawn {
     store(questUberStateGroup.kwoloksWisdomQuest, 4)
     store(questUberStateGroup.lostCompassQuest, 3)
     store(questUberStateGroup.treeKeeperQuest, 3)
-    store(Woods.TreeKeeper.Seed, true)
+    store(Woods.Seed, true)
     store(Pools.KwoloksWisdom.Amulet, true)
     store(Wastes.RoughDiamond.Gem, true)
     store(Glades.RoughDiamondShard, true)

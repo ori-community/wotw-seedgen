@@ -7,9 +7,9 @@
 on change Wastes.Seed store(sela_flowers, Wastes.Seed)
 on change Pools.Seed store(sticky_grass, Pools.Seed)
 on change Depths.Seed store(lightcatchers, Depths.Seed)
-on change Wellspring.ThirdFloor.Seed store(blue_moon, Wellspring.ThirdFloor.Seed)
+on change Wellspring.Seed store(blue_moon, Wellspring.Seed)
 on change Reach.Seed store(spring_plants, Reach.Seed)
-on change Woods.TreeKeeper.Seed store(last_tree, Woods.TreeKeeper.Seed)
+on change Woods.Seed store(last_tree, Woods.Seed)
 
 on tuleyShop.selaFlowers store(Glades.Plants.SelaFlowers, true)
 on tuleyShop.stickyGrass store(Glades.Plants.StickyGrass, true)

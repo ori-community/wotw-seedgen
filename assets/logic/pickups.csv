@@ -28,8 +28,8 @@ Marsh.Howl.DenEntranceSL, 21786|43668, Marsh, SpiritLight, 50, -434.3, -4419.8, 
 Marsh.Howl.FangEF, 21786|61706, Marsh, EnergyFragment, , -233.4, -4384.4, -233.37244, -4383.35
 Marsh.LittleBraver.Fang, 14019|27539, Marsh, QuestItem, Fang, -221.9, -4406.5, -221.93663, -4406.473
 Marsh.LittleBraver.Completed, 14019|15983 >= 3, Marsh, QuestItem, GorlekOre, -391, -4414, -388.5, -4412.6
-Marsh.Den.ExitLoopLF, 21786|28908, Marsh, LifeFragment, , -332.3, -4438.6, -332.26, -4437.58
-Marsh.Den.SecretLF, 9593|61304, Marsh, LifeFragment, , -569.7, -4454.1, -569.7299, -4453.08
+Marsh.DenExitLoop.LF, 21786|28908, Marsh, LifeFragment, , -332.3, -4438.6, -332.26, -4437.58
+Marsh.DenDoorLoop.SecretLF, 9593|61304, Marsh, LifeFragment, , -569.7, -4454.1, -569.7299, -4453.08
 Marsh.Den.AboveDoorKS, 21786|22068, Marsh, Keystone, , -439.5, -4461.4, -439.52002, -4461.38
 Marsh.Den.BoneOre, 21786|2046, Marsh, GorlekOre, , -432.6, -4503.3, -432.58002, -4503.26
 Marsh.SwordTree, 0|100, Marsh, Skill, Sword, -296, -4483, -296, -4478
@@ -40,7 +40,7 @@ Marsh.Den.LaserKS, 21786|2852, Marsh, Keystone, , -399.9, -4567.2, -399.94, -456
 Marsh.DoubleJumpTree.SL, 9593|17818, Marsh, SpiritLight, 50, -507.9, -4536.6, -507.89798, -4536.5684
 Marsh.DoubleJumpTree, 0|5, Marsh, Skill, DoubleJump, -555, -4551, -555.25, -4546.7656
 Marsh.DoubleJumpTree.Shard, 23987|27134, Marsh, Shard, Sticky, -547.8, -4529.3, -547.82, -4528.2896
-Marsh.Trial.LeftLS, 9593|5253, Marsh, SpiritLight, 100, -527.9, -4354.1, -527.93005, -4354.1196
+Marsh.Trial.LeftSL, 9593|5253, Marsh, SpiritLight, 100, -527.9, -4354.1, -527.93005, -4354.1196
 Marsh.Trial.Ore, 9593|25989, Marsh, GorlekOre, , -501.5, -4340.0, -501.49002, -4340.0293
 Marsh.Trial.EF, 9593|27562, Marsh, EnergyFragment, , -473.8, -4339.6, -473.83002, -4338.5796
 Marsh.Trial.MantisLureLF, 21786|20194, Marsh, LifeFragment, , -437.7, -4380.8, -437.67, -4379.8403
@@ -171,7 +171,7 @@ Wellspring.LostCompass.Completed, 14019|20667 >= 3, Wellspring, QuestItem, Gorle
 Wellspring.ThirdFloor.SwimOre, 37858|32932, Wellspring, GorlekOre, , -1203.9, -3715.7, -1203.8998, -3715.6865
 Wellspring.ThirdFloor.EntranceSL, 37858|59022, Wellspring, SpiritLight, 100, -1252.2, -3681.8, -1252.1917, -3681.7656
 Wellspring.ThirdFloor.TPSL, 37858|2797, Wellspring, SpiritLight, 50, -1316.6, -3663.6, -1316.5791, -3663.5505
-Wellspring.ThirdFloor.Seed, 14019|24142, Wellspring, Seed, , -1185.4, -3668.8, -1185.4348, -3668.7515
+Wellspring.Seed, 14019|24142, Wellspring, Seed, , -1185.4, -3668.8, -1185.4348, -3668.7515
 Wellspring.Escape.RevisitSL, 37858|56444, Wellspring, SpiritLight, 100, -1313.1, -3640.1, -1313.1079, -3640.099
 Wellspring.Escape.Reward, 37858|12379, Wellspring, QuestItem, Water, -481, -3763, -1159, -3635
 Woods.Entrance.AboveSwampSL, 58674|8487, Woods, SpiritLight, 50, 513.8, -4184.9, 513.7701, -4184.88
@@ -179,7 +179,7 @@ Woods.Entrance.Ore, 58674|28710, Woods, GorlekOre, , 410.5, -4173.8, 410.37, -41
 Woods.FamilyReunion.Doll, 14019|57399, Woods, QuestItem, Doll, 426.7, -4114.9, 469.2, -4178
 Woods.Entrance.LeafPileSL, 58674|22472, Woods, SpiritLight, 50, 485.1, -4164.3, 485.1499, -4164.5
 Woods.TreeKeeper.Branch, 14019|59708 >= 1, Woods, QuestItem, Branch, 513, -4158, 513, -4158
-Woods.TreeKeeper.Seed, 14019|7470, Woods, Seed, , 513, -4159, 511, -4157
+Woods.Seed, 14019|7470, Woods, Seed, , 513, -4159, 511, -4157
 Woods.EntranceTP.SL, 58674|59691, Woods, SpiritLight, 50, 629.0, -4155.3, 629.00824, -4155.2783
 Woods.FirstDoor.LowerKS, 58674|40073, Woods, Keystone, , 690.3, -4189.3, 690.28, -4189.34
 Woods.FirstDoor.UpperKS, 58674|11736, Woods, Keystone, , 640.7, -4165.8, 640.70996, -4165.76
@@ -223,7 +223,7 @@ Reach.HandToHand.Hat, 14019|26318 >= 5, Reach, QuestItem, Hat, -244, -3989, -244
 Reach.BelowTPMortar.SL, 28895|36231, Reach, SpiritLight, 100, -340.5, -3984.1, -340.5, -3984.111
 Reach.TPMortar.Ore, 28895|47529, Reach, GorlekOre, , -345.7, -3946.6, -345.74002, -3946.64
 Reach.BurrowRoom.Shard, 23987|19630, Reach, Shard, Lifeforce, -400.8, -3860.5, -400.7699, -3859.5312
-Reach.BurrowRoom.ShardSL, 28287|32414, Reach, SpiritLight, 100, -423.2, -3876.4, -423.21375, -3876.4019
+Reach.BurrowRoom.SL, 28287|32414, Reach, SpiritLight, 100, -423.2, -3876.4, -423.21375, -3876.4019
 Reach.TopKSRoom.TongueKS, 28895|1053, Reach, Keystone, , -247.9, -3891.2, -247.87695, -3891.165
 Reach.TopKSRoom.SnaptrapKS, 28895|22382, Reach, Keystone, , -231.5, -3868.9, -231.5, -3868.9
 Reach.TopKSRoom.CeilingKS, 28895|50368, Reach, Keystone, , -206.7, -3842.5, -206.73999, -3842.5005

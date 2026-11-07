@@ -7,12 +7,12 @@
 !tags("No Willow Hearts")
 
 on spawn {
-    store(Willow.GlideHeart, true)
+    store(Willow.WindHeart, true)
     store(Willow.SpinLasersHeart, true)
-    store(Willow.SpinPortalsHeart, true)
+    store(Willow.TopHeart, true)
     store(Willow.MinibossHeart, true)
     store(Willow.BurrowHeart, true)
     store(Willow.RedirectHeart, true)
     store(Willow.BoulderHeart, true)
-    store(Willow.GrappleWheelsHeart, true)
+    store(Willow.MossWheelsHeart, true)
 }
