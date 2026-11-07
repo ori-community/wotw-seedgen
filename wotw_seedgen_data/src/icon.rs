@@ -251,7 +251,7 @@ pub enum MapIcon {
     SmallDoor = 42,
     Shrine = 43,
     ShrineFinished = 44,
-    // Loremaster
+    /// Loremaster
     Baur = 50,
     /// Weaponmaster
     Opher = 51,
