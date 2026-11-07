@@ -34,19 +34,21 @@ pub fn generate_uber_state_log(args: LaunchArgs) -> Result<(), Error> {
 
     for (&group_id, group) in &uber_state_dump.groups {
         for (&member_id, state) in &group.states {
-            if matches!(
-                (group_id, member_id),
-                (8 | 9 | 10 | 12 | 14 | 8246 | 33399, _)
-                    | (5, 40 | 41)
-                    | (30, 1 | 2)
-                    | (3440, 37811)
-            ) || state.r#type.is_readonly()
-                || !state.r#type.is_serialized()
+            if state.r#type.is_readonly() || !state.r#type.is_serialized() {
+                continue;
+            }
+
+            let uber_identifier = UberIdentifier::new(group_id, member_id);
+
+            if uber_identifier.is_custom()
+                || uber_identifier.is_multiworld()
+                // vanilla and rando stats
+                || matches!(uber_identifier.group, 14 | 8246 | 33399)
             {
                 continue;
             }
 
-            let entry = &uber_state_data.id_lookup[&UberIdentifier::new(group_id, member_id)];
+            let entry = &uber_state_data.id_lookup[&uber_identifier];
 
             match &entry.rando_name {
                 None => {
