@@ -15145,6 +15145,8 @@ anchor LowerWastes.SunsetView at 1552, -3984:  # At the Sunset View checkpoint
     unsafe:
       SentryJump=1  # sentry jumps are OP
       Bash  # bash the gorlek then its projectile
+      AerialHammerJump OR WallHammerJump OR GlideHammerJump OR AbilitySwap=2
+      DoubleJump, Sword, Damage=30  # pogo the miner's projectile->dboost->sword to cancel the knockback
       GrenadeJump, DoubleJump
       DoubleJump, Damage=30, GlideJump OR SpearJump=1  # GlideJump from Wastes.TornBridge.HiddenSL
       DoubleJump, Damage=60
@@ -15189,6 +15191,9 @@ anchor LowerWastes.MuncherTunnel at 1681, -4002:  # Above the sand/muncher tunne
       Damage=30 OR Dash OR SentryJump=1
       Bash, Glide OR Sword OR Hammer  # lure the mantis
     kii: Bash OR Hammer OR Sword  # with sword, bait the mantis and pogo
+    unsafe:
+      Shuriken=2 OR GlideJump OR GrenadeJump OR AbilitySwap=1 OR SpearJump=1 OR PauseFloat OR Damage=10
+      RegenJump, Shuriken=1
   conn LowerWastes.SandPot:
     moki:
       Combat=Mantis+ShieldSlug
@@ -15199,7 +15204,7 @@ anchor LowerWastes.MuncherTunnel at 1681, -4002:  # Above the sand/muncher tunne
     kii:
       Combat=ShieldSlug OR Hammer OR Spear=1 OR Shuriken=1 OR Flash=1 OR Sentry=1
       Bash  # use the mantis
-    unsafe: Blaze=1
+    unsafe: Blaze=1 OR GrenadeCancel OR PauseFloat
 
 anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
   refill Checkpoint
@@ -15217,6 +15222,7 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
       Bash, Hammer OR Spear=1 OR Grenade=1  # Break the slime's shell in order to bash it
     unsafe:
       Bash  # Use the mantis to break the slime's shell
+      GrenadeJump OR AbilitySwap=1 OR WallHammerJump OR CoyoteHammerJump
   pickup Wastes.SandPot.SL:
     moki, Burrow:
       Dash, Grapple, DoubleJump OR Glide
@@ -15271,8 +15277,10 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
       DoubleJump, Spear=1
       Hammer, Spear=1
       Bash, Spear=1  # break the slime's shell and bash it
+      SpearJump=1, Spear=1 OR Shuriken=1 OR Blaze=1 OR Sentry=1 OR Flash=1 OR Damage=30
       Dash  # Coyote dash from the top of the pot
-      Glide OR PauseFloat  # climb on the sand pot from the right then hover
+      Glide OR PauseFloat OR AbilitySwap=1  # climb on the sand pot from the right then hover
+      GrenadeJump, Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR Damage=30
 
 anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitSL
   refill Checkpoint
