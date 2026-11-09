@@ -11547,14 +11547,19 @@ anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone
       Grapple, DoubleJump OR Dash
       Glide OR Launch
     gorlek:
-      DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # With Hammer first do howering, then press DoubleJump
+      DoubleJump, TripleJump OR Dash OR Sword OR Hammer  # With Hammer hover first
       Grapple, Sword
     kii:
       Dash OR Sword
       Grapple, Hammer OR Sentry=2
-      DoubleJump, Sentry=2 OR Shuriken
+      DoubleJump, Sentry=2 OR Shuriken=1 OR Damage=30
+      Hammer, Damage=30  # Hover, dboost, upswing
+      Sentry=3
     unsafe:
       DoubleJump, Sentry=1 OR Flash=1 OR Blaze=3
+      AbilitySwap=1
+      Damage=30, GrenadeCancel
+      Damage=30, SpearJump=2  # Actually Spear=1, Damage=30, SpearJump=1
   conn UpperDepths.BelowHive:  # LightPuzzle spawns another bat above the spikes
     moki, Depths.FirstKeystoneDoor:
       Depths.IlluminableTunnel.Solved, Bash, Glide
