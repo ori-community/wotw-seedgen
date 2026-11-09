@@ -2,12 +2,14 @@ pub mod find;
 
 mod optimize_graph_args;
 mod patch_args;
+mod paths_args;
 mod perf_args;
 mod regenerate_args;
 
 use find::{Find, FindArgs};
 pub use optimize_graph_args::OptimizeGraphArgs;
 pub use patch_args::PatchArgs;
+pub use paths_args::{PathsArgs, SeedgenPath};
 pub use perf_args::{PerfArgs, PerfTarget};
 pub use regenerate_args::RegenerateArgs;
 
@@ -30,7 +32,10 @@ pub enum Dev {
         args: PatchArgs,
     },
     /// Display which local paths seedgen is using
-    Paths,
+    Paths {
+        #[command(flatten)]
+        args: PathsArgs,
+    },
     /// Generate a toolseed to log UberState changes
     GenerateUberStateLog {
         #[command(flatten)]

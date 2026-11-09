@@ -23,7 +23,7 @@ pub fn dev(command: Dev) -> Result<(), Error> {
         Dev::ImportUberStates => import_uber_states(),
         Dev::Regenerate { args } => regenerate(args),
         Dev::Patch { args } => patch(args),
-        Dev::Paths => paths(),
+        Dev::Paths { args } => paths(args),
         Dev::GenerateUberStateLog { args } => generate_uber_state_log(args),
         Dev::OptimizeGraph { args } => optimize_graph(args),
         Dev::Find { args, command } => find(args, command),
