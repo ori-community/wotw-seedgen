@@ -7,7 +7,7 @@ use wotw_seedgen::data::assets::{
 
 use crate::Error;
 
-const OVERRIDES: [(&str, f32); 15] = [
+const OVERRIDES: [(&str, f32); 17] = [
     ("player.shardSlots", 3.),
     ("player.positionX", 0.),
     ("player.positionY", 0.),
@@ -15,6 +15,8 @@ const OVERRIDES: [(&str, f32); 15] = [
     ("map.filter", 0.),
     ("player.mouseWorldPositionX", 0.),
     ("player.mouseWorldPositionY", 0.),
+    ("skills.spiritMagnet", 0.),
+    ("settings.randomCurrencyNames", 0.),
     ("rng.randomInteger", 0.),
     ("rng.randomFloat", 0.),
     ("rng.randomBoolean", 0.),

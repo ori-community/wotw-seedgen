@@ -18471,7 +18471,7 @@
         "112": {
           "name": "spiritMagnet",
           "type": "VirtualBooleanUberState",
-          "value": 1.0
+          "value": 0.0
         },
         "115": {
           "name": "blaze",
