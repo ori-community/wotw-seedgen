@@ -129,7 +129,8 @@ Reach.SpiritTrial.Active, 44964|23661 >= 1
 Reach.WispClimb.Fight, 28895|42209
 Reach.HighestReach.Completed, 14019|8973 >= 3
 Depths.FirstKeystoneDoor, 21786|59990
-Depths.IlluminableTunnel.Solved, 18793|21994
+Depths.IlluminableTunnel.LeftBlob, 18793|29066
+Depths.IlluminableTunnel.RightBlob, 18793|11676
 Depths.Teleporter, 18793|38871
 Depths.SecondKeystoneDoor, 18793|10758
 Depths.MoraDefeated, 18793|26713 >= 7

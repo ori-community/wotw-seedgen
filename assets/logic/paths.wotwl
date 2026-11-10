@@ -11516,24 +11516,11 @@ anchor UpperDepths.FirstKSRoom at 223, -4420:  # Below the first firefly egg
     kii: Bash, Grenade=1, DoubleJump OR Dash
 
 # checkpoint at 136, -4425
-# checkpoint at 297, -4376
 
 anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone door
   refill Checkpoint:
     moki: Depths.FirstKeystoneDoor
 
-  state Depths.IlluminableTunnel.Solved:  # breaking the corruption blocking the light
-    moki, Depths.FirstKeystoneDoor, BreakWall=16, BreakWall=16:
-      DoubleJump, Bash, Grapple
-      Bash, Launch
-    gorlek, Depths.FirstKeystoneDoor, BreakWall=16, BreakWall=16:
-      DoubleJump, Grapple, Combat=Spiderling+SneezeSlug
-      Bash, DoubleJump, TripleJump
-      Bash, DoubleJump, Damage=30, Dash OR Glide OR Sword
-      Bash, Grenade=2, Combat=Spiderling+SneezeSlug, DoubleJump OR Dash
-      Launch, DoubleJump OR Dash OR Glide OR Sword
-    kii, Depths.FirstKeystoneDoor, BreakWall=16, BreakWall=16:
-      Launch, Damage=30
   state Depths.FirstKeystoneDoor:
     moki: Keystone=2
 
@@ -11560,23 +11547,35 @@ anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone
       AbilitySwap=1
       Damage=30, GrenadeCancel
       Damage=30, SpearJump=2  # Actually Spear=1, Damage=30, SpearJump=1
-  conn UpperDepths.BelowHive:  # LightPuzzle spawns another bat above the spikes
+  conn UpperDepths.AboveIlluminableTunnel:  # The spiderling becomes a slug after Depths.BreakingMould.Completed
     moki, Depths.FirstKeystoneDoor:
-      Depths.IlluminableTunnel.Solved, Bash, Glide
-      Depths.IlluminableTunnel.Solved OR DepthsLight:
+      DoubleJump, Bash, Grapple
+      Bash, Launch
+    gorlek, Depths.FirstKeystoneDoor:
+      DoubleJump, Grapple, Combat=Spiderling
+      Bash, DoubleJump, TripleJump
+      Bash, DoubleJump, Damage=30, Dash OR Glide OR Sword
+      Bash, Grenade=2, Combat=Spiderling, DoubleJump OR Dash
+      Launch, DoubleJump OR Dash OR Glide OR Sword
+    kii, Depths.FirstKeystoneDoor:
+      Launch, Damage=30
+  conn UpperDepths.BelowHive:  # Depths.IlluminableTunnel.RightBlob spawns another bat above the spike pit
+    moki, Depths.FirstKeystoneDoor:
+      Depths.IlluminableTunnelSolved, Bash, Glide
+      Depths.IlluminableTunnelSolved OR DepthsLight:
         Launch
         Bash, DoubleJump OR Dash
         Combat=2xBat, DoubleJump OR Dash  # Combat=Bat expects a ranged weapon
     gorlek, Depths.FirstKeystoneDoor:
-      Depths.IlluminableTunnel.Solved, Bash
-      Depths.IlluminableTunnel.Solved OR DepthsLight:
+      Depths.IlluminableTunnelSolved, Bash
+      Depths.IlluminableTunnelSolved OR DepthsLight:
         Damage=30
         Combat=Bat, DoubleJump OR Dash OR Glide OR Sword  # Combat=Bat expects a ranged weapon
-    kii, Depths.FirstKeystoneDoor, Depths.IlluminableTunnel.Solved OR DepthsLight:
+    kii, Depths.FirstKeystoneDoor, Depths.IlluminableTunnelSolved OR DepthsLight:
       Combat=Bat, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
     unsafe, Depths.FirstKeystoneDoor:
-      Bash  # https://youtu.be/6lg7Yl-ehX8
-      Damage=10, Depths.IlluminableTunnel.Solved OR DepthsLight  # dboost on a bat's projectile
+      Bash  # https://youtu.be/6lg7Yl-ehX8 Also doable with the slug that replaces the spiderling after Depths.BreakingMould.Completed
+      Damage=10, Depths.IlluminableTunnelSolved OR DepthsLight  # dboost on a bat's projectile
 
 anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the entry keydoor, going towards the keystone
   refill Checkpoint
@@ -11608,6 +11607,49 @@ anchor UpperDepths.RightKeystonePath at 305, -4426:  # at the ledge below the en
     kii:
       Dash, Damage=30, DoubleJump OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Sword OR Hammer
       Dash, DoubleJump, TripleJump
+
+anchor UpperDepths.AboveIlluminableTunnel at 297, -4376:  # On the way to the corruption blobs blocking the light
+  refill Checkpoint
+
+  state Depths.IlluminableTunnel.LeftBlob:
+    moki, BreakWall=16: Combat=SneezeSlug OR Bash
+    gorlek, BreakWall=16: DoubleJump OR Dash
+    kii: BreakWall=16
+  state Depths.IlluminableTunnel.RightBlob:  # Spawns another bat in the tunnel, above the spike pit
+    moki, BreakWall=16:
+      DoubleJump, Bash, Grapple
+      Bash, Launch
+    gorlek, BreakWall=16:
+      DoubleJump, Grapple, Combat=SneezeSlug
+      Bash, DoubleJump, TripleJump
+      Bash, DoubleJump, Damage=30, Dash OR Glide OR Sword
+      # Bash, Grenade=1, DoubleJump  # Too many skeetos to bashnade safely
+      Launch, DoubleJump OR Dash OR Glide OR Sword
+    kii, BreakWall=16:
+      Launch
+      Bash, DoubleJump OR Dash
+      Dash, Grapple
+      GlideJump, Grapple, Damage=30
+    unsafe, BreakWall=16:
+      Bash
+      GlideJump, Grapple
+      GlideJump, DoubleJump, Damage=30
+      AerialHammerJump, Damage=30
+      GlideHammerJump
+      GrenadeCancel, Damage=30, Dash OR Glide OR DoubleJump
+      AbilitySwap=2
+      Sword, Shuriken=1, Grapple  # Pogo
+  state Depths.IlluminableTunnelSolved:  # Convenience. There is mouldwoodDepthsGroup.puzzleSolvedSequenceCompleted (18793|21994) but that is used for a panning cutscene
+    moki: Depths.IlluminableTunnel.LeftBlob, Depths.IlluminableTunnel.RightBlob
+
+  conn UpperDepths.KeydoorLedge:
+    moki, Depths.FirstKeystoneDoor:
+      Combat=Spiderling OR Bash:
+        Grapple, DoubleJump OR Launch
+        DoubleJump, Dash OR Glide
+    gorlek, Depths.FirstKeystoneDoor: Sword OR Hammer OR Glide OR DoubleJump OR Launch OR Damage=30
+    kii, Depths.FirstKeystoneDoor: Grapple OR Dash OR Shuriken=1 OR Flash=1 OR Sentry=1
+    unsafe: Depths.FirstKeystoneDoor
 
 anchor UpperDepths.BelowHive at 422, -4402:  # Below the Hive, on top of the tunnel leading downwards
   refill Checkpoint
