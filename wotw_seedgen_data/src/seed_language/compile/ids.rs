@@ -6,8 +6,9 @@ use std::{
 };
 
 use derivative::Derivative;
+use indexmap::IndexMap;
 use log::warn;
-use rustc_hash::FxHashMap;
+use rustc_hash::FxBuildHasher;
 use serde::{Deserialize, Serialize};
 use wotw_seedgen_log_capture::{LogCapture, NO_LOG_CAPTURE};
 use wotw_seedgen_parse::{Error, Span};
@@ -188,6 +189,7 @@ impl Drop for IdResolver<'_> {
                 match file_create(lockfile_path) {
                     Ok(lockfile) => {
                         self.ids.purge_unused();
+                        self.ids.sort();
 
                         if let Err(err) = serde_json::to_writer(lockfile, &self.ids) {
                             warn!(logger: self.log_capture, "{}", file_err("write id lockfile", lockfile_path, err));
@@ -308,6 +310,34 @@ impl Ids {
         wheel.purge_unused();
         warp_icon.purge_unused();
     }
+
+    fn sort(&mut self) {
+        let Self {
+            boolean,
+            integer,
+            float,
+            string,
+            boolean_state,
+            integer_state,
+            float_state,
+            message,
+            position_trigger,
+            wheel,
+            warp_icon,
+        } = self;
+
+        boolean.sort();
+        integer.sort();
+        float.sort();
+        string.sort();
+        boolean_state.sort();
+        integer_state.sort();
+        float_state.sort();
+        message.sort();
+        position_trigger.sort();
+        wheel.sort();
+        warp_icon.sort();
+    }
 }
 
 #[derive(Derivative, Serialize, Deserialize)]
@@ -318,8 +348,8 @@ pub struct IdMap<const OFFSET: usize, const LIMIT: usize = { usize::MAX }, S = I
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     gaps: Vec<usize>,
     /// Assigned ids
-    #[serde(skip_serializing_if = "FxHashMap::is_empty", default)]
-    ids: FxHashMap<String, Id>,
+    #[serde(skip_serializing_if = "IndexMap::is_empty", default)]
+    ids: IndexMap<String, Id, FxBuildHasher>,
     #[serde(skip)]
     special: PhantomData<S>,
 }
@@ -426,6 +456,11 @@ impl<const OFFSET: usize, const LIMIT: usize, S> IdMap<OFFSET, LIMIT, S> {
 
         self.gaps.retain(|id| *id < max);
     }
+
+    fn sort(&mut self) {
+        self.gaps.sort_unstable();
+        self.ids.sort_unstable_by_key(|_, id| id.value);
+    }
 }
 
 impl<const OFFSET: usize, const LIMIT: usize, S> Default for IdMap<OFFSET, LIMIT, S>
@@ -443,7 +478,7 @@ where
 
 /// Allows specifying default values for [`IdMap`]
 pub trait IdMapDefault {
-    fn default() -> FxHashMap<String, Id>;
+    fn default() -> IndexMap<String, Id, FxBuildHasher>;
 
     fn never_purge(id: usize) -> bool;
 }
@@ -452,8 +487,8 @@ pub trait IdMapDefault {
 pub struct IdMapEmpty;
 
 impl IdMapDefault for IdMapEmpty {
-    fn default() -> FxHashMap<String, Id> {
-        FxHashMap::default()
+    fn default() -> IndexMap<String, Id, FxBuildHasher> {
+        IndexMap::default()
     }
 
     fn never_purge(_id: usize) -> bool {
@@ -465,8 +500,8 @@ impl IdMapDefault for IdMapEmpty {
 pub struct IdMapWheel;
 
 impl IdMapDefault for IdMapWheel {
-    fn default() -> FxHashMap<String, Id> {
-        FxHashMap::from_iter([("root".to_string(), Id::new(0))])
+    fn default() -> IndexMap<String, Id, FxBuildHasher> {
+        IndexMap::from_iter([("root".to_string(), Id::new(0))])
     }
 
     fn never_purge(id: usize) -> bool {
