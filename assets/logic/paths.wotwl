@@ -11571,8 +11571,11 @@ anchor UpperDepths.KeydoorLedge at 281, -4408:  # In front of the entry keystone
       Depths.IlluminableTunnelSolved OR DepthsLight:
         Damage=30
         Combat=Bat, DoubleJump OR Dash OR Glide OR Sword  # Combat=Bat expects a ranged weapon
-    kii, Depths.FirstKeystoneDoor, Depths.IlluminableTunnelSolved OR DepthsLight:
-      Combat=Bat, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+    kii, Depths.FirstKeystoneDoor:
+      Depths.IlluminableTunnelSolved OR DepthsLight:
+        Combat=Bat, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1
+      LaunchSwap
+      # GrenadeZoom
     unsafe, Depths.FirstKeystoneDoor:
       Bash  # https://youtu.be/6lg7Yl-ehX8 Also doable with the slug that replaces the spiderling after Depths.BreakingMould.Completed
       Damage=10, Depths.IlluminableTunnelSolved OR DepthsLight  # dboost on a bat's projectile
