@@ -26,11 +26,17 @@ Supply lasts indefinitely, but the price grows with the demand.")
         )
 
         store(keystone_price, base_price)
+
+        // remove from total pickup count
+        store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+        store(stats.pickupsCollected, stats.pickupsCollected + 1)
     }
 
     on reload disable_server_sync(Shop.Opher.Slot12)
     on Shop.Opher.Slot12 {
         store(Shop.Opher.Slot12, false)
+        store(stats.pickupsCollectedShop, stats.pickupsCollectedShop - 1)
+        store(stats.pickupsCollected, stats.pickupsCollected - 1)
         keystone()
 
         if keystone_price < 5 * base_price {
@@ -58,11 +64,17 @@ Supply lasts indefinitely, but the price grows with the demand.")
         )
 
         store(ore_price, base_price)
+
+        // remove from total pickup count
+        store(stats.pickupsCollectedShop, stats.pickupsCollectedShop + 1)
+        store(stats.pickupsCollected, stats.pickupsCollected + 1)
     }
 
     on reload disable_server_sync(Shop.Twillen.Slot5)
     on Shop.Twillen.Slot5 {
         store(Shop.Twillen.Slot5, false)
+        store(stats.pickupsCollectedShop, stats.pickupsCollectedShop - 1)
+        store(stats.pickupsCollected, stats.pickupsCollected - 1)
         gorlek_ore()
 
         if ore_price < 5 * base_price {
