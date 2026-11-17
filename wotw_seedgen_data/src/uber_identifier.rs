@@ -224,6 +224,8 @@ impl UberIdentifier {
     pub const BASE_MAX_ENERGY: UberIdentifier = UberIdentifier::player(20);
     pub const MAX_ENERGY: UberIdentifier = UberIdentifier::player(21);
     pub const ENERGY: UberIdentifier = UberIdentifier::player(22);
+    pub const POSITION_X: UberIdentifier = UberIdentifier::player(40);
+    pub const POSITION_Y: UberIdentifier = UberIdentifier::player(41);
     pub const PLAYER_AREA: UberIdentifier = UberIdentifier::player(50);
     pub const MAP_FOCUSED_AREA: UberIdentifier = UberIdentifier::map(1);
     pub const SHOW_SMALL_ENTRANCES: UberIdentifier = UberIdentifier::map(20);

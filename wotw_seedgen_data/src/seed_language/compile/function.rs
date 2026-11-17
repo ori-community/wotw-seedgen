@@ -5,8 +5,11 @@ use crate::{
     seed_language::{
         ast::{self, UberStateType},
         compile::{
-            add_float, add_integer, preprocess::PreprocessedFunction, store_boolean, store_float,
-            store_integer, ORIGIN_WORLD_STRING, RESERVED_BOOLEAN, RESERVED_STRING,
+            add_float, add_integer,
+            ids::{CUSTOM_BOOLEANS, CUSTOM_FLOATS, CUSTOM_INTEGERS},
+            preprocess::PreprocessedFunction,
+            store_boolean, store_float, store_integer, ORIGIN_WORLD_STRING, RESERVED_BOOLEAN,
+            RESERVED_STRING,
         },
         output::{
             ArithmeticOperator, AsConstant, Command, CommandArea, CommandBoolean, CommandFloat,
@@ -2028,26 +2031,38 @@ where
         identifier,
         &mut context.compiler.preprocessed.functions,
         &mut context.compiler.global.output.commands.lookup,
-        || CommandVoid::Multi {
-            commands: context
-                .compiler
-                .global
-                .uber_state_data
-                .id_lookup
-                .iter()
-                .filter(|(uber_identifier, meta)| {
-                    !meta.readonly
-                        && !uber_identifier.is_multiworld()
-                        && condition(**uber_identifier)
-                })
-                .map(|(uber_identifier, meta)| match &meta.default_value {
-                    UberStateValue::Boolean(value) => store_boolean(*uber_identifier, *value),
-                    UberStateValue::Integer(value) => store_integer(*uber_identifier, *value),
-                    UberStateValue::Float(value) => store_float(*uber_identifier, *value),
-                })
-                .collect(),
+        || {
+            const CUSTOM_STATES: usize = CUSTOM_BOOLEANS + CUSTOM_INTEGERS + CUSTOM_FLOATS;
+            let mut commands = Vec::with_capacity(3500 + CUSTOM_STATES);
+
+            for (&uber_identifier, entry) in &context.compiler.global.uber_state_data.id_lookup {
+                if entry.readonly
+                    || store_defaults_ignore(uber_identifier)
+                    || !condition(uber_identifier)
+                {
+                    continue;
+                }
+
+                commands.push(match entry.default_value {
+                    UberStateValue::Boolean(value) => store_boolean(uber_identifier, value),
+                    UberStateValue::Integer(value) => store_integer(uber_identifier, value),
+                    UberStateValue::Float(value) => store_float(uber_identifier, value),
+                });
+            }
+
+            commands.shrink_to_fit();
+
+            CommandVoid::Multi { commands }
         },
     )
+}
+
+fn store_defaults_ignore(uber_identifier: UberIdentifier) -> bool {
+    uber_identifier.is_multiworld()
+        || matches!(
+            uber_identifier,
+            UberIdentifier::POSITION_X | UberIdentifier::POSITION_Y
+        )
 }
 
 fn lookup_or_insert<F>(

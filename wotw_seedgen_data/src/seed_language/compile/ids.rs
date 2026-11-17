@@ -204,6 +204,10 @@ impl Drop for IdResolver<'_> {
     }
 }
 
+pub const CUSTOM_BOOLEANS: usize = 100;
+pub const CUSTOM_INTEGERS: usize = 100;
+pub const CUSTOM_FLOATS: usize = 100;
+
 #[derive(Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Ids {
@@ -216,11 +220,11 @@ pub struct Ids {
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     string: IdMap<FREE_STRINGS_START>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub boolean_state: IdMap<0, 100>,
+    pub boolean_state: IdMap<0, CUSTOM_BOOLEANS>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub integer_state: IdMap<0, 100>,
+    pub integer_state: IdMap<0, CUSTOM_INTEGERS>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
-    pub float_state: IdMap<0, 25>,
+    pub float_state: IdMap<0, CUSTOM_FLOATS>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
     message: IdMap<0>,
     #[serde(skip_serializing_if = "IdMap::is_empty", default)]
