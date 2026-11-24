@@ -15285,6 +15285,9 @@ anchor LowerWastes.SandPot at 1726, -3990:  # To the left of the sand pot
 anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitSL
   refill Checkpoint
 
+  state Wastes.DoubleBridge.Wall:
+    gorlek: ShurikenBreak=20, Combat=MaceMiner  # Most paths are redundant with LowerWastes.LeverArea->LowerWastes.BeforeMinesEntrance
+
   pickup Wastes.SandPot.SL:  # Make sure it's not redundant with paths doing WoodenBridge->SandPot->SandPotSL. Kii and above make going from one side of the pot to the other free so it doesn't need any paths
     moki, Burrow:
       Grapple, DoubleJump OR Glide
@@ -15299,13 +15302,14 @@ anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitSL
       Burrow, Glide
     gorlek: Burrow OR Hammer
     kii:
-      Spear=1
+      Spear=1 OR GlideJump
       Glide, Shuriken=1 OR Flash=1 OR Sentry=1  # Could add Grapple so you can retry more easily or Damage=30 so the gliding section is less precise
       Glide, Sword, Grapple OR Damage=30  # Grapple or damage to make it less precise
     unsafe:
       Sword OR Flash=1 OR Sentry=1  # Make the sphere swing by wall jumping on it
       # Glide, Sword
       Dash  # Dash when falling
+      BlazeSwap=1 OR FlashSwap OR PauseFloat
 
   conn LowerWastes.SandPot:
     moki:
@@ -15323,8 +15327,7 @@ anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitSL
       Damage=30, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
       DoubleJump, Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
     unsafe:
-      Damage=30
-      DoubleJump, Blaze=1
+      DoubleJump OR GlideJump OR AbilitySwap=1 OR Damage=30
       # SentryJump=1, Damage=30  # Maybe too dumb. Gotta do a sentry jump in the spikes, and even then it can be close
   conn LowerWastes.LeverArea:
     moki: DoubleJump OR Burrow OR Launch
@@ -15334,11 +15337,14 @@ anchor LowerWastes.WoodenBridge at 1796, -3977:  # Directly above MuncherPitSL
     kii:
       Sword OR Hammer  # With sword, pogo the gorlek
       Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1  # Can add another use of energy weapons if the jump into the bridge feels too awkward
-    unsafe: GlideJump
+    unsafe: GlideJump OR FlashSwap
   conn LowerWastes.BeforeMinesEntrance:
-    gorlek: ShurikenBreak=20, Combat=MaceMiner OR DoubleJump OR Bash OR Launch
+    moki: Wastes.DoubleBridge.Wall, Combat=MaceMiner
 
 anchor LowerWastes.BeforeMinesEntrance at 1849, -3986:  # To the right of the breakable wall leading to the Wooden Bridge
+  state Wastes.DoubleBridge.Wall:
+    moki: BreakWall=20
+  
   pickup Wastes.RuinsShortcut.LF: free
 
   conn LowerWastes.MinesEntrance:
@@ -15354,17 +15360,19 @@ anchor LowerWastes.BeforeMinesEntrance at 1849, -3986:  # To the right of the br
       Bash, Grenade=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump  # Jump over the enemies
     unsafe:
-      Combat=MaceMiner+Mantis, Spear=1 OR Blaze=1
+      Combat=MaceMiner+Mantis, Spear=1 OR Blaze=1 OR FlashSwap
       Bash, Spear=1 OR Blaze=1
   conn LowerWastes.WoodenBridge:
-    moki, BreakWall=20: Combat=MaceMiner OR Bash OR Launch
-    gorlek, BreakWall=20: DoubleJump
-    kii: BreakWall=20
+    moki, Wastes.DoubleBridge.Wall: Combat=MaceMiner OR Bash OR Launch
+    gorlek, Wastes.DoubleBridge.Wall: DoubleJump
+    kii: Wastes.DoubleBridge.Wall
   conn LowerWastes.LeverArea:  # make sure it's not redundant with BeforeMinesEntrance->WoodenBridge->LeverArea and that it still solves if the wall is broken
     gorlek:
       DoubleJump  # if the wall is broken, go through WoodenBridge
       Launch
     kii: Bash, Grenade=1  # if the wall is broken, go through WoodenBridge
+    unsafe:  # Can climb the wall for free. Requirement mirrors LowerWastes.WoodenBridge->LowerWastes.LeverArea so it works with the wall broken
+      Burrow OR Launch OR Dash OR Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GlideJump OR FlashSwap 
 
 anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins breakable wall
   pickup Wastes.RuinsShortcut.SL:  # Make sure it solves even after destroying the breakable wall
@@ -15383,6 +15391,8 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Combat=MaceMiner+Mantis, DoubleJump, TripleJump, Spear=1
     unsafe:
       DoubleJump, TripleJump  # https://youtu.be/tuMG8O-Mifc
+      GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1  # Sword pogo the mantis after the glidejump 
+      GrenadeJump OR AbilitySwap=1 OR SpearJump=1  # Hard wrap around to climb all the way up of the right wall
   pickup Wastes.RuinsShortcut.LF:  # Make sure it's not redundant with conn LowerWastes.BeforeMinesEntrance
     moki:
       Grapple, Combat=MaceMiner+Mantis OR Bash  # Use both Grapple points
@@ -15416,7 +15426,15 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Grapple, Glide, Shuriken=1 OR Flash=1 OR Sentry=1
       Bash, DoubleJump, TripleJump OR Dash  # Bash glide from the gorlek's projectile
     unsafe:
+      AbilitySwap=2
       Grapple, Glide, Spear=1
+      Damage=30, SentryJump=1 OR GrenadeJump
+      GlideJump, BlazeSwap=1 OR SentrySwap=1
+      GlideJump, DoubleJump OR Sword OR Hammer  # From Wastes.RuinsShortcut.SL
+      GlideJump, Spear=1, Dash OR Spear=2  # From Wastes.RuinsShortcut.SL
+      AerialHammerJump OR GlideHammerJump  # starts from the safe spot above Wastes.RuinsShortcut.LF
+      Damage=60, WallHammerJump
+      # AerialHammerJump, Damage=10  # reset djump by getting eaten by the snaptrap
   conn WindtornRuins.MapstoneAltar:
     gorlek: ShurikenBreak=20, Burrow
 
