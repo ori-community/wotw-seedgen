@@ -15372,7 +15372,7 @@ anchor LowerWastes.BeforeMinesEntrance at 1849, -3986:  # To the right of the br
       Launch
     kii: Bash, Grenade=1  # if the wall is broken, go through WoodenBridge
     unsafe:  # Can climb the wall for free. Requirement mirrors LowerWastes.WoodenBridge->LowerWastes.LeverArea so it works with the wall broken
-      Burrow OR Launch OR Dash OR Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GlideJump OR FlashSwap 
+      Burrow OR Launch OR Dash OR Bash OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GlideJump OR FlashSwap
 
 anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins breakable wall
   pickup Wastes.RuinsShortcut.SL:  # Make sure it solves even after destroying the breakable wall
@@ -15391,7 +15391,7 @@ anchor LowerWastes.MinesEntrance at 1921, -4001:  # To the left of the ruins bre
       Combat=MaceMiner+Mantis, DoubleJump, TripleJump, Spear=1
     unsafe:
       DoubleJump, TripleJump  # https://youtu.be/tuMG8O-Mifc
-      GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1  # Sword pogo the mantis after the glidejump 
+      GlideJump, DoubleJump OR Sword OR Hammer OR Spear=1  # Sword pogo the mantis after the glidejump
       GrenadeJump OR AbilitySwap=1 OR SpearJump=1  # Hard wrap around to climb all the way up of the right wall
   pickup Wastes.RuinsShortcut.LF:  # Make sure it's not redundant with conn LowerWastes.BeforeMinesEntrance
     moki:
@@ -15473,10 +15473,14 @@ anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the leve
       Wastes.DoubleBridge.Lever, DoubleJump
       Wastes.DoubleBridge.Lever, Burrow, Glide OR Sword
     unsafe:
-      Wastes.DoubleBridge.Lever, Dash
+      GrenadeJump OR AbilitySwap=1
+      DoubleJump OR Hammer OR Spear=1 OR GlideJump  # Probably a ceiling jump? https://youtu.be/pd25IlOTiZ4
+      Wastes.DoubleBridge.Lever:
+        Dash
+        Sword, Shuriken=1 OR Grenade=1
   conn LowerWastes.LastStandArea:  # Every solutions which needs to land on the left edge should originate from MuncherClimb
     moki: Bash, Grenade=1, DoubleJump
-    gorlek:  # some amount of puzzle knowledge is assumed
+    gorlek:
       SentryJump=1, DoubleJump
       Wastes.DoubleBridge.Lever:
         Burrow, Glide OR Sword
@@ -15509,6 +15513,8 @@ anchor LowerWastes.MuncherClimb at 1791, -3953:  # Checkpoint before the muncher
       DoubleJump, TripleJump, Damage=30  # really precise wall jump to avoid getting one more dboost
       DoubleJump, SpearJump=2, Damage=60
       DoubleJump, SpearJump=3, Damage=30
+      AbilitySwap=6  # 2 to left wall + 3 to right wall + 1 to reach the pickup / You might be able to do 2 to right wall so you land at the snaptrap then wrap around but couldn't get it damageless
+      AerialHammerJump OR DoubleJumpBashChain OR GlideBashChain
 
   conn LowerWastes.LeverArea: free
   conn LowerWastes.LastStandArea:  # Make sure it's not redundant with paths from LeverArea
@@ -15519,11 +15525,11 @@ anchor LowerWastes.MuncherClimb at 1791, -3953:  # Checkpoint before the muncher
       DoubleJump, TripleJump
       Wastes.DoubleBridge.Lever, Dash
     kii:
-      DoubleJump
+      DoubleJump OR GlideJump
       Wastes.DoubleBridge.Lever, Sword OR Hammer OR Spear=2 OR Shuriken=2 OR Sentry=2  # With hammer, upslash before the sand platform
     unsafe:
-      Hammer OR Spear=1
-      Wastes.DoubleBridge.Lever, Burrow  # Way harder on keyboard
+      Hammer OR Spear=1 OR AbilitySwap=1 OR GrenadeJump
+      Sword, Shuriken=1 OR Grenade=1  # don't charge grenade so you it get thrown low enough to avoid touching the ceiling
   conn LowerWastes.SkeetoHive:
     moki:
       Grapple, DoubleJump OR Launch
@@ -15542,6 +15548,8 @@ anchor LowerWastes.MuncherClimb at 1791, -3953:  # Checkpoint before the muncher
       Grapple, Damage=30, Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1
       DoubleJump, TripleJump, Damage=30  # really precise wall jump to avoid getting one more dboost
       DoubleJump, Dash, SpearJump=2, Damage=30
+      AerialHammerJump OR DoubleJumpBashChain OR GlideBashChain
+      AbilitySwap=8  # 2 to left wall + 3 to right wall + 3 the anchor
 
 anchor LowerWastes.LastStandArea at 1794, -3938:  # next to the projectile spawner above the wooden bridge
   pickup Wastes.SandPuzzle.Shard:
