@@ -9,7 +9,7 @@
 // TODO explain key hints?
 
 !if gate_hints {
-    on reload {
+    on spawn {
         position_trigger_rectangle("depths_entrance", 127, -4306, 183, -4268)
         position_trigger_enter_callback("depths_entrance", if Hollow.DepthsOpen == false && skills.glide == false
             item_message("#Motay's Note#\nThe moki will only open the entrance once you find " + skill_string(Glide))

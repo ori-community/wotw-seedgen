@@ -66,7 +66,7 @@ all arenas are completed and all boss combat phases are skipped")
     on willowsEndGroup.petrifiedOwlBossState == 1 store(willowsEndGroup.petrifiedOwlBossState, 2)
 
     // Manual escape refill since we miss the vanilla one somehow
-    on respawn if willowsEndGroup.petrifiedOwlBossState == 2 {
+    on respawn_after_death if willowsEndGroup.petrifiedOwlBossState == 2 {
         store(player.life, player.maxLife)
         store(player.energy, player.maxEnergy)
     }

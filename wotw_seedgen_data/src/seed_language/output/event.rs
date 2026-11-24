@@ -30,9 +30,9 @@ impl Event {
         }
     }
 
-    pub(crate) fn on_reload(command: CommandVoid) -> Self {
+    pub(crate) fn on_initialize(command: CommandVoid) -> Self {
         Self {
-            trigger: Trigger::ClientEvent(ClientEvent::Reload),
+            trigger: Trigger::ClientEvent(ClientEvent::Initialize),
             command,
         }
     }

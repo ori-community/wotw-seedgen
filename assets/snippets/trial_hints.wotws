@@ -55,7 +55,7 @@ on raceGroup.desertRace == 1 {
     item_message("Complete the Wastes Spirit Trial to gain\n" + wastes_trial_item)
 }
 
-on reload {
+on initialize {
     set_wheel_item_name("progress_helper", LeftTop, "Trial Hints")
     set_wheel_item_icon("progress_helper", LeftTop, trial_hints_icon)
     set_wheel_item_all_actions("progress_helper", LeftTop, {
@@ -64,7 +64,7 @@ on reload {
     })
 }
 
-on reload update_wheel()
+on initialize update_wheel()
 on change raceGroup.inkwaterMarshRace update_wheel()
 on change raceGroup.kwolokDropRace update_wheel()
 on change raceGroup.wellspringRace update_wheel()

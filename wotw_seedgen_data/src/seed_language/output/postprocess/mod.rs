@@ -441,7 +441,7 @@ impl<'output, 'pickups, 'log> UniversePostprocessor<'output, 'pickups, 'log> {
         }))
         .unwrap_or_default();
 
-        extra_events.push(Event::on_reload(CommandVoid::CreateSpoilerMapIcon {
+        extra_events.push(Event::on_initialize(CommandVoid::CreateSpoilerMapIcon {
             id: spoiler_icon_id,
             icon,
             x: map_position.x.into(),

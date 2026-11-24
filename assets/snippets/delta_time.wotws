@@ -4,7 +4,7 @@
 
 !timer(active, delta)
 
-on reload store(active, true)
+on spawn store(active, true)
 
 on delta > 0 {
     tick(delta)

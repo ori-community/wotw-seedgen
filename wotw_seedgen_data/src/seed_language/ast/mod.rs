@@ -145,10 +145,18 @@ pub enum Trigger<'source> {
 pub enum ClientEvent {
     /// Trigger when starting a new file
     Spawn,
-    /// Trigger when starting a new file or loading the seed into an active file
-    Reload,
-    /// Trigger when respawning after death, void etc.
-    Respawn,
+    /// Whenever respawning after death. Specifically does not include voiding out.
+    RespawnAfterDeath,
+    /// Whenever the game loads a save state. This happens for example after dying, when loading a
+    /// save from the main menu or when voiding out.
+    SaveLoaded,
+    /// Whenever the seed changed in an active save file.
+    SeedChanged,
+    /// Helper for initializing static (i.e. non-serialized) data that triggers on [`ClientEvent::Spawn`],
+    /// [`ClientEvent::SaveLoaded`] and [`ClientEvent::SeedChanged`].
+    /// TODO: This probably shouldn't exist in the end because there probably shouldn't be
+    ///       non-serialized data that is kept around.
+    Initialize,
     // TODO on input <bind>? Or add all bindings to the `input` uberState group so you can trigger on press/release or check their current state?
     /// Trigger on keybind
     Binding1,
@@ -164,22 +172,6 @@ pub enum ClientEvent {
     ProgressMessage,
     /// Trigger every frame
     Tick,
-    /// Trigger when the Inkwater trial reward text should be updated
-    InkwaterTrialTextRequest, // TODO rename Inkwater -> Marsh
-    /// Trigger when the Hollow trial reward text should be updated
-    HollowTrialTextRequest,
-    /// Trigger when the Wellspring trial reward text should be updated
-    WellspringTrialTextRequest,
-    /// Trigger when the Woods trial reward text should be updated
-    WoodsTrialTextRequest,
-    /// Trigger when the Reach trial reward text should be updated
-    ReachTrialTextRequest,
-    /// Trigger when the Depths trial reward text should be updated
-    DepthsTrialTextRequest,
-    /// Trigger when the Luma trial reward text should be updated
-    LumaTrialTextRequest, // TODO rename Luma -> Pools
-    /// Trigger when the Wastes trial reward text should be updated
-    WastesTrialTextRequest,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ast, Span)]

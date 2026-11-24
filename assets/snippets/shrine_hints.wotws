@@ -39,7 +39,7 @@ on shrines.depthsWave == 1 {
     if Depths.CombatShrineCompleted == false item_message("Complete the Depths Combat Shrine to gain\n" + depths_shrine_item)
 }
 
-on reload {
+on initialize {
     set_wheel_item_name("progress_helper", Left, "Shrine Hints")
     set_wheel_item_icon("progress_helper", Left, shrine_hints_icon)
     set_wheel_item_all_actions("progress_helper", Left, {
@@ -48,7 +48,7 @@ on reload {
     })
 }
 
-on reload update_wheel()
+on initialize update_wheel()
 on change marsh_visited update_wheel()
 on change howls_den_visited update_wheel()
 on change glades_visited update_wheel()

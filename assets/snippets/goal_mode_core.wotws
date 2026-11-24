@@ -58,7 +58,7 @@ fun show_missing_goals() {
     if modifications.enableShriekBarrier == false priority_message("All Goals completed")
 }
 
-on reload {
+on initialize {
     set_wheel_item_data(
         "progress_helper",
         TopRight,

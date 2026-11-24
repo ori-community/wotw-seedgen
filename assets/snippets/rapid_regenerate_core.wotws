@@ -49,7 +49,7 @@ on enabled == false && collected > 0 {
     store(bonusUpgrades.regenerateSpeedMultiplier, 1)
 }
 
-on reload if collected > 0 {
+on initialize if collected > 0 {
     create_wheel_item()
     if enabled set_wheel_item_disable()
     if enabled == false set_wheel_item_enable()

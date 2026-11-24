@@ -11,7 +11,7 @@ on spawn {
     store(map.filter, 4)
 }
 
-on reload {
+on initialize {
     root()
     shards()
     equipment()

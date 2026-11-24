@@ -966,7 +966,8 @@ impl<'graph, 'settings, 'perf, 'log> WorldContext<'graph, 'settings, 'perf, 'log
         let item_pool = item_pool.finish();
 
         world.simulate(&ClientEvent::Spawn, &output.commands);
-        world.simulate(&ClientEvent::Reload, &output.commands);
+        world.simulate(&ClientEvent::SaveLoaded, &output.commands);
+        world.simulate(&ClientEvent::Initialize, &output.commands);
 
         let initial_ks_cost = world.reached_ks_cost();
 

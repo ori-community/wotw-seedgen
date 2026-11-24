@@ -98,7 +98,7 @@ fun add_pickups_row(area: String, collected: Integer, total: Integer) {
 !state(disable_keybinds, Boolean)
 !export(disable_keybinds)
 
-on reload {
+on initialize {
     set_wheel_item_data(
         "root",
         Top,
@@ -186,7 +186,7 @@ on change stats.pickupsCollected update_progress_message()
 on change stats.pickupsTotal update_progress_message()
 on change player.area update_progress_message()
 
-on reload {
+on spawn {
     free_message("map_message", "")
     set_message_position("map_message", 0.5, 0.84)
     set_message_vertical_anchor("map_message", Bottom)

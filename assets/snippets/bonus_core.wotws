@@ -27,14 +27,14 @@ fun enable_all() {}
 fun disable_all() {}
 !export(disable_all)
 
-on reload {
+on initialize {
     set_wheel_item_name("root", TopLeft, "Bonus Toggles")
     set_wheel_item_action("root", TopLeft, Ability1, toggle_all())
     set_wheel_item_action("root", TopLeft, Ability2, switch_wheel("bonus_upgrades"))
     set_wheel_item_action("root", TopLeft, Ability3, switch_wheel("bonus_upgrades"))
     update_bonus_wheel()
 }
-on respawn update_bonus_wheel()
+on initialize update_bonus_wheel()
 
 fun update_bonus_wheel() {
     any_collected()

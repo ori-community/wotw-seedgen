@@ -43,7 +43,7 @@ fun upgrades_row() {
     if get_integer("next_item") == next_item_first set_string("row", "No Upgrades")
 }
 
-on reload {
+on initialize {
     set_wheel_item_data(
         "progress_helper",
         TopLeft,

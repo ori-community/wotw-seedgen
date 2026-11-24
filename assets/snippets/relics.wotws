@@ -301,7 +301,7 @@ on change tracker.relicsRequired update_goals()
 
 // TODO don't update inside reach corner in wellspring escape
 
-on reload update_current_area_has_uncollected_relic()
+on spawn update_current_area_has_uncollected_relic()
 on change player.area update_current_area_has_uncollected_relic()
 on change tracker.relicsCollected update_current_area_has_uncollected_relic()
 fun update_current_area_has_uncollected_relic() {

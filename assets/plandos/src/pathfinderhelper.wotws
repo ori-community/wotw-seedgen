@@ -42,7 +42,7 @@ fun respond(message: String) {
     controlled_priority_message("response", message, 4)
 }
 
-on reload {
+on initialize {
     set_wheel_item_data(
         "root",
         BottomLeft,
