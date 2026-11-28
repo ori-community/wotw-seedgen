@@ -15460,7 +15460,7 @@ anchor LowerWastes.LeverArea at 1833, -3959:  # At the arrow sign below the leve
 
   conn LowerWastes.WoodenBridge: free
   conn LowerWastes.BeforeMinesEntrance: free
-  conn LowerWastes.CentralTP:
+  conn LowerWastes.TokkCentralTP:
     moki: Burrow
   conn LowerWastes.MuncherClimb:
     moki:
@@ -15717,40 +15717,52 @@ anchor LowerWastes.UpperPath at 1761, -3898:  # on the left side of the path con
 
   conn LowerWastes.SkeetoHive:
     moki: Burrow
-  conn LowerWastes.CentralTP:
+  conn LowerWastes.TokkCentralTP:
     moki: Burrow
 
 # checkpoint at no actually just bad refill situation below. Could be solved easily.
 
-anchor LowerWastes.CentralTP at 1992, -3902:  # Location of the east teleporter
-  refill Full
+anchor LowerWastes.TokkCentralTP at 1965, -3890:  # At Tokk, above the central teleporter
+  refill Life=1
+  refill Energy=3:
+    moki: BreakCrystal
 
-  # state NonGladesTeleporter: free  # the associated path got fixed in rando
-
-  pickup Wastes.CentralTP.BreakWallOre:
+  state Wastes.CentralTP.BreakableWall:
     moki, BreakWall=20:
       Burrow OR Launch
-      DoubleJump, Bash, Grenade=1
-      Bash, Grenade=3  # it had to be done
-    gorlek, BreakWall=20:
-      DoubleJump OR SentryJump=1
-      Bash, Grenade=1, Sword OR Hammer
-    unsafe, BreakWall=20:
-      Dash, Damage=60, Spear=1 OR Flash=1 OR Sentry=1
-      Dash, Damage=30, Sword  # Damage boost on the left
-      Dash, Hammer OR Spear=2  # Jump low from the wall on the right to avoid the ceiling, then upslash or spear
-      # Dash, Damage=30, Hammer OR Spear=2  # Damage boost on the left
+      Bash, Grenade=1, DoubleJump OR Dash OR Glide OR Grenade=1  # condition to go on top of the sandball
+    gorlek:
+      SentryJump=1  # use sword/Hammer to break the wall
+      BreakWall=20, DoubleJump
+      BreakWall=20, Bash, Grenade=1, Sword OR Hammer
+    kii:
+      Spear=1 OR Grenade=2 OR Bow=5  # Ranged from the energy cristal
+      Sword OR Hammer
+      DoubleJump OR Dash OR Glide OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=30:  # go on top of the sandball
+        BreakWall=20  # from the sandball, all weapons can reach that wall. Shuriken=3 OR Blaze=2 OR Sentry=3
+    unsafe:
+      BreakWall=20, FlashSwap OR GrenadeJump OR GlideJump
+      Blaze=2 OR PauseFloat OR BlazeSwap=1:  # go on top of the sandball
+        Sentry=2  # jump right, use sentry and go back on the sandball. If sentry is close enough, its explosion will hit the wall
+        BreakWall=20
+
+  pickup Wastes.CentralTP.BreakWallOre:
+    moki, Wastes.CentralTP.BreakableWall:
+      Burrow OR Launch
+      Bash, Grenade=1
+    gorlek, Wastes.CentralTP.BreakableWall:
+      SentryJump=1
+      DoubleJump, TripleJump OR Sword OR Hammer
+    unsafe, Wastes.CentralTP.BreakableWall:
+      DoubleJump OR GlideJump OR AbilitySwap=2 OR WallHammerJump OR CoyoteHammerJump OR GrenadeJump
+      Damage=30, Dash OR Glide OR Sword OR Hammer OR Spear=1 OR Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1 OR GrenadeCancel OR RegenJump OR PauseFloat  # Dboost on the left wall to climb it
+      Glide OR Sword OR Spear=1 OR Shuriken=1 OR Blaze=2 OR Flash=1 OR Sentry=1 OR GrenadeCancel OR PauseFloat:  # jump on the sandball
+        BlazeSwap=1 OR SentrySwap=1 OR SpearJump=1
+      Dash, Sword OR Hammer OR Spear=1 OR Flash=1 OR Sentry=1 OR BlazeSwap=1  # dash ramp on the sandball
   pickup Wastes.TreeToCentralTPArc.SandLF:
     moki: Burrow
 
-  conn Teleporters: free
-  # despawns
-  # conn Tokk:
-  #   moki:
-  #     DoubleJump OR Burrow OR Launch
-  #     Bash, Grenade=1
-  #   gorlek: Sword OR Hammer
-  #   kii: Spear=1 OR Flash=1 OR Sentry=1
+  conn LowerWastes.CentralTP: free
   conn LowerWastes.LeverArea:
     moki: Burrow
   conn LowerWastes.UpperPath:
@@ -15762,6 +15774,27 @@ anchor LowerWastes.CentralTP at 1992, -3902:  # Location of the east teleporter
     gorlek: Burrow, Glide OR Sword
     kii: Burrow, Hammer OR Shuriken=1 OR Flash=1 OR Sentry=1 OR Damage=30
     unsafe: Burrow
+  # despawns
+  # conn Tokk:
+  #   moki:
+  #     DoubleJump OR Burrow OR Launch
+  #     Bash, Grenade=1
+  #   gorlek: Sword OR Hammer
+  #   kii: Spear=1 OR Flash=1 OR Sentry=1
+
+anchor LowerWastes.CentralTP at 1992, -3902:  # Location of the east teleporter
+  refill Full
+
+  # state NonGladesTeleporter: free  # the associated path got fixed in rando
+
+  conn Teleporters: free
+  conn LowerWastes.TokkCentralTP:  # left wall is finicky
+    moki:
+      DoubleJump OR Burrow OR Launch
+      Bash, Grenade=1
+    gorlek: Sword OR Hammer
+    kii: Spear=1 OR Flash=1 OR Sentry=1
+    unsafe: free
 
 region UpperWastes:
   # This is mirrored from LowerWastes.
@@ -15842,7 +15875,7 @@ anchor UpperWastes.KeystoneRoom at 1900, -3831:  # Autosave underneath keystone 
       DoubleJump, TripleJump, Dash, Sword  # tjump+upslash+dash to climb the right wall
       SwordJump, TripleJump
 
-  conn LowerWastes.CentralTP:
+  conn LowerWastes.TokkCentralTP:
     moki: Burrow, DoubleJump OR Dash OR Glide OR Launch
     gorlek: Burrow, Sword OR Hammer OR Damage=30
     kii: Burrow, Shuriken=1 OR Blaze=1 OR Flash=1 OR Sentry=1
